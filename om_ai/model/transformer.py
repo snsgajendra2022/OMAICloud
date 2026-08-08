@@ -198,7 +198,7 @@ def _apply_repetition_penalty(logits: torch.Tensor, generated: torch.Tensor, pen
 
 
 class OMTransformer(nn.Module):
-    def __init__(self, cfg: ModelConfig):
+    def __init__(self, cfg: ModelConfig, *, skip_init: bool = False):
         super().__init__()
         self.cfg = cfg
         self.token_embedding = nn.Embedding(cfg.vocab_size, cfg.d_model)
@@ -208,7 +208,8 @@ class OMTransformer(nn.Module):
         if cfg.tie_embeddings:
             self.lm_head.weight = self.token_embedding.weight
         self.gradient_checkpointing = cfg.gradient_checkpointing
-        self.apply(self._init_weights)
+        if not skip_init:
+            self.apply(self._init_weights)
 
     def _init_weights(self, module: nn.Module):
         if isinstance(module, (nn.Linear, nn.Embedding)):

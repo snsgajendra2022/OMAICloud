@@ -51,6 +51,12 @@ One-shot tiny pipeline: `python scripts/run_actual_training_pipeline.py --steps 
 
 - From-scratch decoder-only Transformer (RoPE, GQA/MHA, SwiGLU, KV cache, optional cross-attention)
 - Custom byte-level BPE; corpus governance and sharding
+## Training at scale
+
+- Tiny / single GPU: `om-ai train ...`
+- OM-70B launcher (GPU cluster): `om-ai train-70b --data ... --tokenizer ... --output ...`
+- See `docs/TRAINING_70B.md` — `serve` never starts 70B training
+
 - Single-process training; DDP/FSDP; optional DeepSpeed
 - SFT, reward model, DPO, PPO infrastructure
 - Agents, SQLite memory, local RAG, security (API keys, RBAC, SSRF, audit, rate limits)

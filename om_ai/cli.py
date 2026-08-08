@@ -277,8 +277,53 @@ def project_scan(args):
     print(json.dumps(payload, indent=2, default=str))
 
 
+def train_70b(args):
+    from om_ai.training.train_70b import run_train_70b
+
+    st = run_train_70b(
+        data=args.data,
+        tokenizer=args.tokenizer,
+        output=args.output,
+        config=args.config,
+        deepspeed_config=args.deepspeed,
+        strategy=args.strategy,
+        preflight_only=args.preflight_only,
+        resume=args.resume,
+        sft_data=args.sft_data,
+        preference_data=args.preference_data,
+        benchmark=args.benchmark,
+        gates_path=args.gates,
+        min_gpus=args.min_gpus,
+        min_vram_gb=args.min_vram_gb,
+        min_free_gb=args.min_free_gb,
+        min_corpus_bytes=args.min_corpus_bytes,
+        allow_cpu=args.allow_cpu,
+        manifest=args.manifest,
+        pretrain_steps=args.pretrain_steps,
+        skip_posttrain=args.skip_posttrain,
+    )
+    print(json.dumps(st.to_dict(), indent=2))
+    if st.stage == "FAILED":
+        raise SystemExit(2)
+    if args.preflight_only and st.artifacts.get("preflight_report"):
+        report = json.loads(Path(st.artifacts["preflight_report"]).read_text())
+        if not report.get("ok"):
+            raise SystemExit(2)
+
+
 def serve(args):
+    import os
+    import sys
     import uvicorn
+
+    # Never silently start a 70B training job from the API server.
+    if os.getenv("OM_AI_AUTO_TRAIN_70B", "0") == "1":
+        print(
+            "WARNING: OM_AI_AUTO_TRAIN_70B=1 is set but ignored by `om-ai serve`. "
+            "Training must be started deliberately with:\n"
+            "  om-ai train-70b --data ... --tokenizer ... --output ...",
+            file=sys.stderr,
+        )
 
     uvicorn.run("om_ai.api.main:app", host=args.host, port=args.port, reload=args.reload)
 
@@ -491,6 +536,36 @@ def main():
     pr = sp.add_parser("project-scan")
     pr.add_argument("--root", required=True)
     pr.set_defaults(func=project_scan)
+
+    t70 = sp.add_parser(
+        "train-70b",
+        help="OM-70B training launcher (preflight + ZeRO-3/FSDP). Does not run from serve.",
+    )
+    t70.add_argument("--data", required=True, help="Licensed corpus path (file or directory)")
+    t70.add_argument("--tokenizer", required=True)
+    t70.add_argument("--output", required=True, help="Checkpoint / status output directory")
+    t70.add_argument("--config", default="configs/70b.json")
+    t70.add_argument("--deepspeed", default="configs/deepspeed_zero3.json")
+    t70.add_argument("--strategy", choices=["deepspeed_zero3", "fsdp"], default="deepspeed_zero3")
+    t70.add_argument("--preflight-only", action="store_true")
+    t70.add_argument("--resume", action="store_true")
+    t70.add_argument("--sft-data")
+    t70.add_argument("--preference-data")
+    t70.add_argument("--benchmark")
+    t70.add_argument("--gates", default="configs/train_70b_gates.json")
+    t70.add_argument("--manifest", help="Optional corpus license manifest JSON")
+    t70.add_argument("--min-gpus", type=int, default=8)
+    t70.add_argument("--min-vram-gb", type=float, default=40.0)
+    t70.add_argument("--min-free-gb", type=float, default=500.0)
+    t70.add_argument("--min-corpus-bytes", type=int, default=1_000_000)
+    t70.add_argument(
+        "--allow-cpu",
+        action="store_true",
+        help="Dev only: do not require CUDA (will still not produce a real 70B brain)",
+    )
+    t70.add_argument("--pretrain-steps", type=int, default=1000)
+    t70.add_argument("--skip-posttrain", action="store_true")
+    t70.set_defaults(func=train_70b)
 
     s = sp.add_parser("serve")
     s.add_argument("--host", default="127.0.0.1")
