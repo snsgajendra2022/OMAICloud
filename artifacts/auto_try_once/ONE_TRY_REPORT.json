@@ -1,0 +1,9 @@
+{
+  "attempt": "one-time fetch+train from https://www.google.com",
+  "fetched_chars": 228,
+  "train_steps": 8,
+  "last_loss": 5.715246677398682,
+  "sample_output": "What is Google?\ufffd\ufffd}\ufffdi\ufffd\ufffd\u02f4r\ufffd\ufffdma\u0674\u0423\ufffd}\ufffd\ufffdP\u0005-\ufffdr\ufffd\u0d23\ufffd\ufffd\t\ufffd\ufffd\u0671\ufffd",
+  "verdict": "Tried once. Still NOT production / NOT 70B. Homepage text is tiny.",
+  "checkpoint": "artifacts/auto_try_once/ckpt/latest.pt"
+}

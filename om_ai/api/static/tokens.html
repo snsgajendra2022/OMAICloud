@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>OM AI — Token Console</title>
+  <style>
+    :root {
+      --bg: #0f1419;
+      --panel: #1a2332;
+      --line: #2a3548;
+      --text: #e8eef7;
+      --muted: #8b9bb4;
+      --accent: #3d8bfd;
+      --ok: #3ecf8e;
+      --warn: #f0b429;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "IBM Plex Sans", "Segoe UI", sans-serif;
+      background: radial-gradient(1200px 600px at 10% -10%, #1b2a44 0%, var(--bg) 55%);
+      color: var(--text);
+      min-height: 100vh;
+    }
+    .wrap { max-width: 760px; margin: 0 auto; padding: 40px 20px 80px; }
+    h1 { font-size: 28px; margin: 0 0 6px; letter-spacing: -0.02em; }
+    .sub { color: var(--muted); margin-bottom: 28px; }
+    .pill {
+      display: inline-block;
+      border: 1px solid var(--line);
+      background: #122033;
+      color: #9ec1ff;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      margin-left: 8px;
+      vertical-align: middle;
+    }
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 20px;
+      margin-bottom: 18px;
+    }
+    label { display: block; font-size: 13px; color: var(--muted); margin-bottom: 6px; }
+    input, select {
+      width: 100%;
+      background: #0d1522;
+      border: 1px solid var(--line);
+      color: var(--text);
+      border-radius: 10px;
+      padding: 12px 14px;
+      font-size: 15px;
+      margin-bottom: 14px;
+    }
+    .row { display: grid; grid-template-columns: 1.4fr 1fr; gap: 12px; }
+    @media (max-width: 640px) { .row { grid-template-columns: 1fr; } }
+    button {
+      appearance: none;
+      border: 0;
+      background: var(--accent);
+      color: white;
+      font-weight: 600;
+      font-size: 15px;
+      padding: 12px 18px;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+    button.secondary { background: #243247; }
+    button:disabled { opacity: 0.5; cursor: not-allowed; }
+    .actions { display: flex; gap: 10px; flex-wrap: wrap; }
+    .result {
+      white-space: pre-wrap;
+      word-break: break-all;
+      background: #0b1220;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 14px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 13px;
+      line-height: 1.45;
+      min-height: 80px;
+    }
+    .ok { color: var(--ok); }
+    .err { color: #ff7b7b; }
+    table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    th, td { text-align: left; padding: 10px 8px; border-bottom: 1px solid var(--line); }
+    th { color: var(--muted); font-weight: 500; }
+    .hint { font-size: 12px; color: var(--muted); margin-top: 8px; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>OM AI Token Console <span class="pill">model: om:free</span></h1>
+    <p class="sub">Create named API tokens for your other apps. Database: <code id="dbPath">artifacts/tokens.sqlite3</code></p>
+
+    <div class="card">
+      <label>Admin API key (bootstrap from .env)</label>
+      <input id="adminKey" type="password" placeholder="Paste admin Bearer token" />
+      <div class="row">
+        <div>
+          <label>Token name</label>
+          <input id="tokenName" placeholder="e.g. memories-app" />
+        </div>
+        <div>
+          <label>Role</label>
+          <select id="tokenRole">
+            <option value="admin">admin</option>
+            <option value="operator" selected>operator</option>
+            <option value="agent">agent</option>
+            <option value="viewer">viewer</option>
+          </select>
+        </div>
+      </div>
+      <div class="actions">
+        <button id="createBtn" type="button">Create Token</button>
+        <button id="listBtn" class="secondary" type="button">Refresh List</button>
+      </div>
+      <p class="hint">Save the token when it appears — it is shown only once.</p>
+    </div>
+
+    <div class="card">
+      <label>Result</label>
+      <div class="result" id="result">Ready.</div>
+    </div>
+
+    <div class="card">
+      <label>Existing tokens</label>
+      <div id="listBox">Click Refresh List</div>
+    </div>
+  </div>
+
+  <script>
+    const resultEl = document.getElementById("result");
+    const listBox = document.getElementById("listBox");
+
+    function adminHeaders() {
+      const key = document.getElementById("adminKey").value.trim();
+      if (!key) throw new Error("Admin API key is required");
+      return {
+        "Authorization": "Bearer " + key,
+        "Content-Type": "application/json",
+      };
+    }
+
+    function show(msg, ok) {
+      resultEl.textContent = msg;
+      resultEl.className = "result " + (ok ? "ok" : "err");
+    }
+
+    async function createToken() {
+      try {
+        const name = document.getElementById("tokenName").value.trim();
+        const role = document.getElementById("tokenRole").value;
+        if (!name) throw new Error("Token name is required");
+        const res = await fetch("/v1/tokens", {
+          method: "POST",
+          headers: adminHeaders(),
+          body: JSON.stringify({ name, role, tenant_id: "default" }),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.detail || JSON.stringify(data));
+        const env = data.usage?.env || {};
+        show(
+          [
+            "CREATED",
+            "label: " + data.label,
+            "name: " + data.name,
+            "role: " + data.role,
+            "id: " + data.id,
+            "",
+            "OM_API_KEY=" + data.token,
+            "OM_API_BASE=" + (env.OM_API_BASE || "http://127.0.0.1:8080/api/v1"),
+            "OM_MODEL=om:free",
+            "",
+            data.note,
+            ].join("\n"),
+            true
+          );
+        document.getElementById("tokenName").value = "";
+        await listTokens();
+      } catch (e) {
+        show(String(e.message || e), false);
+      }
+    }
+
+    async function listTokens() {
+      try {
+        const res = await fetch("/v1/tokens", { headers: adminHeaders() });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.detail || JSON.stringify(data));
+        const tokens = data.tokens || [];
+        if (!tokens.length) {
+          listBox.textContent = "No tokens yet.";
+          return;
+        }
+        const rows = tokens.map(t =>
+          `<tr>
+            <td>${t.name}</td>
+            <td>${t.role}</td>
+            <td>${t.prefix}…</td>
+            <td>${t.active ? "active" : "revoked"}</td>
+            <td><button class="secondary" data-id="${t.id}" type="button">Revoke</button></td>
+          </tr>`
+        ).join("");
+        listBox.innerHTML = `
+          <table>
+            <thead><tr><th>Name</th><th>Role</th><th>Prefix</th><th>Status</th><th></th></tr></thead>
+            <tbody>${rows}</tbody>
+          </table>`;
+        listBox.querySelectorAll("button[data-id]").forEach(btn => {
+          btn.addEventListener("click", () => revokeToken(btn.getAttribute("data-id")));
+        });
+      } catch (e) {
+        listBox.textContent = String(e.message || e);
+      }
+    }
+
+    async function revokeToken(id) {
+      try {
+        const res = await fetch("/v1/tokens/" + id, {
+          method: "DELETE",
+          headers: adminHeaders(),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.detail || JSON.stringify(data));
+        show("Revoked: " + (data.name || id), true);
+        await listTokens();
+      } catch (e) {
+        show(String(e.message || e), false);
+      }
+    }
+
+    document.getElementById("createBtn").addEventListener("click", createToken);
+    document.getElementById("listBtn").addEventListener("click", listTokens);
+
+    fetch("/v1/tokens/meta").then(r => r.json()).then(d => {
+      if (d.database) document.getElementById("dbPath").textContent = d.database;
+    }).catch(() => {});
+  </script>
+</body>
+</html>

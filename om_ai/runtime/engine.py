@@ -34,6 +34,17 @@ class LocalLLMEngine:
         checkpoint_path: str,
         device: str | None = None,
     ) -> dict:
+        cfg = ModelConfig.from_json(config_path)
+        self.tokenizer = ByteBPETokenizer.load(tokenizer_path, extend_specials=False)
+        if cfg.vocab_size != len(self.tokenizer.vocab):
+            cfg.vocab_size = len(self.tokenizer.vocab)
+
+        ckpt = torch.load(checkpoint_path, map_location="cpu", weights_only=False)
+        state = ckpt.get("model", ckpt)
+        # Old demo checkpoints used LayerNorm (*.bias); newer default is RMSNorm.
+        if any(str(k).endswith(".ln1.bias") or str(k) == "final_norm.bias" for k in state):
+            cfg.use_rmsnorm = False
+
         if device:
             self.device = torch.device(device)
         elif torch.cuda.is_available():
@@ -43,15 +54,12 @@ class LocalLLMEngine:
         else:
             self.device = torch.device("cpu")
 
-        cfg = ModelConfig.from_json(config_path)
-        self.tokenizer = ByteBPETokenizer.load(tokenizer_path)
-        if cfg.vocab_size != len(self.tokenizer.vocab):
-            cfg.vocab_size = len(self.tokenizer.vocab)
-
         self.model = OMTransformer(cfg).to(self.device)
-        ckpt = torch.load(checkpoint_path, map_location=self.device, weights_only=False)
-        state = ckpt.get("model", ckpt)
-        self.model.load_state_dict(state)
+        missing, unexpected = self.model.load_state_dict(state, strict=False)
+        if missing:
+            logger.warning("Checkpoint missing keys (non-fatal): %s", missing[:8])
+        if unexpected:
+            logger.warning("Checkpoint unexpected keys (non-fatal): %s", unexpected[:8])
         self.model.eval()
 
         self._config_path = config_path

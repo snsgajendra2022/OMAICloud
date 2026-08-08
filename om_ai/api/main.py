@@ -5,6 +5,7 @@ import json
 import logging
 import os
 import warnings
+from pathlib import Path
 from typing import AsyncGenerator
 
 from fastapi import Depends, FastAPI, HTTPException, Request, status
@@ -97,6 +98,28 @@ agent = AgentOrchestrator(
 agent.register_tool(_shell_tool)
 agent.register_tool(_kb_tool)
 agent.register_tool(_openapi_tool)
+
+# OpenAI-compatible shim for OpenClaw / OpenAI SDK clients
+from om_ai.api.openai_compat import router as openai_router, bind_engine
+
+bind_engine(engine, default_model_id=os.getenv("OM_AI_MODEL_ID", "om-tiny"))
+app.include_router(openai_router)
+
+# Optional auto-load of local OM checkpoint (never pulls external LLMs)
+_AUTOLOAD = os.getenv("OM_AI_AUTOLOAD", "0") == "1"
+_AUTO_CONFIG = os.getenv("OM_AI_CONFIG", "configs/tiny.json")
+_AUTO_TOKENIZER = os.getenv("OM_AI_TOKENIZER", "artifacts/demo/tokenizer.json")
+_AUTO_CHECKPOINT = os.getenv("OM_AI_CHECKPOINT", "artifacts/demo/om-tiny-dpo.pt")
+_AUTO_DEVICE = os.getenv("OM_AI_DEVICE")
+
+if _AUTOLOAD:
+    try:
+        info = engine.load(_AUTO_CONFIG, _AUTO_TOKENIZER, _AUTO_CHECKPOINT, _AUTO_DEVICE)
+        logger.info("OM_AI_AUTOLOAD succeeded: %s", info)
+        # Keep agent wired to the same engine instance
+        agent.llm_engine = engine
+    except Exception:
+        logger.exception("OM_AI_AUTOLOAD failed — API will start without a loaded model")
 
 # Dev-mode warning
 if not os.getenv("OM_AI_API_KEYS") and not os.getenv("OM_AI_API_KEYS_FILE"):
@@ -560,6 +583,103 @@ def submit_feedback(
 def list_registry(ctx: TenantContext = Depends(require_auth)):
     """List all registered model versions."""
     return registry.list_versions()
+
+
+# ---------------------------------------------------------------------------
+# API tokens (named) + UI
+# ---------------------------------------------------------------------------
+
+
+class CreateTokenRequest(BaseModel):
+    name: str = Field(..., min_length=1, max_length=64)
+    role: str = "operator"
+    tenant_id: str = "default"
+
+
+@app.get("/", tags=["UI"])
+def ui_home():
+    from fastapi.responses import RedirectResponse
+    return RedirectResponse(url="/ui/tokens")
+
+
+@app.get("/ui/tokens", tags=["UI"])
+def tokens_ui():
+    from fastapi.responses import HTMLResponse
+    html_path = Path(__file__).parent / "static" / "tokens.html"
+    return HTMLResponse(html_path.read_text(encoding="utf-8"))
+
+
+@app.get("/v1/tokens/meta", tags=["Tokens"])
+def tokens_meta():
+    """Public metadata about token database location and model label."""
+    from om_ai.security.tokens import get_token_store
+    store = get_token_store()
+    return {
+        "database": store.path,
+        "model": os.getenv("OM_AI_MODEL_ID", "om:free"),
+        "create_uri": "POST /v1/tokens",
+        "list_uri": "GET /v1/tokens",
+        "revoke_uri": "DELETE /v1/tokens/{id}",
+        "ui": "/ui/tokens",
+    }
+
+
+@app.post("/v1/tokens", tags=["Tokens"])
+def create_token(
+    req: CreateTokenRequest,
+    ctx: TenantContext = Depends(require_permission("admin.tokens")),
+):
+    """Create a named API token. Plaintext secret is returned once."""
+    from om_ai.security.tokens import get_token_store
+    try:
+        created = get_token_store().create(
+            name=req.name,
+            role=req.role,
+            tenant_id=req.tenant_id or ctx.tenant_id,
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    _audit(
+        "token.create",
+        ctx.actor,
+        ctx.tenant_id,
+        resource="/v1/tokens",
+        detail={"name": req.name, "role": req.role, "id": created["id"]},
+    )
+    return created
+
+
+@app.get("/v1/tokens", tags=["Tokens"])
+def list_tokens(
+    include_revoked: bool = False,
+    ctx: TenantContext = Depends(require_permission("admin.tokens")),
+):
+    from om_ai.security.tokens import get_token_store
+    return {
+        "database": get_token_store().path,
+        "model": os.getenv("OM_AI_MODEL_ID", "om:free"),
+        "tokens": get_token_store().list(include_revoked=include_revoked),
+    }
+
+
+@app.delete("/v1/tokens/{token_id}", tags=["Tokens"])
+def revoke_token(
+    token_id: str,
+    ctx: TenantContext = Depends(require_permission("admin.tokens")),
+):
+    from om_ai.security.tokens import get_token_store
+    try:
+        result = get_token_store().revoke(token_id)
+    except KeyError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+    _audit(
+        "token.revoke",
+        ctx.actor,
+        ctx.tenant_id,
+        resource=f"/v1/tokens/{token_id}",
+        detail={"id": token_id, "name": result.get("name")},
+    )
+    return result
 
 
 # ---------------------------------------------------------------------------

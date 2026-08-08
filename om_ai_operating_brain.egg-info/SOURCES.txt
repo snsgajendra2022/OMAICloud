@@ -9,7 +9,9 @@ om_ai/actions/shell.py
 om_ai/agents/__init__.py
 om_ai/agents/orchestrator.py
 om_ai/api/__init__.py
+om_ai/api/deps.py
 om_ai/api/main.py
+om_ai/api/openai_compat.py
 om_ai/checkpoint/__init__.py
 om_ai/checkpoint/bundle.py
 om_ai/continuous/__init__.py
@@ -82,6 +84,7 @@ om_ai_operating_brain.egg-info/entry_points.txt
 om_ai_operating_brain.egg-info/requires.txt
 om_ai_operating_brain.egg-info/top_level.txt
 tests/test_agent.py
+tests/test_completion_platform.py
 tests/test_governance_feedback_integrations.py
 tests/test_memory.py
 tests/test_model.py

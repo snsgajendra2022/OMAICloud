@@ -241,25 +241,27 @@ class ByteBPETokenizer:
         Path(path).write_text(json.dumps(payload, indent=2))
 
     @classmethod
-    def load(cls, path: str | Path) -> "ByteBPETokenizer":
+    def load(cls, path: str | Path, *, extend_specials: bool = False) -> "ByteBPETokenizer":
         data = json.loads(Path(path).read_text())
         vocab: dict[str, int] = {k: int(v) for k, v in data["vocab"].items()}
         merges: list[tuple[str, str]] = [tuple(x) for x in data["merges"]]  # type: ignore[misc]
         tok = cls(vocab=vocab, merges=merges)
 
-        # Auto-extend with any chat special tokens not present in older saves.
-        next_id = max(vocab.values()) + 1
-        extended = False
-        for token in SPECIAL_TOKENS:
-            if token not in tok.vocab:
-                tok.vocab[token] = next_id
-                next_id += 1
-                extended = True
-        if extended:
-            import warnings
-            warnings.warn(
-                "Loaded tokenizer is missing new special tokens — they have been "
-                "appended at the end of the vocabulary. Re-save to persist this.",
-                stacklevel=2,
-            )
+        # Optional: auto-extend with chat specials (disabled by default so
+        # existing checkpoints keep matching vocab sizes).
+        if extend_specials:
+            next_id = max(vocab.values()) + 1 if vocab else 0
+            extended = False
+            for token in SPECIAL_TOKENS:
+                if token not in tok.vocab:
+                    tok.vocab[token] = next_id
+                    next_id += 1
+                    extended = True
+            if extended:
+                import warnings
+                warnings.warn(
+                    "Loaded tokenizer is missing new special tokens — they have been "
+                    "appended at the end of the vocabulary. Re-save to persist this.",
+                    stacklevel=2,
+                )
         return tok

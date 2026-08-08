@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 _ROLE_PERMISSIONS: dict[str, frozenset[str]] = {
     "admin": frozenset({
         "model.load", "model.generate", "agent.run", "memory.write",
-        "knowledge.write", "admin.registry", "feedback.write",
+        "knowledge.write", "admin.registry", "admin.tokens", "feedback.write",
         "tool.shell", "tool.openapi",
     }),
     "operator": frozenset({
@@ -102,6 +102,14 @@ class APIKeyAuth:
     def reload(self) -> None:
         self._keys = _load_api_keys()
         if not self._keys:
+            # DB tokens alone are enough — don't force open/dev mode if tokens DB may have keys
+            try:
+                from om_ai.security.tokens import get_token_store
+                if get_token_store().list():
+                    self._dev_mode = False
+                    return
+            except Exception:
+                pass
             if os.getenv("OM_AI_REQUIRE_AUTH", "0") == "1":
                 warnings.warn(
                     "OM_AI_REQUIRE_AUTH=1 but no keys configured – all requests will be rejected.",
@@ -111,7 +119,7 @@ class APIKeyAuth:
             else:
                 warnings.warn(
                     "No API keys configured – running in dev mode. "
-                    "Set OM_AI_API_KEYS or OM_AI_API_KEYS_FILE to enable auth.",
+                    "Set OM_AI_API_KEYS or create a token via POST /v1/tokens.",
                     stacklevel=2,
                 )
                 self._dev_mode = True
@@ -119,7 +127,28 @@ class APIKeyAuth:
             self._dev_mode = False
 
     def validate(self, key: str) -> Optional[str]:
+        """Return role for env key, or None. DB tokens validated separately."""
         return self._keys.get(key)
+
+    def validate_full(self, key: str) -> Optional[dict]:
+        """Validate env or DB token. Returns {role, name, tenant_id, source}."""
+        role = self._keys.get(key)
+        if role:
+            return {"role": role, "name": "env-key", "tenant_id": "default", "source": "env"}
+        try:
+            from om_ai.security.tokens import get_token_store
+            rec = get_token_store().validate(key)
+            if rec:
+                return {
+                    "role": rec["role"],
+                    "name": rec["name"],
+                    "tenant_id": rec["tenant_id"],
+                    "source": "db",
+                    "id": rec["id"],
+                }
+        except Exception:
+            logger.exception("token DB validate failed")
+        return None
 
     def is_dev_mode(self) -> bool:
         return self._dev_mode
@@ -168,13 +197,13 @@ def _resolve_context_from_request(request) -> TenantContext:
             detail="Missing API key. Provide X-OM-API-Key or Bearer token.",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    role = auth.validate(raw_key)
-    if role is None:
+    info = auth.validate_full(raw_key)
+    if info is None:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Invalid API key.")
     ctx = TenantContext(
-        tenant_id=request.headers.get("X-Tenant-Id", "default"),
-        actor=f"key:{raw_key[:6]}…",
-        role=role,
+        tenant_id=request.headers.get("X-Tenant-Id", info.get("tenant_id", "default")),
+        actor=f"{info.get('source', 'key')}:{info.get('name', raw_key[:6])}…",
+        role=info["role"],
         request_id=request_id,
     )
     set_current_tenant(ctx)
