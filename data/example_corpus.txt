@@ -1,0 +1,6 @@
+OM AI is a private artificial intelligence operating brain.
+It can learn patterns from data through training and can use tools through an agent orchestrator.
+A responsible AI system separates reasoning, memory, retrieval, action execution and security boundaries.
+The Transformer architecture processes token sequences with causal self attention.
+Rotary positional embeddings encode relative positions in attention queries and keys.
+Training requires licensed data, compute resources, evaluation, checkpointing and careful deployment.

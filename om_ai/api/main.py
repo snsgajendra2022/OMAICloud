@@ -1,0 +1,605 @@
+"""OM AI Operating Brain — Production FastAPI application (v0.3.0)."""
+from __future__ import annotations
+
+import json
+import logging
+import os
+import warnings
+from typing import AsyncGenerator
+
+from fastapi import Depends, FastAPI, HTTPException, Request, status
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import StreamingResponse
+from pydantic import BaseModel, Field
+
+from om_ai.agents import AgentOrchestrator
+from om_ai.actions import SafeShellTool
+from om_ai.actions.knowledge import KnowledgeSearchTool
+from om_ai.discovery import OpenAPIDiscoveryTool
+from om_ai.knowledge import PersistentKnowledgeBase
+from om_ai.memory import SQLiteMemoryStore
+from om_ai.registry import ModelRegistry
+from om_ai.runtime import LocalLLMEngine
+from om_ai.security import (
+    AuditLog,
+    RateLimiter,
+    RateLimitExceeded,
+    SSRFGuard,
+)
+from om_ai.security.auth import TenantContext
+from om_ai.api.deps import require_auth, require_permission
+from om_ai.tenancy import TenantDirectory
+
+logger = logging.getLogger(__name__)
+
+# ---------------------------------------------------------------------------
+# Application factory
+# ---------------------------------------------------------------------------
+
+_API_VERSION = "0.3.0"
+
+app = FastAPI(
+    title="OM AI Operating Brain",
+    version=_API_VERSION,
+    description=(
+        "Self-hosted private AI platform. "
+        "All inference is performed locally — no external model APIs are called."
+    ),
+)
+
+# Optional CORS
+_cors_origins = os.getenv("OM_AI_CORS_ORIGINS", "").strip()
+if _cors_origins:
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=[o.strip() for o in _cors_origins.split(",") if o.strip()],
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
+
+# ---------------------------------------------------------------------------
+# Singletons
+# ---------------------------------------------------------------------------
+
+_DB_PATH = os.getenv("OM_AI_DB", "artifacts/om_ai.sqlite3")
+_KB_PATH = os.getenv("OM_AI_KB", "artifacts/knowledge.sqlite3")
+_AUDIT_DB = os.getenv("OM_AI_AUDIT_DB", "artifacts/audit.sqlite3")
+_REGISTRY_ROOT = os.getenv("OM_AI_REGISTRY", "artifacts/registry")
+
+engine = LocalLLMEngine()
+memory = SQLiteMemoryStore(_DB_PATH)
+knowledge = PersistentKnowledgeBase(_KB_PATH)
+registry = ModelRegistry(_REGISTRY_ROOT)
+tenants = TenantDirectory()
+audit_log = AuditLog(_AUDIT_DB)
+rate_limiter = RateLimiter(
+    max_requests=int(os.getenv("OM_AI_RATE_LIMIT", "120")),
+    window_seconds=60,
+)
+ssrf_guard = SSRFGuard()
+
+# Wire tools
+_shell_allowlist = [
+    x.strip()
+    for x in os.getenv("OM_AI_ALLOWED_SHELL", "echo,pwd,ls").split(",")
+    if x.strip()
+]
+_shell_tool = SafeShellTool(_shell_allowlist)
+_kb_tool = KnowledgeSearchTool(knowledge)
+_openapi_tool = OpenAPIDiscoveryTool(ssrf_guard=ssrf_guard)
+
+agent = AgentOrchestrator(
+    llm_engine=engine,
+    knowledge_base=knowledge,
+    memory_store=memory,
+)
+agent.register_tool(_shell_tool)
+agent.register_tool(_kb_tool)
+agent.register_tool(_openapi_tool)
+
+# Dev-mode warning
+if not os.getenv("OM_AI_API_KEYS") and not os.getenv("OM_AI_API_KEYS_FILE"):
+    warnings.warn(
+        "OM AI is running in OPEN DEV MODE — no API keys configured. "
+        "Set OM_AI_API_KEYS or OM_AI_API_KEYS_FILE for production use.",
+        stacklevel=1,
+    )
+
+
+def _audit(
+    action: str,
+    actor: str,
+    tenant_id: str,
+    resource: str = "",
+    detail: dict | None = None,
+) -> None:
+    """Thin wrapper so callers don't repeat keyword noise."""
+    try:
+        audit_log.record(
+            tenant_id=tenant_id,
+            actor=actor,
+            action=action,
+            resource=resource,
+            detail=detail or {},
+        )
+    except Exception:
+        logger.warning("Audit log write failed for action=%s", action, exc_info=True)
+
+
+# ---------------------------------------------------------------------------
+# Rate-limit middleware
+# ---------------------------------------------------------------------------
+
+
+@app.middleware("http")
+async def _rate_limit_middleware(request: Request, call_next):
+    client = request.client.host if request.client else "unknown"
+    try:
+        rate_limiter.check(client)
+    except RateLimitExceeded:
+        from fastapi.responses import JSONResponse
+        return JSONResponse(
+            status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+            content={"detail": "Rate limit exceeded. Please slow down."},
+        )
+    return await call_next(request)
+
+
+# ---------------------------------------------------------------------------
+# Pydantic request/response models
+# ---------------------------------------------------------------------------
+
+
+class LoadRequest(BaseModel):
+    config_path: str
+    tokenizer_path: str
+    checkpoint_path: str
+    device: str | None = None
+
+
+class GenerateRequest(BaseModel):
+    prompt: str
+    max_new_tokens: int = Field(64, ge=1, le=4096)
+    temperature: float = Field(0.8, ge=0.0, le=5.0)
+    top_k: int = Field(50, ge=0)
+    top_p: float = Field(1.0, ge=0.0, le=1.0)
+    repetition_penalty: float = Field(1.0, ge=0.5, le=5.0)
+
+
+class ChatMessage(BaseModel):
+    role: str = Field(..., pattern="^(system|user|assistant)$")
+    content: str
+
+
+class ChatRequest(BaseModel):
+    messages: list[ChatMessage]
+    max_new_tokens: int = Field(256, ge=1, le=4096)
+    temperature: float = Field(0.8, ge=0.0, le=5.0)
+    top_k: int = Field(50, ge=0)
+    top_p: float = Field(1.0, ge=0.0, le=1.0)
+    repetition_penalty: float = Field(1.0, ge=0.5, le=5.0)
+
+
+class MemoryRequest(BaseModel):
+    tenant_id: str = "default"
+    user_id: str
+    content: str
+    kind: str = "conversation"
+    metadata: dict = {}
+
+
+class KnowledgeAddRequest(BaseModel):
+    doc_id: str
+    text: str
+    metadata: dict = {}
+    namespace: str = "default"
+
+
+class KnowledgeIngestRequest(BaseModel):
+    source: str = Field(..., description="File path or raw text to ingest")
+    doc_id: str | None = None
+    namespace: str = "default"
+    metadata: dict = {}
+
+
+class GoalRequest(BaseModel):
+    goal: str
+    tool_args: dict = {}
+    tenant_id: str = "default"
+
+
+class FeedbackRequest(BaseModel):
+    prompt: str
+    response: str
+    rating: int = Field(..., ge=1, le=5)
+    comment: str = ""
+    tenant_id: str = "default"
+    user_id: str = "anonymous"
+
+
+class MultimodalRequest(BaseModel):
+    text: str = ""
+    image_paths: list[str] = []
+    max_new_tokens: int = Field(128, ge=1, le=2048)
+    temperature: float = Field(0.8, ge=0.0, le=5.0)
+
+
+# ---------------------------------------------------------------------------
+# Health / readiness
+# ---------------------------------------------------------------------------
+
+
+@app.get("/health", tags=["System"])
+def health():
+    """Liveness probe — always 200 if the process is alive."""
+    return {"ok": True, "version": _API_VERSION}
+
+
+@app.get("/ready", tags=["System"])
+def ready():
+    """Readiness probe — 200 only when the model is loaded."""
+    loaded = engine.model is not None
+    if not loaded:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Model not loaded yet.",
+        )
+    return {"ok": True, "model_loaded": True}
+
+
+# ---------------------------------------------------------------------------
+# Model management
+# ---------------------------------------------------------------------------
+
+
+@app.post("/v1/model/load", tags=["Model"])
+def load_model(
+    req: LoadRequest,
+    ctx: TenantContext = Depends(require_permission("model.load")),
+):
+    """Load (or reload) a local model checkpoint. Admin / operator only."""
+    try:
+        result = engine.load(
+            req.config_path, req.tokenizer_path, req.checkpoint_path, req.device
+        )
+        _audit(
+            "model.load",
+            ctx.actor,
+            ctx.tenant_id,
+            resource="/v1/model/load",
+            detail={"checkpoint": req.checkpoint_path},
+        )
+        return result
+    except Exception as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+
+@app.get("/v1/model/info", tags=["Model"])
+def model_info(ctx: TenantContext = Depends(require_auth)):
+    """Return information about the currently loaded model."""
+    return engine.info()
+
+
+# ---------------------------------------------------------------------------
+# Text generation
+# ---------------------------------------------------------------------------
+
+
+@app.post("/v1/generate", tags=["Generate"])
+def generate(
+    req: GenerateRequest,
+    ctx: TenantContext = Depends(require_permission("model.generate")),
+):
+    """Single-shot text generation."""
+    try:
+        text = engine.generate(
+            req.prompt,
+            max_new_tokens=req.max_new_tokens,
+            temperature=req.temperature,
+            top_k=req.top_k,
+            top_p=req.top_p,
+            repetition_penalty=req.repetition_penalty,
+        )
+        _audit(
+            "generate",
+            ctx.actor,
+            ctx.tenant_id,
+            resource="/v1/generate",
+            detail={"prompt_len": len(req.prompt)},
+        )
+        return {"text": text, "model": engine.info().get("checkpoint_path")}
+    except Exception as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+
+@app.post("/v1/generate/stream", tags=["Generate"])
+async def generate_stream(
+    req: GenerateRequest,
+    ctx: TenantContext = Depends(require_permission("model.generate")),
+):
+    """Server-Sent Events streaming text generation."""
+
+    async def _sse_generator() -> AsyncGenerator[str, None]:
+        try:
+            for chunk in engine.generate_stream(
+                req.prompt,
+                max_new_tokens=req.max_new_tokens,
+                temperature=req.temperature,
+                top_k=req.top_k,
+                top_p=req.top_p,
+                repetition_penalty=req.repetition_penalty,
+            ):
+                payload = json.dumps({"token": chunk})
+                yield f"data: {payload}\n\n"
+            yield "data: [DONE]\n\n"
+        except Exception as exc:
+            yield f"data: {json.dumps({'error': str(exc)})}\n\n"
+
+    _audit(
+        "generate.stream",
+        ctx.actor,
+        ctx.tenant_id,
+        resource="/v1/generate/stream",
+        detail={"prompt_len": len(req.prompt)},
+    )
+    return StreamingResponse(_sse_generator(), media_type="text/event-stream")
+
+
+@app.post("/v1/chat", tags=["Chat"])
+def chat(
+    req: ChatRequest,
+    ctx: TenantContext = Depends(require_permission("model.generate")),
+):
+    """Multi-turn chat completion."""
+    try:
+        messages = [m.model_dump() for m in req.messages]
+        reply = engine.chat(
+            messages,
+            max_new_tokens=req.max_new_tokens,
+            temperature=req.temperature,
+            top_k=req.top_k,
+            top_p=req.top_p,
+            repetition_penalty=req.repetition_penalty,
+        )
+        _audit(
+            "chat",
+            ctx.actor,
+            ctx.tenant_id,
+            resource="/v1/chat",
+            detail={"turns": len(messages)},
+        )
+        return {"reply": reply, "role": "assistant"}
+    except Exception as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+
+# ---------------------------------------------------------------------------
+# Memory
+# ---------------------------------------------------------------------------
+
+
+@app.post("/v1/memory", tags=["Memory"])
+def add_memory(
+    req: MemoryRequest,
+    ctx: TenantContext = Depends(require_permission("memory.write")),
+):
+    """Store a memory entry for a given tenant / user."""
+    record_id = memory.add(
+        req.tenant_id, req.user_id, req.content, req.kind, req.metadata
+    )
+    return {"id": record_id}
+
+
+@app.get("/v1/memory/{tenant}/{user}", tags=["Memory"])
+def get_memory(
+    tenant: str,
+    user: str,
+    limit: int = 20,
+    ctx: TenantContext = Depends(require_auth),
+):
+    """Retrieve recent memory entries for a tenant / user."""
+    entries = memory.recent(tenant, user, limit)
+    result = []
+    for m in entries:
+        if hasattr(m, "__dict__"):
+            result.append(m.__dict__)
+        elif hasattr(m, "__slots__"):
+            result.append({s: getattr(m, s) for s in m.__slots__})
+        else:
+            result.append(m)
+    return result
+
+
+# ---------------------------------------------------------------------------
+# Knowledge
+# ---------------------------------------------------------------------------
+
+
+@app.post("/v1/knowledge", tags=["Knowledge"])
+def add_knowledge(
+    req: KnowledgeAddRequest,
+    ctx: TenantContext = Depends(require_permission("knowledge.write")),
+):
+    """Add a document to the knowledge base."""
+    try:
+        knowledge.add(req.doc_id, req.text, req.metadata, tenant_id=ctx.tenant_id)
+        return {"ok": True, "doc_id": req.doc_id}
+    except Exception as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+
+@app.post("/v1/knowledge/ingest", tags=["Knowledge"])
+def ingest_knowledge(
+    req: KnowledgeIngestRequest,
+    ctx: TenantContext = Depends(require_permission("knowledge.write")),
+):
+    """Ingest from a file path or raw text string."""
+    import os as _os
+    import uuid as _uuid
+
+    doc_id = req.doc_id or _uuid.uuid4().hex
+    source = req.source
+
+    if len(source) < 4096 and _os.path.isfile(source):
+        try:
+            text = open(source, encoding="utf-8", errors="replace").read()
+        except Exception as exc:
+            raise HTTPException(status_code=400, detail=f"Cannot read file: {exc}") from exc
+    else:
+        text = source
+
+    if not text.strip():
+        raise HTTPException(status_code=422, detail="Ingest source is empty.")
+
+    try:
+        knowledge.add(doc_id, text, {**req.metadata, "namespace": req.namespace}, tenant_id=ctx.tenant_id)
+        _audit(
+            "knowledge.ingest",
+            ctx.actor,
+            ctx.tenant_id,
+            resource="/v1/knowledge/ingest",
+            detail={"doc_id": doc_id, "chars": len(text)},
+        )
+        return {"ok": True, "doc_id": doc_id, "chars": len(text)}
+    except Exception as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+
+@app.get("/v1/knowledge/search", tags=["Knowledge"])
+def search_knowledge(
+    q: str,
+    k: int = 5,
+    ctx: TenantContext = Depends(require_auth),
+):
+    """Full-text / semantic search over the knowledge base."""
+    try:
+        return knowledge.search_compat(q, k=k, tenant_id=ctx.tenant_id)
+    except Exception as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+
+# ---------------------------------------------------------------------------
+# Agent
+# ---------------------------------------------------------------------------
+
+
+@app.post("/v1/agent/goal", tags=["Agent"])
+def run_goal(
+    req: GoalRequest,
+    ctx: TenantContext = Depends(require_permission("agent.run")),
+):
+    """Execute an agent goal using the registered tool set."""
+    try:
+        result = agent.execute_goal(
+            req.goal,
+            req.tool_args if req.tool_args else None,
+            tenant_id=req.tenant_id,
+        )
+        _audit(
+            "agent.goal",
+            ctx.actor,
+            ctx.tenant_id,
+            resource="/v1/agent/goal",
+            detail={"goal": req.goal[:200]},
+        )
+        return result
+    except Exception as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+
+@app.get("/v1/tools", tags=["Agent"])
+def list_tools(ctx: TenantContext = Depends(require_auth)):
+    """Return metadata for all registered agent tools."""
+    names = agent.available_tools()
+    tools = []
+    for name in names:
+        entry = agent._tools.get(name)
+        if entry:
+            tools.append({
+                "name": name,
+                "risk_level": entry.risk_level,
+                "description": entry.description or getattr(entry.tool, "description", ""),
+            })
+        else:
+            tools.append({"name": name})
+    return {"tools": tools}
+
+
+# ---------------------------------------------------------------------------
+# Feedback
+# ---------------------------------------------------------------------------
+
+
+@app.post("/v1/feedback", tags=["Feedback"])
+def submit_feedback(
+    req: FeedbackRequest,
+    ctx: TenantContext = Depends(require_permission("feedback.write")),
+):
+    """Record human feedback on a model response."""
+    _audit(
+        "feedback",
+        ctx.actor,
+        req.tenant_id,
+        resource="/v1/feedback",
+        detail={
+            "rating": req.rating,
+            "user_id": req.user_id,
+            "comment": req.comment[:500],
+        },
+    )
+    return {"ok": True, "rating": req.rating}
+
+
+# ---------------------------------------------------------------------------
+# Registry
+# ---------------------------------------------------------------------------
+
+
+@app.get("/v1/registry", tags=["Registry"])
+def list_registry(ctx: TenantContext = Depends(require_auth)):
+    """List all registered model versions."""
+    return registry.list_versions()
+
+
+# ---------------------------------------------------------------------------
+# Multimodal
+# ---------------------------------------------------------------------------
+
+
+@app.post("/v1/multimodal", tags=["Multimodal"])
+def multimodal(
+    req: MultimodalRequest,
+    ctx: TenantContext = Depends(require_permission("model.generate")),
+):
+    """Text + optional image inference.
+
+    Image paths are validated and passed to the vision encoder when available.
+    If vision is not available, a clear 501 error is returned.
+    """
+    if req.image_paths:
+        try:
+            from om_ai.multimodal.orchestrator import UnifiedOrchestrator
+            orch = UnifiedOrchestrator(llm_engine=engine)
+            result = orch.run(text=req.text, images=req.image_paths)
+            return result
+        except ImportError:
+            raise HTTPException(
+                status_code=status.HTTP_501_NOT_IMPLEMENTED,
+                detail=(
+                    "Vision capability is not available in this deployment. "
+                    "Install the vision extras and configure a vision encoder."
+                ),
+            )
+        except Exception as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
+    else:
+        try:
+            text = engine.generate(
+                req.text,
+                max_new_tokens=req.max_new_tokens,
+                temperature=req.temperature,
+            )
+            return {"text": text, "modalities_used": ["text"]}
+        except Exception as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc

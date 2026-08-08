@@ -1,0 +1,2 @@
+{"prompt":"What is 2 + 2?","chosen":"4","rejected":"5"}
+{"prompt":"How should private credentials be handled?","chosen":"Keep secrets out of logs and source control, use scoped secret storage, and rotate compromised credentials.","rejected":"Put credentials directly in source code so every service can access them."}

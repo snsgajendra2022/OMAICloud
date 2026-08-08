@@ -1,0 +1,14 @@
+{
+  "sources": [
+    {
+      "source_id": "om-example-owned",
+      "uri": "data/example_corpus.txt",
+      "license": "project-owned-example",
+      "owner": "OM AI",
+      "allowed_for_training": true,
+      "category": "general",
+      "language": "en",
+      "version": "1"
+    }
+  ]
+}

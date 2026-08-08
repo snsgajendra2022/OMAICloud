@@ -1,0 +1,210 @@
+Metadata-Version: 2.4
+Name: om-ai-operating-brain
+Version: 0.2.0
+Summary: Self-owned private AI operating brain foundation
+Requires-Python: >=3.11
+Description-Content-Type: text/markdown
+Requires-Dist: torch>=2.4.0
+Requires-Dist: fastapi>=0.115.0
+Requires-Dist: uvicorn[standard]>=0.30.0
+Requires-Dist: pydantic>=2.8.0
+Requires-Dist: numpy>=1.26.0
+Requires-Dist: httpx>=0.27.0
+Provides-Extra: dev
+Requires-Dist: pytest>=8.0; extra == "dev"
+Requires-Dist: ruff>=0.6; extra == "dev"
+Provides-Extra: deepspeed
+Requires-Dist: deepspeed>=0.15; extra == "deepspeed"
+Provides-Extra: vision
+Requires-Dist: pillow>=10.0; extra == "vision"
+Provides-Extra: voice
+Requires-Dist: soundfile>=0.12; extra == "voice"
+
+# OM AI Operating Brain v0.2
+
+A self-hosted, API-independent AI platform starter that implements the engineering foundations requested in the OM AI master prompt.
+
+## What this repository actually contains
+
+This ZIP contains **working source code and infrastructure**, not magically pre-trained 1B/7B/70B model weights. Training a frontier-scale model requires very large licensed datasets, GPU clusters, substantial engineering, and long-running training jobs. The repository is designed so you can train and own your own models and extend the platform toward larger scales.
+
+Implemented:
+
+**v0.2 actual training additions:** license-governed corpus preparation/sharding, masked SFT, pairwise reward-model training, DPO, benchmark reports, feedback replay, a trainable ViT-to-LLM multimodal path, a trainable local speech encoder/CTC ASR foundation, and a generic integration plugin SDK. A tiny real DPO checkpoint produced by the pipeline is included under `artifacts/demo/`.
+
+
+- From-scratch decoder-only Transformer in PyTorch
+- Multi-head causal self-attention
+- Rotary positional embeddings (RoPE)
+- Residual connections, LayerNorm, SwiGLU feed-forward blocks
+- KV cache for incremental generation
+- Configurable long-context model presets
+- Custom byte-level BPE tokenizer + vocabulary trainer
+- Dataset ingestion, cleaning, license metadata, quality scoring, deduplication, safety filtering, chunking and tokenization
+- Single GPU/CPU training
+- PyTorch DDP support
+- FSDP entry points
+- Optional DeepSpeed launcher/config
+- BF16/FP16 mixed precision
+- Gradient accumulation, clipping, LR warmup/cosine schedule
+- Checkpoint save/resume and failure recovery
+- Model registry and version metadata
+- Evaluation harness for language loss, simple reasoning/math/coding/tool-use smoke benchmarks
+- Persistent SQLite memory
+- Planning/reasoning engine
+- Agent orchestrator with tool execution loop
+- Local knowledge/RAG engine (BM25-like lexical retrieval, no external AI API)
+- API/OpenAPI discovery helper
+- Safe allow-listed shell action tool
+- Vision/voice subsystem interfaces for locally hosted backends
+- WhatsApp adapter interface (provider-neutral; no external intelligence)
+- Multi-tenant AI employee service layer
+- FastAPI HTTP API
+- CLI for tokenizer training, model training, generation, evaluation and API launch
+- Dockerfile, docker-compose, tests and example data
+
+## Architecture
+
+```text
+                         OM AI OPERATING BRAIN
+                                   |
+        ---------------------------------------------------------
+        |             |              |             |            |
+    Foundation      Memory        Reasoning      Vision       Voice
+       LLM          Engine          Engine        Engine       Engine
+        |             |              |             |            |
+        ---------------------------------------------------------
+                                   |
+                         Agent Orchestrator
+                                   |
+        ---------------------------------------------------------
+        |             |              |             |            |
+      Action       Discovery      Knowledge      Tools      Tenants
+      Engine         Engine          RAG          APIs      Employees
+```
+
+## Requirements
+
+Recommended:
+
+- Python 3.11 or 3.12
+- PyTorch 2.4+
+- Linux for distributed GPU training
+- NVIDIA CUDA stack for GPU training
+
+Python 3.13 may work for the pure Python parts, but compatible PyTorch wheels should be confirmed for your platform.
+
+## Quick start — CPU smoke test
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -e .
+
+om-ai tokenizer train --input data/example_corpus.txt --output artifacts/tokenizer.json --vocab-size 512
+om-ai train --config configs/tiny.json --data data/example_corpus.txt --tokenizer artifacts/tokenizer.json --steps 20
+om-ai generate --config configs/tiny.json --tokenizer artifacts/tokenizer.json --checkpoint artifacts/checkpoints/latest.pt --prompt "OM AI"
+```
+
+Run API:
+
+```bash
+om-ai serve --host 0.0.0.0 --port 8080
+```
+
+Then open `http://localhost:8080/docs`.
+
+
+## Actual end-to-end training proof
+
+The included script executes the learning stages on the development model:
+
+```bash
+python scripts/run_actual_training_pipeline.py --steps 5
+```
+
+It performs tokenizer training -> causal pretraining -> supervised instruction tuning -> DPO and writes a final local checkpoint. For the complete production sequence, see `docs/TRAINING_RUNBOOK.md`. For the exact boundary between executable software and external data/compute requirements, see `docs/EXTERNAL_ASSETS_REQUIRED.md`.
+
+The bundled `artifacts/demo/om-tiny-dpo.pt` was generated by this pipeline. It is proof that the code trains real weights, not a claim of frontier intelligence.
+
+## Model scale presets
+
+Configuration presets are included for:
+
+- `tiny.json` — development/smoke test
+- `1b.json` — approximately 1B-class architecture direction
+- `7b.json` — approximately 7B-class architecture direction
+- `13b.json` — approximately 13B-class architecture direction
+- `70b.json` — approximately 70B-class architecture direction
+
+These presets describe architecture; they **do not include trained weights**.
+
+## Distributed training
+
+### torchrun / DDP
+
+```bash
+torchrun --standalone --nproc_per_node=8 -m om_ai.training.distributed \
+  --config configs/1b.json \
+  --data /data/train.jsonl \
+  --tokenizer artifacts/tokenizer.json
+```
+
+### FSDP
+
+```bash
+torchrun --standalone --nproc_per_node=8 -m om_ai.training.distributed \
+  --strategy fsdp \
+  --config configs/7b.json \
+  --data /data/train.jsonl \
+  --tokenizer artifacts/tokenizer.json
+```
+
+### DeepSpeed
+
+```bash
+pip install -e '.[deepspeed]'
+deepSpeed --num_gpus 8 -m om_ai.training.deepspeed_train \
+  --config configs/7b.json \
+  --data /data/train.jsonl \
+  --tokenizer artifacts/tokenizer.json \
+  --deepspeed configs/deepspeed_zero3.json
+```
+
+## Dataset JSONL format
+
+Each row can be plain text:
+
+```json
+{"text":"example training text"}
+```
+
+or richer metadata:
+
+```json
+{
+  "text":"licensed enterprise document text",
+  "source":"internal-wiki",
+  "license":"company-owned",
+  "category":"business",
+  "language":"en",
+  "version":"2026-08-07"
+}
+```
+
+## Security model
+
+The action engine uses deny-by-default behavior. The included shell tool allows only explicitly configured commands. Never expose the API directly to the public internet without authentication, TLS, network policy, rate limits, audit logging and hardened tool permissions.
+
+## Frontier-model reality
+
+A source repository can provide architecture, data pipelines, training infrastructure and orchestration. It cannot include “years of learned knowledge” or billions of trained parameters unless those weights are actually trained or legally obtained. For a true self-owned 70B+ model you still need:
+
+1. A large, licensed, high-quality corpus.
+2. A tokenizer trained on that corpus.
+3. A GPU cluster sized for the target parameter count and token budget.
+4. Pretraining plus instruction tuning/alignment/evaluation.
+5. Model weights generated by those training runs.
+6. Continuous evaluation, red-teaming and deployment infrastructure.
+
+This repository gives you the software foundation to begin that process without depending on OpenAI, Anthropic or Google AI APIs.

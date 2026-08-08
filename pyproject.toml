@@ -1,0 +1,35 @@
+[build-system]
+requires = ["setuptools>=69", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "om-ai-operating-brain"
+version = "0.3.0"
+description = "Self-owned private AI operating brain foundation"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+  "torch>=2.4.0",
+  "fastapi>=0.115.0",
+  "uvicorn[standard]>=0.30.0",
+  "pydantic>=2.8.0",
+  "numpy>=1.26.0",
+  "httpx>=0.27.0",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0", "ruff>=0.6"]
+deepSpeed = ["deepspeed>=0.15"]
+vision = ["pillow>=10.0"]
+voice = ["soundfile>=0.12"]
+
+[project.scripts]
+om-ai = "om_ai.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["om_ai*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]

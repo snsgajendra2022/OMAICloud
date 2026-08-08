@@ -1,0 +1,126 @@
+from __future__ import annotations
+
+from dataclasses import dataclass, asdict
+from pathlib import Path
+import json, math, os, random, time
+import numpy as np
+import torch
+from torch.utils.data import DataLoader
+
+from om_ai.core.config import ModelConfig
+from om_ai.model import OMTransformer
+from om_ai.tokenizer import ByteBPETokenizer
+from om_ai.data import DatasetPipeline, TokenBlockDataset
+
+
+@dataclass(slots=True)
+class TrainingConfig:
+    steps: int = 1000
+    batch_size: int = 4
+    grad_accum_steps: int = 1
+    learning_rate: float = 3e-4
+    min_lr_ratio: float = 0.1
+    warmup_steps: int = 100
+    weight_decay: float = 0.1
+    grad_clip: float = 1.0
+    precision: str = "auto"  # auto|fp32|fp16|bf16
+    checkpoint_every: int = 100
+    log_every: int = 10
+    output_dir: str = "artifacts/checkpoints"
+    seed: int = 42
+    num_workers: int = 0
+
+
+class Trainer:
+    def __init__(self, model: OMTransformer, train_cfg: TrainingConfig, device: str | None = None):
+        self.model = model
+        self.cfg = train_cfg
+        self.device = torch.device(device or ("cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu"))
+        self.model.to(self.device)
+        self.optimizer = torch.optim.AdamW(self.model.parameters(), lr=train_cfg.learning_rate, weight_decay=train_cfg.weight_decay)
+        self.global_step = 0
+        self._seed(train_cfg.seed)
+
+    @staticmethod
+    def _seed(seed):
+        random.seed(seed); np.random.seed(seed); torch.manual_seed(seed)
+        if torch.cuda.is_available(): torch.cuda.manual_seed_all(seed)
+
+    def _amp_dtype(self):
+        if self.cfg.precision == "bf16": return torch.bfloat16
+        if self.cfg.precision == "fp16": return torch.float16
+        if self.cfg.precision == "auto" and self.device.type == "cuda":
+            return torch.bfloat16 if torch.cuda.is_bf16_supported() else torch.float16
+        return None
+
+    def _lr(self, step):
+        if step < self.cfg.warmup_steps:
+            return self.cfg.learning_rate * (step + 1) / max(1, self.cfg.warmup_steps)
+        progress = (step - self.cfg.warmup_steps) / max(1, self.cfg.steps - self.cfg.warmup_steps)
+        cosine = 0.5 * (1 + math.cos(math.pi * min(1.0, progress)))
+        return self.cfg.learning_rate * (self.cfg.min_lr_ratio + (1 - self.cfg.min_lr_ratio) * cosine)
+
+    def save_checkpoint(self, path: str | Path, extra: dict | None = None):
+        p = Path(path); p.parent.mkdir(parents=True, exist_ok=True)
+        torch.save({
+            "model": self.model.state_dict(),
+            "optimizer": self.optimizer.state_dict(),
+            "global_step": self.global_step,
+            "model_config": asdict(self.model.cfg),
+            "train_config": asdict(self.cfg),
+            "extra": extra or {},
+        }, p)
+
+    def load_checkpoint(self, path: str | Path):
+        ckpt = torch.load(path, map_location=self.device, weights_only=False)
+        self.model.load_state_dict(ckpt["model"])
+        if "optimizer" in ckpt:
+            self.optimizer.load_state_dict(ckpt["optimizer"])
+        self.global_step = int(ckpt.get("global_step", 0))
+
+    def train(self, dataset: TokenBlockDataset):
+        loader = DataLoader(dataset, batch_size=self.cfg.batch_size, shuffle=True, num_workers=self.cfg.num_workers, drop_last=False)
+        iterator = iter(loader)
+        amp_dtype = self._amp_dtype()
+        scaler = torch.amp.GradScaler("cuda", enabled=(amp_dtype == torch.float16 and self.device.type == "cuda"))
+        self.model.train()
+        self.optimizer.zero_grad(set_to_none=True)
+        start = time.time()
+
+        while self.global_step < self.cfg.steps:
+            total_loss = 0.0
+            for _ in range(self.cfg.grad_accum_steps):
+                try:
+                    x, y = next(iterator)
+                except StopIteration:
+                    iterator = iter(loader); x, y = next(iterator)
+                x, y = x.to(self.device), y.to(self.device)
+                context = torch.autocast(device_type=self.device.type, dtype=amp_dtype, enabled=amp_dtype is not None and self.device.type in {"cuda", "cpu"})
+                with context:
+                    out = self.model(x, labels=y)
+                    loss = out["loss"] / self.cfg.grad_accum_steps
+                scaler.scale(loss).backward()
+                total_loss += float(loss.detach())
+
+            scaler.unscale_(self.optimizer)
+            torch.nn.utils.clip_grad_norm_(self.model.parameters(), self.cfg.grad_clip)
+            lr = self._lr(self.global_step)
+            for group in self.optimizer.param_groups: group["lr"] = lr
+            scaler.step(self.optimizer); scaler.update(); self.optimizer.zero_grad(set_to_none=True)
+            self.global_step += 1
+
+            if self.global_step % self.cfg.log_every == 0 or self.global_step == 1:
+                elapsed = max(1e-6, time.time() - start)
+                print(json.dumps({"step": self.global_step, "loss": round(total_loss, 5), "lr": lr, "steps_per_sec": round(self.global_step / elapsed, 3)}))
+            if self.global_step % self.cfg.checkpoint_every == 0:
+                self.save_checkpoint(Path(self.cfg.output_dir) / f"step-{self.global_step}.pt")
+                self.save_checkpoint(Path(self.cfg.output_dir) / "latest.pt")
+
+        self.save_checkpoint(Path(self.cfg.output_dir) / "latest.pt")
+        return {"steps": self.global_step, "last_loss": total_loss}
+
+
+def build_dataset(data_path: str, tokenizer: ByteBPETokenizer, seq_len: int) -> TokenBlockDataset:
+    records = DatasetPipeline().process(DatasetPipeline.load(data_path))
+    ids = DatasetPipeline.tokenize(records, tokenizer)
+    return TokenBlockDataset(ids, seq_len=seq_len)

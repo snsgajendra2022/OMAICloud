@@ -1,0 +1,10 @@
+[
+  {
+    "source_id": "om-example-owned",
+    "uri": "data/example_corpus.txt",
+    "license": "project-owned-example",
+    "owner": "OM AI",
+    "sha256": "d9968db4bf6c95bf2317cb790003df96ed4a3ee611651f71a5baa28c0dc76cd9",
+    "bytes": 535
+  }
+]

@@ -1,0 +1,10 @@
+services:
+  om-ai:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      OM_AI_DB: /data/om_ai.sqlite3
+      OM_AI_REGISTRY: /data/registry
+    volumes:
+      - ./artifacts:/data

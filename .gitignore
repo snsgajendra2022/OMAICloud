@@ -1,0 +1,8 @@
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+artifacts/checkpoints/*.pt
+artifacts/registry/*/weights.pt
+*.sqlite3
+.env
