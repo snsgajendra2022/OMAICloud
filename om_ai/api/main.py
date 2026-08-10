@@ -113,9 +113,9 @@ app.include_router(openai_router)
 
 # Optional auto-load of local OM checkpoint (never pulls external LLMs)
 _AUTOLOAD = os.getenv("OM_AI_AUTOLOAD", "0") == "1"
-_AUTO_CONFIG = os.getenv("OM_AI_CONFIG", "configs/tiny.json")
-_AUTO_TOKENIZER = os.getenv("OM_AI_TOKENIZER", "artifacts/demo/tokenizer.json")
-_AUTO_CHECKPOINT = os.getenv("OM_AI_CHECKPOINT", "artifacts/demo/om-tiny-dpo.pt")
+_AUTO_CONFIG = os.getenv("OM_AI_CONFIG", "").strip()
+_AUTO_TOKENIZER = os.getenv("OM_AI_TOKENIZER", "").strip()
+_AUTO_CHECKPOINT = os.getenv("OM_AI_CHECKPOINT", "").strip()
 _AUTO_DEVICE = os.getenv("OM_AI_DEVICE")
 
 if _AUTOLOAD:

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, asdict
+from collections import Counter
 from hashlib import sha256
 from pathlib import Path
 from typing import Iterable
@@ -52,7 +53,7 @@ class DatasetPipeline:
             return False
         words = re.findall(r"\w+", text.lower())
         if len(words) > 50:
-            most = max((words.count(w) for w in set(words)), default=0)
+            most = Counter(words).most_common(1)[0][1] if words else 0
             if most / len(words) > self.max_repetition_ratio:
                 return False
         return True
@@ -77,16 +78,64 @@ class DatasetPipeline:
         p = Path(path)
         if p.suffix.lower() == ".jsonl":
             rows = []
-            for line in p.read_text(errors="ignore").splitlines():
-                if not line.strip():
-                    continue
-                obj = json.loads(line)
-                rows.append(DocumentRecord(
-                    text=obj["text"], source=obj.get("source", str(p)), license=obj.get("license", "unknown"),
-                    quality_score=float(obj.get("quality_score", 0.5)), category=obj.get("category", "general"),
-                    language=obj.get("language", "und"), version=str(obj.get("version", "1"))))
+            with p.open("r", encoding="utf-8", errors="ignore") as f:
+                for line in f:
+                    if not line.strip():
+                        continue
+                    obj = json.loads(line)
+                    rows.append(DocumentRecord(
+                        text=obj["text"],
+                        source=obj.get("source", str(p)),
+                        license=obj.get("license", "unknown"),
+                        quality_score=float(obj.get("quality_score", 0.5)),
+                        category=obj.get("category", "general"),
+                        language=obj.get("language", "und"),
+                        version=str(obj.get("version", "1")),
+                    ))
             return rows
-        return [DocumentRecord(text=p.read_text(errors="ignore"), source=str(p))]
+
+        # Plain text: split on blank lines when the file is multi-document
+        # (e.g. FineWeb dumps). A single contiguous blob stays one record.
+        license = "unknown"
+        source = str(p)
+        version = "1"
+        cand = p.parent / f"{p.stem}.manifest.json"
+        if cand.is_file():
+            try:
+                meta_obj = json.loads(cand.read_text(encoding="utf-8"))
+                license = str(meta_obj.get("license", license))
+                source = str(meta_obj.get("source", source))
+                version = str(meta_obj.get("config", meta_obj.get("version", version)))
+            except Exception:
+                pass
+
+        docs: list[DocumentRecord] = []
+        buf: list[str] = []
+
+        def flush() -> None:
+            text = "\n".join(buf).strip()
+            buf.clear()
+            if text:
+                docs.append(
+                    DocumentRecord(
+                        text=text,
+                        source=source,
+                        license=license,
+                        version=version,
+                    )
+                )
+
+        with p.open("r", encoding="utf-8", errors="ignore") as f:
+            for line in f:
+                if not line.strip():
+                    flush()
+                else:
+                    buf.append(line.rstrip("\n"))
+            flush()
+
+        if not docs:
+            return [DocumentRecord(text="", source=source, license=license, version=version)]
+        return docs
 
     @staticmethod
     def save_jsonl(records: Iterable[DocumentRecord], path: str | Path) -> None:

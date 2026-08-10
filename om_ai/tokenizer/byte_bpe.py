@@ -15,10 +15,7 @@ SPECIAL_TOKENS = [
     "<assistant>", "</assistant>",
 ]
 
-# Tokens present in old tokenizers saved before the chat specials were added.
-_LEGACY_SPECIAL_TOKENS = ["<pad>", "<bos>", "<eos>", "<unk>"]
-
-_TOKENIZER_VERSION = "0.3.0"
+_TOKENIZER_VERSION = "0.3.1"
 
 
 def _byte_symbol(b: int) -> str:
@@ -30,20 +27,12 @@ class ByteBPETokenizer:
     vocab: dict[str, int]
     merges: list[tuple[str, str]]
 
-    # ------------------------------------------------------------------ #
-    #  Factory                                                              #
-    # ------------------------------------------------------------------ #
-
     @classmethod
     def base(cls) -> "ByteBPETokenizer":
         vocab = {t: i for i, t in enumerate(SPECIAL_TOKENS)}
         for b in range(256):
             vocab[_byte_symbol(b)] = len(vocab)
         return cls(vocab=vocab, merges=[])
-
-    # ------------------------------------------------------------------ #
-    #  Special-token id properties                                          #
-    # ------------------------------------------------------------------ #
 
     def _special_id(self, token: str) -> int | None:
         return self.vocab.get(token)
@@ -88,10 +77,6 @@ class ByteBPETokenizer:
     def assistant_end_id(self) -> int | None:
         return self._special_id("</assistant>")
 
-    # ------------------------------------------------------------------ #
-    #  Core encode / decode                                                 #
-    # ------------------------------------------------------------------ #
-
     def _initial_symbols(self, text: str) -> list[str]:
         return [_byte_symbol(b) for b in text.encode("utf-8")]
 
@@ -120,90 +105,61 @@ class ByteBPETokenizer:
             ids.append(self.eos_id)
         return ids
 
-    def decode(self, ids: list[int]) -> str:
+    def token_bytes(self, token_id: int) -> bytes:
         inv = {v: k for k, v in self.vocab.items()}
-        # All known special tokens (not just the original four)
-        all_specials = set(SPECIAL_TOKENS)
+        sym = inv.get(int(token_id), "<unk>")
+        if sym in set(SPECIAL_TOKENS):
+            return b""
+        raw = bytearray()
+        for hx in re.findall(r"<0x([0-9A-F]{2})>", sym):
+            raw.append(int(hx, 16))
+        return bytes(raw)
+
+    def decode(self, ids: list[int]) -> str:
         raw = bytearray()
         for idx in ids:
-            sym = inv.get(int(idx), "<unk>")
-            if sym in all_specials:
-                continue
-            for hx in re.findall(r"<0x([0-9A-F]{2})>", sym):
-                raw.append(int(hx, 16))
-        return raw.decode("utf-8", errors="replace")
-
-    # ------------------------------------------------------------------ #
-    #  Chat encoding                                                        #
-    # ------------------------------------------------------------------ #
+            raw.extend(self.token_bytes(int(idx)))
+        return bytes(raw).decode("utf-8", errors="replace")
 
     def encode_chat(
         self,
         messages: list[dict],
         *,
         add_generation_prompt: bool = False,
-        add_eos: bool | None = None,
+        add_eos: bool = True,
     ) -> list[int]:
-        """Encode chat messages into a flat token-id sequence.
-
-        Each message dict must have ``role`` (system | user | assistant) and
-        ``content`` (str).  Role wrappers use dedicated special-token IDs when
-        present (never byte-encoded angle-bracket text).
-
-        Training / completed dialogue (default)::
-
-            <bos><system>…</system><user>…</user><assistant>…</assistant><eos>
-
-        Inference prompt (``add_generation_prompt=True``)::
-
-            <bos><system>…</system><user>…</user><assistant>
-                                                      ↑ generation starts here
-
-        When ``add_eos`` is omitted it defaults to ``not add_generation_prompt``.
-        Falls back gracefully if chat special tokens are missing (legacy vocab).
-        """
-        if add_eos is None:
-            add_eos = not add_generation_prompt
-
         ids: list[int] = [self.bos_id]
+        role_tokens = {
+            "system": ("<system>", "</system>"),
+            "user": ("<user>", "</user>"),
+            "assistant": ("<assistant>", "</assistant>"),
+        }
+
         for msg in messages:
             role = str(msg.get("role", "user")).lower()
-            content = msg.get("content", "")
-            if content is None:
-                content = ""
-            elif not isinstance(content, str):
-                content = str(content)
+            content = str(msg.get("content", ""))
+            open_name, close_name = role_tokens.get(role, role_tokens["user"])
+            open_tok = self._special_id(open_name)
+            close_tok = self._special_id(close_name)
 
-            if role == "system":
-                open_tok = self._special_id("<system>")
-                close_tok = self._special_id("</system>")
-            elif role == "assistant":
-                open_tok = self._special_id("<assistant>")
-                close_tok = self._special_id("</assistant>")
+            if open_tok is None or close_tok is None:
+                ids.extend(self.encode(f"{open_name}\n{content}\n{close_name}\n"))
             else:
-                open_tok = self._special_id("<user>")
-                close_tok = self._special_id("</user>")
-
-            if open_tok is not None:
                 ids.append(open_tok)
-            ids.extend(self.encode(content))
-            if close_tok is not None:
+                ids.extend(self.encode(content))
                 ids.append(close_tok)
 
         if add_generation_prompt:
-            open_asst = self._special_id("<assistant>")
-            if open_asst is not None:
-                ids.append(open_asst)
+            if self.assistant_id is None:
+                ids.extend(self.encode("<assistant>\n"))
+            else:
+                ids.append(self.assistant_id)
         elif add_eos:
             ids.append(self.eos_id)
+
         return ids
 
-    # ------------------------------------------------------------------ #
-    #  Introspection                                                        #
-    # ------------------------------------------------------------------ #
-
     def inspect(self) -> dict:
-        """Return a summary dict describing this tokenizer."""
         present_specials = [t for t in SPECIAL_TOKENS if t in self.vocab]
         return {
             "version": _TOKENIZER_VERSION,
@@ -212,13 +168,13 @@ class ByteBPETokenizer:
             "special_tokens": present_specials,
             "chat_tokens_available": all(
                 t in self.vocab
-                for t in ("<system>", "<user>", "<assistant>")
+                for t in (
+                    "<system>", "</system>",
+                    "<user>", "</user>",
+                    "<assistant>", "</assistant>",
+                )
             ),
         }
-
-    # ------------------------------------------------------------------ #
-    #  Training                                                             #
-    # ------------------------------------------------------------------ #
 
     @classmethod
     def train(cls, texts: list[str], vocab_size: int = 1024, min_pair_freq: int = 2) -> "ByteBPETokenizer":
@@ -254,10 +210,6 @@ class ByteBPETokenizer:
             corpus = new_corpus
         return tok
 
-    # ------------------------------------------------------------------ #
-    #  Persistence                                                          #
-    # ------------------------------------------------------------------ #
-
     def save(self, path: str | Path) -> None:
         Path(path).parent.mkdir(parents=True, exist_ok=True)
         payload = {
@@ -267,30 +219,19 @@ class ByteBPETokenizer:
             "vocab": self.vocab,
             "merges": self.merges,
         }
-        Path(path).write_text(json.dumps(payload, indent=2))
+        Path(path).write_text(json.dumps(payload, indent=2), encoding="utf-8")
 
     @classmethod
     def load(cls, path: str | Path, *, extend_specials: bool = False) -> "ByteBPETokenizer":
-        data = json.loads(Path(path).read_text())
-        vocab: dict[str, int] = {k: int(v) for k, v in data["vocab"].items()}
-        merges: list[tuple[str, str]] = [tuple(x) for x in data["merges"]]  # type: ignore[misc]
+        data = json.loads(Path(path).read_text(encoding="utf-8"))
+        vocab = {k: int(v) for k, v in data["vocab"].items()}
+        merges = [tuple(x) for x in data["merges"]]
         tok = cls(vocab=vocab, merges=merges)
 
-        # Optional: auto-extend with chat specials (disabled by default so
-        # existing checkpoints keep matching vocab sizes).
         if extend_specials:
             next_id = max(vocab.values()) + 1 if vocab else 0
-            extended = False
             for token in SPECIAL_TOKENS:
                 if token not in tok.vocab:
                     tok.vocab[token] = next_id
                     next_id += 1
-                    extended = True
-            if extended:
-                import warnings
-                warnings.warn(
-                    "Loaded tokenizer is missing new special tokens — they have been "
-                    "appended at the end of the vocabulary. Re-save to persist this.",
-                    stacklevel=2,
-                )
         return tok
