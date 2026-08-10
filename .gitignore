@@ -1,8 +1,158 @@
+# =========================================================
+# Python
+# =========================================================
 .venv/
+venv/
+env/
+
 __pycache__/
-*.pyc
+*.py[cod]
+*$py.class
+
 .pytest_cache/
-artifacts/checkpoints/*.pt
-artifacts/registry/*/weights.pt
-*.sqlite3
+.coverage
+htmlcov/
+.mypy_cache/
+.ruff_cache/
+
+# =========================================================
+# Environment / Secrets
+# =========================================================
 .env
+.env.*
+!.env.example
+
+*.pem
+*.key
+*.crt
+credentials.json
+secrets.json
+
+# =========================================================
+# IDE / OS
+# =========================================================
+.DS_Store
+.idea/
+.vscode/
+
+# =========================================================
+# Databases
+# =========================================================
+*.sqlite
+*.sqlite3
+*.db
+
+# =========================================================
+# Production Training Corpus
+# DO NOT COMMIT LARGE DATASETS TO GITHUB
+# =========================================================
+data/production-corpus/raw/
+data/production-corpus/clean/
+data/production-corpus/shards/
+data/production-corpus/cache/
+
+# Hugging Face dataset/download caches
+.cache/
+.cache/huggingface/
+huggingface_cache/
+hf_cache/
+
+# Large corpus files anywhere
+*.parquet
+*.arrow
+*.tar
+*.tar.gz
+*.tgz
+*.zst
+*.gz
+
+# Optional large JSONL/TXT shards
+data/**/*.jsonl
+data/**/*.txt
+
+# But keep your tiny repository examples
+!data/example_corpus.txt
+!data/example_sft.jsonl
+!data/example_preferences.jsonl
+!data/example_reward.jsonl
+
+# =========================================================
+# Model Checkpoints / Weights
+# =========================================================
+artifacts/checkpoints/
+artifacts/sft/
+artifacts/dpo/
+artifacts/reward/
+artifacts/models/
+
+*.pt
+*.pth
+*.ckpt
+*.bin
+*.safetensors
+
+# DeepSpeed / distributed checkpoint files
+zero_pp_rank_*
+mp_rank_*
+bf16_zero_pp_rank_*
+fp16_zero_pp_rank_*
+latest
+
+# =========================================================
+# 70B Checkpoints
+# =========================================================
+artifacts/om-70b/
+checkpoints/
+checkpoints-*/
+model-*-of-*.safetensors
+optimizer.pt
+scheduler.pt
+
+# =========================================================
+# Registry large weights only
+# =========================================================
+artifacts/registry/*/weights.pt
+artifacts/registry/*/*.safetensors
+
+# =========================================================
+# Tokenizers
+# =========================================================
+
+# Ignore locally generated/demo tokenizer artifacts
+artifacts/tokenizer-fixed*.json
+artifacts/tokenizer-v*.json
+
+# If production tokenizer is stored externally, ignore it too
+artifacts/tokenizer-production-*.json
+
+# =========================================================
+# Corpus generated artifacts
+# =========================================================
+artifacts/corpus/*.jsonl
+artifacts/corpus/shards/
+artifacts/corpus/cache/
+
+# KEEP manifests/audits because they are small and useful
+!artifacts/corpus/*.json
+!artifacts/manifests/
+!artifacts/manifests/**
+
+# =========================================================
+# Training logs
+# =========================================================
+logs/
+runs/
+wandb/
+tensorboard/
+*.log
+
+# =========================================================
+# Temporary files
+# =========================================================
+tmp/
+temp/
+*.tmp
+*.bak
+*.pre70b.bak
+*.before-chat-fix.bak
+*.before-production-tokenizer.bak
