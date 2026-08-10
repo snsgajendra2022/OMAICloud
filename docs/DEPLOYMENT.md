@@ -5,8 +5,11 @@
 ```bash
 python3 -m venv .venv && source .venv/bin/activate
 pip install -e .
+# Optional: copy .env.example → .env and edit. `om-ai serve` loads .env automatically.
 om-ai serve --host 0.0.0.0 --port 8080
 ```
+
+You do **not** need `source .env` before every serve — the CLI/API load `.env` into the process at startup (existing shell exports still win).
 
 ## Docker
 

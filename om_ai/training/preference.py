@@ -17,14 +17,33 @@ class PreferenceDataset(Dataset):
     def __len__(self): return len(self.rows)
     def __getitem__(self,i): return self.rows[i]
 
-    def encode_pair(self,prompt,response):
-        prefix=f"<user>\n{prompt}\n</user>\n<assistant>\n"
-        pids=self.tok.encode(prefix,add_bos=True)
-        rids=self.tok.encode(response+"\n</assistant>",add_eos=True)
-        ids=(pids+rids)[:self.max_seq_len]
-        response_start=min(len(pids),len(ids))
-        mask=[0]*response_start+[1]*max(0,len(ids)-response_start)
-        return ids,mask
+    def encode_pair(self, prompt, response):
+        """Encode prompt/response with the same chat specials as SFT/inference."""
+        messages = [{"role": "user", "content": prompt}]
+        if self.tok.inspect().get("chat_tokens_available"):
+            prefix = self.tok.encode_chat(messages, add_generation_prompt=True)
+            full = self.tok.encode_chat(
+                messages + [{"role": "assistant", "content": response}],
+                add_generation_prompt=False,
+                add_eos=True,
+            )
+            if full[: len(prefix)] != prefix:
+                raise ValueError(
+                    "Preference chat encoding mismatch: generation prompt is "
+                    "not a prefix of the completed dialogue encoding."
+                )
+            ids = full[: self.max_seq_len]
+            response_start = min(len(prefix), len(ids))
+        else:
+            # Legacy vocab fallback (byte-encodes angle brackets — avoid for new runs).
+            pids = self.tok.encode(
+                f"<user>\n{prompt}\n</user>\n<assistant>\n", add_bos=True
+            )
+            rids = self.tok.encode(response + "\n</assistant>", add_eos=True)
+            ids = (pids + rids)[: self.max_seq_len]
+            response_start = min(len(pids), len(ids))
+        mask = [0] * response_start + [1] * max(0, len(ids) - response_start)
+        return ids, mask
 
     def collate(self,batch):
         enc=[]

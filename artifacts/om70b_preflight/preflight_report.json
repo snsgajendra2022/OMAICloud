@@ -1,0 +1,51 @@
+{
+  "ok": false,
+  "checks": [
+    {
+      "name": "config",
+      "ok": true,
+      "detail": "layers=80 d_model=8192 ~69.0B params (architecture only)",
+      "required": true
+    },
+    {
+      "name": "corpus",
+      "ok": true,
+      "detail": "1 file(s), 535 bytes at data/example_corpus.txt",
+      "required": true
+    },
+    {
+      "name": "tokenizer.vocab",
+      "ok": false,
+      "detail": "vocab_size=334 looks too small vs config vocab_size=65536",
+      "required": true
+    },
+    {
+      "name": "cuda",
+      "ok": false,
+      "detail": "CUDA not available. Mac/CPU can develop software and run tiny smoke jobs; final OM-70B pretraining needs a GPU cluster.",
+      "required": true
+    },
+    {
+      "name": "distributed.env",
+      "ok": true,
+      "detail": "single-process / will be set by torchrun or deepspeed launcher",
+      "required": false
+    },
+    {
+      "name": "disk.free",
+      "ok": true,
+      "detail": "free=3.3 GiB at artifacts/om70b_preflight (min_free_gb=1.0)",
+      "required": true
+    },
+    {
+      "name": "deepspeed",
+      "ok": false,
+      "detail": "not installed \u2014 pip install -e '.[deepSpeed]' on the training cluster",
+      "required": false
+    }
+  ],
+  "summary": {
+    "ready_to_train": false,
+    "note": "Passing preflight means the *software path* can start. It does not mean OM-70B is trained or frontier-capable."
+  }
+}

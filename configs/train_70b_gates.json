@@ -1,0 +1,22 @@
+{
+  "min_benchmark_score": 0.0,
+  "require_benchmark_file": true,
+  "never_claim_frontier_without_metrics": true,
+  "target": "Develop OM-70B toward frontier-class general assistant capability.",
+  "requirements": [
+    "strong reasoning",
+    "coding",
+    "mathematics",
+    "general knowledge",
+    "multilingual capability",
+    "instruction following",
+    "long context",
+    "tool calling",
+    "RAG",
+    "agent execution",
+    "self-correction",
+    "safety",
+    "multimodal capability"
+  ],
+  "promotion_rule": "Never claim GPT-equivalent or frontier capability unless measured benchmark results support that conclusion. Never set trained=True without passing gates."
+}

@@ -128,5 +128,11 @@ def test_project_discovery():
 def test_tokenizer_chat_tokens():
     tok = ByteBPETokenizer.base()
     assert "<user>" in tok.vocab
-    ids = tok.encode_chat([{"role": "user", "content": "hi"}])
+    ids = tok.encode_chat(
+        [{"role": "user", "content": "hi"}],
+        add_generation_prompt=True,
+    )
     assert isinstance(ids, list) and len(ids) > 0
+    assert ids[0] == tok.bos_id
+    assert ids[-1] == tok.assistant_id
+    assert tok.eos_id not in ids

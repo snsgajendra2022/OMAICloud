@@ -316,6 +316,14 @@ def serve(args):
     import sys
     import uvicorn
 
+    from om_ai.env import load_dotenv
+
+    # ``.env`` is a file — it is not automatically the process environment.
+    # Load once here so `om-ai serve` picks up OM_AI_* without `source .env`.
+    loaded = load_dotenv()
+    if loaded is not None:
+        print(f"Loaded environment from {loaded}", file=sys.stderr)
+
     # Never silently start a 70B training job from the API server.
     if os.getenv("OM_AI_AUTO_TRAIN_70B", "0") == "1":
         print(

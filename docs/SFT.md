@@ -14,7 +14,12 @@ Example: `data/example_sft.jsonl`.
 
 ## Behavior
 
-`SFTTrainer` / `SFTDataset` mask prompt (and system) tokens and optimize **response** tokens only (causal LM loss on assistant span).
+`SFTTrainer` / `SFTDataset` use `tokenizer.encode_chat` (same special-token IDs as inference):
+
+- training: `<bos>…<user>…</user><assistant>answer</assistant><eos>`
+- inference prompt: same prefix ending at opening `<assistant>` (`add_generation_prompt=True`)
+
+Prompt tokens through the opening `<assistant>` are label-masked; loss is on the assistant span only. The tokenizer must include chat specials (`<system>`, `<user>`, `<assistant>`) — do not SFT with the legacy demo vocab that only has pad/bos/eos/unk.
 
 ## Run
 

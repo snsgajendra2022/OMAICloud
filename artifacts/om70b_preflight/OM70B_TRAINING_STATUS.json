@@ -1,0 +1,19 @@
+{
+  "stage": "FAILED",
+  "updated_at": "2026-08-08T09:14:30.312163+00:00",
+  "config": "configs/70b.json",
+  "data": "data/example_corpus.txt",
+  "tokenizer": "artifacts/demo/tokenizer.json",
+  "output": "artifacts/om70b_preflight",
+  "strategy": "deepspeed_zero3",
+  "messages": [
+    "2026-08-08T09:14:30.311985+00:00 Preflight ok=False \u2192 artifacts/om70b_preflight/preflight_report.json",
+    "2026-08-08T09:14:30.312155+00:00 Preflight failed \u2014 refusing to start 70B training."
+  ],
+  "artifacts": {
+    "preflight_report": "artifacts/om70b_preflight/preflight_report.json"
+  },
+  "metrics": {},
+  "trained": false,
+  "production_candidate": false
+}

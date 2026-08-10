@@ -152,9 +152,15 @@ class LocalLLMEngine:
         assert self.tokenizer is not None
 
         if hasattr(self.tokenizer, "encode_chat") and self.tokenizer.inspect().get("chat_tokens_available"):
-            ids = self.tokenizer.encode_chat(messages)
-            ids = ids[-self.model.cfg.max_seq_len:]  # type: ignore[union-attr]
+            # End at opening <assistant> so the model continues the reply —
+            # never append <eos> before generation.
+            ids = self.tokenizer.encode_chat(messages, add_generation_prompt=True)
+            ids = ids[-self.model.cfg.max_seq_len :]  # type: ignore[union-attr]
             x = torch.tensor([ids], device=self.device)
+            stop_ids: list[int] = []
+            asst_end = self.tokenizer.assistant_end_id
+            if asst_end is not None:
+                stop_ids.append(asst_end)
             out = self.model.generate(  # type: ignore[union-attr]
                 x,
                 max_new_tokens=gen_kwargs.get("max_new_tokens", 256),
@@ -163,8 +169,12 @@ class LocalLLMEngine:
                 top_p=gen_kwargs.get("top_p", 1.0),
                 repetition_penalty=gen_kwargs.get("repetition_penalty", 1.0),
                 eos_token_id=self.tokenizer.eos_id,
+                stop_token_ids=stop_ids or None,
             )
-            return self.tokenizer.decode(out[0].tolist())
+            # Decode only newly generated tokens (skip the chat prompt).
+            prompt_len = x.size(1)
+            new_ids = out[0, prompt_len:].tolist()
+            return self.tokenizer.decode(new_ids)
 
         # Fallback: simple text formatting
         parts: list[str] = []

@@ -8,6 +8,12 @@ import warnings
 from pathlib import Path
 from typing import AsyncGenerator
 
+# Load repo ``.env`` into the process before any ``os.getenv`` below.
+# Without this, values in ``.env`` are ignored unless the user ``source``s them.
+from om_ai.env import load_dotenv
+
+load_dotenv()
+
 from fastapi import Depends, FastAPI, HTTPException, Request, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse

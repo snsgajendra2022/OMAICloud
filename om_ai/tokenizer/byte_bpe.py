@@ -137,19 +137,43 @@ class ByteBPETokenizer:
     #  Chat encoding                                                        #
     # ------------------------------------------------------------------ #
 
-    def encode_chat(self, messages: list[dict]) -> list[int]:
-        """Encode a list of chat messages into a flat token id sequence.
+    def encode_chat(
+        self,
+        messages: list[dict],
+        *,
+        add_generation_prompt: bool = False,
+        add_eos: bool | None = None,
+    ) -> list[int]:
+        """Encode chat messages into a flat token-id sequence.
 
         Each message dict must have ``role`` (system | user | assistant) and
-        ``content`` (str).  The sequence starts with ``<bos>`` and the final
-        assistant turn is closed with ``<eos>``.
+        ``content`` (str).  Role wrappers use dedicated special-token IDs when
+        present (never byte-encoded angle-bracket text).
 
-        Falls back gracefully if chat special tokens are missing (old vocab).
+        Training / completed dialogue (default)::
+
+            <bos><system>…</system><user>…</user><assistant>…</assistant><eos>
+
+        Inference prompt (``add_generation_prompt=True``)::
+
+            <bos><system>…</system><user>…</user><assistant>
+                                                      ↑ generation starts here
+
+        When ``add_eos`` is omitted it defaults to ``not add_generation_prompt``.
+        Falls back gracefully if chat special tokens are missing (legacy vocab).
         """
+        if add_eos is None:
+            add_eos = not add_generation_prompt
+
         ids: list[int] = [self.bos_id]
         for msg in messages:
-            role = msg.get("role", "user").lower()
+            role = str(msg.get("role", "user")).lower()
             content = msg.get("content", "")
+            if content is None:
+                content = ""
+            elif not isinstance(content, str):
+                content = str(content)
+
             if role == "system":
                 open_tok = self._special_id("<system>")
                 close_tok = self._special_id("</system>")
@@ -166,7 +190,12 @@ class ByteBPETokenizer:
             if close_tok is not None:
                 ids.append(close_tok)
 
-        ids.append(self.eos_id)
+        if add_generation_prompt:
+            open_asst = self._special_id("<assistant>")
+            if open_asst is not None:
+                ids.append(open_asst)
+        elif add_eos:
+            ids.append(self.eos_id)
         return ids
 
     # ------------------------------------------------------------------ #

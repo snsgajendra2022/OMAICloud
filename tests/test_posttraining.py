@@ -13,12 +13,31 @@ from om_ai.training.reward_model import RewardModel
 def test_sft_dpo_reward_shapes(tmp_path):
     tok=ByteBPETokenizer.base()
     sft=tmp_path/'sft.jsonl'; sft.write_text(json.dumps({'prompt':'Hi','response':'Hello'})+'\n')
-    ds=SFTDataset(str(sft),tok,32); x,y=ds.collate([ds[0]])
-    cfg=ModelConfig(vocab_size=len(tok.vocab),max_seq_len=32,n_layers=1,n_heads=4,d_model=32,d_ff=64)
+    ds=SFTDataset(str(sft),tok,64); x,y=ds.collate([ds[0]])
+    # Prompt through opening <assistant> is masked; response tokens are supervised.
+    ids, labels = ds[0]
+    prefix = tok.encode_chat([{"role": "user", "content": "Hi"}], add_generation_prompt=True)
+    assert labels[: len(prefix)] == [-100] * len(prefix)
+    assert any(t != -100 for t in labels[len(prefix) :])
+    cfg=ModelConfig(vocab_size=len(tok.vocab),max_seq_len=64,n_layers=1,n_heads=4,d_model=32,d_ff=64)
     model=OMTransformer(cfg)
     assert model(x,labels=y)['loss'].ndim==0
 
     pref=tmp_path/'pref.jsonl'; pref.write_text(json.dumps({'prompt':'2+2','chosen':'4','rejected':'5'})+'\n')
-    pds=PreferenceDataset(str(pref),tok,32); b=pds.collate([pds[0]])
+    pds=PreferenceDataset(str(pref),tok,64); b=pds.collate([pds[0]])
     lp=sequence_logprob(model,b['chosen_ids'],b['chosen_mask']); assert lp.shape==(1,)
     rm=RewardModel(model); scores=rm(b['chosen_ids'],b['chosen_ids']!=tok.pad_id); assert scores.shape==(1,)
+
+
+def test_sft_rejects_legacy_tokenizer_without_chat_specials(tmp_path):
+    # Simulate old demo vocab: only pad/bos/eos/unk + bytes.
+    tok = ByteBPETokenizer.base()
+    for t in ("<system>", "</system>", "<user>", "</user>", "<assistant>", "</assistant>"):
+        del tok.vocab[t]
+    sft = tmp_path / "sft.jsonl"
+    sft.write_text(json.dumps({"prompt": "Hi", "response": "Hello"}) + "\n")
+    try:
+        SFTDataset(str(sft), tok, 32)
+        assert False, "expected ValueError"
+    except ValueError as exc:
+        assert "chat specials" in str(exc)

@@ -1,44 +1,83 @@
 from __future__ import annotations
 from dataclasses import dataclass
 from pathlib import Path
-import json, math
+import json
 import torch
 from torch.utils.data import Dataset, DataLoader
 from om_ai.tokenizer import ByteBPETokenizer
 
 
 class SFTDataset(Dataset):
+    """JSONL SFT rows encoded with the same ``encode_chat`` path as inference.
+
+    Each row: ``{"system"?: str, "prompt"|"instruction": str, "response"|"output": str}``
+
+    Sequence layout matches training format::
+
+        <bos><system>…</system><user>…</user><assistant>…</assistant><eos>
+
+    Prompt tokens through the opening ``<assistant>`` are label-masked (-100);
+    loss is on the assistant content, ``</assistant>``, and ``<eos>``.
+    """
+
     def __init__(self, path: str, tokenizer: ByteBPETokenizer, max_seq_len: int):
-        self.rows=[]; self.tok=tokenizer; self.max_seq_len=max_seq_len
-        for line in Path(path).read_text(encoding="utf-8",errors="ignore").splitlines():
-            if not line.strip(): continue
-            obj=json.loads(line)
-            prompt=str(obj.get("prompt", obj.get("instruction", "")))
-            response=str(obj.get("response", obj.get("output", "")))
-            system=str(obj.get("system", ""))
-            prefix=(f"<system>\n{system}\n</system>\n" if system else "") + f"<user>\n{prompt}\n</user>\n<assistant>\n"
-            prefix_ids=tokenizer.encode(prefix, add_bos=True)
-            response_ids=tokenizer.encode(response+"\n</assistant>", add_eos=True)
-            ids=(prefix_ids+response_ids)[:max_seq_len]
-            labels=ids.copy()
-            cutoff=min(len(prefix_ids),len(labels))
-            labels[:cutoff]=[-100]*cutoff
-            if len(ids)>=2: self.rows.append((ids,labels))
-        if not self.rows: raise ValueError("No usable SFT rows")
+        self.rows: list[tuple[list[int], list[int]]] = []
+        self.tok = tokenizer
+        self.max_seq_len = max_seq_len
+        if not tokenizer.inspect().get("chat_tokens_available"):
+            raise ValueError(
+                "SFT requires a tokenizer with chat specials "
+                "(<system>, <user>, <assistant>). Train/save a new tokenizer; "
+                "do not use the legacy demo vocab that only has pad/bos/eos/unk."
+            )
+        for line in Path(path).read_text(encoding="utf-8", errors="ignore").splitlines():
+            if not line.strip():
+                continue
+            obj = json.loads(line)
+            prompt = str(obj.get("prompt", obj.get("instruction", "")))
+            response = str(obj.get("response", obj.get("output", "")))
+            system = str(obj.get("system", "") or "")
+            messages: list[dict] = []
+            if system:
+                messages.append({"role": "system", "content": system})
+            messages.append({"role": "user", "content": prompt})
+            prefix_ids = tokenizer.encode_chat(messages, add_generation_prompt=True)
+            full_ids = tokenizer.encode_chat(
+                messages + [{"role": "assistant", "content": response}],
+                add_generation_prompt=False,
+                add_eos=True,
+            )
+            if full_ids[: len(prefix_ids)] != prefix_ids:
+                raise ValueError(
+                    "SFT chat encoding mismatch: generation prompt is not a "
+                    "prefix of the completed dialogue encoding."
+                )
+            ids = full_ids[:max_seq_len]
+            labels = ids.copy()
+            cutoff = min(len(prefix_ids), len(labels))
+            labels[:cutoff] = [-100] * cutoff
+            if len(ids) >= 2:
+                self.rows.append((ids, labels))
+        if not self.rows:
+            raise ValueError("No usable SFT rows")
 
-    def __len__(self): return len(self.rows)
-    def __getitem__(self, idx): return self.rows[idx]
+    def __len__(self):
+        return len(self.rows)
 
-    def collate(self,batch):
-        maxlen=max(len(x[0]) for x in batch)
-        xs=[]; ys=[]
-        for ids,labels in batch:
-            pad=maxlen-len(ids)
-            full_ids=ids+[self.tok.pad_id]*pad
-            full_labels=labels+[-100]*pad
+    def __getitem__(self, idx):
+        return self.rows[idx]
+
+    def collate(self, batch):
+        maxlen = max(len(x[0]) for x in batch)
+        xs = []
+        ys = []
+        for ids, labels in batch:
+            pad = maxlen - len(ids)
+            full_ids = ids + [self.tok.pad_id] * pad
+            full_labels = labels + [-100] * pad
             xs.append(full_ids[:-1])
             ys.append(full_labels[1:])
-        return torch.tensor(xs,dtype=torch.long), torch.tensor(ys,dtype=torch.long)
+        return torch.tensor(xs, dtype=torch.long), torch.tensor(ys, dtype=torch.long)
 
 
 @dataclass(slots=True)
