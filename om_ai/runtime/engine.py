@@ -5,7 +5,7 @@ from typing import Generator
 import torch
 from om_ai.core.config import ModelConfig
 from om_ai.model import OMTransformer
-from om_ai.tokenizer import ByteBPETokenizer
+from om_ai.tokenizer import load_tokenizer
 
 logger = logging.getLogger(__name__)
 
@@ -20,7 +20,7 @@ class LocalLLMEngine:
 
     def load(self, config_path: str, tokenizer_path: str, checkpoint_path: str, device: str | None = None) -> dict:
         cfg = ModelConfig.from_json(config_path)
-        self.tokenizer = ByteBPETokenizer.load(tokenizer_path, extend_specials=False)
+        self.tokenizer = load_tokenizer(tokenizer_path)
         if cfg.vocab_size != len(self.tokenizer.vocab):
             cfg.vocab_size = len(self.tokenizer.vocab)
 

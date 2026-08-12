@@ -69,9 +69,9 @@ def check_tokenizer(tokenizer_path: str | Path, *, expect_vocab: int | None = No
     if not path.is_file():
         return CheckResult("tokenizer.exists", False, f"missing: {path}")
     try:
-        from om_ai.tokenizer import ByteBPETokenizer
+        from om_ai.tokenizer import load_tokenizer
 
-        tok = ByteBPETokenizer.load(path)
+        tok = load_tokenizer(path)
         n = len(tok.vocab)
     except Exception as exc:
         return CheckResult("tokenizer.load", False, f"failed to load: {exc}")

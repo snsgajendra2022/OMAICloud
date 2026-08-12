@@ -12,7 +12,7 @@ from torch.nn.parallel import DistributedDataParallel as DDP
 from torch.utils.data import DataLoader, DistributedSampler
 
 from om_ai.core.config import ModelConfig
-from om_ai.tokenizer import ByteBPETokenizer
+from om_ai.tokenizer import load_tokenizer
 from om_ai.training.partition_init import create_om_transformer, wrap_fsdp
 from om_ai.training.trainer import build_dataset
 
@@ -42,7 +42,7 @@ def main():
     device = torch.device(f"cuda:{local_rank}" if torch.cuda.is_available() else "cpu")
 
     cfg = ModelConfig.from_json(args.config)
-    tok = ByteBPETokenizer.load(args.tokenizer)
+    tok = load_tokenizer(args.tokenizer)
     cfg.vocab_size = len(tok.vocab)
 
     if args.strategy == "fsdp" and args.partition_init:

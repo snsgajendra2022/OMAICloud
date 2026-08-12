@@ -223,7 +223,34 @@ class ByteBPETokenizer:
 
     @classmethod
     def load(cls, path: str | Path, *, extend_specials: bool = False) -> "ByteBPETokenizer":
-        data = json.loads(Path(path).read_text(encoding="utf-8"))
+        path = Path(path)
+        data = json.loads(path.read_text(encoding="utf-8"))
+        if not isinstance(data, dict):
+            raise ValueError(
+                f"Invalid tokenizer JSON at {path}: expected an object with "
+                f"'vocab' and 'merges' (OM ByteBPETokenizer format)."
+            )
+        if "vocab" not in data or "merges" not in data:
+            looks_hf = (
+                "model" in data
+                or "added_tokens" in data
+                or data.get("version") in ("1.0", 1.0)
+            )
+            hint = (
+                " This looks like a HuggingFace `tokenizers` JSON "
+                "(top-level keys like model/added_tokens), not OM ByteBPE."
+                if looks_hf
+                else f" Top-level keys found: {sorted(data.keys())[:12]}."
+            )
+            raise ValueError(
+                f"Tokenizer at {path} is not OM ByteBPE format "
+                f"(requires top-level 'vocab' and 'merges').{hint} "
+                "Train or use an OM tokenizer, e.g. "
+                "`om-ai tokenizer train --input <corpus> --output artifacts/tokenizer-om-production.json --vocab-size 4096`, "
+                "or pass a known OM file such as `artifacts/tokenizer-fixed-v3.json` "
+                "(chat specials included). Do not pass HuggingFace tokenizer JSON "
+                "from scripts/train_production_tokenizer.py."
+            )
         vocab = {k: int(v) for k, v in data["vocab"].items()}
         merges = [tuple(x) for x in data["merges"]]
         tok = cls(vocab=vocab, merges=merges)

@@ -1,5 +1,5 @@
 {
-  "vocab_size": 65536,
+  "vocab_size": 4096,
   "max_seq_len": 8192,
   "n_layers": 24,
   "n_heads": 16,

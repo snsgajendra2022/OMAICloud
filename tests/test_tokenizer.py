@@ -1,3 +1,8 @@
+import json
+from pathlib import Path
+
+import pytest
+
 from om_ai.tokenizer import ByteBPETokenizer
 from om_ai.tokenizer.byte_bpe import SPECIAL_TOKENS
 
@@ -6,6 +11,40 @@ def test_roundtrip_unicode():
     text = "Hello OM AI — नमस्ते"
     tok = ByteBPETokenizer.train([text, text], vocab_size=300, min_pair_freq=1)
     assert tok.decode(tok.encode(text)) == text
+
+
+def test_load_om_format_roundtrip(tmp_path: Path):
+    text = "OM ByteBPE load test"
+    tok = ByteBPETokenizer.train([text], vocab_size=300, min_pair_freq=1)
+    path = tmp_path / "om-tok.json"
+    tok.save(path)
+    loaded = ByteBPETokenizer.load(path)
+    assert loaded.vocab == tok.vocab
+    assert loaded.merges == tok.merges
+    assert loaded.decode(loaded.encode(text)) == text
+
+
+def test_load_huggingface_format_raises_clear_error(tmp_path: Path):
+    path = tmp_path / "hf-tok.json"
+    path.write_text(
+        json.dumps(
+            {
+                "version": "1.0",
+                "truncation": None,
+                "padding": None,
+                "added_tokens": [{"id": 0, "content": "<pad>", "special": True}],
+                "normalizer": {"type": "NFKC"},
+                "pre_tokenizer": {"type": "ByteLevel"},
+                "model": {"type": "BPE", "vocab": {}, "merges": []},
+            }
+        ),
+        encoding="utf-8",
+    )
+    with pytest.raises(ValueError, match="not OM ByteBPE|HuggingFace|vocab.*merges") as exc:
+        ByteBPETokenizer.load(path)
+    msg = str(exc.value)
+    assert "vocab" in msg and "merges" in msg
+    assert "HuggingFace" in msg or "om-ai tokenizer train" in msg
 
 
 def test_base_includes_chat_specials():

@@ -9,7 +9,7 @@ import torch
 
 from om_ai.core.config import ModelConfig
 from om_ai.model import OMTransformer
-from om_ai.tokenizer import ByteBPETokenizer
+from om_ai.tokenizer import ByteBPETokenizer, load_tokenizer
 from om_ai.data import DatasetPipeline
 from om_ai.training import (
     Trainer,
@@ -36,7 +36,7 @@ from om_ai.discovery import ProjectDiscovery
 
 def load_model(config_path, tokenizer_path, checkpoint=None, device=None):
     cfg = ModelConfig.from_json(config_path)
-    tok = ByteBPETokenizer.load(tokenizer_path)
+    tok = load_tokenizer(tokenizer_path)
     cfg.vocab_size = len(tok.vocab)
     dev = torch.device(
         device
@@ -74,7 +74,7 @@ def model_info(args):
         "note": "Estimate from architecture JSON. Instantiate with matching vocab for exact count.",
     }
     if args.tokenizer:
-        tok = ByteBPETokenizer.load(args.tokenizer)
+        tok = load_tokenizer(args.tokenizer)
         cfg.vocab_size = len(tok.vocab)
         model = OMTransformer(cfg)
         payload["exact_parameters"] = model.exact_parameter_count()
@@ -93,20 +93,20 @@ def tokenizer_train(args):
 
 
 def tokenizer_inspect(args):
-    tok = ByteBPETokenizer.load(args.tokenizer)
+    tok = load_tokenizer(args.tokenizer)
     print(json.dumps(tok.inspect() if hasattr(tok, "inspect") else {
         "vocab_size": len(tok.vocab), "merges": len(tok.merges)
     }, indent=2))
 
 
 def tokenizer_encode(args):
-    tok = ByteBPETokenizer.load(args.tokenizer)
+    tok = load_tokenizer(args.tokenizer)
     ids = tok.encode(args.text, add_bos=args.bos, add_eos=args.eos)
     print(json.dumps({"ids": ids, "n_tokens": len(ids)}))
 
 
 def tokenizer_decode(args):
-    tok = ByteBPETokenizer.load(args.tokenizer)
+    tok = load_tokenizer(args.tokenizer)
     ids = json.loads(args.ids) if args.ids.strip().startswith("[") else [int(x) for x in args.ids.split(",")]
     print(json.dumps({"text": tok.decode(ids)}))
 

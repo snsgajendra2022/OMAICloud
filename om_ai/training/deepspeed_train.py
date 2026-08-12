@@ -10,7 +10,7 @@ import torch
 from torch.utils.data import DataLoader
 
 from om_ai.core.config import ModelConfig
-from om_ai.tokenizer import ByteBPETokenizer
+from om_ai.tokenizer import load_tokenizer
 from om_ai.training.partition_init import create_om_transformer, recommended_strategy
 from om_ai.training.trainer import build_dataset
 
@@ -39,7 +39,7 @@ def main():
     args = ap.parse_args()
 
     cfg = ModelConfig.from_json(args.config)
-    tok = ByteBPETokenizer.load(args.tokenizer)
+    tok = load_tokenizer(args.tokenizer)
     cfg.vocab_size = len(tok.vocab)
     ds_cfg = json.load(open(args.deepspeed))
     out_dir = Path(
