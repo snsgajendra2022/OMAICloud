@@ -46,13 +46,34 @@ def main():
 
     try:
         raw = json.loads(tokenizer.read_text(encoding="utf-8"))
-        vocab = raw.get("vocab", {})
-        report["tokenizer"]["vocab_size"] = len(vocab)
-        report["tokenizer"]["chat_tokens"] = all(
-            t in vocab
-            for t in ("<system>", "</system>", "<user>", "</user>", "<assistant>", "</assistant>")
+        chat_needed = (
+            "<system>",
+            "</system>",
+            "<user>",
+            "</user>",
+            "<assistant>",
+            "</assistant>",
         )
+        # Native OM ByteBPE format
+        vocab = raw.get("vocab") or {}
+        # HuggingFace tokenizers.json (e.g. artifacts/tokenizer-production-65536.json)
+        if not vocab and isinstance(raw.get("model"), dict):
+            vocab = dict(raw["model"].get("vocab") or {})
+            report["tokenizer"]["format"] = "huggingface_tokenizers"
+            for tok in raw.get("added_tokens") or []:
+                if isinstance(tok, dict) and tok.get("content") is not None:
+                    vocab[str(tok["content"])] = int(tok.get("id", len(vocab)))
+        else:
+            report["tokenizer"]["format"] = "om_byte_bpe"
+        report["tokenizer"]["vocab_size"] = len(vocab)
+        report["tokenizer"]["chat_tokens"] = all(t in vocab for t in chat_needed)
         report["tokenizer"]["ok"] = report["tokenizer"]["ok"] and report["tokenizer"]["chat_tokens"]
+        if report["tokenizer"]["format"] == "huggingface_tokenizers":
+            report["tokenizer"]["note"] = (
+                "HF tokenizers.json detected. om-ai train/train-70b currently loads "
+                "ByteBPETokenizer (vocab+merges). Convert or re-export to OM ByteBPE "
+                "before cluster training."
+            )
     except Exception as exc:
         report["tokenizer"]["ok"] = False
         report["tokenizer"]["error"] = str(exc)

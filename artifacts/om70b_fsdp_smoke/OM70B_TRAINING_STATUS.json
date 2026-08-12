@@ -1,0 +1,22 @@
+{
+  "stage": "FAILED",
+  "updated_at": "2026-08-12T13:18:24.424085+00:00",
+  "config": "configs/tiny.json",
+  "data": "/Users/gajendrarawat/Downloads/om-ai-operating-brain 3/data/production-corpus/clean/fineweb-clean.jsonl",
+  "tokenizer": "/Users/gajendrarawat/Downloads/om-ai-operating-brain 3/artifacts/tokenizer-fixed-v3.json",
+  "output": "/Users/gajendrarawat/Downloads/om-ai-operating-brain 3/artifacts/om70b_fsdp_smoke",
+  "strategy": "fsdp",
+  "messages": [
+    "2026-08-12T13:17:08.236341+00:00 Preflight ok=True \u2192 /Users/gajendrarawat/Downloads/om-ai-operating-brain 3/artifacts/om70b_fsdp_smoke/preflight_report.json",
+    "2026-08-12T13:18:24.423932+00:00 Pretrain exited with code -15"
+  ],
+  "artifacts": {
+    "preflight_report": "/Users/gajendrarawat/Downloads/om-ai-operating-brain 3/artifacts/om70b_fsdp_smoke/preflight_report.json"
+  },
+  "metrics": {
+    "pretrain_seconds": 76.19,
+    "pretrain_exit_code": -15
+  },
+  "trained": false,
+  "production_candidate": false
+}

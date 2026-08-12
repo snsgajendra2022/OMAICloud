@@ -128,10 +128,10 @@ if _AUTOLOAD:
         logger.exception("OM_AI_AUTOLOAD failed — API will start without a loaded model")
 
 # Dev-mode warning
-if not os.getenv("OM_AI_API_KEYS") and not os.getenv("OM_AI_API_KEYS_FILE"):
+if not os.getenv("OM_AI_API_KEYS") and not os.getenv("OM_AI_API_KEYS_FILE") and not os.getenv("OM_AI_API_KEYS_ADMIN"):
     warnings.warn(
         "OM AI is running in OPEN DEV MODE — no API keys configured. "
-        "Set OM_AI_API_KEYS or OM_AI_API_KEYS_FILE for production use.",
+        "Set OM_AI_API_KEYS, OM_AI_API_KEYS_ADMIN, or OM_AI_API_KEYS_FILE for production use.",
         stacklevel=1,
     )
 
@@ -608,11 +608,24 @@ def ui_home():
     return RedirectResponse(url="/ui/tokens")
 
 
-@app.get("/ui/tokens", tags=["UI"])
-def tokens_ui():
+def _serve_tokens_chat_ui():
     from fastapi.responses import HTMLResponse
     html_path = Path(__file__).parent / "static" / "tokens.html"
-    return HTMLResponse(html_path.read_text(encoding="utf-8"))
+    return HTMLResponse(
+        html_path.read_text(encoding="utf-8"),
+        headers={"Cache-Control": "no-store"},
+    )
+
+
+@app.get("/ui/tokens", tags=["UI"])
+def tokens_ui():
+    return _serve_tokens_chat_ui()
+
+
+@app.get("/ui/chat", tags=["UI"])
+def chat_ui():
+    """Same OM AI chat console as /ui/tokens (chat-first product surface)."""
+    return _serve_tokens_chat_ui()
 
 
 @app.get("/v1/tokens/meta", tags=["Tokens"])

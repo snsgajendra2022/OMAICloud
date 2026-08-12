@@ -2,6 +2,7 @@ README.md
 pyproject.toml
 om_ai/__init__.py
 om_ai/cli.py
+om_ai/env.py
 om_ai/actions/__init__.py
 om_ai/actions/base.py
 om_ai/actions/knowledge.py
@@ -57,6 +58,7 @@ om_ai/security/auth.py
 om_ai/security/rate_limit.py
 om_ai/security/secrets.py
 om_ai/security/ssrf.py
+om_ai/security/tokens.py
 om_ai/tenancy/__init__.py
 om_ai/tenancy/service.py
 om_ai/tokenizer/__init__.py
@@ -65,10 +67,13 @@ om_ai/training/__init__.py
 om_ai/training/deepspeed_train.py
 om_ai/training/distributed.py
 om_ai/training/dpo.py
+om_ai/training/partition_init.py
 om_ai/training/ppo.py
 om_ai/training/preference.py
+om_ai/training/preflight.py
 om_ai/training/reward_model.py
 om_ai/training/sft.py
+om_ai/training/train_70b.py
 om_ai/training/trainer.py
 om_ai/vision/__init__.py
 om_ai/vision/base.py
@@ -84,10 +89,13 @@ om_ai_operating_brain.egg-info/entry_points.txt
 om_ai_operating_brain.egg-info/requires.txt
 om_ai_operating_brain.egg-info/top_level.txt
 tests/test_agent.py
+tests/test_chat_pipeline.py
 tests/test_completion_platform.py
+tests/test_env.py
 tests/test_governance_feedback_integrations.py
 tests/test_memory.py
 tests/test_model.py
 tests/test_multimodal.py
 tests/test_posttraining.py
 tests/test_tokenizer.py
+tests/test_train_70b.py

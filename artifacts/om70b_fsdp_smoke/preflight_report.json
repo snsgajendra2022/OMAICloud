@@ -1,10 +1,10 @@
 {
-  "ok": false,
+  "ok": true,
   "checks": [
     {
       "name": "config",
       "ok": true,
-      "detail": "layers=80 d_model=8192 ~69.0B params (architecture only)",
+      "detail": "layers=4 d_model=256 ~0.0B params (architecture only)",
       "required": true
     },
     {
@@ -14,16 +14,16 @@
       "required": true
     },
     {
-      "name": "tokenizer.vocab",
-      "ok": false,
-      "detail": "vocab_size=340 looks too small vs config vocab_size=65536",
+      "name": "tokenizer",
+      "ok": true,
+      "detail": "vocab_size=340 path=/Users/gajendrarawat/Downloads/om-ai-operating-brain 3/artifacts/tokenizer-fixed-v3.json",
       "required": true
     },
     {
       "name": "cuda",
-      "ok": false,
+      "ok": true,
       "detail": "CUDA not available. Mac/CPU can develop software and run tiny smoke jobs; final OM-70B pretraining needs a GPU cluster.",
-      "required": true
+      "required": false
     },
     {
       "name": "distributed.env",
@@ -33,8 +33,8 @@
     },
     {
       "name": "disk.free",
-      "ok": false,
-      "detail": "free=23.0 GiB at /Users/gajendrarawat/Downloads/om-ai-operating-brain 3/artifacts/om70b_preflight (min_free_gb=500.0)",
+      "ok": true,
+      "detail": "free=25.5 GiB at /Users/gajendrarawat/Downloads/om-ai-operating-brain 3/artifacts/om70b_fsdp_smoke (min_free_gb=1.0)",
       "required": true
     },
     {
@@ -45,7 +45,7 @@
     }
   ],
   "summary": {
-    "ready_to_train": false,
+    "ready_to_train": true,
     "note": "Passing preflight means the *software path* can start. It does not mean OM-70B is trained or frontier-capable."
   }
 }

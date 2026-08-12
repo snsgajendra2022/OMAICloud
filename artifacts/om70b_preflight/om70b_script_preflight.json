@@ -1,0 +1,28 @@
+{
+  "config": {
+    "ok": true,
+    "path": "configs/70b.json"
+  },
+  "data": {
+    "ok": false,
+    "path": "/Users/gajendrarawat/Downloads/om-ai-operating-brain 3/data/production-corpus/clean/fineweb-clean.jsonl",
+    "bytes": 105665478
+  },
+  "tokenizer": {
+    "ok": true,
+    "path": "/Users/gajendrarawat/Downloads/om-ai-operating-brain 3/artifacts/tokenizer-fixed-v3.json",
+    "format": "om_byte_bpe",
+    "vocab_size": 340,
+    "chat_tokens": true
+  },
+  "cuda": {
+    "ok": false,
+    "gpu_count": 0,
+    "gpus": [],
+    "mps_available": false
+  },
+  "deepspeed": {
+    "ok": false
+  },
+  "ready": false
+}

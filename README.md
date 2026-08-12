@@ -30,6 +30,14 @@ om-ai serve --host 127.0.0.1 --port 8080
 
 One-shot tiny pipeline: `python scripts/run_actual_training_pipeline.py --steps 5`
 
+cd "/path/to/om-ai-operating-brain"
+source .venv/bin/activate
+pip install -e '.[deepSpeed]'
+export OM_AI_70B_DATA=/data/licensed-corpus   # ≥1GB, preferably much larger
+export OM_AI_70B_TOKENIZER=/data/tokenizer-bytebpe-65536.json  # OM ByteBPE + chat tokens
+export OM_AI_70B_OUTPUT=/checkpoints/om-70b
+./scripts/train_70b.sh
+
 ## Major CLI commands
 
 | Command | Purpose |

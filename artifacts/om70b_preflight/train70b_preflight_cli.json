@@ -1,0 +1,21 @@
+Preflight ok=False → /Users/gajendrarawat/Downloads/om-ai-operating-brain 3/artifacts/om70b_preflight/preflight_report.json
+Preflight failed — refusing to start 70B training.
+{
+  "stage": "FAILED",
+  "updated_at": "2026-08-12T13:26:45.840872+00:00",
+  "config": "configs/70b.json",
+  "data": "/Users/gajendrarawat/Downloads/om-ai-operating-brain 3/data/production-corpus/clean/fineweb-clean.jsonl",
+  "tokenizer": "/Users/gajendrarawat/Downloads/om-ai-operating-brain 3/artifacts/tokenizer-fixed-v3.json",
+  "output": "/Users/gajendrarawat/Downloads/om-ai-operating-brain 3/artifacts/om70b_preflight",
+  "strategy": "deepspeed_zero3",
+  "messages": [
+    "2026-08-12T13:26:45.840684+00:00 Preflight ok=False \u2192 /Users/gajendrarawat/Downloads/om-ai-operating-brain 3/artifacts/om70b_preflight/preflight_report.json",
+    "2026-08-12T13:26:45.840861+00:00 Preflight failed \u2014 refusing to start 70B training."
+  ],
+  "artifacts": {
+    "preflight_report": "/Users/gajendrarawat/Downloads/om-ai-operating-brain 3/artifacts/om70b_preflight/preflight_report.json"
+  },
+  "metrics": {},
+  "trained": false,
+  "production_candidate": false
+}

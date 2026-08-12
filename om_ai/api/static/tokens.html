@@ -3,73 +3,685 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>OM AI — Token Console</title>
+  <title>OM AI — Chat</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <style>
     :root {
-      --bg: #0f1419;
-      --panel: #1a2332;
-      --line: #2a3548;
-      --text: #e8eef7;
-      --muted: #8b9bb4;
-      --accent: #3d8bfd;
-      --ok: #3ecf8e;
-      --warn: #f0b429;
+      --bg-0: #070b10;
+      --bg-1: #0c1219;
+      --bg-2: #111920;
+      --panel: #121a22;
+      --panel-elev: #172029;
+      --line: #243040;
+      --line-soft: #1a2430;
+      --text: #e6edf5;
+      --muted: #8899ad;
+      --accent: #2dd4bf;
+      --accent-dim: rgba(45, 212, 191, 0.14);
+      --accent-hot: #5eead4;
+      --accent-ink: #042f2e;
+      --ok: #34d399;
+      --warn: #fbbf24;
+      --err: #fb7185;
+      --user-bg: #16353a;
+      --user-line: #2a5c64;
+      --bot-bg: #141c24;
+      --shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
+      --radius: 16px;
+      --mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+      --sans: "Outfit", "Segoe UI", sans-serif;
+      --sidebar-w: 272px;
     }
+
     * { box-sizing: border-box; }
+    html, body { height: 100%; margin: 0; }
     body {
-      margin: 0;
-      font-family: "IBM Plex Sans", "Segoe UI", sans-serif;
-      background: radial-gradient(1200px 600px at 10% -10%, #1b2a44 0%, var(--bg) 55%);
+      font-family: var(--sans);
       color: var(--text);
-      min-height: 100vh;
+      background: var(--bg-0);
+      overflow: hidden;
     }
-    .wrap { max-width: 760px; margin: 0 auto; padding: 40px 20px 80px; }
-    h1 { font-size: 28px; margin: 0 0 6px; letter-spacing: -0.02em; }
-    .sub { color: var(--muted); margin-bottom: 28px; }
+
+    /* Atmospheric layer */
+    .atmosphere {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+      background:
+        radial-gradient(ellipse 80% 50% at 15% -10%, rgba(45, 212, 191, 0.12), transparent 55%),
+        radial-gradient(ellipse 60% 40% at 90% 10%, rgba(14, 165, 233, 0.08), transparent 50%),
+        radial-gradient(ellipse 50% 60% at 50% 110%, rgba(52, 211, 153, 0.06), transparent 55%),
+        linear-gradient(165deg, var(--bg-1) 0%, var(--bg-0) 55%, #06090d 100%);
+    }
+    .atmosphere::before,
+    .atmosphere::after {
+      content: "";
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(60px);
+      opacity: 0.55;
+      animation: auroraDrift 18s ease-in-out infinite alternate;
+    }
+    .atmosphere::before {
+      width: 42vw;
+      height: 42vw;
+      top: -12%;
+      left: -8%;
+      background: radial-gradient(circle, rgba(45, 212, 191, 0.22), transparent 70%);
+    }
+    .atmosphere::after {
+      width: 36vw;
+      height: 36vw;
+      bottom: -18%;
+      right: -6%;
+      background: radial-gradient(circle, rgba(14, 165, 233, 0.16), transparent 70%);
+      animation-delay: -7s;
+      animation-duration: 22s;
+    }
+    @keyframes auroraDrift {
+      0% { transform: translate(0, 0) scale(1); }
+      50% { transform: translate(4%, 6%) scale(1.08); }
+      100% { transform: translate(-3%, 3%) scale(0.96); }
+    }
+
+    .app {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: var(--sidebar-w) 1fr;
+      height: 100vh;
+      height: 100dvh;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      display: flex;
+      flex-direction: column;
+      border-right: 1px solid var(--line-soft);
+      background: rgba(8, 12, 16, 0.72);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      padding: 20px 16px;
+      gap: 18px;
+      min-height: 0;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 4px 6px 8px;
+    }
+    .brand-mark {
+      width: 42px;
+      height: 42px;
+      border-radius: 13px;
+      background: linear-gradient(145deg, #5eead4 0%, var(--accent) 48%, #0ea5e9 100%);
+      border: 1px solid rgba(94, 234, 212, 0.45);
+      display: grid;
+      place-items: center;
+      position: relative;
+      overflow: hidden;
+      flex-shrink: 0;
+      color: var(--accent-ink);
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: -0.06em;
+      box-shadow: 0 10px 28px rgba(45, 212, 191, 0.28);
+      animation: markPulse 3.2s ease-in-out infinite;
+    }
+    .brand-mark::before {
+      content: "OM";
+    }
+    @keyframes markPulse {
+      0%, 100% { transform: scale(1); box-shadow: 0 10px 28px rgba(45, 212, 191, 0.28); }
+      50% { transform: scale(1.04); box-shadow: 0 14px 36px rgba(45, 212, 191, 0.42); }
+    }
+    .atmosphere-grid {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.022) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.022) 1px, transparent 1px);
+      background-size: 52px 52px;
+      mask-image: radial-gradient(ellipse at 40% 30%, black 15%, transparent 72%);
+      animation: gridDrift 30s linear infinite;
+      opacity: 0.7;
+    }
+    @keyframes gridDrift {
+      from { transform: translateY(0); }
+      to { transform: translateY(52px); }
+    }
+    .brand-text h1 {
+      margin: 0;
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      line-height: 1.1;
+    }
+    .brand-text p {
+      margin: 2px 0 0;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .nav-tabs {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .nav-tab {
+      appearance: none;
+      border: 1px solid transparent;
+      background: transparent;
+      color: var(--muted);
+      text-align: left;
+      padding: 11px 12px;
+      border-radius: 12px;
+      font: inherit;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+    }
+    .nav-tab:hover {
+      background: rgba(255, 255, 255, 0.03);
+      color: var(--text);
+    }
+    .nav-tab.active {
+      background: var(--accent-dim);
+      border-color: rgba(45, 212, 191, 0.28);
+      color: var(--accent-hot);
+    }
+    .nav-tab .ico {
+      width: 18px;
+      height: 18px;
+      opacity: 0.9;
+    }
+
+    .sidebar-block {
+      background: rgba(18, 26, 34, 0.65);
+      border: 1px solid var(--line-soft);
+      border-radius: 14px;
+      padding: 12px;
+    }
+    .sidebar-block label {
+      display: block;
+      font-size: 11px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
+    .key-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 6px;
+    }
+    .key-row input {
+      margin: 0;
+      font-size: 13px;
+      padding: 10px 11px;
+    }
+    .key-row button {
+      padding: 10px 12px;
+      font-size: 12px;
+      min-width: 58px;
+    }
+    .auth-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 10px;
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.35;
+    }
+    .auth-badge .dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #5a6a82;
+      flex-shrink: 0;
+    }
+    .auth-badge.ready .dot { background: var(--ok); box-shadow: 0 0 8px rgba(52, 211, 153, 0.5); }
+    .auth-badge.ready { color: #9fd9bb; }
+    .auth-badge.missing .dot { background: var(--warn); }
+    .auth-badge.missing { color: #efd08a; }
+
+    .sidebar-meta {
+      margin-top: auto;
+      font-size: 11px;
+      color: var(--muted);
+      line-height: 1.5;
+      padding: 4px 6px;
+    }
+    .sidebar-meta code {
+      font-family: var(--mono);
+      font-size: 10px;
+      color: #a8b9cc;
+      word-break: break-all;
+    }
     .pill {
       display: inline-block;
-      border: 1px solid var(--line);
-      background: #122033;
-      color: #9ec1ff;
-      padding: 4px 10px;
+      border: 1px solid rgba(45, 212, 191, 0.28);
+      background: var(--accent-dim);
+      color: var(--accent-hot);
+      padding: 3px 8px;
       border-radius: 999px;
-      font-size: 12px;
-      margin-left: 8px;
-      vertical-align: middle;
+      font-size: 11px;
+      font-weight: 600;
+      margin-bottom: 8px;
     }
-    .card {
-      background: var(--panel);
-      border: 1px solid var(--line);
-      border-radius: 14px;
-      padding: 20px;
-      margin-bottom: 18px;
+
+    /* Main stage */
+    .stage {
+      min-width: 0;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      position: relative;
     }
-    label { display: block; font-size: 13px; color: var(--muted); margin-bottom: 6px; }
-    input, select {
+    .view { display: none; flex: 1; min-height: 0; flex-direction: column; }
+    .view.active { display: flex; }
+
+    /* Chat view — immersive */
+    .chat-shell {
+      flex: 1;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      max-width: 860px;
       width: 100%;
+      margin: 0 auto;
+    }
+    .chat-header {
+      padding: 18px 24px 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .chat-header h2 {
+      margin: 0;
+      font-size: 15px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+    }
+    .chat-header .meta {
+      font-size: 12px;
+      color: var(--muted);
+      font-family: var(--mono);
+    }
+
+    .chat-log {
+      flex: 1;
+      overflow-y: auto;
+      padding: 8px 24px 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      scroll-behavior: smooth;
+    }
+    .chat-log::-webkit-scrollbar { width: 8px; }
+    .chat-log::-webkit-scrollbar-thumb {
+      background: #2a3848;
+      border-radius: 8px;
+    }
+
+    .chat-empty {
+      margin: auto;
+      text-align: center;
+      max-width: 420px;
+      padding: 40px 16px;
+      animation: msgEnter 0.45s ease-out;
+    }
+    .chat-empty .hero-orb {
+      width: 72px;
+      height: 72px;
+      margin: 0 auto 18px;
+      border-radius: 22px;
+      background: linear-gradient(145deg, #5eead4, var(--accent) 50%, #0ea5e9);
+      border: 1px solid rgba(94, 234, 212, 0.4);
+      box-shadow: 0 18px 48px rgba(45, 212, 191, 0.28);
+      position: relative;
+      display: grid;
+      place-items: center;
+      color: var(--accent-ink);
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: -0.06em;
+      animation: markPulse 3.2s ease-in-out infinite;
+    }
+    .chat-empty .hero-orb::before {
+      content: "OM";
+      position: relative;
+      z-index: 1;
+    }
+    .chat-empty .hero-orb::after {
+      content: "";
+      position: absolute;
+      inset: -18%;
+      border-radius: 30px;
+      background: radial-gradient(circle, rgba(45, 212, 191, 0.28), transparent 68%);
+      z-index: 0;
+      animation: markPulse 3.2s ease-in-out infinite;
+      pointer-events: none;
+    }
+    .chat-empty strong {
+      display: block;
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: -0.04em;
+      margin-bottom: 8px;
+    }
+    .chat-empty span {
+      display: block;
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+    .suggest-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: center;
+      margin-top: 22px;
+    }
+    .suggest {
+      appearance: none;
+      border: 1px solid var(--line);
+      background: rgba(18, 26, 34, 0.7);
+      color: var(--text);
+      border-radius: 999px;
+      padding: 8px 14px;
+      font: inherit;
+      font-size: 13px;
+      cursor: pointer;
+      transition: border-color 0.15s ease, background 0.15s ease;
+    }
+    .suggest:hover {
+      border-color: rgba(45, 212, 191, 0.45);
+      background: var(--accent-dim);
+    }
+
+    .msg {
+      max-width: min(92%, 680px);
+      padding: 12px 14px;
+      border-radius: 16px;
+      font-size: 15px;
+      line-height: 1.55;
+      white-space: pre-wrap;
+      word-break: break-word;
+      animation: msgEnter 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    @keyframes msgEnter {
+      from { opacity: 0; transform: translateY(14px) scale(0.98); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    .msg.user {
+      align-self: flex-end;
+      background: linear-gradient(160deg, #1a4046 0%, var(--user-bg) 100%);
+      border: 1px solid var(--user-line);
+      border-bottom-right-radius: 6px;
+    }
+    .msg.assistant {
+      align-self: flex-start;
+      background: var(--bot-bg);
+      border: 1px solid var(--line);
+      border-bottom-left-radius: 6px;
+    }
+    .msg.system {
+      align-self: stretch;
+      max-width: 100%;
+      background: rgba(251, 113, 133, 0.08);
+      border: 1px solid rgba(251, 113, 133, 0.35);
+      color: #fecdd3;
+      font-size: 13px;
+    }
+    .msg .msg-head {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 6px;
+    }
+    .msg .who {
+      display: block;
+      font-size: 11px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      font-weight: 600;
+    }
+    .msg .when {
+      font-size: 11px;
+      color: #6b7c90;
+      font-family: var(--mono);
+      font-weight: 400;
+      text-transform: none;
+      letter-spacing: 0;
+    }
+    .msg.user .who { color: #7ec8c4; }
+    .msg.assistant .who { color: var(--accent); }
+
+    .msg.typing .body {
+      display: inline-flex;
+      gap: 6px;
+      align-items: center;
+      min-height: 20px;
+      padding: 2px 0;
+    }
+    .msg.typing .dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--accent);
+      animation: typingDots 1.15s infinite ease-in-out;
+    }
+    .msg.typing .dot:nth-child(2) { animation-delay: 0.16s; }
+    .msg.typing .dot:nth-child(3) { animation-delay: 0.32s; }
+    @keyframes typingDots {
+      0%, 80%, 100% { opacity: 0.25; transform: translateY(0) scale(0.85); }
+      40% { opacity: 1; transform: translateY(-4px) scale(1); }
+    }
+
+    /* Sticky composer */
+    .composer-wrap {
+      position: sticky;
+      bottom: 0;
+      padding: 0 20px 20px;
+      background: linear-gradient(180deg, transparent 0%, rgba(7, 11, 16, 0.55) 28%, rgba(7, 11, 16, 0.92) 70%);
+    }
+    .composer {
+      border: 1px solid var(--line);
+      background: rgba(18, 26, 34, 0.92);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-radius: 20px;
+      padding: 12px 12px 10px;
+      box-shadow: var(--shadow);
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+    .composer:focus-within {
+      border-color: rgba(45, 212, 191, 0.45);
+      box-shadow: 0 0 0 3px rgba(45, 212, 191, 0.12), var(--shadow);
+    }
+    .composer textarea {
+      width: 100%;
+      border: 0;
+      background: transparent;
+      color: var(--text);
+      resize: none;
+      min-height: 52px;
+      max-height: 180px;
+      padding: 8px 8px 4px;
+      font: inherit;
+      font-size: 15px;
+      line-height: 1.45;
+      outline: none;
+      margin: 0;
+    }
+    .composer-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 4px 4px 2px;
+    }
+    .composer-hint {
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .kbd {
+      font-family: var(--mono);
+      font-size: 10px;
+      border: 1px solid var(--line);
+      border-bottom-width: 2px;
+      border-radius: 5px;
+      padding: 1px 5px;
+      color: #a8b7cd;
       background: #0d1522;
+    }
+    .composer-actions {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      background: #0d1520;
       border: 1px solid var(--line);
       color: var(--text);
       border-radius: 10px;
-      padding: 12px 14px;
-      font-size: 15px;
-      margin-bottom: 14px;
+      padding: 11px 12px;
+      font-size: 14px;
+      margin-bottom: 12px;
+      font-family: inherit;
+      outline: none;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
     }
-    .row { display: grid; grid-template-columns: 1.4fr 1fr; gap: 12px; }
-    @media (max-width: 640px) { .row { grid-template-columns: 1fr; } }
+    input:focus, select:focus, textarea:focus {
+      border-color: rgba(45, 212, 191, 0.5);
+      box-shadow: 0 0 0 3px rgba(45, 212, 191, 0.12);
+    }
     button {
       appearance: none;
       border: 0;
       background: var(--accent);
-      color: white;
-      font-weight: 600;
-      font-size: 15px;
-      padding: 12px 18px;
-      border-radius: 10px;
+      color: var(--accent-ink);
+      font-weight: 650;
+      font-size: 14px;
+      padding: 10px 16px;
+      border-radius: 11px;
       cursor: pointer;
+      font-family: inherit;
+      transition: background 0.15s ease, opacity 0.15s ease, transform 0.08s ease, box-shadow 0.2s ease;
     }
-    button.secondary { background: #243247; }
-    button:disabled { opacity: 0.5; cursor: not-allowed; }
+    button:hover:not(:disabled) { background: var(--accent-hot); }
+    button:active:not(:disabled) { transform: translateY(1px); }
+    button.secondary {
+      background: #243247;
+      color: var(--text);
+    }
+    button.secondary:hover:not(:disabled) { background: #2c3c55; }
+    button:disabled { opacity: 0.45; cursor: not-allowed; }
+    button.send-btn {
+      min-width: 88px;
+      position: relative;
+      overflow: hidden;
+    }
+    button.send-btn.pulse {
+      animation: sendPulse 0.55s ease-out;
+    }
+    @keyframes sendPulse {
+      0% { box-shadow: 0 0 0 0 rgba(45, 212, 191, 0.55); }
+      70% { box-shadow: 0 0 0 14px rgba(45, 212, 191, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(45, 212, 191, 0); }
+    }
+
+    .chat-status {
+      min-height: 18px;
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 10px;
+      padding: 0 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .chat-status.busy { color: var(--warn); }
+    .chat-status.error { color: var(--err); }
+    .chat-status.ok { color: var(--ok); }
+    .spinner {
+      width: 12px;
+      height: 12px;
+      border: 2px solid rgba(251, 191, 36, 0.25);
+      border-top-color: var(--warn);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      display: none;
+    }
+    .chat-status.busy .spinner { display: inline-block; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Tokens view */
+    .tokens-shell {
+      flex: 1;
+      min-height: 0;
+      overflow-y: auto;
+      padding: 28px 28px 48px;
+    }
+    .tokens-inner {
+      max-width: 720px;
+      margin: 0 auto;
+    }
+    .tokens-inner h2 {
+      margin: 0 0 6px;
+      font-size: 24px;
+      letter-spacing: -0.03em;
+    }
+    .tokens-inner .sub {
+      color: var(--muted);
+      margin: 0 0 22px;
+      line-height: 1.45;
+      font-size: 14px;
+    }
+    .card {
+      background: rgba(18, 26, 34, 0.78);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 18px 20px;
+      margin-bottom: 14px;
+      box-shadow: var(--shadow);
+    }
+    .card-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+    .card-head h3 {
+      margin: 0;
+      font-size: 16px;
+      font-weight: 600;
+    }
+    label.field {
+      display: block;
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+    .row { display: grid; grid-template-columns: 1.4fr 1fr; gap: 12px; }
     .actions { display: flex; gap: 10px; flex-wrap: wrap; }
     .result {
       white-space: pre-wrap;
@@ -78,167 +690,680 @@
       border: 1px solid var(--line);
       border-radius: 10px;
       padding: 14px;
-      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-family: var(--mono);
       font-size: 13px;
       line-height: 1.45;
       min-height: 80px;
     }
     .ok { color: var(--ok); }
-    .err { color: #ff7b7b; }
+    .err { color: var(--err); }
     table { width: 100%; border-collapse: collapse; font-size: 14px; }
     th, td { text-align: left; padding: 10px 8px; border-bottom: 1px solid var(--line); }
     th { color: var(--muted); font-weight: 500; }
-    .hint { font-size: 12px; color: var(--muted); margin-top: 8px; }
+    .hint { font-size: 12px; color: var(--muted); margin-top: 8px; line-height: 1.45; }
+    .hint code, .sub code {
+      font-family: var(--mono);
+      font-size: 0.92em;
+      color: #b7c7de;
+    }
+
+    .mobile-bar {
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--line-soft);
+      background: rgba(8, 12, 16, 0.85);
+      backdrop-filter: blur(12px);
+    }
+    .mobile-bar .brand-text h1 { font-size: 16px; }
+    .menu-btn {
+      background: #243247;
+      color: var(--text);
+      padding: 8px 12px;
+      font-size: 13px;
+    }
+
+    @media (max-width: 860px) {
+      .app { grid-template-columns: 1fr; }
+      .sidebar {
+        position: fixed;
+        inset: 0 auto 0 0;
+        width: min(86vw, var(--sidebar-w));
+        z-index: 40;
+        transform: translateX(-105%);
+        transition: transform 0.22s ease;
+        box-shadow: var(--shadow);
+      }
+      .sidebar.open { transform: translateX(0); }
+      .mobile-bar { display: flex; }
+      .backdrop {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.45);
+        z-index: 30;
+      }
+      .backdrop.show { display: block; }
+      .chat-log { padding: 8px 14px 24px; }
+      .composer-wrap { padding: 0 12px 14px; }
+      .tokens-shell { padding: 18px 14px 40px; }
+      .row { grid-template-columns: 1fr; }
+    }
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <h1>OM AI Token Console <span class="pill">model: om:free</span></h1>
-    <p class="sub">Create named API tokens for your other apps. Database: <code id="dbPath">artifacts/tokens.sqlite3</code></p>
+  <div class="atmosphere" aria-hidden="true"><div class="atmosphere-grid"></div></div>
+  <div class="backdrop" id="backdrop"></div>
 
-    <div class="card">
-      <label>Admin API key (bootstrap from .env)</label>
-      <input id="adminKey" type="password" placeholder="Paste admin Bearer token" />
-      <div class="row">
-        <div>
-          <label>Token name</label>
-          <input id="tokenName" placeholder="e.g. memories-app" />
-        </div>
-        <div>
-          <label>Role</label>
-          <select id="tokenRole">
-            <option value="admin">admin</option>
-            <option value="operator" selected>operator</option>
-            <option value="agent">agent</option>
-            <option value="viewer">viewer</option>
-          </select>
+  <div class="app">
+    <aside class="sidebar" id="sidebar">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true"></div>
+        <div class="brand-text">
+          <h1>OM AI</h1>
+          <p>Local operating brain</p>
         </div>
       </div>
-      <div class="actions">
-        <button id="createBtn" type="button">Create Token</button>
-        <button id="listBtn" class="secondary" type="button">Refresh List</button>
+
+      <nav class="nav-tabs" aria-label="Primary">
+        <button type="button" class="nav-tab active" data-view="chat" id="tabChat">
+          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 6.5A2.5 2.5 0 0 1 6.5 4h11A2.5 2.5 0 0 1 20 6.5v7A2.5 2.5 0 0 1 17.5 16H9l-4 3.5V6.5Z"/></svg>
+          Chat
+        </button>
+        <button type="button" class="nav-tab" data-view="tokens" id="tabTokens">
+          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="6" width="16" height="12" rx="2"/><path d="M8 12h8M8 9h3"/></svg>
+          Tokens
+        </button>
+      </nav>
+
+      <div class="sidebar-block">
+        <label for="adminKey">API key</label>
+        <div class="key-row">
+          <input id="adminKey" type="password" placeholder="Paste Bearer key…" autocomplete="off" />
+          <button id="toggleKeyBtn" class="secondary" type="button" title="Show or hide key">Show</button>
+        </div>
+        <div class="auth-badge missing" id="authBadge"><span class="dot"></span><span id="authBadgeText">API key required</span></div>
+        <p class="hint" style="margin-top:10px;margin-bottom:0">Paste the key only (no <code>OM_AI_API_KEYS=</code>, no <code>:admin</code> suffix). Chat needs <code>model.generate</code>; token create/list needs an <code>admin</code> key.</p>
       </div>
-      <p class="hint">Save the token when it appears — it is shown only once.</p>
-    </div>
 
-    <div class="card">
-      <label>Result</label>
-      <div class="result" id="result">Ready.</div>
-    </div>
+      <div class="sidebar-meta">
+        <div class="pill" id="modelPill">model: om:free</div>
+        <div>DB: <code id="dbPath">artifacts/tokens.sqlite3</code></div>
+      </div>
+    </aside>
 
-    <div class="card">
-      <label>Existing tokens</label>
-      <div id="listBox">Click Refresh List</div>
-    </div>
+    <main class="stage">
+      <div class="mobile-bar">
+        <div class="brand-text"><h1>OM AI</h1></div>
+        <button type="button" class="menu-btn" id="menuBtn">Menu</button>
+      </div>
+
+      <!-- Chat -->
+      <section class="view active" id="viewChat" aria-label="Chat">
+        <div class="chat-shell">
+          <div class="chat-header">
+            <h2>Conversation</h2>
+            <div class="meta">POST /api/v1/chat/completions · <span id="chatModelLabel">om:free</span></div>
+          </div>
+
+          <div class="chat-log" id="chatLog" aria-live="polite">
+            <div class="chat-empty" id="chatEmpty">
+              <div class="hero-orb" aria-hidden="true"></div>
+              <strong>OM AI</strong>
+              <span>Your local operating brain. Paste an API key in the sidebar, then send a message. Enter to send · Shift+Enter for a new line.</span>
+              <div class="suggest-row">
+                <button type="button" class="suggest" data-prompt="Say hello in one short sentence.">Say hello</button>
+                <button type="button" class="suggest" data-prompt="What can you do as a local OM model?">What can you do?</button>
+                <button type="button" class="suggest" data-prompt="Summarize yourself in one line.">One-line summary</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="composer-wrap">
+            <div class="composer">
+              <textarea id="chatInput" rows="2" placeholder="Message OM AI…" aria-label="Chat message"></textarea>
+              <div class="composer-bar">
+                <div class="composer-hint"><span class="kbd">Enter</span> send · <span class="kbd">⇧ Enter</span> newline</div>
+                <div class="composer-actions">
+                  <button id="chatClearBtn" class="secondary" type="button">Clear</button>
+                  <button id="chatSendBtn" class="send-btn" type="button">Send</button>
+                </div>
+              </div>
+            </div>
+            <div class="chat-status" id="chatStatus">
+              <span class="spinner" aria-hidden="true"></span>
+              <span id="chatStatusText">Ready</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Tokens -->
+      <section class="view" id="viewTokens" aria-label="Tokens">
+        <div class="tokens-shell">
+          <div class="tokens-inner">
+            <h2>Token console</h2>
+            <p class="sub">Create and revoke named API tokens. Admin key required for create/list/revoke.</p>
+
+            <div class="card">
+              <div class="card-head"><h3>Create token</h3></div>
+              <div class="row">
+                <div>
+                  <label class="field" for="tokenName">Token name</label>
+                  <input id="tokenName" placeholder="e.g. memories-app" />
+                </div>
+                <div>
+                  <label class="field" for="tokenRole">Role</label>
+                  <select id="tokenRole">
+                    <option value="admin">admin</option>
+                    <option value="operator" selected>operator</option>
+                    <option value="agent">agent</option>
+                    <option value="viewer">viewer</option>
+                  </select>
+                </div>
+              </div>
+              <div class="actions">
+                <button id="createBtn" type="button">Create Token</button>
+                <button id="listBtn" class="secondary" type="button">Refresh List</button>
+              </div>
+              <p class="hint">Save the token when it appears — it is shown only once.</p>
+            </div>
+
+            <div class="card">
+              <label class="field">Result</label>
+              <div class="result" id="result">Ready.</div>
+            </div>
+
+            <div class="card">
+              <label class="field">Existing tokens</label>
+              <div id="listBox">Click Refresh List</div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
   </div>
 
   <script>
-    const resultEl = document.getElementById("result");
-    const listBox = document.getElementById("listBox");
+    (function () {
+      const resultEl = document.getElementById("result");
+      const listBox = document.getElementById("listBox");
+      const chatLog = document.getElementById("chatLog");
+      const chatInput = document.getElementById("chatInput");
+      const chatSendBtn = document.getElementById("chatSendBtn");
+      const chatClearBtn = document.getElementById("chatClearBtn");
+      const chatStatus = document.getElementById("chatStatus");
+      const chatStatusText = document.getElementById("chatStatusText");
+      const adminKeyEl = document.getElementById("adminKey");
+      const authBadge = document.getElementById("authBadge");
+      const authBadgeText = document.getElementById("authBadgeText");
+      const toggleKeyBtn = document.getElementById("toggleKeyBtn");
+      const sidebar = document.getElementById("sidebar");
+      const backdrop = document.getElementById("backdrop");
+      const menuBtn = document.getElementById("menuBtn");
+      const viewChat = document.getElementById("viewChat");
+      const viewTokens = document.getElementById("viewTokens");
+      const tabChat = document.getElementById("tabChat");
+      const tabTokens = document.getElementById("tabTokens");
 
-    function adminHeaders() {
-      const key = document.getElementById("adminKey").value.trim();
-      if (!key) throw new Error("Admin API key is required");
-      return {
-        "Authorization": "Bearer " + key,
-        "Content-Type": "application/json",
-      };
-    }
+      const chatMessages = [];
+      let chatBusy = false;
+      let chatModel = "om:free";
+      let typingEl = null;
+      const DEFAULT_HINT = "Ready";
 
-    function show(msg, ok) {
-      resultEl.textContent = msg;
-      resultEl.className = "result " + (ok ? "ok" : "err");
-    }
+      function normalizeApiKey(raw) {
+        let key = String(raw || "").trim();
+        if (!key) return "";
+        key = key.replace(/^OM_AI_API_KEYS\s*=\s*/i, "");
+        key = key.replace(/^Bearer\s+/i, "");
+        if (key.includes(",")) key = key.split(",")[0].trim();
+        if (/:(admin|operator|agent|viewer)\s*$/i.test(key)) {
+          key = key.replace(/:(admin|operator|agent|viewer)\s*$/i, "").trim();
+        }
+        return key;
+      }
 
-    async function createToken() {
-      try {
-        const name = document.getElementById("tokenName").value.trim();
-        const role = document.getElementById("tokenRole").value;
-        if (!name) throw new Error("Token name is required");
-        const res = await fetch("/v1/tokens", {
-          method: "POST",
-          headers: adminHeaders(),
-          body: JSON.stringify({ name, role, tenant_id: "default" }),
-        });
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.detail || JSON.stringify(data));
-        const env = data.usage?.env || {};
-        show(
-          [
-            "CREATED",
-            "label: " + data.label,
-            "name: " + data.name,
-            "role: " + data.role,
-            "id: " + data.id,
-            "",
-            "OM_API_KEY=" + data.token,
-            "OM_API_BASE=" + (env.OM_API_BASE || "http://127.0.0.1:8080/api/v1"),
-            "OM_MODEL=om:free",
-            "",
-            data.note,
+      function currentApiKey() {
+        return normalizeApiKey(adminKeyEl.value);
+      }
+
+      function updateAuthUi() {
+        const key = currentApiKey();
+        if (key) {
+          authBadge.className = "auth-badge ready";
+          authBadgeText.textContent = "API key ready";
+        } else {
+          authBadge.className = "auth-badge missing";
+          authBadgeText.textContent = "API key required";
+        }
+        if (!chatBusy) chatSendBtn.disabled = false;
+      }
+
+      function adminHeaders() {
+        const key = currentApiKey();
+        if (!key) {
+          throw new Error("401 — missing API key. Paste OM_AI_API_KEYS value (the part before :role) or a created token.");
+        }
+        if (adminKeyEl.value.trim() !== key) {
+          adminKeyEl.value = key;
+          persistKey();
+        }
+        return {
+          "Authorization": "Bearer " + key,
+          "Content-Type": "application/json",
+        };
+      }
+
+      function show(msg, ok) {
+        resultEl.textContent = msg;
+        resultEl.className = "result " + (ok ? "ok" : "err");
+      }
+
+      function setChatStatus(msg, kind) {
+        chatStatusText.textContent = msg || DEFAULT_HINT;
+        chatStatus.className = "chat-status" + (kind ? " " + kind : "");
+      }
+
+      function detailText(data) {
+        if (!data) return "Request failed";
+        if (typeof data.detail === "string") return data.detail;
+        if (Array.isArray(data.detail)) {
+          return data.detail.map(d => (d && d.msg) || JSON.stringify(d)).join("; ");
+        }
+        if (data.error && data.error.message) return data.error.message;
+        return JSON.stringify(data);
+      }
+
+      function friendlyHttpError(status, data) {
+        const detail = detailText(data);
+        if (status === 401) {
+          const extra = detail && detail !== "Request failed" ? " Server: " + detail : "";
+          return (
+            "401 — missing or invalid API key. Paste the key from OM_AI_API_KEYS / OM_AI_API_KEYS_ADMIN " +
+            "(strip any :role suffix)." + extra
+          );
+        }
+        if (status === 403) {
+          const reason = detail && detail !== "Request failed" ? detail : "forbidden";
+          return (
+            "403 — " + reason +
+            " Token create/list requires an admin key (permission admin.tokens). " +
+            "Chat needs model.generate (operator/admin/agent/viewer)."
+          );
+        }
+        if (status === 503 || /not loaded|autoload|checkpoint/i.test(String(detail)) || String(detail).includes("OM model not loaded")) {
+          return (
+            "503 — model not loaded. Start the server with OM_AI_AUTOLOAD=1 and OM_AI_CHECKPOINT " +
+            "(plus OM_AI_CONFIG / OM_AI_TOKENIZER), or POST /v1/model/load, then retry."
+          );
+        }
+        return detail || ("HTTP " + status);
+      }
+
+      function ensureEmptyState() {
+        if (chatLog.querySelector(".msg")) return;
+        if (document.getElementById("chatEmpty")) return;
+        const empty = document.createElement("div");
+        empty.className = "chat-empty";
+        empty.id = "chatEmpty";
+        empty.innerHTML =
+          '<div class="hero-orb" aria-hidden="true"></div>' +
+          "<strong>OM AI</strong>" +
+          "<span>Your local operating brain. Paste an API key in the sidebar, then send a message.</span>" +
+          '<div class="suggest-row">' +
+          '<button type="button" class="suggest" data-prompt="Say hello in one short sentence.">Say hello</button>' +
+          '<button type="button" class="suggest" data-prompt="What can you do as a local OM model?">What can you do?</button>' +
+          '<button type="button" class="suggest" data-prompt="Summarize yourself in one line.">One-line summary</button>' +
+          "</div>";
+        chatLog.appendChild(empty);
+      }
+
+      function removeEmptyState() {
+        const empty = document.getElementById("chatEmpty");
+        if (empty) empty.remove();
+      }
+
+      function appendBubble(role, content) {
+        removeEmptyState();
+        const el = document.createElement("div");
+        el.className = "msg " + role;
+        const head = document.createElement("div");
+        head.className = "msg-head";
+        const who = document.createElement("span");
+        who.className = "who";
+        who.textContent = role === "user" ? "You" : role === "assistant" ? "OM AI" : "Error";
+        const time = document.createElement("span");
+        time.className = "when";
+        try {
+          time.textContent = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+        } catch (_) {
+          time.textContent = "";
+        }
+        head.appendChild(who);
+        head.appendChild(time);
+        const body = document.createElement("div");
+        body.className = "body";
+        body.textContent = content;
+        el.appendChild(head);
+        el.appendChild(body);
+        chatLog.appendChild(el);
+        chatLog.scrollTop = chatLog.scrollHeight;
+        return el;
+      }
+
+      function showTyping() {
+        removeEmptyState();
+        removeTyping();
+        const el = document.createElement("div");
+        el.className = "msg assistant typing";
+        el.id = "typingBubble";
+        el.innerHTML =
+          '<div class="msg-head"><span class="who">OM AI</span><span class="when">thinking</span></div>' +
+          '<div class="body"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>';
+        chatLog.appendChild(el);
+        chatLog.scrollTop = chatLog.scrollHeight;
+        typingEl = el;
+      }
+
+      function removeTyping() {
+        if (typingEl) {
+          typingEl.remove();
+          typingEl = null;
+        }
+        const leftover = document.getElementById("typingBubble");
+        if (leftover) leftover.remove();
+      }
+
+      function clearChat() {
+        chatMessages.length = 0;
+        chatLog.innerHTML = "";
+        typingEl = null;
+        ensureEmptyState();
+        setChatStatus(DEFAULT_HINT, "");
+        chatInput.focus();
+      }
+
+      function persistKey() {
+        try {
+          localStorage.setItem("om_ai_api_key", currentApiKey());
+        } catch (_) {}
+      }
+
+      function pulseSend() {
+        chatSendBtn.classList.remove("pulse");
+        void chatSendBtn.offsetWidth;
+        chatSendBtn.classList.add("pulse");
+      }
+
+      async function sendChat(presetText) {
+        if (chatBusy) return;
+        const text = String(presetText != null ? presetText : chatInput.value).trim();
+        if (!text) {
+          setChatStatus("Type a message before sending.", "error");
+          chatInput.focus();
+          return;
+        }
+
+        let headers;
+        try {
+          headers = adminHeaders();
+        } catch (e) {
+          setChatStatus(String(e.message || e), "error");
+          adminKeyEl.focus();
+          updateAuthUi();
+          openSidebar();
+          return;
+        }
+
+        chatBusy = true;
+        chatSendBtn.disabled = true;
+        chatSendBtn.textContent = "Sending…";
+        pulseSend();
+        if (presetText == null) chatInput.value = "";
+        else chatInput.value = "";
+        appendBubble("user", text);
+        chatMessages.push({ role: "user", content: text });
+        showTyping();
+        setChatStatus("Waiting for the model…", "busy");
+
+        try {
+          const res = await fetch("/api/v1/chat/completions", {
+            method: "POST",
+            headers,
+            body: JSON.stringify({
+              model: chatModel,
+              messages: chatMessages,
+              max_tokens: 256,
+              temperature: 0.8,
+              stream: false,
+            }),
+          });
+          let data = null;
+          try {
+            data = await res.json();
+          } catch (_) {
+            data = null;
+          }
+          removeTyping();
+          if (!res.ok) {
+            const err = friendlyHttpError(res.status, data);
+            appendBubble("system", err);
+            setChatStatus(err, "error");
+            chatMessages.pop();
+            return;
+          }
+          const reply =
+            (data && data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content) ||
+            "";
+          const clean = String(reply || "").trim() || "(empty reply)";
+          chatMessages.push({ role: "assistant", content: clean });
+          appendBubble("assistant", clean);
+          setChatStatus("Reply received.", "ok");
+          setTimeout(() => {
+            if (!chatBusy) setChatStatus(DEFAULT_HINT, "");
+          }, 1200);
+        } catch (e) {
+          removeTyping();
+          const err = String(e.message || e);
+          appendBubble("system", err);
+          setChatStatus(err, "error");
+          chatMessages.pop();
+        } finally {
+          chatBusy = false;
+          chatSendBtn.disabled = false;
+          chatSendBtn.textContent = "Send";
+          chatInput.focus();
+        }
+      }
+
+      async function createToken() {
+        try {
+          const name = document.getElementById("tokenName").value.trim();
+          const role = document.getElementById("tokenRole").value;
+          if (!name) throw new Error("Token name is required");
+          const res = await fetch("/v1/tokens", {
+            method: "POST",
+            headers: adminHeaders(),
+            body: JSON.stringify({ name, role, tenant_id: "default" }),
+          });
+          const data = await res.json();
+          if (!res.ok) throw new Error(friendlyHttpError(res.status, data));
+          const env = data.usage?.env || {};
+          show(
+            [
+              "CREATED",
+              "label: " + data.label,
+              "name: " + data.name,
+              "role: " + data.role,
+              "id: " + data.id,
+              "",
+              "OM_API_KEY=" + data.token,
+              "OM_API_BASE=" + (env.OM_API_BASE || "http://127.0.0.1:8080/api/v1"),
+              "OM_MODEL=om:free",
+              "",
+              data.note,
             ].join("\n"),
             true
           );
-        document.getElementById("tokenName").value = "";
-        await listTokens();
-      } catch (e) {
-        show(String(e.message || e), false);
-      }
-    }
-
-    async function listTokens() {
-      try {
-        const res = await fetch("/v1/tokens", { headers: adminHeaders() });
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.detail || JSON.stringify(data));
-        const tokens = data.tokens || [];
-        if (!tokens.length) {
-          listBox.textContent = "No tokens yet.";
-          return;
+          document.getElementById("tokenName").value = "";
+          await listTokens();
+        } catch (e) {
+          show(String(e.message || e), false);
         }
-        const rows = tokens.map(t =>
-          `<tr>
-            <td>${t.name}</td>
-            <td>${t.role}</td>
-            <td>${t.prefix}…</td>
-            <td>${t.active ? "active" : "revoked"}</td>
-            <td><button class="secondary" data-id="${t.id}" type="button">Revoke</button></td>
-          </tr>`
-        ).join("");
-        listBox.innerHTML = `
-          <table>
-            <thead><tr><th>Name</th><th>Role</th><th>Prefix</th><th>Status</th><th></th></tr></thead>
-            <tbody>${rows}</tbody>
-          </table>`;
-        listBox.querySelectorAll("button[data-id]").forEach(btn => {
-          btn.addEventListener("click", () => revokeToken(btn.getAttribute("data-id")));
-        });
-      } catch (e) {
-        listBox.textContent = String(e.message || e);
       }
-    }
 
-    async function revokeToken(id) {
+      async function listTokens() {
+        try {
+          const res = await fetch("/v1/tokens", { headers: adminHeaders() });
+          const data = await res.json();
+          if (!res.ok) throw new Error(friendlyHttpError(res.status, data));
+          const tokens = data.tokens || [];
+          if (!tokens.length) {
+            listBox.textContent = "No tokens yet.";
+            return;
+          }
+          const rows = tokens.map(t =>
+            `<tr>
+              <td>${t.name}</td>
+              <td>${t.role}</td>
+              <td>${t.prefix}…</td>
+              <td>${t.active ? "active" : "revoked"}</td>
+              <td><button class="secondary" data-id="${t.id}" type="button">Revoke</button></td>
+            </tr>`
+          ).join("");
+          listBox.innerHTML = `
+            <table>
+              <thead><tr><th>Name</th><th>Role</th><th>Prefix</th><th>Status</th><th></th></tr></thead>
+              <tbody>${rows}</tbody>
+            </table>`;
+          listBox.querySelectorAll("button[data-id]").forEach(btn => {
+            btn.addEventListener("click", () => revokeToken(btn.getAttribute("data-id")));
+          });
+        } catch (e) {
+          listBox.textContent = String(e.message || e);
+        }
+      }
+
+      async function revokeToken(id) {
+        try {
+          const res = await fetch("/v1/tokens/" + id, {
+            method: "DELETE",
+            headers: adminHeaders(),
+          });
+          const data = await res.json();
+          if (!res.ok) throw new Error(friendlyHttpError(res.status, data));
+          show("Revoked: " + (data.name || id), true);
+          await listTokens();
+        } catch (e) {
+          show(String(e.message || e), false);
+        }
+      }
+
+      function closeSidebar() {
+        sidebar.classList.remove("open");
+        backdrop.classList.remove("show");
+      }
+      function openSidebar() {
+        sidebar.classList.add("open");
+        backdrop.classList.add("show");
+      }
+
+      function setView(name) {
+        const chat = name === "chat";
+        viewChat.classList.toggle("active", chat);
+        viewTokens.classList.toggle("active", !chat);
+        tabChat.classList.toggle("active", chat);
+        tabTokens.classList.toggle("active", !chat);
+        try {
+          history.replaceState(null, "", chat ? "#chat" : "#tokens");
+        } catch (_) {}
+        closeSidebar();
+        if (chat) chatInput.focus();
+      }
+
+      function applyHash() {
+        const h = (location.hash || "#chat").replace("#", "").toLowerCase();
+        setView(h === "tokens" ? "tokens" : "chat");
+      }
+
+      document.getElementById("createBtn").addEventListener("click", createToken);
+      document.getElementById("listBtn").addEventListener("click", listTokens);
+      chatSendBtn.addEventListener("click", function (e) {
+        e.preventDefault();
+        sendChat();
+      });
+      chatClearBtn.addEventListener("click", function (e) {
+        e.preventDefault();
+        clearChat();
+      });
+      chatInput.addEventListener("keydown", function (e) {
+        if (e.key === "Enter" && !e.shiftKey) {
+          e.preventDefault();
+          sendChat();
+        }
+      });
+      chatInput.addEventListener("input", function () {
+        this.style.height = "auto";
+        this.style.height = Math.min(180, this.scrollHeight) + "px";
+      });
+
+      chatLog.addEventListener("click", function (e) {
+        const btn = e.target.closest(".suggest");
+        if (!btn) return;
+        const prompt = btn.getAttribute("data-prompt") || btn.textContent;
+        sendChat(prompt);
+      });
+
+      tabChat.addEventListener("click", () => setView("chat"));
+      tabTokens.addEventListener("click", () => setView("tokens"));
+      menuBtn.addEventListener("click", openSidebar);
+      backdrop.addEventListener("click", closeSidebar);
+      window.addEventListener("hashchange", applyHash);
+
+      toggleKeyBtn.addEventListener("click", function () {
+        const showing = adminKeyEl.type === "text";
+        adminKeyEl.type = showing ? "password" : "text";
+        toggleKeyBtn.textContent = showing ? "Show" : "Hide";
+      });
+
+      adminKeyEl.addEventListener("input", function () {
+        updateAuthUi();
+        persistKey();
+      });
+      adminKeyEl.addEventListener("change", function () {
+        adminKeyEl.value = currentApiKey();
+        updateAuthUi();
+        persistKey();
+      });
+      adminKeyEl.addEventListener("blur", function () {
+        const cleaned = currentApiKey();
+        if (cleaned && adminKeyEl.value.trim() !== cleaned) {
+          adminKeyEl.value = cleaned;
+          persistKey();
+          updateAuthUi();
+        }
+      });
+
+      fetch("/v1/tokens/meta").then(r => r.json()).then(d => {
+        if (d.database) document.getElementById("dbPath").textContent = d.database;
+        if (d.model) {
+          chatModel = d.model;
+          const pill = document.getElementById("modelPill");
+          const label = document.getElementById("chatModelLabel");
+          if (pill) pill.textContent = "model: " + d.model;
+          if (label) label.textContent = d.model;
+        }
+      }).catch(() => {});
+
       try {
-        const res = await fetch("/v1/tokens/" + id, {
-          method: "DELETE",
-          headers: adminHeaders(),
-        });
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.detail || JSON.stringify(data));
-        show("Revoked: " + (data.name || id), true);
-        await listTokens();
-      } catch (e) {
-        show(String(e.message || e), false);
-      }
-    }
-
-    document.getElementById("createBtn").addEventListener("click", createToken);
-    document.getElementById("listBtn").addEventListener("click", listTokens);
-
-    fetch("/v1/tokens/meta").then(r => r.json()).then(d => {
-      if (d.database) document.getElementById("dbPath").textContent = d.database;
-    }).catch(() => {});
+        const saved = localStorage.getItem("om_ai_api_key");
+        if (saved) adminKeyEl.value = normalizeApiKey(saved);
+      } catch (_) {}
+      updateAuthUi();
+      applyHash();
+    })();
   </script>
 </body>
 </html>

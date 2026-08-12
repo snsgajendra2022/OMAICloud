@@ -71,18 +71,34 @@ def set_current_tenant(ctx: TenantContext) -> None:
     _current_tenant.set(ctx)
 
 
+def _parse_key_list(raw_env: str, *, default_role: str) -> dict[str, str]:
+    """Parse comma-separated ``key`` or ``key:role`` entries into a key→role map."""
+    keys: dict[str, str] = {}
+    if not raw_env.strip():
+        return keys
+    fallback = default_role if default_role in VALID_ROLES else "viewer"
+    for raw in raw_env.split(","):
+        raw = raw.strip()
+        if not raw:
+            continue
+        if ":" in raw:
+            k, _, role = raw.partition(":")
+            role = role.strip() if role.strip() in VALID_ROLES else fallback
+            key = k.strip()
+            if key:
+                keys[key] = role
+        else:
+            keys[raw] = fallback
+    return keys
+
+
 def _load_api_keys() -> dict[str, str]:
     keys: dict[str, str] = {}
-    keys_env = os.getenv("OM_AI_API_KEYS", "").strip()
-    if keys_env:
-        for raw in keys_env.split(","):
-            raw = raw.strip()
-            if ":" in raw:
-                k, _, role = raw.partition(":")
-                role = role.strip() if role.strip() in VALID_ROLES else "viewer"
-                keys[k.strip()] = role
-            elif raw:
-                keys[raw] = "operator"
+    # Standard bootstrap: key or key:role (bare key → operator).
+    keys.update(_parse_key_list(os.getenv("OM_AI_API_KEYS", ""), default_role="operator"))
+    # Optional admin-only list (bare key → admin). Supported so .env can keep
+    # OM_AI_API_KEYS_ADMIN=…:admin without merging into OM_AI_API_KEYS.
+    keys.update(_parse_key_list(os.getenv("OM_AI_API_KEYS_ADMIN", ""), default_role="admin"))
     keys_file = os.getenv("OM_AI_API_KEYS_FILE", "").strip()
     if keys_file and os.path.isfile(keys_file):
         with open(keys_file) as fh:
@@ -199,7 +215,12 @@ def _resolve_context_from_request(request) -> TenantContext:
         )
     info = auth.validate_full(raw_key)
     if info is None:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Invalid API key.")
+        # 401 = bad/unknown credentials; 403 is reserved for valid keys lacking permission.
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid API key.",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
     ctx = TenantContext(
         tenant_id=request.headers.get("X-Tenant-Id", info.get("tenant_id", "default")),
         actor=f"{info.get('source', 'key')}:{info.get('name', raw_key[:6])}…",

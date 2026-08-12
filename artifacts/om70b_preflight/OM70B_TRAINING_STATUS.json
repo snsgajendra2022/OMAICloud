@@ -1,19 +1,42 @@
 {
   "stage": "FAILED",
-  "updated_at": "2026-08-08T09:14:30.312163+00:00",
+  "status": "BLOCKED",
+  "updated_at": "2026-08-12T13:26:46.073370+00:00",
   "config": "configs/70b.json",
-  "data": "data/example_corpus.txt",
-  "tokenizer": "artifacts/demo/tokenizer.json",
-  "output": "artifacts/om70b_preflight",
+  "data": "/Users/gajendrarawat/Downloads/om-ai-operating-brain 3/data/production-corpus/clean/fineweb-clean.jsonl",
+  "tokenizer": "/Users/gajendrarawat/Downloads/om-ai-operating-brain 3/artifacts/tokenizer-fixed-v3.json",
+  "output": "/Users/gajendrarawat/Downloads/om-ai-operating-brain 3/artifacts/om70b_preflight",
   "strategy": "deepspeed_zero3",
   "messages": [
-    "2026-08-08T09:14:30.311985+00:00 Preflight ok=False \u2192 artifacts/om70b_preflight/preflight_report.json",
-    "2026-08-08T09:14:30.312155+00:00 Preflight failed \u2014 refusing to start 70B training."
+    "2026-08-12T13:26:46.073477+00:00 STATUS=BLOCKED \u2014 OM-70B frontier training NOT STARTED on this Mac.",
+    "2026-08-12T13:26:46.073479+00:00 Preflight ready=false (honest gates; did not fake --min-data-bytes).",
+    "2026-08-12T13:26:46.073480+00:00 Local alternative COMPLETED: tiny FineWeb shard train 1000 steps \u2192 artifacts/checkpoints/tiny-fineweb-70b-alt/ (NOT a 70B model)."
+  ],
+  "blockers": [
+    "CUDA unavailable (gpu_count=0); MPS also unavailable on this torch build",
+    "DeepSpeed not installed / deepspeed binary not on PATH",
+    "Corpus size 105665478 bytes < scripts/om70b_preflight default min-data-bytes=1_000_000_000 (101MB FineWeb clean present but below 1GB gate)",
+    "tokenizer-fixed-v3 vocab_size=340 too small vs configs/70b.json vocab_size=65536",
+    "artifacts/tokenizer-production-65536.json is HuggingFace format (65536 + chat tokens) but om-ai train/train-70b loads ByteBPETokenizer \u2014 need OM ByteBPE export for cluster",
+    "Disk free ~25GB << train-70b default min_free_gb=500",
+    "Mac torch.distributed/FSDP smoke hung on hostname/IPv6 (Mac.lan) \u2014 killed; not a substitute for CUDA cluster"
   ],
   "artifacts": {
-    "preflight_report": "artifacts/om70b_preflight/preflight_report.json"
+    "preflight_report": "/Users/gajendrarawat/Downloads/om-ai-operating-brain 3/artifacts/om70b_preflight/preflight_report.json",
+    "script_preflight": "/Users/gajendrarawat/Downloads/om-ai-operating-brain 3/artifacts/om70b_preflight/om70b_script_preflight.json",
+    "local_tiny_checkpoint": "/Users/gajendrarawat/Downloads/om-ai-operating-brain 3/artifacts/checkpoints/tiny-fineweb-70b-alt/latest.pt",
+    "local_tiny_step_1000": "/Users/gajendrarawat/Downloads/om-ai-operating-brain 3/artifacts/checkpoints/tiny-fineweb-70b-alt/step-1000.pt"
   },
-  "metrics": {},
+  "metrics": {
+    "script_preflight_ready": false,
+    "cli_preflight_ok": false,
+    "corpus_bytes": 105665478,
+    "local_alt_steps": 1000,
+    "local_alt_last_loss": 2.42844,
+    "local_alt_parameters": 3300608,
+    "local_alt_dataset_blocks": 88499
+  },
   "trained": false,
-  "production_candidate": false
+  "production_candidate": false,
+  "honest_note": "No OM-70B weights were trained. CUDA+DeepSpeed multi-GPU cluster required. Local tiny FineWeb run is software/capability proof only."
 }
