@@ -2,10 +2,12 @@
 
 Exposes:
   GET  /api/v1/models
+  GET  /api/v1/chat/backend
   POST /api/v1/chat/completions
   POST /api/v1/completions
 
-This does NOT call OpenAI. It routes to the local OM LocalLLMEngine.
+Routes chat to Ollama / OpenAI-compatible APIs / local OM engine based on
+``OM_AI_CHAT_BACKEND`` (see ``om_ai.runtime.chat_backend``).
 """
 from __future__ import annotations
 
@@ -19,6 +21,7 @@ from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
 
 from om_ai.api.deps import require_auth, require_permission
+from om_ai.runtime.chat_backend import backend_status, chat_reply, resolve_backend
 from om_ai.security.auth import TenantContext
 
 router = APIRouter(prefix="/api/v1", tags=["OpenAI Compatible"])
@@ -34,13 +37,20 @@ def bind_engine(engine, default_model_id: str = "om-tiny") -> None:
     _default_model_id = default_model_id
 
 
-def _require_engine():
-    if _engine is None or getattr(_engine, "model", None) is None:
+def _local_loaded() -> bool:
+    return bool(_engine is not None and getattr(_engine, "model", None) is not None)
+
+
+def _require_local_engine():
+    if not _local_loaded():
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             detail=(
                 "OM model not loaded. Start server with OM_AI_AUTOLOAD=1 "
-                "or POST /v1/model/load first."
+                "or POST /v1/model/load first. "
+                "For coherent chat without a capable local checkpoint, set "
+                "OM_AI_CHAT_BACKEND=ollama (with Ollama running) or provide "
+                "OM_AI_OPENAI_API_KEY / OPENAI_API_KEY."
             ),
         )
     return _engine
@@ -100,8 +110,15 @@ def _messages_to_dicts(messages: list[ChatMessage]) -> list[dict]:
     return out
 
 
-def _chat_response(model: str, text: str, prompt_tokens: int = 0, completion_tokens: int = 0) -> dict:
-    return {
+def _chat_response(
+    model: str,
+    text: str,
+    prompt_tokens: int = 0,
+    completion_tokens: int = 0,
+    *,
+    backend: str | None = None,
+) -> dict:
+    body: dict[str, Any] = {
         "id": f"chatcmpl-{uuid.uuid4().hex[:24]}",
         "object": "chat.completion",
         "created": int(time.time()),
@@ -119,16 +136,50 @@ def _chat_response(model: str, text: str, prompt_tokens: int = 0, completion_tok
             "total_tokens": prompt_tokens + completion_tokens,
         },
     }
+    if backend:
+        body["om_backend"] = backend
+    return body
 
 
 def _sse(data: dict) -> str:
     return f"data: {json.dumps(data, ensure_ascii=False)}\n\n"
 
 
+def _run_chat(
+    messages: list[dict],
+    *,
+    max_new: int,
+    temperature: float,
+    top_p: float,
+) -> tuple[str, str, str]:
+    """Return (text, response_model_id, backend_name)."""
+    info = resolve_backend(local_loaded=_local_loaded())
+    try:
+        text, used = chat_reply(
+            messages,
+            local_chat=_engine.chat if _engine is not None else None,
+            local_loaded=_local_loaded(),
+            max_new_tokens=max_new,
+            temperature=temperature,
+            top_p=top_p,
+        )
+    except Exception as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    model_name = used.model or info.model or _default_model_id
+    return text, model_name, used.backend
+
+
+@router.get("/chat/backend")
+def chat_backend_info(ctx: TenantContext = Depends(require_auth)):
+    """Report which chat backend is active (local / ollama / openai)."""
+    return backend_status(local_loaded=_local_loaded())
+
+
 @router.get("/models")
 def list_models(ctx: TenantContext = Depends(require_auth)):
     eng = _engine
     loaded = bool(eng and getattr(eng, "model", None) is not None)
+    info = resolve_backend(local_loaded=loaded)
     models = [
         {
             "id": _default_model_id,
@@ -139,6 +190,7 @@ def list_models(ctx: TenantContext = Depends(require_auth)):
             "root": _default_model_id,
             "parent": None,
             "loaded": loaded,
+            "om_backend": info.backend,
         }
     ]
     # Aliases clients may already have configured (OpenClaw / OpenRouter-style ids)
@@ -147,8 +199,9 @@ def list_models(ctx: TenantContext = Depends(require_auth)):
         "om-tiny",
         "om-ai",
         "local",
+        info.model,
     ):
-        if alias != _default_model_id:
+        if alias and alias != _default_model_id and all(m["id"] != alias for m in models):
             models.append(
                 {
                     "id": alias,
@@ -158,10 +211,11 @@ def list_models(ctx: TenantContext = Depends(require_auth)):
                     "permission": [],
                     "root": _default_model_id,
                     "parent": None,
-                    "note": f"Alias mapped to local {_default_model_id}",
+                    "om_backend": info.backend,
+                    "note": f"Alias mapped via {info.backend} backend",
                 }
             )
-    return {"object": "list", "data": models}
+    return {"object": "list", "data": models, "om_backend": info.backend}
 
 
 @router.post("/chat/completions")
@@ -169,23 +223,20 @@ async def chat_completions(
     req: ChatCompletionsRequest,
     ctx: TenantContext = Depends(require_permission("model.generate")),
 ):
-    eng = _require_engine()
     messages = _messages_to_dicts(req.messages)
     max_new = int(req.max_tokens or 128)
     temperature = float(req.temperature if req.temperature is not None else 0.8)
     top_p = float(req.top_p if req.top_p is not None else 1.0)
-    model_name = req.model or _default_model_id
 
     if req.stream:
         async def event_stream() -> AsyncGenerator[str, None]:
             chunk_id = f"chatcmpl-{uuid.uuid4().hex[:24]}"
-            # role preamble
             yield _sse(
                 {
                     "id": chunk_id,
                     "object": "chat.completion.chunk",
                     "created": int(time.time()),
-                    "model": model_name,
+                    "model": req.model or _default_model_id,
                     "choices": [
                         {
                             "index": 0,
@@ -195,21 +246,22 @@ async def chat_completions(
                     ],
                 }
             )
-            # Build prompt once, stream tokens from generate_stream via chat fallback
-            # Use non-stream chat then fake stream if stream path is awkward for chat tokens
             try:
-                text = eng.chat(
+                text, model_name, backend = _run_chat(
                     messages,
-                    max_new_tokens=max_new,
+                    max_new=max_new,
                     temperature=temperature,
                     top_p=top_p,
                 )
+            except HTTPException as exc:
+                yield _sse({"error": {"message": str(exc.detail), "type": "server_error"}})
+                yield "data: [DONE]\n\n"
+                return
             except Exception as exc:
                 yield _sse({"error": {"message": str(exc), "type": "server_error"}})
                 yield "data: [DONE]\n\n"
                 return
 
-            # Emit in small chunks for client UX
             step = max(1, len(text) // 20) if text else 1
             for i in range(0, len(text), step):
                 piece = text[i : i + step]
@@ -219,6 +271,7 @@ async def chat_completions(
                         "object": "chat.completion.chunk",
                         "created": int(time.time()),
                         "model": model_name,
+                        "om_backend": backend,
                         "choices": [
                             {
                                 "index": 0,
@@ -234,6 +287,7 @@ async def chat_completions(
                     "object": "chat.completion.chunk",
                     "created": int(time.time()),
                     "model": model_name,
+                    "om_backend": backend,
                     "choices": [{"index": 0, "delta": {}, "finish_reason": "stop"}],
                 }
             )
@@ -241,17 +295,13 @@ async def chat_completions(
 
         return StreamingResponse(event_stream(), media_type="text/event-stream")
 
-    try:
-        text = eng.chat(
-            messages,
-            max_new_tokens=max_new,
-            temperature=temperature,
-            top_p=top_p,
-        )
-    except Exception as exc:
-        raise HTTPException(status_code=400, detail=str(exc)) from exc
-
-    return _chat_response(model_name, text)
+    text, model_name, backend = _run_chat(
+        messages,
+        max_new=max_new,
+        temperature=temperature,
+        top_p=top_p,
+    )
+    return _chat_response(model_name, text, backend=backend)
 
 
 @router.post("/completions")
@@ -259,7 +309,7 @@ async def completions(
     req: CompletionsRequest,
     ctx: TenantContext = Depends(require_permission("model.generate")),
 ):
-    eng = _require_engine()
+    eng = _require_local_engine()
     prompt = req.prompt if isinstance(req.prompt, str) else "\n".join(req.prompt)
     max_new = int(req.max_tokens or 128)
     temperature = float(req.temperature if req.temperature is not None else 0.8)

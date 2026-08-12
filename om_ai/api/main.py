@@ -50,7 +50,8 @@ app = FastAPI(
     version=_API_VERSION,
     description=(
         "Self-hosted private AI platform. "
-        "All inference is performed locally — no external model APIs are called."
+        "Chat may use local OM weights, Ollama, or an OpenAI-compatible API "
+        "(see OM_AI_CHAT_BACKEND)."
     ),
 )
 
@@ -380,11 +381,15 @@ def chat(
     req: ChatRequest,
     ctx: TenantContext = Depends(require_permission("model.generate")),
 ):
-    """Multi-turn chat completion."""
+    """Multi-turn chat completion (local OM / Ollama / OpenAI per OM_AI_CHAT_BACKEND)."""
+    from om_ai.runtime.chat_backend import chat_reply
+
     try:
         messages = [m.model_dump() for m in req.messages]
-        reply = engine.chat(
+        reply, backend = chat_reply(
             messages,
+            local_chat=engine.chat,
+            local_loaded=engine.model is not None,
             max_new_tokens=req.max_new_tokens,
             temperature=req.temperature,
             top_k=req.top_k,
@@ -396,9 +401,14 @@ def chat(
             ctx.actor,
             ctx.tenant_id,
             resource="/v1/chat",
-            detail={"turns": len(messages)},
+            detail={"turns": len(messages), "backend": backend.backend},
         )
-        return {"reply": reply, "role": "assistant"}
+        return {
+            "reply": reply,
+            "role": "assistant",
+            "om_backend": backend.backend,
+            "model": backend.model,
+        }
     except Exception as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
 

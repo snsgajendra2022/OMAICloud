@@ -25,7 +25,9 @@ om-ai train --config configs/tiny.json --data data/example_corpus.txt --tokenize
 om-ai generate --config configs/tiny.json --tokenizer artifacts/tokenizer.json --checkpoint artifacts/checkpoints/latest.pt --prompt "OM AI"
 
 om-ai serve --host 127.0.0.1 --port 8080
-# http://127.0.0.1:8080/docs
+# Chat UI: http://127.0.0.1:8080/ui/chat  (same as /ui/tokens)
+# Coherent English: start Ollama (`ollama serve` + `ollama pull llama3.2`) or set
+# OPENAI_API_KEY / OM_AI_OPENAI_API_KEY. Tiny local demo weights are not smart.
 ```
 
 One-shot tiny pipeline: `python scripts/run_actual_training_pipeline.py --steps 5`

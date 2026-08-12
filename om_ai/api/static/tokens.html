@@ -280,6 +280,38 @@
       font-weight: 600;
       margin-bottom: 8px;
     }
+    .backend-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border: 1px solid rgba(148, 163, 184, 0.35);
+      background: rgba(15, 23, 42, 0.55);
+      color: #cbd5e1;
+      padding: 3px 9px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      letter-spacing: 0.02em;
+    }
+    .backend-badge .dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #94a3b8;
+    }
+    .backend-badge.ollama { border-color: rgba(52, 211, 153, 0.45); color: #9fd9bb; }
+    .backend-badge.ollama .dot { background: #34d399; }
+    .backend-badge.openai { border-color: rgba(96, 165, 250, 0.45); color: #93c5fd; }
+    .backend-badge.openai .dot { background: #60a5fa; }
+    .backend-badge.local { border-color: rgba(251, 191, 36, 0.4); color: #fcd34d; }
+    .backend-badge.local .dot { background: #fbbf24; }
+    .chat-header .meta {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+    }
 
     /* Main stage */
     .stage {
@@ -789,6 +821,7 @@
 
       <div class="sidebar-meta">
         <div class="pill" id="modelPill">model: om:free</div>
+        <div class="backend-badge local" id="backendBadge" title="Active chat backend"><span class="dot"></span><span id="backendBadgeText">backend: …</span></div>
         <div>DB: <code id="dbPath">artifacts/tokens.sqlite3</code></div>
       </div>
     </aside>
@@ -804,14 +837,17 @@
         <div class="chat-shell">
           <div class="chat-header">
             <h2>Conversation</h2>
-            <div class="meta">POST /api/v1/chat/completions · <span id="chatModelLabel">om:free</span></div>
+            <div class="meta">
+              <span>POST /api/v1/chat/completions · <span id="chatModelLabel">om:free</span></span>
+              <span class="backend-badge local" id="chatBackendBadge"><span class="dot"></span><span id="chatBackendLabel">backend: …</span></span>
+            </div>
           </div>
 
           <div class="chat-log" id="chatLog" aria-live="polite">
             <div class="chat-empty" id="chatEmpty">
               <div class="hero-orb" aria-hidden="true"></div>
               <strong>OM AI</strong>
-              <span>Your local operating brain. Paste an API key in the sidebar, then send a message. Enter to send · Shift+Enter for a new line.</span>
+              <span>Paste an API key, then chat. Coherent English needs Ollama or an OpenAI-compatible key — the tiny local demo checkpoint is not a smart model. Enter to send · Shift+Enter for a new line.</span>
               <div class="suggest-row">
                 <button type="button" class="suggest" data-prompt="Say hello in one short sentence.">Say hello</button>
                 <button type="button" class="suggest" data-prompt="What can you do as a local OM model?">What can you do?</button>
@@ -939,6 +975,40 @@
           authBadgeText.textContent = "API key required";
         }
         if (!chatBusy) chatSendBtn.disabled = false;
+      }
+
+      function setBackendUi(backend, model) {
+        const b = String(backend || "local").toLowerCase();
+        const label = "backend: " + b + (model ? " · " + model : "");
+        const side = document.getElementById("backendBadge");
+        const sideText = document.getElementById("backendBadgeText");
+        const chatBadge = document.getElementById("chatBackendBadge");
+        const chatLabel = document.getElementById("chatBackendLabel");
+        const cls = "backend-badge " + (b === "ollama" || b === "openai" || b === "local" ? b : "local");
+        if (side) side.className = cls;
+        if (sideText) sideText.textContent = label;
+        if (chatBadge) chatBadge.className = cls;
+        if (chatLabel) chatLabel.textContent = label;
+        if (model) {
+          const pill = document.getElementById("modelPill");
+          const modelLabel = document.getElementById("chatModelLabel");
+          if (pill) pill.textContent = "model: " + model;
+          if (modelLabel) modelLabel.textContent = model;
+          chatModel = model;
+        }
+      }
+
+      async function refreshBackendBadge() {
+        try {
+          const headers = {};
+          try {
+            Object.assign(headers, adminHeaders());
+          } catch (_) {}
+          const res = await fetch("/api/v1/chat/backend", { headers });
+          if (!res.ok) return;
+          const d = await res.json();
+          setBackendUi(d.backend, d.model);
+        } catch (_) {}
       }
 
       function adminHeaders() {
@@ -1158,6 +1228,7 @@
             (data && data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content) ||
             "";
           const clean = String(reply || "").trim() || "(empty reply)";
+          if (data && data.om_backend) setBackendUi(data.om_backend, data.model);
           chatMessages.push({ role: "assistant", content: clean });
           appendBubble("assistant", clean);
           setChatStatus("Reply received.", "ok");
@@ -1363,6 +1434,10 @@
       } catch (_) {}
       updateAuthUi();
       applyHash();
+      refreshBackendBadge();
+      adminKeyEl.addEventListener("input", function () {
+        setTimeout(refreshBackendBadge, 0);
+      });
     })();
   </script>
 </body>
