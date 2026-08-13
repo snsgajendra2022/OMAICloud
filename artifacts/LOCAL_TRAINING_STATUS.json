@@ -1,0 +1,33 @@
+{
+  "pid": 30074,
+  "started_at": "2026-08-12T15:17:06Z",
+  "updated_at": "2026-08-12T15:29:14Z",
+  "status": "running",
+  "phase": "training_2e6_steps",
+  "command": ".venv/bin/om-ai train --config configs/tiny.json --data data/production-corpus/clean/fineweb-deduped.jsonl --tokenizer artifacts/tokenizer-fixed-v3.json --steps 2000000 --batch-size 8 --grad-accum 2 --lr 3e-4 --precision auto --device mps --checkpoint-every 25000 --log-every 100 --resume artifacts/checkpoints/om-local-longrun/latest.pt --output artifacts/checkpoints/om-local-longrun",
+  "config": "configs/tiny.json",
+  "tokenizer": "artifacts/tokenizer-fixed-v3.json",
+  "data": "data/production-corpus/clean/fineweb-deduped.jsonl",
+  "resume_from": "artifacts/checkpoints/om-local-longrun/latest.pt",
+  "output": "artifacts/checkpoints/om-local-longrun",
+  "log": "artifacts/om-local-longrun-train.log",
+  "steps": 2000000,
+  "device": "mps",
+  "approx_parameters": 3300608,
+  "verified_loss_sample": {
+    "step": 2300,
+    "loss": 2.10068
+  },
+  "not_70b": true,
+  "model_note": "tiny (~3.3M params, vocab 340). NOT 70B. No DeepSpeed/CUDA. Strongest reliable multi-hour local weight training on this 8GB M2 Mac.",
+  "chat_ui_note": "/ui/chat is inference-only and does NOT train model weights. Chat page cannot train OM AI.",
+  "how_to_monitor": "tail -f artifacts/om-local-longrun-train.log",
+  "how_to_point_chat": "After training progresses: set OM_AI_CONFIG=configs/tiny.json, OM_AI_TOKENIZER=artifacts/tokenizer-fixed-v3.json, OM_AI_CHECKPOINT=artifacts/checkpoints/om-local-longrun/latest.pt, OM_AI_CHAT_BACKEND=local, OM_AI_AUTOLOAD=1; restart om-ai serve. Expect much weaker English than Ollama.",
+  "point_serve_when_ready": {
+    "OM_AI_CONFIG": "configs/tiny.json",
+    "OM_AI_TOKENIZER": "artifacts/tokenizer-fixed-v3.json",
+    "OM_AI_CHECKPOINT": "artifacts/checkpoints/om-local-longrun/latest.pt",
+    "OM_AI_CHAT_BACKEND": "local",
+    "OM_AI_AUTOLOAD": "1"
+  }
+}

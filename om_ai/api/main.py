@@ -24,7 +24,7 @@ from om_ai.actions import SafeShellTool
 from om_ai.actions.knowledge import KnowledgeSearchTool
 from om_ai.discovery import OpenAPIDiscoveryTool
 from om_ai.knowledge import PersistentKnowledgeBase
-from om_ai.memory import SQLiteMemoryStore
+from om_ai.memory import SQLiteMemoryStore, ConversationStore
 from om_ai.registry import ModelRegistry
 from om_ai.runtime import LocalLLMEngine
 from om_ai.security import (
@@ -36,6 +36,8 @@ from om_ai.security import (
 from om_ai.security.auth import TenantContext
 from om_ai.api.deps import require_auth, require_permission
 from om_ai.tenancy import TenantDirectory
+from om_ai.api.conversations import router as conversations_router, bind_conversation_store
+from om_ai.continuous.feedback import FeedbackStore
 
 logger = logging.getLogger(__name__)
 
@@ -77,10 +79,16 @@ _REGISTRY_ROOT = os.getenv("OM_AI_REGISTRY", "artifacts/registry")
 
 engine = LocalLLMEngine()
 memory = SQLiteMemoryStore(_DB_PATH)
+conversations = ConversationStore(_DB_PATH)
 knowledge = PersistentKnowledgeBase(_KB_PATH)
 registry = ModelRegistry(_REGISTRY_ROOT)
 tenants = TenantDirectory()
 audit_log = AuditLog(_AUDIT_DB)
+_FEEDBACK_DB = os.getenv("OM_AI_FEEDBACK_DB", "artifacts/feedback.sqlite3")
+feedback_store = FeedbackStore(_FEEDBACK_DB)
+
+bind_conversation_store(conversations)
+app.include_router(conversations_router)
 rate_limiter = RateLimiter(
     max_requests=int(os.getenv("OM_AI_RATE_LIMIT", "120")),
     window_seconds=60,
@@ -575,7 +583,14 @@ def submit_feedback(
     req: FeedbackRequest,
     ctx: TenantContext = Depends(require_permission("feedback.write")),
 ):
-    """Record human feedback on a model response."""
+    """Record human feedback on a model response (SQLite; not online weight updates)."""
+    fid = feedback_store.add(
+        prompt=req.prompt,
+        response=req.response,
+        rating=req.rating,
+        user_id=req.user_id or ctx.actor,
+        metadata=json.dumps({"comment": req.comment, "tenant_id": req.tenant_id}),
+    )
     _audit(
         "feedback",
         ctx.actor,
@@ -585,9 +600,16 @@ def submit_feedback(
             "rating": req.rating,
             "user_id": req.user_id,
             "comment": req.comment[:500],
+            "feedback_id": fid,
         },
     )
-    return {"ok": True, "rating": req.rating}
+    return {
+        "ok": True,
+        "id": fid,
+        "rating": req.rating,
+        "database": _FEEDBACK_DB,
+        "note": "Saved for later SFT export — does not update model weights online.",
+    }
 
 
 # ---------------------------------------------------------------------------
@@ -615,7 +637,7 @@ class CreateTokenRequest(BaseModel):
 @app.get("/", tags=["UI"])
 def ui_home():
     from fastapi.responses import RedirectResponse
-    return RedirectResponse(url="/ui/tokens")
+    return RedirectResponse(url="/ui/chat")
 
 
 def _serve_tokens_chat_ui():
@@ -638,6 +660,13 @@ def chat_ui():
     return _serve_tokens_chat_ui()
 
 
+@app.get("/ui/settings", tags=["UI"])
+def settings_ui():
+    """Settings opens the same SPA; client routes to the Settings view via #settings."""
+    from fastapi.responses import RedirectResponse
+    return RedirectResponse(url="/ui/chat#settings", headers={"Cache-Control": "no-store"})
+
+
 @app.get("/v1/tokens/meta", tags=["Tokens"])
 def tokens_meta():
     """Public metadata about token database location and model label."""
@@ -645,11 +674,14 @@ def tokens_meta():
     store = get_token_store()
     return {
         "database": store.path,
+        "chat_database": conversations.path,
+        "feedback_database": _FEEDBACK_DB,
         "model": os.getenv("OM_AI_MODEL_ID", "om:free"),
         "create_uri": "POST /v1/tokens",
         "list_uri": "GET /v1/tokens",
         "revoke_uri": "DELETE /v1/tokens/{id}",
-        "ui": "/ui/tokens",
+        "ui": "/ui/chat",
+        "conversations_uri": "/v1/conversations",
     }
 
 
