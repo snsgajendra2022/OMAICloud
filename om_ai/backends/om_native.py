@@ -190,8 +190,17 @@ class OMNativeBackend:
 
         import codecs
 
+        from om_ai.runtime.engine import (
+            EMPTY_GENERATION_FALLBACK,
+            fit_messages_to_context,
+            usable_generation_text,
+        )
+
         tok = self.engine.tokenizer
-        ids = tok.encode_chat(messages, add_generation_prompt=True, add_eos=False)
+        fitted = fit_messages_to_context(
+            messages, tok, self.engine.model.cfg.max_seq_len
+        )
+        ids = tok.encode_chat(fitted, add_generation_prompt=True, add_eos=False)
         ids = ids[-self.engine.model.cfg.max_seq_len :]
         x = torch.tensor([ids], device=self.engine.device)
         decoder = codecs.getincrementaldecoder("utf-8")(errors="replace")
@@ -199,29 +208,41 @@ class OMNativeBackend:
         if getattr(tok, "assistant_end_id", None) is not None:
             stops.add(int(tok.assistant_end_id))
         stops.add(int(tok.eos_id))
+        min_new = int(kwargs.get("min_new_tokens", 4))
+        emitted: list[str] = []
 
-        for token_tensor in self.engine.model.generate_stream(
-            x,
-            max_new_tokens=kwargs.get("max_new_tokens", 256),
-            temperature=kwargs.get("temperature", 0.8),
-            top_k=kwargs.get("top_k", 50),
-            top_p=kwargs.get("top_p", 1.0),
-            repetition_penalty=kwargs.get("repetition_penalty", 1.0),
-            eos_token_id=tok.eos_id,
-            stop_token_ids=list(stops - {int(tok.eos_id)}),
+        for step, token_tensor in enumerate(
+            self.engine.model.generate_stream(
+                x,
+                max_new_tokens=kwargs.get("max_new_tokens", 256),
+                temperature=kwargs.get("temperature", 0.8),
+                top_k=kwargs.get("top_k", 50),
+                top_p=kwargs.get("top_p", 1.0),
+                repetition_penalty=kwargs.get("repetition_penalty", 1.0),
+                eos_token_id=tok.eos_id,
+                stop_token_ids=list(stops - {int(tok.eos_id)}),
+                min_new_tokens=min_new,
+            )
         ):
             token_id = int(token_tensor.view(-1)[0])
-            if token_id in stops:
+            if token_id in stops and step >= min_new:
                 break
             raw = tok.token_bytes(token_id)
             if not raw:
                 continue
             chunk = decoder.decode(raw, final=False)
             if chunk:
+                emitted.append(chunk)
                 yield chunk
         tail = decoder.decode(b"", final=True)
         if tail:
+            emitted.append(tail)
             yield tail
+        if not emitted:
+            yield EMPTY_GENERATION_FALLBACK
+        elif not usable_generation_text("".join(emitted)):
+            # Stream already flushed garbage; surface an honest recovery hint.
+            yield "\n" + EMPTY_GENERATION_FALLBACK
 
     def health(self) -> dict[str, Any]:
         ckpt = self._paths.get("checkpoint") or default_native_paths()["checkpoint"]

@@ -27,15 +27,15 @@ BackendName = str  # "om_native" | "local" | "openai"
 
 _DEFAULT_BACKEND = "om_native"
 
+# Keep identity short: local OM-1.0 configs often use max_seq_len=128, and a long
+# system preamble was truncating the user turn and producing empty/garbage replies.
 OM_SYSTEM_IDENTITY = (
     "You are OM AI, powered by the OM-1.0 native language model. "
-    "You are running through OM's own inference runtime. "
     "Do not claim to be Llama, Ollama, ChatGPT, GPT, Claude, Gemini, "
-    "or another third-party model. "
-    "Be accurate about tools and retrieved information. "
-    "Never claim to have executed an action that was not actually executed. "
-    "Do not invent frontier-scale capability claims for this checkpoint."
+    "or another third-party model."
 )
+
+OM_SYSTEM_IDENTITY_COMPACT = "You are OM AI (OM-1.0 native language model)."
 
 
 @dataclass(frozen=True)
@@ -157,13 +157,21 @@ def runtime_date_system_text(*, today: date | None = None) -> str:
     except Exception:
         tz_name = "UTC"
     return (
-        f"{OM_SYSTEM_IDENTITY}\n\n"
+        f"{OM_SYSTEM_IDENTITY} "
         f"Today's date is {human}. "
         f"Always treat the current year as {d.year}. "
-        f"Current timezone: {tz_name}. "
-        "Do not claim the year is 2023 or cite a 2023 knowledge cutoff as the present. "
-        "If asked about events after your training data, say you may lack post-training "
-        "details and answer carefully without inventing news."
+        f"Timezone: {tz_name}."
+    )
+
+
+def runtime_date_system_text_compact(*, today: date | None = None) -> str:
+    """Ultra-short system line for tiny context windows (e.g. max_seq_len=128)."""
+    d = today or date.today()
+    human = d.strftime(f"%A, %B {d.day}, %Y")
+    return (
+        f"{OM_SYSTEM_IDENTITY_COMPACT} "
+        f"Today's date is {human}. "
+        f"Always treat the current year as {d.year}."
     )
 
 
@@ -265,13 +273,17 @@ def chat_reply(
         if repetition_penalty is not None:
             local_kwargs["repetition_penalty"] = repetition_penalty
         try:
-            return native_chat(messages, **local_kwargs), info
+            text = native_chat(messages, **local_kwargs)
         except NativeCheckpointError:
             raise
         except Exception as exc:
             raise NativeCheckpointError(
                 f"OM-1.0 checkpoint unavailable. ({exc})"
             ) from exc
+        # Harden API/UI: never return whitespace-only (UI labels that "(empty reply)").
+        if not (text or "").strip():
+            text = "OM-1.0 produced no text; try again."
+        return text, info
 
     if info.backend == "openai":
         text = chat_via_openai(messages, model=info.model, **kwargs)

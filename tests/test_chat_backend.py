@@ -12,9 +12,11 @@ def test_runtime_date_system_text_uses_calendar_date():
     text = cb.runtime_date_system_text(today=date(2026, 8, 13))
     assert "Today's date is Thursday, August 13, 2026" in text
     assert "Always treat the current year as 2026" in text
-    assert "Do not claim the year is 2023" in text
-    assert "lack post-training" in text
     assert "OM-1.0 native language model" in text
+    compact = cb.runtime_date_system_text_compact(today=date(2026, 8, 13))
+    assert "Today's date is Thursday, August 13, 2026" in compact
+    assert "Always treat the current year as 2026" in compact
+    assert len(compact) < len(text)
 
 
 def test_with_runtime_date_context_prepends_system():

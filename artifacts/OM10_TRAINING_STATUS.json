@@ -1,0 +1,50 @@
+{
+  "name": "OM-1.0",
+  "status": "running",
+  "pid": 27259,
+  "updated_at": "2026-08-13T12:35:53.339222+00:00",
+  "phase": "base_pretrain_continuing_after_sft",
+  "device": "mps",
+  "config": "configs/om-1.0-local.json",
+  "tokenizer": "artifacts/tokenizer-fixed-v3.json",
+  "data": "data/production-corpus/clean/fineweb-1gb.jsonl",
+  "data_caps": {
+    "max_tokens": 2000000,
+    "max_docs": 20000,
+    "dataset_blocks": 15624
+  },
+  "data_note": "fineweb-1gb with caps (2e6 tokens / 20k docs). Full uncapped tokenize OOMs/stalls on 8GB Mac.",
+  "resume_from": "artifacts/checkpoints/om-1.0-long/latest.pt",
+  "resume_global_step": 150002,
+  "resume_source_lineage": "om-local-longrun@150000 (suspended pid 30074 killed) + tiny CPU bump to 150002",
+  "output": "artifacts/checkpoints/om-1.0-long",
+  "log": "artifacts/om-1.0-train.log",
+  "steps_target": 250000,
+  "steps_current": 159500,
+  "last_loss": 1.38047,
+  "checkpoint_every": 5000,
+  "approx_parameters": 3300608,
+  "production_ready": false,
+  "not_70b": true,
+  "ollama": false,
+  "sft": {
+    "status": "done",
+    "data": "data/om10_english_sft.jsonl",
+    "rows": 25,
+    "steps": 600,
+    "last_loss": 0.02969,
+    "output": "artifacts/checkpoints/om-1.0-sft/latest.pt",
+    "device": "cpu",
+    "base_freeze": "artifacts/checkpoints/om-1.0-long/freeze-for-sft.pt",
+    "smoke_chat": "Hello \u2014 I\u2019m OM AI."
+  },
+  "serve": {
+    "OM_AI_CHAT_BACKEND": "om_native",
+    "OM_MODEL_CHECKPOINT": "artifacts/checkpoints/om-1.0-sft/latest.pt",
+    "OM_MODEL_CONFIG": "configs/om-1.0-local.json",
+    "OM_MODEL_TOKENIZER": "artifacts/tokenizer-fixed-v3.json",
+    "restart_note": "Restart `om-ai serve` now to load SFT weights. Base train continues independently to 250k; optionally re-SFT later from a newer long ckpt."
+  },
+  "how_to_monitor": "tail -f artifacts/om-1.0-train.log",
+  "consolidated": "Single active train PID; prior om-local-longrun 30074 killed; om-1.0-long@300 superseded by 150k lineage"
+}

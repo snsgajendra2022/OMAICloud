@@ -96,3 +96,48 @@ Python ≥ 3.11, PyTorch ≥ 2.4. Linux + CUDA for serious distributed training.
 ## Frontier-model reality
 
 Owning a capable private model still means: licensed corpus → tokenizer → cluster pretrain → SFT/alignment → eval → deployed weights. This repo is the engineering foundation for that process — not a substitute for the training work itself.
+{
+  "steps": 250000,
+  "last_loss": 0.5564836859703064,
+  "checkpoint": "artifacts/checkpoints/om-1.0-long/latest.pt",
+  "registry_metadata": "/Users/gajendrarawat/Downloads/om-ai-operating-brain 3/artifacts/models/om-1.0/metadata.json",
+  "tokenizer_fingerprint": "13b365fd78f468e96137462cbef86f008192415c3bb825653f1bbf16f12ddb5f",
+  "trained": true,
+  "device": "mps",
+  "parameters": 3300608
+}
+
+
+1
+
+om-ai train-om1 \
+  --config configs/om-1.0-local.json \
+  --data data/production-corpus/raw/fineweb-100mb.txt \
+  --tokenizer artifacts/tokenizer-production-65536.json \
+  --steps 5000 \
+  --batch-size 4 \
+  --max-tokens 10000000 \
+  --max-docs 100000 \
+  --checkpoint-every 500 \
+  --log-every 25 \
+  --device mps \
+  --precision auto \
+  --resume artifacts/checkpoints/om-1.0-base/latest.pt \
+  --output artifacts/checkpoints/om-1.0-base
+
+  2
+
+  om-ai train-om1 \
+  --config configs/om-1.0-local.json \
+  --data data/production-corpus/raw/fineweb-100mb.txt \
+  --tokenizer artifacts/tokenizer-production-65536.json \
+  --steps 20000 \
+  --batch-size 4 \
+  --max-tokens 25000000 \
+  --max-docs 250000 \
+  --checkpoint-every 1000 \
+  --log-every 50 \
+  --device mps \
+  --precision auto \
+  --resume artifacts/checkpoints/om-1.0-base/latest.pt \
+  --output artifacts/checkpoints/om-1.0-base

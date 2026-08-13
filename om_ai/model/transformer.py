@@ -296,24 +296,35 @@ class OMTransformer(nn.Module):
         repetition_penalty: float = 1.0,
         eos_token_id: int | None = None,
         stop_token_ids: list[int] | None = None,
+        min_new_tokens: int = 0,
         encoder_hidden_states: torch.Tensor | None = None,
     ) -> torch.Tensor:
         self.eval()
         stops = set(stop_token_ids or [])
         if eos_token_id is not None:
             stops.add(eos_token_id)
+        min_new_tokens = max(0, int(min_new_tokens))
         if input_ids.size(1) > self.cfg.max_seq_len:
             input_ids = input_ids[:, -self.cfg.max_seq_len :]
         out = self.forward(input_ids, use_cache=True, encoder_hidden_states=encoder_hidden_states)
         caches = out["caches"]
         generated = input_ids
         logits = out["logits"][:, -1, :]
-        for _ in range(max_new_tokens):
+        for step in range(max_new_tokens):
+            step_logits = logits
+            if step < min_new_tokens and stops:
+                step_logits = step_logits.clone()
+                for sid in stops:
+                    step_logits[:, int(sid)] = float("-inf")
             next_token = self._sample_next(
-                logits, generated, temperature, top_k, top_p, repetition_penalty
+                step_logits, generated, temperature, top_k, top_p, repetition_penalty
             )
             generated = torch.cat([generated, next_token], dim=1)
-            if stops and all(int(t) in stops for t in next_token.view(-1).tolist()):
+            if (
+                step >= min_new_tokens
+                and stops
+                and all(int(t) in stops for t in next_token.view(-1).tolist())
+            ):
                 break
             out = self.forward(
                 next_token,
@@ -336,25 +347,36 @@ class OMTransformer(nn.Module):
         repetition_penalty: float = 1.0,
         eos_token_id: int | None = None,
         stop_token_ids: list[int] | None = None,
+        min_new_tokens: int = 0,
         encoder_hidden_states: torch.Tensor | None = None,
     ) -> Iterator[torch.Tensor]:
         self.eval()
         stops = set(stop_token_ids or [])
         if eos_token_id is not None:
             stops.add(eos_token_id)
+        min_new_tokens = max(0, int(min_new_tokens))
         if input_ids.size(1) > self.cfg.max_seq_len:
             input_ids = input_ids[:, -self.cfg.max_seq_len :]
         out = self.forward(input_ids, use_cache=True, encoder_hidden_states=encoder_hidden_states)
         caches = out["caches"]
         generated = input_ids
         logits = out["logits"][:, -1, :]
-        for _ in range(max_new_tokens):
+        for step in range(max_new_tokens):
+            step_logits = logits
+            if step < min_new_tokens and stops:
+                step_logits = step_logits.clone()
+                for sid in stops:
+                    step_logits[:, int(sid)] = float("-inf")
             next_token = self._sample_next(
-                logits, generated, temperature, top_k, top_p, repetition_penalty
+                step_logits, generated, temperature, top_k, top_p, repetition_penalty
             )
             generated = torch.cat([generated, next_token], dim=1)
             yield next_token
-            if stops and all(int(t) in stops for t in next_token.view(-1).tolist()):
+            if (
+                step >= min_new_tokens
+                and stops
+                and all(int(t) in stops for t in next_token.view(-1).tolist())
+            ):
                 break
             out = self.forward(
                 next_token,
