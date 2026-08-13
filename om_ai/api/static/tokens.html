@@ -1056,7 +1056,7 @@
         const native = backend === "om_native" || backend === "om-native";
         if (native) {
           // Never show ollama/llama labels in native mode.
-          modelBadge.textContent = "Model OM-1.0 · Provider OM AI · Backend OM Native";
+          modelBadge.textContent = "Model OM-1.0";
           modelBadge.className = "model-badge native";
           chatModel = "OM-1.0";
           return;
@@ -1356,6 +1356,13 @@
           .replace(/"/g, "&quot;");
       }
 
+      /** First character upper; rest unchanged (not String#toUpperCase of whole word via capitalize). */
+      function capitalizeTitle(s) {
+        const t = String(s || "").trim();
+        if (!t) return t;
+        return t.charAt(0).toUpperCase() + t.slice(1);
+      }
+
       async function api(path, opts) {
         const headers = adminHeaders();
         const res = await fetch(path, Object.assign({ headers }, opts || {}));
@@ -1376,7 +1383,7 @@
         if (!res.ok) throw new Error(friendlyHttpError(res.status, data));
         currentConversationId = data.id;
         persistConvId(currentConversationId);
-        chatTitleEl.textContent = data.title || "New chat";
+        chatTitleEl.textContent = capitalizeTitle(data.title || "New chat");
         await refreshHistory();
         return currentConversationId;
       }
@@ -1398,7 +1405,7 @@
           return;
         }
         if (data.conversation && data.conversation.title) {
-          chatTitleEl.textContent = data.conversation.title;
+          chatTitleEl.textContent = capitalizeTitle(data.conversation.title);
         }
         await refreshHistory();
       }
@@ -1415,7 +1422,7 @@
         return (
           '<div class="hist-item' + active + '" data-id="' + escapeHtml(c.id) + '">' +
           '<button type="button" class="main" data-open="' + escapeHtml(c.id) + '">' +
-          '<span class="item-title">' + escapeHtml(c.title || "New chat") + "</span></button>" +
+          '<span class="item-title">' + escapeHtml(capitalizeTitle(c.title || "New chat")) + "</span></button>" +
           moreBtnHtml("chat", c.id) +
           "</div>"
         );
@@ -1437,7 +1444,7 @@
             '<div class="folder-item">' +
             '<button type="button" class="main" data-folder-toggle="' + escapeHtml(f.id) + '">' +
             CHEVRON_SVG + FOLDER_SVG +
-            '<span class="item-title">' + escapeHtml(f.name) + "</span></button>" +
+            '<span class="item-title">' + escapeHtml(capitalizeTitle(f.name)) + "</span></button>" +
             moreBtnHtml("project", f.id) +
             "</div>" +
             '<div class="project-chats">' + chatsHtml + "</div></div>"
@@ -1568,7 +1575,7 @@
         if (!res.ok) throw new Error(friendlyHttpError(res.status, data));
         currentConversationId = data.id;
         persistConvId(id);
-        chatTitleEl.textContent = data.title || "Chat";
+        chatTitleEl.textContent = capitalizeTitle(data.title || "Chat");
         renderMessages(data.messages || []);
         setChatStatus("Loaded conversation", "ok");
         setTimeout(function () { if (!chatBusy) setChatStatus(DEFAULT_HINT, ""); }, 1000);
@@ -1860,21 +1867,47 @@
         if (navSettingsBtn) navSettingsBtn.classList.toggle("active", view === "settings");
       }
 
+      /** Clean chat URL: `/` or `/ui/chat` (etc.) with no hash — never `#chat`. */
+      function chatUrl() {
+        const path = location.pathname || "/";
+        const base =
+          path === "/" || path === "/ui/chat" || path === "/ui/tokens" ? path : "/";
+        return base + (location.search || "");
+      }
+
+      /** Settings: keep path, use `#settings` (or `/#settings` from `/ui/settings`). */
+      function settingsUrl() {
+        let path = location.pathname || "/";
+        if (/\/ui\/settings\/?$/.test(path)) path = "/";
+        return path + (location.search || "") + "#settings";
+      }
+
       function showView(view, opts) {
         const next = view === "settings" ? "settings" : "chat";
         currentView = next;
-        const pushHash = !(opts && opts.skipHash);
+        const syncUrl = !(opts && opts.skipHash);
         viewChat.classList.toggle("active", next === "chat");
         viewSettings.classList.toggle("active", next === "settings");
         syncNavActive(next);
         closeSidebar();
-        if (pushHash) {
-          const target = next === "settings" ? "#settings" : "#chat";
-          if (location.hash !== target) {
-            try { history.replaceState(null, "", target); } catch (_) {
-              location.hash = target.slice(1);
+        if (syncUrl) {
+          if (next === "settings") {
+            const target = settingsUrl();
+            if ((location.pathname + location.search + location.hash) !== target) {
+              try { history.replaceState(null, "", target); } catch (_) {
+                location.hash = "settings";
+              }
+            }
+          } else {
+            // Chat: bare path, clear any hash (including #chat).
+            const target = chatUrl();
+            if (location.hash || (location.pathname + location.search) !== target) {
+              try { history.replaceState(null, "", target); } catch (_) {}
             }
           }
+        } else if (next === "chat" && /^#chat$/i.test(location.hash || "")) {
+          // Always strip legacy #chat even when skipHash (boot / hashchange).
+          try { history.replaceState(null, "", chatUrl()); } catch (_) {}
         }
         document.title = next === "settings" ? "OM AI — Settings" : "OM AI — Chat";
         if (next === "settings") {
@@ -1952,7 +1985,7 @@
           if (!name || !String(name).trim()) return;
           const { res, data } = await api("/v1/folders", {
             method: "POST",
-            body: JSON.stringify({ name: String(name).trim() }),
+            body: JSON.stringify({ name: capitalizeTitle(name) }),
           });
           if (!res.ok) throw new Error(friendlyHttpError(res.status, data));
           if (data && data.id) {
@@ -1993,16 +2026,17 @@
         const title = await openModal({
           title: "Rename chat",
           input: true,
-          value: (cur && cur.title) || "New chat",
+          value: capitalizeTitle((cur && cur.title) || "New chat"),
           confirmText: "Save",
         });
         if (!title || !String(title).trim()) return;
+        const normalized = capitalizeTitle(title);
         const { res, data } = await api("/v1/conversations/" + id, {
           method: "PATCH",
-          body: JSON.stringify({ title: String(title).trim() }),
+          body: JSON.stringify({ title: normalized }),
         });
         if (!res.ok) throw new Error(friendlyHttpError(res.status, data));
-        if (id === currentConversationId) chatTitleEl.textContent = data.title;
+        if (id === currentConversationId) chatTitleEl.textContent = capitalizeTitle(data.title || normalized);
         await refreshSidebar();
       }
 
@@ -2039,13 +2073,13 @@
         const name = await openModal({
           title: "Rename project",
           input: true,
-          value: (cur && cur.name) || "",
+          value: capitalizeTitle((cur && cur.name) || ""),
           confirmText: "Save",
         });
         if (!name || !String(name).trim()) return;
         const { res, data } = await api("/v1/folders/" + id, {
           method: "PATCH",
-          body: JSON.stringify({ name: String(name).trim() }),
+          body: JSON.stringify({ name: capitalizeTitle(name) }),
         });
         if (!res.ok) throw new Error(friendlyHttpError(res.status, data));
         await refreshSidebar();
@@ -2265,8 +2299,12 @@
 
       window.addEventListener("hashchange", function () {
         const h = (location.hash || "").replace(/^#/, "").toLowerCase();
-        if (h === "settings") showView("settings", { skipHash: true });
-        else showView("chat", { skipHash: true });
+        if (h === "settings") {
+          showView("settings", { skipHash: true });
+        } else {
+          // empty, "/", "chat", or anything else → chat; clear #chat from the bar
+          showView("chat");
+        }
       });
 
       fetch("/v1/tokens/meta").then(r => r.json()).then(d => {
@@ -2289,10 +2327,12 @@
       if (bootHash === "settings" || /\/ui\/settings\/?$/.test(location.pathname)) {
         showView("settings", { skipHash: bootHash === "settings" });
         if (/\/ui\/settings\/?$/.test(location.pathname) && bootHash !== "settings") {
-          try { history.replaceState(null, "", "/ui/chat#settings"); } catch (_) {}
+          try { history.replaceState(null, "", "/#settings"); } catch (_) {}
         }
       } else {
-        showView("chat", { skipHash: true });
+        // Default view = chat when hash is empty, "/", "chat", or anything else.
+        // showView clears #chat so the address bar stays clean.
+        showView("chat");
       }
       if (currentView === "chat") chatInput.focus();
     })();

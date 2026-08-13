@@ -21,6 +21,14 @@ def _utc_now() -> str:
     return datetime.now(timezone.utc).replace(microsecond=0).isoformat()
 
 
+def capitalize_title(text: str) -> str:
+    """Capitalize the first character; leave the rest unchanged (not ``str.capitalize``)."""
+    s = (text or "").strip()
+    if not s:
+        return s
+    return s[:1].upper() + s[1:]
+
+
 _DDL = """
 PRAGMA journal_mode = WAL;
 
@@ -164,7 +172,7 @@ class ConversationStore:
         return [Folder(**dict(r)) for r in rows]
 
     def create_folder(self, tenant_id: str, actor: str, name: str) -> Folder:
-        name = (name or "").strip() or "Untitled folder"
+        name = capitalize_title(name) or "Untitled folder"
         now = _utc_now()
         fid = uuid.uuid4().hex
         with self._tx():
@@ -178,7 +186,7 @@ class ConversationStore:
         return Folder(fid, tenant_id, actor, name, now, now)
 
     def rename_folder(self, folder_id: str, tenant_id: str, actor: str, name: str) -> Folder:
-        name = (name or "").strip() or "Untitled folder"
+        name = capitalize_title(name) or "Untitled folder"
         now = _utc_now()
         with self._tx():
             cur = self._conn.execute(
@@ -259,7 +267,7 @@ class ConversationStore:
         title: str = "New chat",
         folder_id: str | None = None,
     ) -> Conversation:
-        title = (title or "").strip() or "New chat"
+        title = capitalize_title(title) or "New chat"
         if folder_id:
             self.get_folder(folder_id, tenant_id, actor)
         now = _utc_now()
@@ -300,7 +308,7 @@ class ConversationStore:
         folder_id: str | None | object = ...,
     ) -> Conversation:
         conv = self.get_conversation(conversation_id, tenant_id, actor)
-        new_title = conv.title if title is None else ((title or "").strip() or "New chat")
+        new_title = conv.title if title is None else (capitalize_title(title) or "New chat")
         if folder_id is ...:
             new_folder = conv.folder_id
         else:
@@ -384,7 +392,8 @@ class ConversationStore:
                 for msg in messages:
                     if msg.get("role") == "user" and str(msg.get("content") or "").strip():
                         text = str(msg["content"]).strip().replace("\n", " ")
-                        new_title = text[:60] + ("…" if len(text) > 60 else "")
+                        text = text[:60] + ("…" if len(text) > 60 else "")
+                        new_title = capitalize_title(text)
                         break
             self._conn.execute(
                 """

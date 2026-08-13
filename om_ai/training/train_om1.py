@@ -96,7 +96,24 @@ def run_train_om1(
     )
     trainer = Trainer(model, tc, device=dev)
     if resume:
-        trainer.load_checkpoint(resume)
+        try:
+            trainer.load_checkpoint(resume)
+        except ValueError as e:
+            if "Corrupt checkpoint" not in str(e):
+                raise
+            # Auto-fallback so a stale/partial latest.pt does not abort training.
+            print(
+                json.dumps(
+                    {
+                        "event": "om1_resume_corrupt",
+                        "path": resume,
+                        "warning": str(e),
+                        "fallback": "from_scratch",
+                    }
+                ),
+                flush=True,
+            )
+            trainer.global_step = 0
 
     ds = build_dataset(
         data,
@@ -123,7 +140,8 @@ def run_train_om1(
                 "output": str(out_dir),
                 "not_70b": True,
             }
-        )
+        ),
+        flush=True,
     )
 
     result = trainer.train(ds)
@@ -187,5 +205,5 @@ def run_train_om1(
         "device": str(trainer.device),
         "parameters": model.exact_parameter_count(),
     }
-    print(json.dumps({"event": "om1_train_done", **payload}))
+    print(json.dumps({"event": "om1_train_done", **payload}), flush=True)
     return payload

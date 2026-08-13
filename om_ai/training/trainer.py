@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, asdict
 from pathlib import Path
-import json, math, os, random, time
+import json, math, os, pickle, random, time
 import numpy as np
 import torch
 from torch.utils.data import DataLoader
@@ -61,18 +61,39 @@ class Trainer:
         return self.cfg.learning_rate * (self.cfg.min_lr_ratio + (1 - self.cfg.min_lr_ratio) * cosine)
 
     def save_checkpoint(self, path: str | Path, extra: dict | None = None):
-        p = Path(path); p.parent.mkdir(parents=True, exist_ok=True)
-        torch.save({
+        p = Path(path)
+        p.parent.mkdir(parents=True, exist_ok=True)
+        payload = {
             "model": self.model.state_dict(),
             "optimizer": self.optimizer.state_dict(),
             "global_step": self.global_step,
             "model_config": asdict(self.model.cfg),
             "train_config": asdict(self.cfg),
             "extra": extra or {},
-        }, p)
+        }
+        # Atomic write: avoid truncated latest.pt if training is interrupted mid-save.
+        tmp = p.with_name(f".{p.name}.{os.getpid()}.tmp")
+        try:
+            torch.save(payload, tmp)
+            os.replace(tmp, p)
+        finally:
+            if tmp.exists():
+                tmp.unlink(missing_ok=True)
 
     def load_checkpoint(self, path: str | Path):
-        ckpt = torch.load(path, map_location=self.device, weights_only=False)
+        p = Path(path)
+        try:
+            if not p.is_file() or p.stat().st_size == 0:
+                raise EOFError("empty or missing checkpoint")
+            ckpt = torch.load(p, map_location=self.device, weights_only=False)
+        except (EOFError, pickle.UnpicklingError, RuntimeError) as e:
+            # RuntimeError: pytorch sometimes wraps truncated zip / pickle failures.
+            msg = str(e).lower()
+            if isinstance(e, RuntimeError) and "pickle" not in msg and "eof" not in msg and "zip" not in msg:
+                raise
+            raise ValueError(
+                f"Corrupt checkpoint at {p}; remove --resume or delete file and restart."
+            ) from e
         self.model.load_state_dict(ckpt["model"])
         if "optimizer" in ckpt:
             self.optimizer.load_state_dict(ckpt["optimizer"])
@@ -111,7 +132,17 @@ class Trainer:
 
             if self.global_step % self.cfg.log_every == 0 or self.global_step == 1:
                 elapsed = max(1e-6, time.time() - start)
-                print(json.dumps({"step": self.global_step, "loss": round(total_loss, 5), "lr": lr, "steps_per_sec": round(self.global_step / elapsed, 3)}))
+                print(
+                    json.dumps(
+                        {
+                            "step": self.global_step,
+                            "loss": round(total_loss, 5),
+                            "lr": lr,
+                            "steps_per_sec": round(self.global_step / elapsed, 3),
+                        }
+                    ),
+                    flush=True,
+                )
             if self.global_step % self.cfg.checkpoint_every == 0:
                 self.save_checkpoint(Path(self.cfg.output_dir) / f"step-{self.global_step}.pt")
                 self.save_checkpoint(Path(self.cfg.output_dir) / "latest.pt")

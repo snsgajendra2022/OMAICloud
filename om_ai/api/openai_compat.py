@@ -60,10 +60,9 @@ def _require_local_engine():
             detail=(
                 "OM model not loaded. Start server with OM_AI_AUTOLOAD=1 "
                 "or POST /v1/model/load first. "
-                "For coherent chat without a capable local checkpoint, set "
-                "OM_AI_CHAT_BACKEND=ollama (with Ollama running) or provide "
-                "OM_AI_OPENAI_API_KEY / OPENAI_API_KEY. "
-                "For OM-1.0 native: OM_MODEL_PROVIDER=om_native after train-om1."
+                "Default is OM-1.0 native (OM_MODEL_PROVIDER=om_native) with a "
+                "checkpoint. Alternatives: OM_AI_OPENAI_API_KEY / OPENAI_API_KEY, "
+                "or explicit OM_AI_CHAT_BACKEND=ollama."
             ),
         )
     return _engine

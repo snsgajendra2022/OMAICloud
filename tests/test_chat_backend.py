@@ -39,22 +39,44 @@ def test_with_runtime_date_context_merges_existing_system():
     assert msgs[1]["role"] == "user"
 
 
-def test_resolve_prefers_ollama_when_reachable(monkeypatch):
+def test_default_backend_is_om_native(monkeypatch):
+    monkeypatch.delenv("OM_AI_CHAT_BACKEND", raising=False)
+    monkeypatch.delenv("OM_MODEL_PROVIDER", raising=False)
+    monkeypatch.setattr(cb, "ollama_reachable", lambda timeout=1.5: True)
+    assert cb.configured_backend() == "om_native"
+    info = cb.resolve_backend(native_ready=True)
+    assert info.backend == "om_native"
+    assert info.model == "OM-1.0"
+
+
+def test_auto_never_picks_ollama(monkeypatch):
     monkeypatch.setenv("OM_AI_CHAT_BACKEND", "auto")
+    monkeypatch.delenv("OM_MODEL_PROVIDER", raising=False)
     monkeypatch.delenv("OM_AI_OPENAI_API_KEY", raising=False)
     monkeypatch.delenv("OPENAI_API_KEY", raising=False)
     monkeypatch.setenv("OM_AI_OLLAMA_MODEL", "llama3.2")
+    monkeypatch.setenv("OM_AI_MODEL_ID", "om:free")
     monkeypatch.setattr(cb, "ollama_reachable", lambda timeout=1.5: True)
+    info = cb.resolve_backend(local_loaded=True)
+    assert info.backend == "local"
+    assert info.model == "om:free"
+
+
+def test_explicit_ollama_still_works(monkeypatch):
+    monkeypatch.setenv("OM_AI_CHAT_BACKEND", "ollama")
+    monkeypatch.delenv("OM_MODEL_PROVIDER", raising=False)
+    monkeypatch.setenv("OM_AI_OLLAMA_MODEL", "llama3.2")
     info = cb.resolve_backend(local_loaded=True)
     assert info.backend == "ollama"
     assert info.model == "llama3.2"
 
 
-def test_resolve_openai_when_key_and_no_ollama(monkeypatch):
+def test_resolve_openai_when_key_and_auto(monkeypatch):
     monkeypatch.setenv("OM_AI_CHAT_BACKEND", "auto")
+    monkeypatch.delenv("OM_MODEL_PROVIDER", raising=False)
     monkeypatch.setenv("OPENAI_API_KEY", "sk-test")
     monkeypatch.setenv("OM_AI_OPENAI_MODEL", "gpt-4o-mini")
-    monkeypatch.setattr(cb, "ollama_reachable", lambda timeout=1.5: False)
+    monkeypatch.setattr(cb, "ollama_reachable", lambda timeout=1.5: True)
     info = cb.resolve_backend(local_loaded=False)
     assert info.backend == "openai"
     assert info.model == "gpt-4o-mini"
@@ -62,6 +84,7 @@ def test_resolve_openai_when_key_and_no_ollama(monkeypatch):
 
 def test_resolve_local_fallback(monkeypatch):
     monkeypatch.setenv("OM_AI_CHAT_BACKEND", "auto")
+    monkeypatch.delenv("OM_MODEL_PROVIDER", raising=False)
     monkeypatch.delenv("OM_AI_OPENAI_API_KEY", raising=False)
     monkeypatch.delenv("OPENAI_API_KEY", raising=False)
     monkeypatch.setenv("OM_AI_MODEL_ID", "om:free")
@@ -73,6 +96,7 @@ def test_resolve_local_fallback(monkeypatch):
 
 def test_force_openai(monkeypatch):
     monkeypatch.setenv("OM_AI_CHAT_BACKEND", "openai")
+    monkeypatch.delenv("OM_MODEL_PROVIDER", raising=False)
     monkeypatch.setenv("OM_AI_OPENAI_MODEL", "gpt-4o-mini")
     monkeypatch.setattr(cb, "ollama_reachable", lambda timeout=1.5: True)
     info = cb.resolve_backend()

@@ -3,7 +3,16 @@ from __future__ import annotations
 
 import pytest
 
-from om_ai.memory.conversations import ConversationStore
+from om_ai.memory.conversations import ConversationStore, capitalize_title
+
+
+def test_capitalize_title():
+    assert capitalize_title("what year is it") == "What year is it"
+    assert capitalize_title("hiiii") == "Hiiii"
+    assert capitalize_title("ram ram ji") == "Ram ram ji"
+    assert capitalize_title("hello") == "Hello"
+    assert capitalize_title("  already Cap") == "Already Cap"
+    assert capitalize_title("") == ""
 
 
 def test_conversation_crud_and_messages(tmp_path):
@@ -35,6 +44,28 @@ def test_conversation_crud_and_messages(tmp_path):
     store.delete_conversation(conv.id, "t1", "alice")
     with pytest.raises(KeyError):
         store.get_conversation(conv.id, "t1", "alice")
+
+
+def test_auto_title_and_folder_capitalize_first_letter(tmp_path):
+    store = ConversationStore(str(tmp_path / "chat.db"))
+    conv = store.create_conversation("t1", "alice")
+    store.append_messages(
+        conv.id,
+        "t1",
+        "alice",
+        [
+            {"role": "user", "content": "what year is it"},
+            {"role": "assistant", "content": "2026"},
+        ],
+    )
+    assert store.get_conversation(conv.id, "t1", "alice").title == "What year is it"
+
+    folder = store.create_folder("t1", "alice", "my project")
+    assert folder.name == "My project"
+    renamed = store.rename_folder(folder.id, "t1", "alice", "side stuff")
+    assert renamed.name == "Side stuff"
+    updated = store.update_conversation(conv.id, "t1", "alice", title="ram ram ji")
+    assert updated.title == "Ram ram ji"
 
 
 def test_folders_and_move(tmp_path):

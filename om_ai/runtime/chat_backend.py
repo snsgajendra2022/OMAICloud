@@ -1,9 +1,9 @@
 """Chat reply backends: OM native, local engine, Ollama, or OpenAI-compatible API.
 
 Selection (``OM_AI_CHAT_BACKEND`` or ``OM_MODEL_PROVIDER``):
-  - ``om_native``: OMNativeBackend ONLY — never silently falls back to Ollama/OpenAI
-  - ``ollama`` / ``openai`` / ``local``: force that path
-  - ``auto`` (default): Ollama if reachable → OpenAI if API key set → local OM
+  - ``om_native`` (default when unset): OMNativeBackend ONLY — no Ollama/OpenAI fallback
+  - ``ollama`` / ``openai`` / ``local``: force that path (Ollama is explicit opt-in only)
+  - ``auto``: OpenAI if API key set → local OM (never auto-picks Ollama)
 """
 from __future__ import annotations
 
@@ -20,6 +20,8 @@ from om_ai.backends.base import NativeCheckpointError
 logger = logging.getLogger(__name__)
 
 BackendName = str  # "om_native" | "local" | "ollama" | "openai"
+
+_DEFAULT_BACKEND = "om_native"
 
 
 @dataclass(frozen=True)
@@ -57,17 +59,19 @@ def openai_api_key() -> str:
 def configured_backend() -> str:
     """Resolve configured chat backend.
 
-    ``OM_MODEL_PROVIDER=om_native`` (or ``OM_AI_CHAT_BACKEND=om_native``) forces
-    the native path. Explicit ``ollama`` keeps Ollama only when requested.
+    Default when unset is ``om_native``. Explicit ``ollama`` keeps Ollama only
+    when requested — never selected by default or by ``auto``.
     """
     provider = (_env("OM_MODEL_PROVIDER") or "").lower()
-    chat = (_env("OM_AI_CHAT_BACKEND", "auto") or "auto").lower()
+    chat = (_env("OM_AI_CHAT_BACKEND") or _DEFAULT_BACKEND).lower()
     if provider in {"om_native", "om-native", "native"}:
         return "om_native"
     if chat in {"om_native", "om-native", "native"}:
         return "om_native"
-    if provider in {"ollama", "openai", "local"} and chat == "auto":
+    if provider in {"ollama", "openai", "local"} and chat in {_DEFAULT_BACKEND, "auto"}:
         return provider
+    if not chat:
+        return _DEFAULT_BACKEND
     return chat
 
 
@@ -92,7 +96,7 @@ def resolve_backend(*, local_loaded: bool = False, native_ready: bool = False) -
         return ChatBackendInfo(
             "om_native",
             _env("OM_MODEL_ID", "OM-1.0") or "OM-1.0",
-            "forced by OM_MODEL_PROVIDER/OM_AI_CHAT_BACKEND=om_native"
+            "OM_MODEL_PROVIDER/OM_AI_CHAT_BACKEND=om_native (default)"
             + (" (ready)" if native_ready else " (checkpoint required)"),
             provider="OM AI",
         )
@@ -118,11 +122,7 @@ def resolve_backend(*, local_loaded: bool = False, native_ready: bool = False) -
             provider="OM AI",
         )
 
-    # auto
-    if ollama_reachable():
-        return ChatBackendInfo(
-            "ollama", ollama_model(), "auto: Ollama reachable", provider="Ollama"
-        )
+    # auto — never picks Ollama; use OM_AI_CHAT_BACKEND=ollama for that
     if openai_configured():
         return ChatBackendInfo(
             "openai", openai_model(), "auto: OpenAI API key present", provider="OpenAI"
@@ -331,9 +331,10 @@ def chat_reply(
 
     if local_chat is None or not local_loaded:
         raise RuntimeError(
-            "No chat backend available. Install/start Ollama (OM_AI_CHAT_BACKEND=ollama), "
-            "set OM_AI_OPENAI_API_KEY / OPENAI_API_KEY, load a local OM checkpoint "
-            "(OM_AI_AUTOLOAD=1), or set OM_MODEL_PROVIDER=om_native with a real checkpoint."
+            "No chat backend available. Set OM_MODEL_PROVIDER=om_native with a real "
+            "checkpoint, load a local OM checkpoint (OM_AI_AUTOLOAD=1), set "
+            "OM_AI_OPENAI_API_KEY / OPENAI_API_KEY, or explicitly set "
+            "OM_AI_CHAT_BACKEND=ollama with Ollama running."
         )
     local_kwargs = dict(kwargs)
     if top_k is not None:
@@ -351,11 +352,9 @@ def backend_status(*, local_loaded: bool = False, native_ready: bool = False) ->
         "provider": info.provider,
         "detail": info.detail,
         "configured": configured_backend(),
-        "ollama_url": ollama_base_url(),
+        "ollama_url": ollama_base_url() if configured_backend() == "ollama" else None,
         "ollama_reachable": (
-            ollama_reachable()
-            if info.backend == "ollama" or configured_backend() in {"auto", "ollama"}
-            else None
+            ollama_reachable() if configured_backend() == "ollama" else None
         ),
         "openai_configured": openai_configured(),
         "local_loaded": local_loaded,

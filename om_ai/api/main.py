@@ -749,10 +749,10 @@ def chat_ui():
 
 @app.get("/ui/settings", tags=["UI"])
 def settings_ui():
-    """Settings opens the same SPA; client routes to the Settings view via #settings."""
+    """Settings opens the same SPA; client routes via #settings (chat stays at / with no hash)."""
     from fastapi.responses import RedirectResponse
     return RedirectResponse(
-        url="/ui/chat#settings",
+        url="/#settings",
         headers={"Cache-Control": "no-store, no-cache, must-revalidate"},
     )
 
