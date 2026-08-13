@@ -277,6 +277,28 @@ def project_scan(args):
     print(json.dumps(payload, indent=2, default=str))
 
 
+def train_om1(args):
+    from om_ai.training.train_om1 import run_train_om1
+
+    payload = run_train_om1(
+        config=args.config,
+        data=args.data,
+        tokenizer=args.tokenizer,
+        output=args.output,
+        steps=args.steps,
+        batch_size=args.batch_size,
+        lr=args.lr,
+        device=args.device,
+        max_tokens=args.max_tokens,
+        max_docs=args.max_docs,
+        checkpoint_every=args.checkpoint_every,
+        log_every=args.log_every,
+        precision=args.precision,
+        resume=args.resume,
+    )
+    print(json.dumps(payload, indent=2))
+
+
 def train_70b(args):
     from om_ai.training.train_70b import run_train_70b
 
@@ -544,6 +566,26 @@ def main():
     pr = sp.add_parser("project-scan")
     pr.add_argument("--root", required=True)
     pr.set_defaults(func=project_scan)
+
+    t1 = sp.add_parser(
+        "train-om1",
+        help="OM-1.0 local/smoke train (streaming corpus; not 70B).",
+    )
+    t1.add_argument("--config", default="configs/om-1.0-local.json")
+    t1.add_argument("--data", help="JSONL or text corpus (streamed line-by-line)")
+    t1.add_argument("--tokenizer", help="OM ByteBPE or HF chat tokenizer JSON")
+    t1.add_argument("--output", default="artifacts/checkpoints/om-1.0-smoke")
+    t1.add_argument("--steps", type=int, default=20)
+    t1.add_argument("--batch-size", type=int, default=4)
+    t1.add_argument("--lr", type=float, default=3e-4)
+    t1.add_argument("--device")
+    t1.add_argument("--max-tokens", type=int, default=250_000)
+    t1.add_argument("--max-docs", type=int, default=2000)
+    t1.add_argument("--checkpoint-every", type=int, default=10)
+    t1.add_argument("--log-every", type=int, default=1)
+    t1.add_argument("--precision", default="auto", choices=["auto", "fp32", "fp16", "bf16"])
+    t1.add_argument("--resume")
+    t1.set_defaults(func=train_om1)
 
     t70 = sp.add_parser(
         "train-70b",

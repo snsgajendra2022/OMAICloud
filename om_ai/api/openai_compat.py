@@ -6,39 +6,51 @@ Exposes:
   POST /api/v1/chat/completions
   POST /api/v1/completions
 
-Routes chat to Ollama / OpenAI-compatible APIs / local OM engine based on
-``OM_AI_CHAT_BACKEND`` (see ``om_ai.runtime.chat_backend``).
+Routes chat to OM native / Ollama / OpenAI-compatible APIs / local OM engine based on
+``OM_AI_CHAT_BACKEND`` / ``OM_MODEL_PROVIDER`` (see ``om_ai.runtime.chat_backend``).
 """
 from __future__ import annotations
 
 import json
 import time
 import uuid
-from typing import Any, AsyncGenerator, Literal
+from typing import Any, AsyncGenerator
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
 
 from om_ai.api.deps import require_auth, require_permission
-from om_ai.runtime.chat_backend import backend_status, chat_reply, resolve_backend
+from om_ai.backends.base import NativeCheckpointError
+from om_ai.runtime.chat_backend import backend_status, chat_reply, configured_backend, resolve_backend
 from om_ai.security.auth import TenantContext
 
 router = APIRouter(prefix="/api/v1", tags=["OpenAI Compatible"])
 
 # Filled by main.py after engine singleton exists
 _engine = None
+_native_backend = None
 _default_model_id = "om-tiny"
 
 
-def bind_engine(engine, default_model_id: str = "om-tiny") -> None:
-    global _engine, _default_model_id
+def bind_engine(
+    engine,
+    default_model_id: str = "om-tiny",
+    native_backend=None,
+) -> None:
+    global _engine, _default_model_id, _native_backend
     _engine = engine
     _default_model_id = default_model_id
+    _native_backend = native_backend
 
 
 def _local_loaded() -> bool:
     return bool(_engine is not None and getattr(_engine, "model", None) is not None)
+
+
+def _native_ready() -> bool:
+    nb = _native_backend
+    return bool(nb is not None and getattr(nb, "loaded", False) and getattr(nb, "_trained", False))
 
 
 def _require_local_engine():
@@ -50,7 +62,8 @@ def _require_local_engine():
                 "or POST /v1/model/load first. "
                 "For coherent chat without a capable local checkpoint, set "
                 "OM_AI_CHAT_BACKEND=ollama (with Ollama running) or provide "
-                "OM_AI_OPENAI_API_KEY / OPENAI_API_KEY."
+                "OM_AI_OPENAI_API_KEY / OPENAI_API_KEY. "
+                "For OM-1.0 native: OM_MODEL_PROVIDER=om_native after train-om1."
             ),
         )
     return _engine
@@ -117,6 +130,7 @@ def _chat_response(
     completion_tokens: int = 0,
     *,
     backend: str | None = None,
+    provider: str | None = None,
 ) -> dict:
     body: dict[str, Any] = {
         "id": f"chatcmpl-{uuid.uuid4().hex[:24]}",
@@ -138,6 +152,8 @@ def _chat_response(
     }
     if backend:
         body["om_backend"] = backend
+    if provider:
+        body["om_provider"] = provider
     return body
 
 
@@ -151,35 +167,66 @@ def _run_chat(
     max_new: int,
     temperature: float,
     top_p: float,
-) -> tuple[str, str, str]:
-    """Return (text, response_model_id, backend_name)."""
-    info = resolve_backend(local_loaded=_local_loaded())
+) -> tuple[str, str, str, str]:
+    """Return (text, response_model_id, backend_name, provider)."""
+    info = resolve_backend(local_loaded=_local_loaded(), native_ready=_native_ready())
     try:
         text, used = chat_reply(
             messages,
             local_chat=_engine.chat if _engine is not None else None,
             local_loaded=_local_loaded(),
+            native_chat=_native_backend.chat if _native_backend is not None else None,
+            native_ready=_native_ready(),
             max_new_tokens=max_new,
             temperature=temperature,
             top_p=top_p,
         )
+    except NativeCheckpointError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail=str(exc) or "OM-1.0 checkpoint unavailable.",
+        ) from exc
     except Exception as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
     model_name = used.model or info.model or _default_model_id
-    return text, model_name, used.backend
+    if used.backend == "om_native":
+        model_name = "OM-1.0"
+    return text, model_name, used.backend, used.provider or ""
 
 
 @router.get("/chat/backend")
 def chat_backend_info(ctx: TenantContext = Depends(require_auth)):
-    """Report which chat backend is active (local / ollama / openai)."""
-    return backend_status(local_loaded=_local_loaded())
+    """Report which chat backend is active (om_native / local / ollama / openai)."""
+    return backend_status(local_loaded=_local_loaded(), native_ready=_native_ready())
 
 
 @router.get("/models")
 def list_models(ctx: TenantContext = Depends(require_auth)):
     eng = _engine
     loaded = bool(eng and getattr(eng, "model", None) is not None)
-    info = resolve_backend(local_loaded=loaded)
+    info = resolve_backend(local_loaded=loaded, native_ready=_native_ready())
+    if info.backend == "om_native":
+        return {
+            "object": "list",
+            "data": [
+                {
+                    "id": "OM-1.0",
+                    "object": "model",
+                    "created": int(time.time()),
+                    "owned_by": "OM AI",
+                    "permission": [],
+                    "root": "OM-1.0",
+                    "parent": None,
+                    "loaded": _native_ready(),
+                    "om_backend": "om_native",
+                    "provider": "OM AI",
+                    "backend_label": "OM Native",
+                }
+            ],
+            "om_backend": "om_native",
+            "provider": "OM AI",
+        }
+
     models = [
         {
             "id": _default_model_id,
@@ -228,6 +275,13 @@ async def chat_completions(
     temperature = float(req.temperature if req.temperature is not None else 0.8)
     top_p = float(req.top_p if req.top_p is not None else 1.0)
 
+    # When native is forced and checkpoint missing, fail fast with 503 (no Ollama).
+    if configured_backend() == "om_native" and not _native_ready():
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="OM-1.0 checkpoint unavailable.",
+        )
+
     if req.stream:
         async def event_stream() -> AsyncGenerator[str, None]:
             chunk_id = f"chatcmpl-{uuid.uuid4().hex[:24]}"
@@ -236,7 +290,7 @@ async def chat_completions(
                     "id": chunk_id,
                     "object": "chat.completion.chunk",
                     "created": int(time.time()),
-                    "model": req.model or _default_model_id,
+                    "model": "OM-1.0" if configured_backend() == "om_native" else (req.model or _default_model_id),
                     "choices": [
                         {
                             "index": 0,
@@ -247,7 +301,7 @@ async def chat_completions(
                 }
             )
             try:
-                text, model_name, backend = _run_chat(
+                text, model_name, backend, provider = _run_chat(
                     messages,
                     max_new=max_new,
                     temperature=temperature,
@@ -272,6 +326,7 @@ async def chat_completions(
                         "created": int(time.time()),
                         "model": model_name,
                         "om_backend": backend,
+                        "om_provider": provider,
                         "choices": [
                             {
                                 "index": 0,
@@ -288,6 +343,7 @@ async def chat_completions(
                     "created": int(time.time()),
                     "model": model_name,
                     "om_backend": backend,
+                    "om_provider": provider,
                     "choices": [{"index": 0, "delta": {}, "finish_reason": "stop"}],
                 }
             )
@@ -295,13 +351,13 @@ async def chat_completions(
 
         return StreamingResponse(event_stream(), media_type="text/event-stream")
 
-    text, model_name, backend = _run_chat(
+    text, model_name, backend, provider = _run_chat(
         messages,
         max_new=max_new,
         temperature=temperature,
         top_p=top_p,
     )
-    return _chat_response(model_name, text, backend=backend)
+    return _chat_response(model_name, text, backend=backend, provider=provider)
 
 
 @router.post("/completions")
@@ -309,12 +365,17 @@ async def completions(
     req: CompletionsRequest,
     ctx: TenantContext = Depends(require_permission("model.generate")),
 ):
+    if configured_backend() == "om_native" and not _native_ready():
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="OM-1.0 checkpoint unavailable.",
+        )
     eng = _require_local_engine()
     prompt = req.prompt if isinstance(req.prompt, str) else "\n".join(req.prompt)
     max_new = int(req.max_tokens or 128)
     temperature = float(req.temperature if req.temperature is not None else 0.8)
     top_p = float(req.top_p if req.top_p is not None else 1.0)
-    model_name = req.model or _default_model_id
+    model_name = "OM-1.0" if configured_backend() == "om_native" else (req.model or _default_model_id)
     try:
         text = eng.generate(
             prompt,

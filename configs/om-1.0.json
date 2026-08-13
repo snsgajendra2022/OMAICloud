@@ -1,0 +1,18 @@
+{
+  "name": "OM-1.0",
+  "description": "Staged OM-1.0 target architecture (~100M–220M params depending on vocab). Not 70B. Prefer om-1.0-local.json for Mac smoke first.",
+  "vocab_size": 8000,
+  "max_seq_len": 512,
+  "n_layers": 12,
+  "n_heads": 12,
+  "n_kv_heads": 12,
+  "d_model": 768,
+  "d_ff": 2048,
+  "rope_theta": 10000.0,
+  "dropout": 0.0,
+  "bias": false,
+  "tie_embeddings": true,
+  "use_rmsnorm": true,
+  "gradient_checkpointing": true,
+  "parameter_goal_note": "Architecture estimate ~91M with vocab 8000; scale vocab toward production (16k–65k) for ~100M–300M class. Train only when host memory allows; local Mac smoke uses configs/om-1.0-local.json."
+}

@@ -1,0 +1,28 @@
+# OM-70B server pack manifest
+# created_utc=20260813T065541Z
+# root=/Users/gajendrarawat/Downloads/om-ai-operating-brain 3
+# archive=/Users/gajendrarawat/Downloads/om-ai-operating-brain 3/artifacts/handoff/om70b-server-pack-20260813T065541Z.tar.gz
+# smoke_corpus=data/production-corpus/clean/fineweb-deduped.jsonl (~100MB; expand on server)
+# tokenizer_hf=artifacts/tokenizer-production-65536.json
+# see=docs/SERVER_70B_HANDOFF.md
+
+FILE 750 pyproject.toml
+FILE 4001 README.md
+FILE 2404 .env.example
+FILE 179 Makefile
+FILE 226 Dockerfile
+DIR  om_ai
+FILE 283 configs/70b.json
+FILE 608 configs/deepspeed_zero3.json
+FILE 681 configs/train_70b_gates.json
+FILE 275 configs/tiny.json
+FILE 1279 scripts/train_70b.sh
+FILE 3981 scripts/om70b_preflight.py
+FILE 3689 scripts/pack_for_70b_server.sh
+FILE 10035 docs/SERVER_70B_HANDOFF.md
+FILE 3447 docs/TRAINING_70B.md
+FILE 1834 docs/DISTRIBUTED_TRAINING.md
+FILE 2627 docs/EXTERNAL_ASSETS_REQUIRED.md
+FILE 4683536 artifacts/tokenizer-production-65536.json
+FILE 394533 artifacts/tokenizer-om-production.json
+FILE 105825208 data/production-corpus/clean/fineweb-deduped.jsonl

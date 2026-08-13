@@ -32,13 +32,7 @@ om-ai serve --host 127.0.0.1 --port 8080
 
 One-shot tiny pipeline: `python scripts/run_actual_training_pipeline.py --steps 5`
 
-cd "/path/to/om-ai-operating-brain"
-source .venv/bin/activate
-pip install -e '.[deepSpeed]'
-export OM_AI_70B_DATA=/data/licensed-corpus   # ≥1GB, preferably much larger
-export OM_AI_70B_TOKENIZER=/data/tokenizer-bytebpe-65536.json  # OM ByteBPE + chat tokens
-export OM_AI_70B_OUTPUT=/checkpoints/om-70b
-./scripts/train_70b.sh
+**OM-70B:** Mac prepares corpus/tokenizer/configs; final train is on a CUDA+DeepSpeed server — see [`docs/SERVER_70B_HANDOFF.md`](docs/SERVER_70B_HANDOFF.md). Pack upload set: `./scripts/pack_for_70b_server.sh`.
 
 ## Major CLI commands
 
@@ -65,7 +59,7 @@ export OM_AI_70B_OUTPUT=/checkpoints/om-70b
 
 - Tiny / single GPU: `om-ai train ...`
 - OM-70B launcher (GPU cluster): `om-ai train-70b --data ... --tokenizer ... --output ...`
-- See `docs/TRAINING_70B.md` — `serve` never starts 70B training
+- Mac → server handoff: `docs/SERVER_70B_HANDOFF.md` (also `docs/TRAINING_70B.md`). `serve` never starts 70B training.
 
 - Single-process training; DDP/FSDP; optional DeepSpeed
 - SFT, reward model, DPO, PPO infrastructure

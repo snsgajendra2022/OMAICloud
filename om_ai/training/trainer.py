@@ -120,7 +120,21 @@ class Trainer:
         return {"steps": self.global_step, "last_loss": total_loss}
 
 
-def build_dataset(data_path: str, tokenizer: ByteBPETokenizer, seq_len: int) -> TokenBlockDataset:
-    records = DatasetPipeline().process(DatasetPipeline.load(data_path))
-    ids = DatasetPipeline.tokenize(records, tokenizer)
+def build_dataset(
+    data_path: str,
+    tokenizer: ByteBPETokenizer,
+    seq_len: int,
+    *,
+    max_tokens: int | None = None,
+    max_docs: int | None = None,
+) -> TokenBlockDataset:
+    """Build token blocks via streaming load (no full multi-GB ``read_text``)."""
+    pipe = DatasetPipeline()
+    records = pipe.iter_process(DatasetPipeline.iter_load(data_path))
+    ids = DatasetPipeline.tokenize_streaming(
+        records,
+        tokenizer,
+        max_tokens=max_tokens,
+        max_docs=max_docs,
+    )
     return TokenBlockDataset(ids, seq_len=seq_len)

@@ -4,7 +4,7 @@ from dataclasses import dataclass, asdict
 from collections import Counter
 from hashlib import sha256
 from pathlib import Path
-from typing import Iterable
+from typing import Iterable, Iterator
 import json
 import re
 import unicodedata
@@ -74,25 +74,28 @@ class DatasetPipeline:
         return out
 
     @staticmethod
-    def load(path: str | Path) -> list[DocumentRecord]:
+    def iter_load(path: str | Path) -> Iterator[DocumentRecord]:
+        """Stream documents line-by-line / blank-line blocks. Never ``read_text()`` whole file."""
         p = Path(path)
         if p.suffix.lower() == ".jsonl":
-            rows = []
             with p.open("r", encoding="utf-8", errors="ignore") as f:
                 for line in f:
                     if not line.strip():
                         continue
                     obj = json.loads(line)
-                    rows.append(DocumentRecord(
-                        text=obj["text"],
+                    text = obj.get("text")
+                    if text is None:
+                        continue
+                    yield DocumentRecord(
+                        text=str(text),
                         source=obj.get("source", str(p)),
                         license=obj.get("license", "unknown"),
                         quality_score=float(obj.get("quality_score", 0.5)),
                         category=obj.get("category", "general"),
                         language=obj.get("language", "und"),
                         version=str(obj.get("version", "1")),
-                    ))
-            return rows
+                    )
+            return
 
         # Plain text: split on blank lines when the file is multi-document
         # (e.g. FineWeb dumps). A single contiguous blob stays one record.
@@ -102,40 +105,49 @@ class DatasetPipeline:
         cand = p.parent / f"{p.stem}.manifest.json"
         if cand.is_file():
             try:
-                meta_obj = json.loads(cand.read_text(encoding="utf-8"))
+                with cand.open("r", encoding="utf-8") as mf:
+                    meta_obj = json.load(mf)
                 license = str(meta_obj.get("license", license))
                 source = str(meta_obj.get("source", source))
                 version = str(meta_obj.get("config", meta_obj.get("version", version)))
             except Exception:
                 pass
 
-        docs: list[DocumentRecord] = []
         buf: list[str] = []
+        yielded = False
 
-        def flush() -> None:
+        def flush() -> DocumentRecord | None:
             text = "\n".join(buf).strip()
             buf.clear()
-            if text:
-                docs.append(
-                    DocumentRecord(
-                        text=text,
-                        source=source,
-                        license=license,
-                        version=version,
-                    )
-                )
+            if not text:
+                return None
+            return DocumentRecord(
+                text=text,
+                source=source,
+                license=license,
+                version=version,
+            )
 
         with p.open("r", encoding="utf-8", errors="ignore") as f:
             for line in f:
                 if not line.strip():
-                    flush()
+                    rec = flush()
+                    if rec is not None:
+                        yielded = True
+                        yield rec
                 else:
                     buf.append(line.rstrip("\n"))
-            flush()
+            rec = flush()
+            if rec is not None:
+                yielded = True
+                yield rec
 
-        if not docs:
-            return [DocumentRecord(text="", source=source, license=license, version=version)]
-        return docs
+        if not yielded:
+            yield DocumentRecord(text="", source=source, license=license, version=version)
+
+    @staticmethod
+    def load(path: str | Path) -> list[DocumentRecord]:
+        return list(DatasetPipeline.iter_load(path))
 
     @staticmethod
     def save_jsonl(records: Iterable[DocumentRecord], path: str | Path) -> None:
@@ -149,4 +161,40 @@ class DatasetPipeline:
         ids: list[int] = []
         for r in records:
             ids.extend(tokenizer.encode(r.text, add_eos=add_eos))
+        return ids
+
+    def iter_process(self, records: Iterable[DocumentRecord]) -> Iterator[DocumentRecord]:
+        """Streaming clean/dedupe — same rules as ``process`` without materializing all rows."""
+        seen: set[str] = set()
+        for rec in records:
+            text = self.clean(rec.text)
+            if len(text) < self.min_chars or not self.safe_enough(text):
+                continue
+            new = DocumentRecord(**{**asdict(rec), "text": text, "quality_score": self.quality_score(text)})
+            fp = new.fingerprint()
+            if fp in seen:
+                continue
+            seen.add(fp)
+            yield new
+
+    @staticmethod
+    def tokenize_streaming(
+        records: Iterable[DocumentRecord],
+        tokenizer,
+        *,
+        add_eos: bool = True,
+        max_tokens: int | None = None,
+        max_docs: int | None = None,
+    ) -> list[int]:
+        """Tokenize incrementally; stop once ``max_tokens`` / ``max_docs`` reached."""
+        ids: list[int] = []
+        docs = 0
+        for r in records:
+            ids.extend(tokenizer.encode(r.text, add_eos=add_eos))
+            docs += 1
+            if max_docs is not None and docs >= max_docs:
+                break
+            if max_tokens is not None and len(ids) >= max_tokens:
+                ids = ids[:max_tokens]
+                break
         return ids

@@ -1,0 +1,31 @@
+{
+  "model": "OM-1.0",
+  "not_70b": true,
+  "phases": {
+    "1_tokenizer": "PASS",
+    "2_native_backend": "PASS",
+    "3_configs_registry": "PASS",
+    "4_6_smoke_train": "PASS",
+    "7_8_inference_chat": "PASS",
+    "api_model_endpoint": "PASS",
+    "ui_native_labels": "PASS",
+    "tests_subset": "PASS",
+    "11_15_stubs": "STUB_ONLY"
+  },
+  "smoke": {
+    "steps": 12,
+    "device": "mps",
+    "parameters": 3300608,
+    "checkpoint": "artifacts/checkpoints/om-1.0-smoke/latest.pt",
+    "tokenizer": "artifacts/tokenizer-fixed-v3.json",
+    "config": "configs/om-1.0-local.json",
+    "last_loss": 4.9789,
+    "trained": true,
+    "lifecycle": "checkpoint_available"
+  },
+  "truth": {
+    "fake_70b_weights": false,
+    "silent_ollama_proxy_when_native": false,
+    "english_quality": "smoke-only gibberish expected after 12 steps"
+  }
+}

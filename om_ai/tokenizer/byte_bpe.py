@@ -27,6 +27,10 @@ class ByteBPETokenizer:
     vocab: dict[str, int]
     merges: list[tuple[str, str]]
 
+    # Optional binding metadata set by ``load_tokenizer``.
+    _source_path: str | None = None
+    _fingerprint: str | None = None
+
     @classmethod
     def base(cls) -> "ByteBPETokenizer":
         vocab = {t: i for i, t in enumerate(SPECIAL_TOKENS)}
@@ -36,6 +40,14 @@ class ByteBPETokenizer:
 
     def _special_id(self, token: str) -> int | None:
         return self.vocab.get(token)
+
+    @property
+    def vocab_size(self) -> int:
+        return len(self.vocab)
+
+    @property
+    def fingerprint(self) -> str | None:
+        return self._fingerprint
 
     @property
     def pad_id(self) -> int:
@@ -163,9 +175,12 @@ class ByteBPETokenizer:
         present_specials = [t for t in SPECIAL_TOKENS if t in self.vocab]
         return {
             "version": _TOKENIZER_VERSION,
-            "vocab_size": len(self.vocab),
+            "backend": "om-byte-bpe",
+            "vocab_size": self.vocab_size,
             "num_merges": len(self.merges),
             "special_tokens": present_specials,
+            "fingerprint": self._fingerprint,
+            "source_path": self._source_path,
             "chat_tokens_available": all(
                 t in self.vocab
                 for t in (
@@ -174,6 +189,10 @@ class ByteBPETokenizer:
                     "<assistant>", "</assistant>",
                 )
             ),
+            "pad_id": self.pad_id,
+            "bos_id": self.bos_id,
+            "eos_id": self.eos_id,
+            "unk_id": self.unk_id,
         }
 
     @classmethod

@@ -5,9 +5,13 @@ from typing import Generator
 import torch
 from om_ai.core.config import ModelConfig
 from om_ai.model import OMTransformer
-from om_ai.tokenizer import load_tokenizer
+from om_ai.tokenizer import load_tokenizer, tokenizer_fingerprint
 
 logger = logging.getLogger(__name__)
+
+
+class CheckpointTokenizerMismatch(ValueError):
+    """Checkpoint was bound to a different tokenizer fingerprint."""
 
 
 class LocalLLMEngine:
@@ -17,15 +21,27 @@ class LocalLLMEngine:
         self.device = None
         self._config_path = None
         self._checkpoint_path = None
+        self._tokenizer_path = None
+        self._tokenizer_fingerprint = None
 
     def load(self, config_path: str, tokenizer_path: str, checkpoint_path: str, device: str | None = None) -> dict:
         cfg = ModelConfig.from_json(config_path)
         self.tokenizer = load_tokenizer(tokenizer_path)
+        tok_fp = tokenizer_fingerprint(tokenizer_path)
         if cfg.vocab_size != len(self.tokenizer.vocab):
             cfg.vocab_size = len(self.tokenizer.vocab)
 
         ckpt = torch.load(checkpoint_path, map_location="cpu", weights_only=False)
         state = ckpt.get("model", ckpt)
+        extra = ckpt.get("extra") if isinstance(ckpt, dict) else None
+        bound_fp = None
+        if isinstance(extra, dict):
+            bound_fp = extra.get("tokenizer_fingerprint") or extra.get("tokenizer_sha256")
+        if bound_fp and bound_fp != tok_fp:
+            raise CheckpointTokenizerMismatch(
+                f"Checkpoint tokenizer mismatch: checkpoint bound to {bound_fp}, "
+                f"but loaded tokenizer fingerprint is {tok_fp}"
+            )
 
         if any(str(k).endswith(".ln1.bias") or str(k) == "final_norm.bias" for k in state):
             cfg.use_rmsnorm = False
@@ -49,11 +65,14 @@ class LocalLLMEngine:
         self.model.eval()
         self._config_path = config_path
         self._checkpoint_path = checkpoint_path
+        self._tokenizer_path = tokenizer_path
+        self._tokenizer_fingerprint = tok_fp
 
         return {
             "device": str(self.device),
             "parameters": self.model.exact_parameter_count(),
             "tokenizer": self.tokenizer.inspect(),
+            "tokenizer_fingerprint": tok_fp,
             "checkpoint": checkpoint_path,
         }
 
@@ -187,5 +206,7 @@ class LocalLLMEngine:
             "vocab_size": len(self.tokenizer.vocab),
             "config_path": self._config_path,
             "checkpoint_path": self._checkpoint_path,
+            "tokenizer_path": self._tokenizer_path,
+            "tokenizer_fingerprint": self._tokenizer_fingerprint,
             "tokenizer_info": self.tokenizer.inspect(),
         }

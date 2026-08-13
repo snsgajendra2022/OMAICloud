@@ -1,24 +1,49 @@
 from __future__ import annotations
 
+import hashlib
 import json
 from pathlib import Path
+from typing import Any
 
 from .byte_bpe import ByteBPETokenizer
+
+
+def tokenizer_fingerprint(path: str | Path) -> str:
+    """Stable SHA-256 of tokenizer JSON bytes for checkpoint binding."""
+    data = Path(path).read_bytes()
+    return hashlib.sha256(data).hexdigest()
+
+
+def tokenizer_sha256(path: str | Path) -> str:
+    """Alias for ``tokenizer_fingerprint`` (checkpoint / registry binding)."""
+    return tokenizer_fingerprint(path)
 
 
 class HFTokenizerAdapter:
     """Adapter exposing the OM tokenizer API over Hugging Face `tokenizers` JSON."""
 
-    def __init__(self, tokenizer):
+    def __init__(self, tokenizer, *, source_path: str | Path | None = None):
         self._tok = tokenizer
+        self._source_path = str(source_path) if source_path else None
+        self._fingerprint: str | None = (
+            tokenizer_fingerprint(source_path) if source_path else None
+        )
 
     @property
     def vocab(self):
         return self._tok.get_vocab()
 
     @property
+    def vocab_size(self) -> int:
+        return len(self.vocab)
+
+    @property
     def merges(self):
         return []
+
+    @property
+    def fingerprint(self) -> str | None:
+        return self._fingerprint
 
     def _id(self, token: str):
         return self._tok.token_to_id(token)
@@ -86,6 +111,14 @@ class HFTokenizerAdapter:
     def decode(self, ids):
         return self._tok.decode([int(x) for x in ids], skip_special_tokens=True)
 
+    def token_bytes(self, token_id: int) -> bytes:
+        """Best-effort UTF-8 bytes for a single token (streaming decode)."""
+        piece = self._tok.decode([int(token_id)], skip_special_tokens=False)
+        # Avoid emitting special-token literals into the stream.
+        if piece.startswith("<") and piece.endswith(">") and len(piece) <= 32:
+            return b""
+        return piece.encode("utf-8", errors="replace")
+
     def encode_chat(self, messages, *, add_generation_prompt=False, add_eos=True):
         ids = [self.bos_id]
         roles = {
@@ -115,7 +148,7 @@ class HFTokenizerAdapter:
             ids.append(self.eos_id)
         return ids
 
-    def inspect(self):
+    def inspect(self) -> dict[str, Any]:
         required = [
             "<system>", "</system>",
             "<user>", "</user>",
@@ -123,23 +156,37 @@ class HFTokenizerAdapter:
         ]
         return {
             "backend": "huggingface-tokenizers",
-            "vocab_size": len(self.vocab),
+            "vocab_size": self.vocab_size,
             "chat_tokens_available": all(self._id(t) is not None for t in required),
+            "fingerprint": self._fingerprint,
+            "source_path": self._source_path,
             "special_tokens": {
                 t: self._id(t)
                 for t in ["<pad>", "<bos>", "<eos>", "<unk>", *required]
             },
+            "pad_id": self.pad_id,
+            "bos_id": self.bos_id,
+            "eos_id": self.eos_id,
+            "unk_id": self.unk_id,
         }
 
 
 def load_tokenizer(path):
-    """Load either OM legacy ByteBPE JSON or Hugging Face tokenizer JSON."""
+    """Single entry: load OM ByteBPE JSON or Hugging Face tokenizer JSON.
+
+    Returns an object with encode / decode / encode_chat / inspect / vocab_size
+    and pad/bos/eos/unk ids. Chat inference with ``add_generation_prompt=True``
+    ends with the opening ``<assistant>`` special id.
+    """
     p = Path(path)
     data = json.loads(p.read_text(encoding="utf-8"))
 
     # OM legacy/custom tokenizer.
     if isinstance(data.get("vocab"), dict) and "merges" in data:
-        return ByteBPETokenizer.load(p)
+        tok = ByteBPETokenizer.load(p)
+        tok._source_path = str(p)  # type: ignore[attr-defined]
+        tok._fingerprint = tokenizer_fingerprint(p)  # type: ignore[attr-defined]
+        return tok
 
     # Hugging Face tokenizers JSON normally has a top-level model object.
     if isinstance(data.get("model"), dict):
@@ -151,7 +198,7 @@ def load_tokenizer(path):
                 "Install it with: python3 -m pip install -U tokenizers"
             ) from exc
 
-        tok = HFTokenizerAdapter(Tokenizer.from_file(str(p)))
+        tok = HFTokenizerAdapter(Tokenizer.from_file(str(p)), source_path=p)
         info = tok.inspect()
 
         if not info["chat_tokens_available"]:

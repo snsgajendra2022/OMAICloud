@@ -26,7 +26,10 @@ from om_ai.discovery import OpenAPIDiscoveryTool
 from om_ai.knowledge import PersistentKnowledgeBase
 from om_ai.memory import SQLiteMemoryStore, ConversationStore
 from om_ai.registry import ModelRegistry
+from om_ai.backends import NativeCheckpointError, OMNativeBackend
+from om_ai.backends.om_native import default_native_paths
 from om_ai.runtime import LocalLLMEngine
+from om_ai.runtime.chat_backend import configured_backend
 from om_ai.security import (
     AuditLog,
     RateLimiter,
@@ -78,6 +81,7 @@ _AUDIT_DB = os.getenv("OM_AI_AUDIT_DB", "artifacts/audit.sqlite3")
 _REGISTRY_ROOT = os.getenv("OM_AI_REGISTRY", "artifacts/registry")
 
 engine = LocalLLMEngine()
+native_backend = OMNativeBackend(engine=engine)
 memory = SQLiteMemoryStore(_DB_PATH)
 conversations = ConversationStore(_DB_PATH)
 knowledge = PersistentKnowledgeBase(_KB_PATH)
@@ -117,7 +121,16 @@ agent.register_tool(_openapi_tool)
 # OpenAI-compatible shim for OpenClaw / OpenAI SDK clients
 from om_ai.api.openai_compat import router as openai_router, bind_engine
 
-bind_engine(engine, default_model_id=os.getenv("OM_AI_MODEL_ID", "om-tiny"))
+_default_model_id = (
+    os.getenv("OM_MODEL_ID")
+    or os.getenv("OM_AI_MODEL_ID")
+    or ("OM-1.0" if configured_backend() == "om_native" else "om-tiny")
+)
+bind_engine(
+    engine,
+    default_model_id=_default_model_id,
+    native_backend=native_backend,
+)
 app.include_router(openai_router)
 
 # Optional auto-load of local OM checkpoint (never pulls external LLMs)
@@ -126,13 +139,44 @@ _AUTO_CONFIG = os.getenv("OM_AI_CONFIG", "").strip()
 _AUTO_TOKENIZER = os.getenv("OM_AI_TOKENIZER", "").strip()
 _AUTO_CHECKPOINT = os.getenv("OM_AI_CHECKPOINT", "").strip()
 _AUTO_DEVICE = os.getenv("OM_AI_DEVICE")
+_NATIVE_MODE = configured_backend() == "om_native"
 
-if _AUTOLOAD:
+if _NATIVE_MODE:
+    # OM native: load only real checkpoint paths; never proxy to Ollama.
+    paths = default_native_paths()
+    try:
+        if paths["checkpoint"] and Path(paths["checkpoint"]).is_file():
+            info = native_backend.load(
+                paths["config"],
+                paths["tokenizer"],
+                paths["checkpoint"],
+                paths["device"] or _AUTO_DEVICE,
+                require_checkpoint=True,
+            )
+            logger.info("OM native autoload succeeded: %s", info)
+            agent.llm_engine = engine
+        else:
+            logger.error(
+                "OM_MODEL_PROVIDER/OM_AI_CHAT_BACKEND=om_native but checkpoint missing — "
+                "chat will return 503 until train-om1 produces a checkpoint."
+            )
+    except Exception:
+        logger.exception("OM native autoload failed — chat will return 503 (no Ollama fallback)")
+elif _AUTOLOAD:
     try:
         info = engine.load(_AUTO_CONFIG, _AUTO_TOKENIZER, _AUTO_CHECKPOINT, _AUTO_DEVICE)
         logger.info("OM_AI_AUTOLOAD succeeded: %s", info)
         # Keep agent wired to the same engine instance
         agent.llm_engine = engine
+        # Reflect loaded local weights on native backend metadata when applicable.
+        if _AUTO_CHECKPOINT and Path(_AUTO_CHECKPOINT).is_file():
+            native_backend._trained = True
+            native_backend._paths = {
+                "config": _AUTO_CONFIG,
+                "tokenizer": _AUTO_TOKENIZER,
+                "checkpoint": _AUTO_CHECKPOINT,
+                "device": _AUTO_DEVICE or "",
+            }
     except Exception:
         logger.exception("OM_AI_AUTOLOAD failed — API will start without a loaded model")
 
@@ -316,7 +360,42 @@ def load_model(
 @app.get("/v1/model/info", tags=["Model"])
 def model_info(ctx: TenantContext = Depends(require_auth)):
     """Return information about the currently loaded model."""
+    if configured_backend() == "om_native":
+        return native_backend.model_info()
     return engine.info()
+
+
+@app.get("/api/v1/model", tags=["Model"])
+def api_v1_model(ctx: TenantContext = Depends(require_auth)):
+    """Live OM-1.0 / runtime model metadata for UI and clients."""
+    from om_ai.runtime.chat_backend import backend_status
+
+    status = backend_status(
+        local_loaded=engine.model is not None,
+        native_ready=bool(native_backend.loaded and native_backend._trained),
+    )
+    if configured_backend() == "om_native" or status["backend"] == "om_native":
+        info = native_backend.model_info()
+        return {
+            **info,
+            "name": info.get("name") or "OM-1.0",
+            "provider": "OM AI",
+            "backend": "om_native",
+            "backend_label": "OM Native",
+            "chat_status": status,
+            "health": native_backend.health(),
+        }
+    eng = engine.info()
+    return {
+        "name": status.get("model") or _default_model_id,
+        "provider": status.get("provider") or "OM AI",
+        "backend": status.get("backend"),
+        "backend_label": status.get("backend"),
+        "trained": bool(eng.get("loaded")),
+        "loaded": bool(eng.get("loaded")),
+        "engine": eng,
+        "chat_status": status,
+    }
 
 
 # ---------------------------------------------------------------------------
@@ -398,6 +477,8 @@ def chat(
             messages,
             local_chat=engine.chat,
             local_loaded=engine.model is not None,
+            native_chat=native_backend.chat,
+            native_ready=bool(native_backend.loaded and native_backend._trained),
             max_new_tokens=req.max_new_tokens,
             temperature=req.temperature,
             top_k=req.top_k,
@@ -416,7 +497,13 @@ def chat(
             "role": "assistant",
             "om_backend": backend.backend,
             "model": backend.model,
+            "provider": backend.provider,
         }
+    except NativeCheckpointError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail=str(exc) or "OM-1.0 checkpoint unavailable.",
+        ) from exc
     except Exception as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
 
@@ -634,19 +721,19 @@ class CreateTokenRequest(BaseModel):
     tenant_id: str = "default"
 
 
-@app.get("/", tags=["UI"])
-def ui_home():
-    from fastapi.responses import RedirectResponse
-    return RedirectResponse(url="/ui/chat")
-
-
 def _serve_tokens_chat_ui():
     from fastapi.responses import HTMLResponse
     html_path = Path(__file__).parent / "static" / "tokens.html"
     return HTMLResponse(
         html_path.read_text(encoding="utf-8"),
-        headers={"Cache-Control": "no-store"},
+        headers={"Cache-Control": "no-store, no-cache, must-revalidate"},
     )
+
+
+@app.get("/", tags=["UI"])
+def ui_home():
+    """Primary app surface: same chat console as /ui/chat."""
+    return _serve_tokens_chat_ui()
 
 
 @app.get("/ui/tokens", tags=["UI"])
@@ -656,7 +743,7 @@ def tokens_ui():
 
 @app.get("/ui/chat", tags=["UI"])
 def chat_ui():
-    """Same OM AI chat console as /ui/tokens (chat-first product surface)."""
+    """Same OM AI chat console as / (chat-first product surface)."""
     return _serve_tokens_chat_ui()
 
 
@@ -664,7 +751,10 @@ def chat_ui():
 def settings_ui():
     """Settings opens the same SPA; client routes to the Settings view via #settings."""
     from fastapi.responses import RedirectResponse
-    return RedirectResponse(url="/ui/chat#settings", headers={"Cache-Control": "no-store"})
+    return RedirectResponse(
+        url="/ui/chat#settings",
+        headers={"Cache-Control": "no-store, no-cache, must-revalidate"},
+    )
 
 
 @app.get("/v1/tokens/meta", tags=["Tokens"])
@@ -672,11 +762,19 @@ def tokens_meta():
     """Public metadata about token database location and model label."""
     from om_ai.security.tokens import get_token_store
     store = get_token_store()
+    native = configured_backend() == "om_native"
+    model_label = (
+        "OM-1.0"
+        if native
+        else (os.getenv("OM_MODEL_ID") or os.getenv("OM_AI_MODEL_ID", "om:free"))
+    )
     return {
         "database": store.path,
         "chat_database": conversations.path,
         "feedback_database": _FEEDBACK_DB,
-        "model": os.getenv("OM_AI_MODEL_ID", "om:free"),
+        "model": model_label,
+        "provider": "OM AI" if native else None,
+        "backend": "om_native" if native else configured_backend(),
         "create_uri": "POST /v1/tokens",
         "list_uri": "GET /v1/tokens",
         "revoke_uri": "DELETE /v1/tokens/{id}",

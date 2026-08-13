@@ -1,0 +1,18 @@
+{
+  "name": "OM-1.0-local",
+  "description": "Small architecture for Mac verification / smoke training. Not 70B.",
+  "vocab_size": 512,
+  "max_seq_len": 128,
+  "n_layers": 4,
+  "n_heads": 4,
+  "n_kv_heads": 4,
+  "d_model": 256,
+  "d_ff": 704,
+  "rope_theta": 10000.0,
+  "dropout": 0.0,
+  "bias": false,
+  "tie_embeddings": true,
+  "use_rmsnorm": true,
+  "gradient_checkpointing": false,
+  "parameter_goal_note": "~3.3M params with tokenizer-fixed-v3 (~340 vocab). Aligns with tiny-ish for local MPS smoke."
+}

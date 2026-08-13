@@ -1,7 +1,42 @@
 """Tests for chat backend selection (Ollama / OpenAI / local)."""
 from __future__ import annotations
 
+from datetime import date
+
 from om_ai.runtime import chat_backend as cb
+
+
+def test_runtime_date_system_text_uses_calendar_date():
+    text = cb.runtime_date_system_text(today=date(2026, 8, 13))
+    assert "Today's date is Thursday, August 13, 2026" in text
+    assert "Always treat the current year as 2026" in text
+    assert "Do not claim the year is 2023" in text
+    assert "lack post-training" in text
+
+
+def test_with_runtime_date_context_prepends_system():
+    msgs = cb.with_runtime_date_context(
+        [{"role": "user", "content": "What year is it?"}],
+        today=date(2026, 8, 13),
+    )
+    assert msgs[0]["role"] == "system"
+    assert "August 13, 2026" in msgs[0]["content"]
+    assert "current year as 2026" in msgs[0]["content"]
+    assert msgs[1]["role"] == "user"
+
+
+def test_with_runtime_date_context_merges_existing_system():
+    msgs = cb.with_runtime_date_context(
+        [
+            {"role": "system", "content": "Be concise."},
+            {"role": "user", "content": "hi"},
+        ],
+        today=date(2026, 8, 13),
+    )
+    assert msgs[0]["role"] == "system"
+    assert msgs[0]["content"].startswith("Be concise.")
+    assert "Today's date is Thursday, August 13, 2026" in msgs[0]["content"]
+    assert msgs[1]["role"] == "user"
 
 
 def test_resolve_prefers_ollama_when_reachable(monkeypatch):
