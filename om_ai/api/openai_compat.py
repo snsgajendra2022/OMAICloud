@@ -6,8 +6,9 @@ Exposes:
   POST /api/v1/chat/completions
   POST /api/v1/completions
 
-Routes chat to OM native / Ollama / OpenAI-compatible APIs / local OM engine based on
+Routes chat to OM native (default) / OpenAI-compatible APIs / local OM engine based on
 ``OM_AI_CHAT_BACKEND`` / ``OM_MODEL_PROVIDER`` (see ``om_ai.runtime.chat_backend``).
+Ollama is not part of the production path.
 """
 from __future__ import annotations
 
@@ -58,11 +59,10 @@ def _require_local_engine():
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             detail=(
-                "OM model not loaded. Start server with OM_AI_AUTOLOAD=1 "
-                "or POST /v1/model/load first. "
-                "Default is OM-1.0 native (OM_MODEL_PROVIDER=om_native) with a "
-                "checkpoint. Alternatives: OM_AI_OPENAI_API_KEY / OPENAI_API_KEY, "
-                "or explicit OM_AI_CHAT_BACKEND=ollama."
+                "OM model not loaded. Default is OM-1.0 native "
+                "(OM_MODEL_PROVIDER=om_native) with a real checkpoint. "
+                "Train with `om-ai train-om1`, or POST /v1/model/load. "
+                "There is no Ollama fallback."
             ),
         )
     return _engine
@@ -195,7 +195,7 @@ def _run_chat(
 
 @router.get("/chat/backend")
 def chat_backend_info(ctx: TenantContext = Depends(require_auth)):
-    """Report which chat backend is active (om_native / local / ollama / openai)."""
+    """Report which chat backend is active (om_native / local / openai)."""
     return backend_status(local_loaded=_local_loaded(), native_ready=_native_ready())
 
 
@@ -274,7 +274,7 @@ async def chat_completions(
     temperature = float(req.temperature if req.temperature is not None else 0.8)
     top_p = float(req.top_p if req.top_p is not None else 1.0)
 
-    # When native is forced and checkpoint missing, fail fast with 503 (no Ollama).
+    # When native is forced and checkpoint missing, fail fast with 503 (no third-party LLM).
     if configured_backend() == "om_native" and not _native_ready():
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,

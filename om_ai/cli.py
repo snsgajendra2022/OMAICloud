@@ -56,6 +56,51 @@ def load_model(config_path, tokenizer_path, checkpoint=None, device=None):
 
 
 def model_info(args):
+    # Native OM-1.0 summary when --config omitted (or --native).
+    if getattr(args, "native", False) or not getattr(args, "config", None):
+        from om_ai.backends.om_native import default_native_paths, pick_device
+        from om_ai.backends.om_registry import load_registry_metadata, sync_om10_registry
+        from om_ai.tokenizer import tokenizer_fingerprint
+
+        paths = default_native_paths()
+        try:
+            meta = sync_om10_registry(
+                checkpoint=paths.get("checkpoint") or None,
+                tokenizer=paths.get("tokenizer"),
+                config=paths.get("config"),
+                stamp_checkpoint=True,
+            )
+        except Exception:
+            meta = load_registry_metadata() or {}
+        tok_path = paths.get("tokenizer") or ""
+        tok_ok = bool(tok_path and Path(tok_path).is_file())
+        ckpt_path = paths.get("checkpoint") or meta.get("checkpoint") or ""
+        ckpt_ok = bool(ckpt_path and Path(str(ckpt_path)).is_file())
+        try:
+            device = str(pick_device(paths.get("device") or None))
+        except Exception:
+            device = "cpu"
+        human = {
+            "Name": "OM-1.0",
+            "Provider": "OM AI",
+            "Backend": "OM Native",
+            "Checkpoint": "verified" if ckpt_ok else "missing",
+            "Tokenizer": "verified" if tok_ok else "missing",
+            "Device": device.upper() if device in {"cpu", "mps", "cuda"} else device,
+            "checkpoint_path": str(ckpt_path) if ckpt_path else None,
+            "tokenizer_path": tok_path or None,
+            "tokenizer_sha256": (
+                tokenizer_fingerprint(tok_path) if tok_ok else meta.get("tokenizer_sha256")
+            ),
+            "steps": meta.get("steps"),
+            "parameters": meta.get("parameters"),
+            "trained": bool(meta.get("trained") and ckpt_ok),
+            "not_70b": True,
+            "honesty": "Local OM-1.0 checkpoint; not production frontier intelligence.",
+        }
+        print(json.dumps(human, indent=2))
+        return
+
     cfg = ModelConfig.from_json(args.config)
     estimate = cfg.parameter_estimate()
     payload = {
@@ -355,6 +400,10 @@ def serve(args):
             file=sys.stderr,
         )
 
+    # Prefer OM native checkpoint paths; READY banner prints from api.main on load.
+    os.environ.setdefault("OM_MODEL_PROVIDER", "om_native")
+    os.environ.setdefault("OM_AI_CHAT_BACKEND", "om_native")
+
     uvicorn.run("om_ai.api.main:app", host=args.host, port=args.port, reload=args.reload)
 
 
@@ -363,8 +412,17 @@ def main():
     sp = p.add_subparsers(dest="cmd", required=True)
 
     mi = sp.add_parser("model-info")
-    mi.add_argument("--config", required=True)
+    mi.add_argument(
+        "--config",
+        required=False,
+        help="Architecture JSON. Omit for OM-1.0 native registry summary.",
+    )
     mi.add_argument("--tokenizer")
+    mi.add_argument(
+        "--native",
+        action="store_true",
+        help="Show OM-1.0 native backend / registry info (default when --config omitted).",
+    )
     mi.set_defaults(func=model_info)
 
     t = sp.add_parser("tokenizer")

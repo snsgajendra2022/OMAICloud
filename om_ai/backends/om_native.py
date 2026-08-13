@@ -41,7 +41,10 @@ def pick_device(preferred: str | None = None) -> torch.device:
 
 
 def default_native_paths() -> dict[str, str]:
-    """Resolve OM-1.0 paths from env (OM_MODEL_* preferred, OM_AI_* fallback)."""
+    """Resolve OM-1.0 paths from env (OM_MODEL_* preferred, OM_AI_* fallback).
+
+    Checkpoint preference when unset: ``om-1.0-long`` → registry → ``om-1.0-smoke``.
+    """
     root = Path(__file__).resolve().parents[2]
     config = (
         os.getenv("OM_MODEL_CONFIG")
@@ -59,15 +62,21 @@ def default_native_paths() -> dict[str, str]:
         or ""
     )
     if not checkpoint:
-        candidates = [
-            root / "artifacts" / "checkpoints" / "om-1.0-smoke" / "latest.pt",
-            root / "artifacts" / "models" / "om-1.0" / "checkpoint.pt",
-            root / "artifacts" / "models" / "om-1.0" / "latest.pt",
-        ]
-        for c in candidates:
-            if c.is_file():
-                checkpoint = str(c)
-                break
+        from om_ai.backends.om_registry import pick_best_checkpoint
+
+        best = pick_best_checkpoint(root)
+        if best is not None:
+            checkpoint = str(best)
+        else:
+            candidates = [
+                root / "artifacts" / "checkpoints" / "om-1.0-long" / "latest.pt",
+                root / "artifacts" / "models" / "om-1.0" / "checkpoint.pt",
+                root / "artifacts" / "checkpoints" / "om-1.0-smoke" / "latest.pt",
+            ]
+            for c in candidates:
+                if c.is_file():
+                    checkpoint = str(c)
+                    break
     return {
         "config": config,
         "tokenizer": tokenizer,
@@ -115,6 +124,24 @@ class OMNativeBackend:
             self._load_error = "OM-1.0 checkpoint unavailable."
             raise NativeCheckpointError(self._load_error)
 
+        # Bind tokenizer_sha256 from registry metadata when present.
+        try:
+            from om_ai.backends.om_registry import load_registry_metadata
+
+            reg = load_registry_metadata()
+            if reg and tokenizer_path and Path(tokenizer_path).is_file():
+                expected = reg.get("tokenizer_sha256") or reg.get("tokenizer_fingerprint")
+                actual = tokenizer_fingerprint(tokenizer_path)
+                if expected and expected != actual:
+                    raise NativeCheckpointError(
+                        f"OM-1.0 tokenizer_sha256 mismatch: registry={expected}, "
+                        f"loaded={actual}"
+                    )
+        except NativeCheckpointError:
+            raise
+        except Exception:
+            pass
+
         try:
             info = self.engine.load(
                 config_path,
@@ -125,7 +152,10 @@ class OMNativeBackend:
         except Exception as exc:
             self._trained = False
             self._load_error = str(exc)
-            raise
+            # Never fall back to Ollama / third-party LLMs.
+            raise NativeCheckpointError(
+                f"OM-1.0 checkpoint unavailable. ({exc})"
+            ) from exc
 
         # trained=true ONLY when a real training checkpoint was loaded (file existed).
         self._trained = bool(checkpoint_path and Path(checkpoint_path).is_file())
@@ -134,6 +164,7 @@ class OMNativeBackend:
         info["name"] = OM_MODEL_NAME
         info["provider"] = OM_PROVIDER
         info["backend"] = OM_BACKEND_ID
+        info["tokenizer_sha256"] = info.get("tokenizer_fingerprint")
         return info
 
     def ensure_loaded(self) -> None:

@@ -56,23 +56,20 @@ def test_encode_chat_generation_prompt_ends_assistant_open():
 
 def test_resolve_om_native_forced(monkeypatch):
     monkeypatch.setenv("OM_MODEL_PROVIDER", "om_native")
-    monkeypatch.setenv("OM_AI_CHAT_BACKEND", "ollama")
-    monkeypatch.setattr(cb, "ollama_reachable", lambda timeout=1.5: True)
+    monkeypatch.setenv("OM_AI_CHAT_BACKEND", "openai")
     info = cb.resolve_backend(native_ready=False)
     assert info.backend == "om_native"
     assert info.provider == "OM AI"
     assert info.model == "OM-1.0" or "OM" in info.model
 
 
-def test_om_native_no_silent_ollama_fallback(monkeypatch):
+def test_om_native_no_silent_third_party_fallback(monkeypatch):
     monkeypatch.setenv("OM_MODEL_PROVIDER", "om_native")
-    monkeypatch.setattr(cb, "ollama_reachable", lambda timeout=1.5: True)
     monkeypatch.setenv("OPENAI_API_KEY", "sk-test")
 
     def boom(*_a, **_k):
-        raise AssertionError("Ollama must not be called in om_native mode")
+        raise AssertionError("OpenAI must not be called in om_native mode")
 
-    monkeypatch.setattr(cb, "chat_via_ollama", boom)
     monkeypatch.setattr(cb, "chat_via_openai", boom)
 
     with pytest.raises(NativeCheckpointError, match="OM-1.0 checkpoint unavailable"):

@@ -9,23 +9,25 @@
     "7_8_inference_chat": "PASS",
     "api_model_endpoint": "PASS",
     "ui_native_labels": "PASS",
+    "ollama_removed_from_production": "PASS",
+    "live_knowledge_stubs": "PARTIAL",
     "tests_subset": "PASS",
     "11_15_stubs": "STUB_ONLY"
   },
-  "smoke": {
-    "steps": 12,
-    "device": "mps",
+  "serve_default": {
+    "backend": "om_native",
+    "checkpoint": "artifacts/checkpoints/om-1.0-long/latest.pt",
+    "steps": 300,
     "parameters": 3300608,
-    "checkpoint": "artifacts/checkpoints/om-1.0-smoke/latest.pt",
     "tokenizer": "artifacts/tokenizer-fixed-v3.json",
     "config": "configs/om-1.0-local.json",
-    "last_loss": 4.9789,
     "trained": true,
-    "lifecycle": "checkpoint_available"
+    "lifecycle": "checkpoint_available",
+    "honesty": "Local OM-1.0 checkpoint; not production frontier intelligence."
   },
   "truth": {
     "fake_70b_weights": false,
     "silent_ollama_proxy_when_native": false,
-    "english_quality": "smoke-only gibberish expected after 12 steps"
+    "english_quality": "undertrained local weights — gibberish/partial English expected"
   }
 }

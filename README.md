@@ -1,6 +1,6 @@
 # OM AI Operating Brain v0.3
 
-Self-hosted, API-independent AI platform foundation: train and run your own models, agents, memory, and RAG without calling OpenAI, Anthropic, or Google model APIs.
+Self-hosted, API-independent AI platform: train and run **OM-1.0** natively — no Ollama, Llama proxy, or third-party LLM required for the default serve path.
 
 ## Honesty about weights
 
@@ -8,26 +8,41 @@ This repository is **working software** (architecture, trainers, agents, API). I
 
 - Architecture presets under `configs/` describe model **shapes**
 - Useful intelligence requires licensed data + real GPU training that produce checkpoint files
-- Included `artifacts/demo/om-tiny-dpo.pt` proves the training pipeline runs end-to-end on toy data — it is not frontier capability
+- Local OM-1.0 smoke/long checkpoints prove the native pipeline; they are **not** frontier capability
 - No fabricated benchmark leaderboard scores are claimed
 
 See `docs/IMPLEMENTATION_STATUS.md` and `docs/EXTERNAL_ASSETS_REQUIRED.md`.
 
-## Quick start (venv)
+## Quick start (OM-1.0 native)
 
 ```bash
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -e '.[dev]'
 
+# Optional: short smoke train (creates a real OM checkpoint)
+om-ai train-om1 --config configs/om-1.0-local.json --steps 20
+
+# Inspect native model / registry
+om-ai model-info
+
+# Serve OM-1.0 only (loads checkpoint; never falls back to Ollama)
+om-ai serve --host 127.0.0.1 --port 8080
+# Chat UI: http://127.0.0.1:8080/ui/chat
+```
+
+Default env (see `.env.example`):
+
+- `OM_MODEL_PROVIDER=om_native`
+- `OM_MODEL_CHECKPOINT=artifacts/checkpoints/om-1.0-long/latest.pt` (or smoke if long missing)
+- Missing checkpoint → clear error / HTTP 503 — **no** third-party LLM fallback
+
+Tiny architecture demo (optional):
+
+```bash
 om-ai tokenizer train --input data/example_corpus.txt --output artifacts/tokenizer.json --vocab-size 512
 om-ai train --config configs/tiny.json --data data/example_corpus.txt --tokenizer artifacts/tokenizer.json --steps 20
 om-ai generate --config configs/tiny.json --tokenizer artifacts/tokenizer.json --checkpoint artifacts/checkpoints/latest.pt --prompt "OM AI"
-
-om-ai serve --host 127.0.0.1 --port 8080
-# Chat UI: http://127.0.0.1:8080/ui/chat  (same as /ui/tokens)
-# Coherent English: start Ollama (`ollama serve` + `ollama pull llama3.2`) or set
-# OPENAI_API_KEY / OM_AI_OPENAI_API_KEY. Tiny local demo weights are not smart.
 ```
 
 One-shot tiny pipeline: `python scripts/run_actual_training_pipeline.py --steps 5`
@@ -38,7 +53,8 @@ One-shot tiny pipeline: `python scripts/run_actual_training_pipeline.py --steps 
 
 | Command | Purpose |
 |---------|---------|
-| `om-ai model-info` | Parameter estimate from config |
+| `om-ai model-info` | OM-1.0 native info (or `--config` architecture estimate) |
+| `om-ai train-om1` | Local OM-1.0 smoke / continue training |
 | `om-ai tokenizer train\|inspect\|encode\|decode` | Byte-BPE tokenizer |
 | `om-ai corpus import\|validate\|dedupe\|audit\|shard\|stats` | Corpus governance |
 | `om-ai pretrain` / `om-ai train` | Causal pretraining |
@@ -49,15 +65,17 @@ One-shot tiny pipeline: `python scripts/run_actual_training_pipeline.py --steps 
 | `om-ai registry list\|register` | Model lifecycle registry |
 | `om-ai bundle` | Checkpoint bundle + integrity |
 | `om-ai project-scan` | Local project discovery |
-| `om-ai serve` | FastAPI server |
+| `om-ai serve` | FastAPI server (OM native by default) |
 
 ## What v0.3 includes
 
 - From-scratch decoder-only Transformer (RoPE, GQA/MHA, SwiGLU, KV cache, optional cross-attention)
 - Custom byte-level BPE; corpus governance and sharding
+- OM-1.0 native backend (`om_ai/backends/om_native.py`) + registry under `artifacts/models/om-1.0/`
+- Live knowledge stubs (`om_ai/live_knowledge/`) — HTTP/search retrieval, **not** another LLM
 ## Training at scale
 
-- Tiny / single GPU: `om-ai train ...`
+- Tiny / single GPU: `om-ai train ...` or `om-ai train-om1 ...`
 - OM-70B launcher (GPU cluster): `om-ai train-70b --data ... --tokenizer ... --output ...`
 - Mac → server handoff: `docs/SERVER_70B_HANDOFF.md` (also `docs/TRAINING_70B.md`). `serve` never starts 70B training.
 

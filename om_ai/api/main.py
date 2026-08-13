@@ -55,8 +55,7 @@ app = FastAPI(
     version=_API_VERSION,
     description=(
         "Self-hosted private AI platform. "
-        "Chat may use local OM weights, Ollama, or an OpenAI-compatible API "
-        "(see OM_AI_CHAT_BACKEND)."
+        "Default chat backend is OM-1.0 native (om_native) — no Ollama proxy."
     ),
 )
 
@@ -141,8 +140,51 @@ _AUTO_CHECKPOINT = os.getenv("OM_AI_CHECKPOINT", "").strip()
 _AUTO_DEVICE = os.getenv("OM_AI_DEVICE")
 _NATIVE_MODE = configured_backend() == "om_native"
 
+def _print_native_ready_banner(*, ready: bool, info: dict | None = None) -> None:
+    """Print OM native READY banner only after a successful checkpoint load."""
+    import sys
+
+    info = info or {}
+    tok_info = info.get("tokenizer") or {}
+    vocab = tok_info.get("vocab_size") if isinstance(tok_info, dict) else info.get("vocab_size")
+    device = info.get("device") or "unknown"
+    ckpt_status = "VERIFIED" if ready else "MISSING"
+    status = "READY" if ready else "NOT READY — OM-1.0 checkpoint unavailable"
+    lines = [
+        "====================================",
+        "        OM AI NATIVE RUNTIME",
+        "====================================",
+        "Model:          OM-1.0",
+        "Provider:       OM AI",
+        "Backend:        OM Native",
+        f"Tokenizer:      {vocab if vocab is not None else 'n/a'}",
+        f"Checkpoint:     {ckpt_status}",
+        f"Device:         {device}",
+        "Memory:         ENABLED",
+        "Knowledge:      ENABLED",
+        "Tools:          ENABLED",
+        "External LLM:   NONE",
+        "",
+        f"Status: {status}",
+        "====================================",
+    ]
+    print("\n".join(lines), file=sys.stderr)
+
+
 if _NATIVE_MODE:
-    # OM native: load only real checkpoint paths; never proxy to Ollama.
+    # OM native: load only real checkpoint paths; never proxy to third-party LLMs.
+    from om_ai.backends.om_registry import sync_om10_registry
+
+    try:
+        sync_om10_registry(
+            checkpoint=os.getenv("OM_MODEL_CHECKPOINT") or os.getenv("OM_AI_CHECKPOINT") or None,
+            tokenizer=os.getenv("OM_MODEL_TOKENIZER") or os.getenv("OM_AI_TOKENIZER") or None,
+            config=os.getenv("OM_MODEL_CONFIG") or os.getenv("OM_AI_CONFIG") or None,
+            stamp_checkpoint=True,
+        )
+    except Exception:
+        logger.exception("OM-1.0 registry sync failed (non-fatal)")
+
     paths = default_native_paths()
     try:
         if paths["checkpoint"] and Path(paths["checkpoint"]).is_file():
@@ -155,13 +197,19 @@ if _NATIVE_MODE:
             )
             logger.info("OM native autoload succeeded: %s", info)
             agent.llm_engine = engine
+            _print_native_ready_banner(ready=True, info=info)
         else:
             logger.error(
                 "OM_MODEL_PROVIDER/OM_AI_CHAT_BACKEND=om_native but checkpoint missing — "
-                "chat will return 503 until train-om1 produces a checkpoint."
+                "chat will return 503 until train-om1 produces a checkpoint. "
+                "No Ollama/third-party LLM fallback."
             )
+            _print_native_ready_banner(ready=False)
     except Exception:
-        logger.exception("OM native autoload failed — chat will return 503 (no Ollama fallback)")
+        logger.exception(
+            "OM native autoload failed — chat will return 503 (no Ollama fallback)"
+        )
+        _print_native_ready_banner(ready=False)
 elif _AUTOLOAD:
     try:
         info = engine.load(_AUTO_CONFIG, _AUTO_TOKENIZER, _AUTO_CHECKPOINT, _AUTO_DEVICE)
@@ -375,15 +423,29 @@ def api_v1_model(ctx: TenantContext = Depends(require_auth)):
         native_ready=bool(native_backend.loaded and native_backend._trained),
     )
     if configured_backend() == "om_native" or status["backend"] == "om_native":
+        from om_ai.backends.om_registry import load_registry_metadata
+
         info = native_backend.model_info()
+        reg = load_registry_metadata() or {}
         return {
             **info,
             "name": info.get("name") or "OM-1.0",
             "provider": "OM AI",
             "backend": "om_native",
             "backend_label": "OM Native",
+            "tokenizer_sha256": info.get("tokenizer_fingerprint")
+            or reg.get("tokenizer_sha256"),
+            "steps": reg.get("steps"),
+            "not_70b": True,
+            "honesty": reg.get("honesty")
+            or "Local OM-1.0 checkpoint; not production frontier intelligence.",
             "chat_status": status,
             "health": native_backend.health(),
+            "registry": {
+                "checkpoint": reg.get("checkpoint"),
+                "lifecycle": reg.get("lifecycle"),
+                "trained": reg.get("trained"),
+            },
         }
     eng = engine.info()
     return {
@@ -468,7 +530,7 @@ def chat(
     req: ChatRequest,
     ctx: TenantContext = Depends(require_permission("model.generate")),
 ):
-    """Multi-turn chat completion (local OM / Ollama / OpenAI per OM_AI_CHAT_BACKEND)."""
+    """Multi-turn chat completion (OM native by default; see OM_AI_CHAT_BACKEND)."""
     from om_ai.runtime.chat_backend import chat_reply
 
     try:

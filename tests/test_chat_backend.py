@@ -1,7 +1,9 @@
-"""Tests for chat backend selection (Ollama / OpenAI / local)."""
+"""Tests for chat backend selection (OM native / OpenAI / local)."""
 from __future__ import annotations
 
 from datetime import date
+
+import pytest
 
 from om_ai.runtime import chat_backend as cb
 
@@ -12,6 +14,7 @@ def test_runtime_date_system_text_uses_calendar_date():
     assert "Always treat the current year as 2026" in text
     assert "Do not claim the year is 2023" in text
     assert "lack post-training" in text
+    assert "OM-1.0 native language model" in text
 
 
 def test_with_runtime_date_context_prepends_system():
@@ -42,7 +45,6 @@ def test_with_runtime_date_context_merges_existing_system():
 def test_default_backend_is_om_native(monkeypatch):
     monkeypatch.delenv("OM_AI_CHAT_BACKEND", raising=False)
     monkeypatch.delenv("OM_MODEL_PROVIDER", raising=False)
-    monkeypatch.setattr(cb, "ollama_reachable", lambda timeout=1.5: True)
     assert cb.configured_backend() == "om_native"
     info = cb.resolve_backend(native_ready=True)
     assert info.backend == "om_native"
@@ -54,21 +56,17 @@ def test_auto_never_picks_ollama(monkeypatch):
     monkeypatch.delenv("OM_MODEL_PROVIDER", raising=False)
     monkeypatch.delenv("OM_AI_OPENAI_API_KEY", raising=False)
     monkeypatch.delenv("OPENAI_API_KEY", raising=False)
-    monkeypatch.setenv("OM_AI_OLLAMA_MODEL", "llama3.2")
     monkeypatch.setenv("OM_AI_MODEL_ID", "om:free")
-    monkeypatch.setattr(cb, "ollama_reachable", lambda timeout=1.5: True)
     info = cb.resolve_backend(local_loaded=True)
     assert info.backend == "local"
     assert info.model == "om:free"
 
 
-def test_explicit_ollama_still_works(monkeypatch):
+def test_explicit_ollama_rejected(monkeypatch):
     monkeypatch.setenv("OM_AI_CHAT_BACKEND", "ollama")
     monkeypatch.delenv("OM_MODEL_PROVIDER", raising=False)
-    monkeypatch.setenv("OM_AI_OLLAMA_MODEL", "llama3.2")
-    info = cb.resolve_backend(local_loaded=True)
-    assert info.backend == "ollama"
-    assert info.model == "llama3.2"
+    with pytest.raises(RuntimeError, match="not part of the OM-1.0 native"):
+        cb.resolve_backend(local_loaded=True)
 
 
 def test_resolve_openai_when_key_and_auto(monkeypatch):
@@ -76,7 +74,6 @@ def test_resolve_openai_when_key_and_auto(monkeypatch):
     monkeypatch.delenv("OM_MODEL_PROVIDER", raising=False)
     monkeypatch.setenv("OPENAI_API_KEY", "sk-test")
     monkeypatch.setenv("OM_AI_OPENAI_MODEL", "gpt-4o-mini")
-    monkeypatch.setattr(cb, "ollama_reachable", lambda timeout=1.5: True)
     info = cb.resolve_backend(local_loaded=False)
     assert info.backend == "openai"
     assert info.model == "gpt-4o-mini"
@@ -88,7 +85,6 @@ def test_resolve_local_fallback(monkeypatch):
     monkeypatch.delenv("OM_AI_OPENAI_API_KEY", raising=False)
     monkeypatch.delenv("OPENAI_API_KEY", raising=False)
     monkeypatch.setenv("OM_AI_MODEL_ID", "om:free")
-    monkeypatch.setattr(cb, "ollama_reachable", lambda timeout=1.5: False)
     info = cb.resolve_backend(local_loaded=True)
     assert info.backend == "local"
     assert info.model == "om:free"
@@ -98,6 +94,6 @@ def test_force_openai(monkeypatch):
     monkeypatch.setenv("OM_AI_CHAT_BACKEND", "openai")
     monkeypatch.delenv("OM_MODEL_PROVIDER", raising=False)
     monkeypatch.setenv("OM_AI_OPENAI_MODEL", "gpt-4o-mini")
-    monkeypatch.setattr(cb, "ollama_reachable", lambda timeout=1.5: True)
-    info = cb.resolve_backend()
+    info = cb.resolve_backend(local_loaded=False)
     assert info.backend == "openai"
+    assert info.model == "gpt-4o-mini"

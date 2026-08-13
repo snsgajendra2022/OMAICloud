@@ -2,7 +2,6 @@
 from __future__ import annotations
 
 import json
-import os
 from dataclasses import asdict
 from datetime import datetime, timezone
 from pathlib import Path
@@ -160,40 +159,24 @@ def run_train_om1(
     trainer.save_checkpoint(latest, extra=extra)
     trainer.save_checkpoint(out_dir / f"step-{trainer.global_step}.pt", extra=extra)
 
-    # Update registry metadata with real values only.
+    from om_ai.backends.om_registry import sync_om10_registry
+
+    meta = sync_om10_registry(
+        checkpoint=latest,
+        tokenizer=tokenizer,
+        config=config,
+        root=root,
+        stamp_checkpoint=True,
+    )
+    # Preserve training-run metrics that sync may not know.
+    meta["device"] = str(trainer.device)
+    meta["parameters"] = model.exact_parameter_count()
+    meta["steps"] = trainer.global_step
+    meta["last_loss"] = result.get("last_loss")
+    meta["model_config"] = asdict(cfg)
+    meta["tokenizer_fingerprint"] = tok_fp
+    meta["tokenizer_sha256"] = tok_fp
     reg_dir = root / "artifacts/models/om-1.0"
-    reg_dir.mkdir(parents=True, exist_ok=True)
-    # Optionally copy/symlink checkpoint into registry layout.
-    reg_ckpt = reg_dir / "checkpoint.pt"
-    if latest.is_file():
-        if reg_ckpt.exists() or reg_ckpt.is_symlink():
-            reg_ckpt.unlink()
-        try:
-            os.symlink(latest.resolve(), reg_ckpt)
-        except OSError:
-            import shutil
-
-            shutil.copy2(latest, reg_ckpt)
-
-    meta = {
-        "name": "OM-1.0",
-        "provider": "OM AI",
-        "backend": "om_native",
-        "version": "1.0",
-        "lifecycle": "checkpoint_available",
-        "trained": True,
-        "config": config,
-        "tokenizer": tokenizer,
-        "tokenizer_fingerprint": tok_fp,
-        "checkpoint": str(latest.resolve()),
-        "parameters": model.exact_parameter_count(),
-        "device": str(trainer.device),
-        "steps": trainer.global_step,
-        "last_loss": result.get("last_loss"),
-        "updated_at": datetime.now(timezone.utc).isoformat(),
-        "not_70b": True,
-        "model_config": asdict(cfg),
-    }
     (reg_dir / "metadata.json").write_text(json.dumps(meta, indent=2) + "\n")
 
     payload = {

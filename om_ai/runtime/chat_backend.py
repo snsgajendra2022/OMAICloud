@@ -1,9 +1,12 @@
-"""Chat reply backends: OM native, local engine, Ollama, or OpenAI-compatible API.
+"""Chat reply backends: OM native (default), local engine, or OpenAI-compatible API.
 
 Selection (``OM_AI_CHAT_BACKEND`` or ``OM_MODEL_PROVIDER``):
-  - ``om_native`` (default when unset): OMNativeBackend ONLY — no Ollama/OpenAI fallback
-  - ``ollama`` / ``openai`` / ``local``: force that path (Ollama is explicit opt-in only)
-  - ``auto``: OpenAI if API key set → local OM (never auto-picks Ollama)
+  - ``om_native`` (default when unset): OMNativeBackend ONLY — no third-party LLM fallback
+  - ``openai`` / ``local``: explicit opt-in only
+  - ``auto``: OpenAI if API key set → local OM (never Ollama)
+
+Ollama is not part of the production path. Legacy client lives under
+``om_ai.legacy.ollama`` and is never auto-imported by serve/API.
 """
 from __future__ import annotations
 
@@ -12,6 +15,7 @@ import os
 from dataclasses import dataclass
 from datetime import date
 from typing import Any, Callable
+from zoneinfo import ZoneInfo
 
 import httpx
 
@@ -19,9 +23,19 @@ from om_ai.backends.base import NativeCheckpointError
 
 logger = logging.getLogger(__name__)
 
-BackendName = str  # "om_native" | "local" | "ollama" | "openai"
+BackendName = str  # "om_native" | "local" | "openai"
 
 _DEFAULT_BACKEND = "om_native"
+
+OM_SYSTEM_IDENTITY = (
+    "You are OM AI, powered by the OM-1.0 native language model. "
+    "You are running through OM's own inference runtime. "
+    "Do not claim to be Llama, Ollama, ChatGPT, GPT, Claude, Gemini, "
+    "or another third-party model. "
+    "Be accurate about tools and retrieved information. "
+    "Never claim to have executed an action that was not actually executed. "
+    "Do not invent frontier-scale capability claims for this checkpoint."
+)
 
 
 @dataclass(frozen=True)
@@ -34,14 +48,6 @@ class ChatBackendInfo:
 
 def _env(name: str, default: str = "") -> str:
     return (os.getenv(name) or default).strip()
-
-
-def ollama_base_url() -> str:
-    return _env("OM_AI_OLLAMA_URL", "http://127.0.0.1:11434").rstrip("/")
-
-
-def ollama_model() -> str:
-    return _env("OM_AI_OLLAMA_MODEL", "llama3.2")
 
 
 def openai_base_url() -> str:
@@ -59,30 +65,26 @@ def openai_api_key() -> str:
 def configured_backend() -> str:
     """Resolve configured chat backend.
 
-    Default when unset is ``om_native``. Explicit ``ollama`` keeps Ollama only
-    when requested — never selected by default or by ``auto``.
+    Default when unset is ``om_native``. ``ollama`` is rejected in production —
+    use ``om_ai.legacy.ollama`` only via explicit external scripts.
     """
     provider = (_env("OM_MODEL_PROVIDER") or "").lower()
     chat = (_env("OM_AI_CHAT_BACKEND") or _DEFAULT_BACKEND).lower()
-    if provider in {"om_native", "om-native", "native"}:
+    if provider in {"om_native", "om-native", "native", "om"}:
         return "om_native"
     if chat in {"om_native", "om-native", "native"}:
         return "om_native"
-    if provider in {"ollama", "openai", "local"} and chat in {_DEFAULT_BACKEND, "auto"}:
+    if chat == "ollama" or provider == "ollama":
+        raise RuntimeError(
+            "Ollama is not part of the OM-1.0 native production path. "
+            "Unset OM_AI_CHAT_BACKEND/OM_MODEL_PROVIDER or use om_native. "
+            "Legacy client (opt-in scripts only): om_ai.legacy.ollama"
+        )
+    if provider in {"openai", "local"} and chat in {_DEFAULT_BACKEND, "auto"}:
         return provider
     if not chat:
         return _DEFAULT_BACKEND
     return chat
-
-
-def ollama_reachable(timeout: float = 1.5) -> bool:
-    url = f"{ollama_base_url()}/api/tags"
-    try:
-        with httpx.Client(timeout=timeout) as client:
-            r = client.get(url)
-            return r.status_code < 500
-    except Exception:
-        return False
 
 
 def openai_configured() -> bool:
@@ -100,14 +102,7 @@ def resolve_backend(*, local_loaded: bool = False, native_ready: bool = False) -
             + (" (ready)" if native_ready else " (checkpoint required)"),
             provider="OM AI",
         )
-    if mode in {"ollama", "openai", "local"}:
-        if mode == "ollama":
-            return ChatBackendInfo(
-                "ollama",
-                ollama_model(),
-                "forced by OM_AI_CHAT_BACKEND=ollama",
-                provider="Ollama",
-            )
+    if mode in {"openai", "local"}:
         if mode == "openai":
             return ChatBackendInfo(
                 "openai",
@@ -122,7 +117,7 @@ def resolve_backend(*, local_loaded: bool = False, native_ready: bool = False) -
             provider="OM AI",
         )
 
-    # auto — never picks Ollama; use OM_AI_CHAT_BACKEND=ollama for that
+    # auto — never picks Ollama
     if openai_configured():
         return ChatBackendInfo(
             "openai", openai_model(), "auto: OpenAI API key present", provider="OpenAI"
@@ -148,14 +143,24 @@ def _normalize_messages(messages: list[dict]) -> list[dict[str, str]]:
     return out
 
 
+def om_system_identity_text() -> str:
+    return OM_SYSTEM_IDENTITY
+
+
 def runtime_date_system_text(*, today: date | None = None) -> str:
     """Build a dynamic date/year system prompt from the real calendar date."""
     d = today or date.today()
-    # Example: Wednesday, August 13, 2026
     human = d.strftime(f"%A, %B {d.day}, %Y")
+    tz_name = _env("OM_TIMEZONE") or _env("TZ") or "UTC"
+    try:
+        ZoneInfo(tz_name)
+    except Exception:
+        tz_name = "UTC"
     return (
-        f"You are OM AI. Today's date is {human}. "
+        f"{OM_SYSTEM_IDENTITY}\n\n"
+        f"Today's date is {human}. "
         f"Always treat the current year as {d.year}. "
+        f"Current timezone: {tz_name}. "
         "Do not claim the year is 2023 or cite a 2023 knowledge cutoff as the present. "
         "If asked about events after your training data, say you may lack post-training "
         "details and answer carefully without inventing news."
@@ -167,57 +172,25 @@ def with_runtime_date_context(
     *,
     today: date | None = None,
 ) -> list[dict[str, str]]:
-    """Ensure messages include accurate runtime date context.
-
-    If a system message already exists, keep its content and append the date
-    line. Otherwise prepend a new system message.
-    """
+    """Ensure messages include OM identity + accurate runtime date context."""
     date_line = runtime_date_system_text(today=today)
     msgs = _normalize_messages(messages)
     for i, m in enumerate(msgs):
         if m["role"] != "system":
             continue
         content = (m["content"] or "").strip()
-        # Avoid duplicating if runtime date framing is already present.
         if "Today's date is " in content and "Always treat the current year as " in content:
+            if "OM-1.0 native language model" not in content:
+                msgs[i] = {"role": "system", "content": f"{OM_SYSTEM_IDENTITY}\n\n{content}"}
             return msgs
-        # Legacy phrasing from an earlier injector — do not stack another date block.
         if "Today's date is " in content and "The current year is " in content:
+            if "OM-1.0 native language model" not in content:
+                msgs[i] = {"role": "system", "content": f"{OM_SYSTEM_IDENTITY}\n\n{content}"}
             return msgs
         merged = f"{content}\n\n{date_line}" if content else date_line
         msgs[i] = {"role": "system", "content": merged}
         return msgs
     return [{"role": "system", "content": date_line}] + msgs
-
-
-def chat_via_ollama(
-    messages: list[dict],
-    *,
-    max_new_tokens: int = 256,
-    temperature: float = 0.8,
-    top_p: float = 1.0,
-    model: str | None = None,
-) -> str:
-    payload = {
-        "model": model or ollama_model(),
-        "messages": _normalize_messages(messages),
-        "stream": False,
-        "options": {
-            "temperature": float(temperature),
-            "top_p": float(top_p),
-            "num_predict": int(max_new_tokens),
-        },
-    }
-    url = f"{ollama_base_url()}/api/chat"
-    with httpx.Client(timeout=120.0) as client:
-        r = client.post(url, json=payload)
-        r.raise_for_status()
-        data = r.json()
-    msg = data.get("message") or {}
-    text = msg.get("content")
-    if not isinstance(text, str):
-        raise RuntimeError(f"Ollama returned unexpected payload: {data!r}")
-    return text
 
 
 def chat_via_openai(
@@ -279,6 +252,13 @@ def chat_reply(
     if info.backend == "om_native":
         if native_chat is None or not native_ready:
             raise NativeCheckpointError("OM-1.0 checkpoint unavailable.")
+        # Live knowledge stubs (HTTP/search) — synthesis still OM-1.0 only.
+        try:
+            from om_ai.live_knowledge import enrich_messages_for_live_knowledge
+
+            messages, _lk_meta = enrich_messages_for_live_knowledge(messages)
+        except Exception as exc:
+            logger.debug("live_knowledge enrich skipped: %s", exc)
         local_kwargs = dict(kwargs)
         if top_k is not None:
             local_kwargs["top_k"] = top_k
@@ -289,41 +269,9 @@ def chat_reply(
         except NativeCheckpointError:
             raise
         except Exception as exc:
-            # Surface as checkpoint/runtime failure — still no Ollama proxy.
             raise NativeCheckpointError(
                 f"OM-1.0 checkpoint unavailable. ({exc})"
             ) from exc
-
-    if info.backend == "ollama":
-        try:
-            text = chat_via_ollama(messages, model=info.model, **kwargs)
-            return text, info
-        except Exception as exc:
-            # Only fall back when NOT in om_native mode (already handled above).
-            logger.warning("Ollama chat failed (%s); falling back", exc)
-            if openai_configured():
-                info = ChatBackendInfo(
-                    "openai",
-                    openai_model(),
-                    f"fallback after Ollama error: {exc}",
-                    provider="OpenAI",
-                )
-                text = chat_via_openai(messages, model=info.model, **kwargs)
-                return text, info
-            if local_chat is not None and local_loaded:
-                info = ChatBackendInfo(
-                    "local",
-                    _env("OM_AI_MODEL_ID", "om-tiny") or "om-tiny",
-                    f"fallback after Ollama error: {exc}",
-                    provider="OM AI",
-                )
-                local_kwargs = dict(kwargs)
-                if top_k is not None:
-                    local_kwargs["top_k"] = top_k
-                if repetition_penalty is not None:
-                    local_kwargs["repetition_penalty"] = repetition_penalty
-                return local_chat(messages, **local_kwargs), info
-            raise
 
     if info.backend == "openai":
         text = chat_via_openai(messages, model=info.model, **kwargs)
@@ -332,9 +280,8 @@ def chat_reply(
     if local_chat is None or not local_loaded:
         raise RuntimeError(
             "No chat backend available. Set OM_MODEL_PROVIDER=om_native with a real "
-            "checkpoint, load a local OM checkpoint (OM_AI_AUTOLOAD=1), set "
-            "OM_AI_OPENAI_API_KEY / OPENAI_API_KEY, or explicitly set "
-            "OM_AI_CHAT_BACKEND=ollama with Ollama running."
+            "OM-1.0 checkpoint, load a local OM checkpoint (OM_AI_AUTOLOAD=1), or set "
+            "OM_AI_OPENAI_API_KEY / OPENAI_API_KEY with OM_AI_CHAT_BACKEND=openai."
         )
     local_kwargs = dict(kwargs)
     if top_k is not None:
@@ -352,11 +299,8 @@ def backend_status(*, local_loaded: bool = False, native_ready: bool = False) ->
         "provider": info.provider,
         "detail": info.detail,
         "configured": configured_backend(),
-        "ollama_url": ollama_base_url() if configured_backend() == "ollama" else None,
-        "ollama_reachable": (
-            ollama_reachable() if configured_backend() == "ollama" else None
-        ),
         "openai_configured": openai_configured(),
         "local_loaded": local_loaded,
         "native_ready": native_ready,
+        "external_llm": "none" if info.backend == "om_native" else info.backend,
     }
