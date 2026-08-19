@@ -554,13 +554,16 @@ def chat(
             resource="/v1/chat",
             detail={"turns": len(messages), "backend": backend.backend},
         )
-        return {
+        payload: dict = {
             "reply": reply,
             "role": "assistant",
             "om_backend": backend.backend,
             "model": backend.model,
             "provider": backend.provider,
         }
+        if backend.live_knowledge:
+            payload["live_knowledge"] = backend.live_knowledge
+        return payload
     except NativeCheckpointError as exc:
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,

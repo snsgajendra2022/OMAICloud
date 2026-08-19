@@ -139,3 +139,63 @@ def test_checkpoint_tokenizer_mismatch_rejected(tmp_path: Path):
     eng = LocalLLMEngine()
     with pytest.raises(CheckpointTokenizerMismatch):
         eng.load(str(CFG_LOCAL), str(path_b), str(ckpt), "cpu")
+
+
+def test_resolve_tokenizer_prefers_vocab_match_over_stale_metadata():
+    from om_ai.runtime.engine import resolve_tokenizer_path_for_checkpoint
+
+    if not TOK_FIXED.is_file():
+        pytest.skip("tokenizer-fixed-v3 missing")
+    prod = ROOT / "artifacts" / "tokenizer-production-65536.json"
+    if not prod.is_file():
+        pytest.skip("production tokenizer missing")
+
+    chosen = resolve_tokenizer_path_for_checkpoint(
+        str(TOK_FIXED),
+        65536,
+        {"tokenizer_path": "artifacts/tokenizer-fixed-v3.json"},
+    )
+    assert Path(chosen).resolve() == prod.resolve()
+
+
+def test_checkpoint_vocab_mismatch_autoselects_extra_tokenizer(tmp_path: Path):
+    import torch
+    from om_ai.core.config import ModelConfig
+    from om_ai.model import OMTransformer
+
+    if not CFG_LOCAL.is_file():
+        pytest.skip("om-1.0-local config missing")
+
+    tok_small = ByteBPETokenizer.base()
+    path_small = tmp_path / "tok-small.json"
+    tok_small.save(path_small)
+
+    tok_wide = ByteBPETokenizer.train(
+        ["hello world hello om ai native checkpoint"] * 20,
+        vocab_size=max(len(tok_small.vocab) + 40, 320),
+        min_pair_freq=1,
+    )
+    path_wide = tmp_path / "tok-wide.json"
+    tok_wide.save(path_wide)
+    assert len(tok_wide.vocab) != len(tok_small.vocab)
+
+    cfg = ModelConfig.from_json(CFG_LOCAL)
+    cfg.vocab_size = len(tok_wide.vocab)
+    model = OMTransformer(cfg)
+    ckpt = tmp_path / "ckpt.pt"
+    torch.save(
+        {
+            "model": model.state_dict(),
+            "extra": {
+                "tokenizer_path": str(path_wide),
+                "tokenizer_fingerprint": tokenizer_fingerprint(path_small),
+            },
+        },
+        ckpt,
+    )
+
+    eng = LocalLLMEngine()
+    info = eng.load(str(CFG_LOCAL), str(path_small), str(ckpt), "cpu")
+    assert eng.model is not None
+    assert eng.model.cfg.vocab_size == len(tok_wide.vocab)
+    assert info["tokenizer"]["vocab_size"] == len(tok_wide.vocab)

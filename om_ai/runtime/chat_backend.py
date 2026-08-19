@@ -44,6 +44,7 @@ class ChatBackendInfo:
     model: str
     detail: str = ""
     provider: str = ""
+    live_knowledge: dict[str, Any] | None = None
 
 
 def _env(name: str, default: str = "") -> str:
@@ -260,13 +261,38 @@ def chat_reply(
     if info.backend == "om_native":
         if native_chat is None or not native_ready:
             raise NativeCheckpointError("OM-1.0 checkpoint unavailable.")
-        # Live knowledge stubs (HTTP/search) — synthesis still OM-1.0 only.
+        # Live knowledge (HTTP/search/local) — never another LLM.
+        lk_meta: dict[str, Any] = {}
         try:
             from om_ai.live_knowledge import enrich_messages_for_live_knowledge
 
-            messages, _lk_meta = enrich_messages_for_live_knowledge(messages)
+            messages, lk_meta = enrich_messages_for_live_knowledge(messages)
         except Exception as exc:
             logger.debug("live_knowledge enrich skipped: %s", exc)
+
+        grounded = (lk_meta.get("grounded_reply") or "").strip()
+        prefer_grounded = bool(lk_meta.get("prefer_grounded_reply")) and bool(grounded)
+        # Tiny OM-1.0 windows often cannot synthesize long retrieval context.
+        # When live retrieval succeeded, return the grounded extractive answer
+        # (still not an external LLM). Set OM_LIVE_KNOWLEDGE_GROUNDED=0 to force
+        # native-only synthesis of the injected facts.
+        grounded_env = (_env("OM_LIVE_KNOWLEDGE_GROUNDED") or "1").lower()
+        grounded_allowed = grounded_env not in {"0", "false", "no", "off"}
+        info_lk = ChatBackendInfo(
+            backend=info.backend,
+            model=info.model,
+            detail=info.detail,
+            provider=info.provider,
+            live_knowledge={
+                k: v
+                for k, v in lk_meta.items()
+                if k != "grounded_reply"  # full text already returned as reply
+            }
+            or None,
+        )
+        if prefer_grounded and grounded_allowed:
+            return grounded, info_lk
+
         local_kwargs = dict(kwargs)
         if top_k is not None:
             local_kwargs["top_k"] = top_k
@@ -282,8 +308,11 @@ def chat_reply(
             ) from exc
         # Harden API/UI: never return whitespace-only (UI labels that "(empty reply)").
         if not (text or "").strip():
-            text = "OM-1.0 produced no text; try again."
-        return text, info
+            if grounded:
+                text = grounded
+            else:
+                text = "OM-1.0 produced no text; try again."
+        return text, info_lk
 
     if info.backend == "openai":
         text = chat_via_openai(messages, model=info.model, **kwargs)

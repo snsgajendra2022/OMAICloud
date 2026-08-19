@@ -2,7 +2,8 @@ from __future__ import annotations
 import codecs
 import logging
 import re
-from typing import Generator
+from pathlib import Path
+from typing import Any, Generator
 import torch
 from om_ai.core.config import ModelConfig
 from om_ai.model import OMTransformer
@@ -15,7 +16,112 @@ _CTRL_OR_REPLACEMENT = re.compile(r"[\x00-\x08\x0b\x0c\x0e-\x1f\uFFFD]")
 
 
 class CheckpointTokenizerMismatch(ValueError):
-    """Checkpoint was bound to a different tokenizer fingerprint."""
+    """Checkpoint was bound to a different tokenizer fingerprint or vocab size."""
+
+
+_KNOWN_TOKENIZERS = (
+    "artifacts/tokenizer-production-65536.json",
+    "artifacts/tokenizer-fixed-v3.json",
+    "artifacts/tokenizer-om-production.json",
+    "artifacts/tokenizer.json",
+)
+
+
+def _repo_root() -> Path:
+    return Path(__file__).resolve().parents[2]
+
+
+def _embedding_vocab(state: Any) -> int | None:
+    if not isinstance(state, dict):
+        return None
+    for key, value in state.items():
+        name = str(key)
+        if name == "token_embedding.weight" or name.endswith(".token_embedding.weight"):
+            try:
+                return int(value.shape[0])
+            except Exception:
+                return None
+    return None
+
+
+def resolve_tokenizer_path_for_checkpoint(
+    tokenizer_path: str,
+    ckpt_vocab: int | None,
+    extra: dict | None = None,
+) -> str:
+    """Return a tokenizer whose vocab size matches checkpoint embeddings.
+
+    Stale checkpoint metadata can claim tokenizer-fixed-v3 while the weights
+    were actually trained at 65536. Prefer the requested path when it matches;
+    otherwise search extra.tokenizer_path and known artifacts.
+    """
+    requested = Path(tokenizer_path)
+    tok_n = len(load_tokenizer(requested).vocab)
+    if ckpt_vocab is None or tok_n == ckpt_vocab:
+        return str(requested)
+
+    candidates: list[Path] = []
+    if isinstance(extra, dict):
+        raw = extra.get("tokenizer_path")
+        if raw:
+            p = Path(str(raw))
+            candidates.append(p)
+            if not p.is_absolute():
+                candidates.append(_repo_root() / p)
+    for rel in _KNOWN_TOKENIZERS:
+        candidates.append(_repo_root() / rel)
+
+    seen: set[str] = set()
+    try:
+        seen.add(str(requested.resolve()))
+    except OSError:
+        seen.add(str(requested))
+
+    for cand in candidates:
+        if not cand.is_file():
+            continue
+        try:
+            key = str(cand.resolve())
+        except OSError:
+            key = str(cand)
+        if key in seen:
+            continue
+        seen.add(key)
+        try:
+            n = len(load_tokenizer(cand).vocab)
+        except Exception:
+            continue
+        if n == ckpt_vocab:
+            logger.warning(
+                "Checkpoint embeddings are vocab=%s but tokenizer %s has vocab=%s; "
+                "using matching tokenizer %s",
+                ckpt_vocab,
+                tokenizer_path,
+                tok_n,
+                cand,
+            )
+            return str(cand)
+
+    raise CheckpointTokenizerMismatch(
+        f"Checkpoint embedding vocab is {ckpt_vocab} but tokenizer {tokenizer_path} "
+        f"has vocab {tok_n}. Set OM_MODEL_TOKENIZER to a matching file "
+        f"(artifacts/tokenizer-production-65536.json for 65536, "
+        f"artifacts/tokenizer-fixed-v3.json for ~340)."
+    )
+
+
+def _extra_tokenizer_matches_vocab(extra: dict | None, ckpt_vocab: int | None) -> bool:
+    if not isinstance(extra, dict) or not extra.get("tokenizer_path") or ckpt_vocab is None:
+        return True
+    p = Path(str(extra["tokenizer_path"]))
+    if not p.is_file():
+        p = _repo_root() / p
+    if not p.is_file():
+        return True
+    try:
+        return len(load_tokenizer(p).vocab) == ckpt_vocab
+    except Exception:
+        return True
 
 
 def usable_generation_text(text: str | None) -> str:
@@ -112,22 +218,40 @@ class LocalLLMEngine:
 
     def load(self, config_path: str, tokenizer_path: str, checkpoint_path: str, device: str | None = None) -> dict:
         cfg = ModelConfig.from_json(config_path)
-        self.tokenizer = load_tokenizer(tokenizer_path)
-        tok_fp = tokenizer_fingerprint(tokenizer_path)
-        if cfg.vocab_size != len(self.tokenizer.vocab):
-            cfg.vocab_size = len(self.tokenizer.vocab)
-
         ckpt = torch.load(checkpoint_path, map_location="cpu", weights_only=False)
         state = ckpt.get("model", ckpt)
         extra = ckpt.get("extra") if isinstance(ckpt, dict) else None
+        ckpt_vocab = _embedding_vocab(state)
+        requested_tokenizer = tokenizer_path
+        tokenizer_path = resolve_tokenizer_path_for_checkpoint(
+            tokenizer_path, ckpt_vocab, extra if isinstance(extra, dict) else None
+        )
+        switched_tokenizer = Path(tokenizer_path).resolve() != Path(requested_tokenizer).resolve()
+        self.tokenizer = load_tokenizer(tokenizer_path)
+        tok_fp = tokenizer_fingerprint(tokenizer_path)
+        tok_n = len(self.tokenizer.vocab)
+        cfg.vocab_size = ckpt_vocab if ckpt_vocab is not None else tok_n
+
         bound_fp = None
         if isinstance(extra, dict):
             bound_fp = extra.get("tokenizer_fingerprint") or extra.get("tokenizer_sha256")
         if bound_fp and bound_fp != tok_fp:
-            raise CheckpointTokenizerMismatch(
-                f"Checkpoint tokenizer mismatch: checkpoint bound to {bound_fp}, "
-                f"but loaded tokenizer fingerprint is {tok_fp}"
+            stale_meta = switched_tokenizer or not _extra_tokenizer_matches_vocab(
+                extra if isinstance(extra, dict) else None, ckpt_vocab
             )
+            if stale_meta:
+                logger.warning(
+                    "Ignoring stale checkpoint tokenizer fingerprint %s "
+                    "(using tokenizer %s for embedding vocab=%s)",
+                    bound_fp,
+                    tokenizer_path,
+                    ckpt_vocab,
+                )
+            else:
+                raise CheckpointTokenizerMismatch(
+                    f"Checkpoint tokenizer mismatch: checkpoint bound to {bound_fp}, "
+                    f"but loaded tokenizer fingerprint is {tok_fp}"
+                )
 
         if any(str(k).endswith(".ln1.bias") or str(k) == "final_norm.bias" for k in state):
             cfg.use_rmsnorm = False

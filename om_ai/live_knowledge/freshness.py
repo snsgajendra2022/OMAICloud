@@ -8,8 +8,9 @@ _TIME_SENSITIVE = re.compile(
     r"\b("
     r"latest|current|today|tonight|yesterday|this\s+week|this\s+month|"
     r"right\s+now|as\s+of|breaking|news|release|version|changelog|"
-    r"who\s+is\s+the\s+current|prime\s+minister|president|"
-    r"stock\s+price|weather|score|election"
+    r"who\s+is\s+the\s+current|prime\s+minister|president|head\s+of\s+state|"
+    r"stock\s+price|weather|score|election|up[\s-]?to[\s-]?date|"
+    r"what\s+happened|recently|this\s+year|202[4-9]|203\d"
     r")\b",
     re.IGNORECASE,
 )

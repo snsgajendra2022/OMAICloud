@@ -1,4 +1,4 @@
-"""HTTP fetch stub for live knowledge (deterministic retrieval, not an LLM)."""
+"""HTTP fetch for live knowledge (deterministic retrieval, not an LLM)."""
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -6,6 +6,10 @@ from typing import Any
 from urllib.parse import urlparse
 
 import httpx
+
+from om_ai.live_knowledge.html_text import extract_title, html_to_text
+
+_UA = "OM-AI-LiveKnowledge/1.0 (+retrieval-only; no-llm)"
 
 
 @dataclass(frozen=True)
@@ -49,16 +53,20 @@ def fetch_url(
         )
 
     try:
-        with httpx.Client(timeout=timeout, follow_redirects=True) as client:
-            r = client.get(url, headers={"User-Agent": "OM-AI-LiveKnowledge/1.0"})
-            text = (r.text or "")[:max_chars]
-            title = ""
-            lower = text.lower()
-            if "<title>" in lower:
-                start = lower.find("<title>") + 7
-                end = lower.find("</title>", start)
-                if end > start:
-                    title = text[start:end].strip()[:200]
+        with httpx.Client(
+            timeout=timeout,
+            follow_redirects=True,
+            headers={"User-Agent": _UA},
+        ) as client:
+            r = client.get(url)
+            raw = r.text or ""
+            ctype = (r.headers.get("content-type") or "").lower()
+            if "html" in ctype or raw.lstrip().lower().startswith("<!doctype") or "<html" in raw[:200].lower():
+                title = extract_title(raw)
+                text = html_to_text(raw, max_chars=max_chars)
+            else:
+                title = ""
+                text = raw[:max_chars]
             return FetchResult(
                 url=str(r.url),
                 ok=r.status_code < 400,
