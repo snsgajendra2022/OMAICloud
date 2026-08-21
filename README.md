@@ -28,7 +28,7 @@ om-ai model-info
 
 # Serve OM-1.0 only (loads checkpoint; never falls back to Ollama)
 om-ai serve --host 127.0.0.1 --port 8080
-# Chat UI: http://127.0.0.1:8080/ui/chat
+# Workspace UI: http://127.0.0.1:8080/chat
 ```
 
 Default env (see `.env.example`):
@@ -137,6 +137,24 @@ om-ai train-om1 \
   --max-docs 250000 \
   --checkpoint-every 1000 \
   --log-every 50 \
+  --device mps \
+  --precision auto \
+  --resume artifacts/checkpoints/om-1.0-base/latest.pt \
+  --output artifacts/checkpoints/om-1.0-base
+
+./scripts/train_om1_mac_native.sh
+
+
+om-ai train-om1 \
+  --config configs/om-1.0-local.json \
+  --data data/production-corpus/raw/fineweb-100mb.txt \
+  --tokenizer artifacts/tokenizer-production-65536.json \
+  --steps 70000000000000 \
+  --batch-size 4 \
+  --max-tokens 7500000000 \
+  --max-docs 75000000 \
+  --checkpoint-every 70000 \
+  --log-every 7000 \
   --device mps \
   --precision auto \
   --resume artifacts/checkpoints/om-1.0-base/latest.pt \

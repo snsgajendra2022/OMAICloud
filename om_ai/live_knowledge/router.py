@@ -19,6 +19,7 @@ def enrich_messages_for_live_knowledge(
     router: FreshnessRouter | None = None,
     allow_network: bool | None = None,
     prefer_grounded_reply: bool | None = None,
+    force: bool = False,
 ) -> tuple[list[dict[str, str]], dict[str, Any]]:
     """If query looks time-sensitive, attach retrieval context (never another LLM).
 
@@ -44,14 +45,17 @@ def enrich_messages_for_live_knowledge(
     if index is not None:
         engine.index = index
 
-    result = engine.collect(messages)
+    result = engine.collect(messages, force=force)
     meta: dict[str, Any] = dict(result.meta)
     meta["grounded_reply"] = result.grounded_reply
     meta["llm_used"] = None
 
     if prefer_grounded_reply is None:
-        # Prefer grounded extractive reply when we have real evidence (network or local).
-        prefer_grounded_reply = bool(result.evidence) and bool(result.grounded_reply)
+        # Never paste web dumps as the chat reply by default — users expect
+        # normal assistant text. Retrieval still injects context for OM-1.0;
+        # grounded extract is only used when the caller sets prefer=True
+        # (e.g. after degenerate native output).
+        prefer_grounded_reply = False
     meta["prefer_grounded_reply"] = prefer_grounded_reply
 
     if not result.needs_live:

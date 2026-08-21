@@ -14,9 +14,31 @@ from om_ai.live_knowledge.sources import urls_for_query
 
 
 def test_freshness_detects_time_sensitive():
+    from om_ai.live_knowledge.freshness import is_greeting_like, is_om_self_query
+
     assert needs_live_knowledge("Who is the current Prime Minister of Nepal?")
     assert needs_live_knowledge("What is the latest Ionic release?")
-    assert not needs_live_knowledge("What is recursion?")
+    assert needs_live_knowledge("What is recursion?")
+    assert needs_live_knowledge("Super season's basketball team")
+    assert not needs_live_knowledge("hello")
+    assert not needs_live_knowledge("good morning bhai")
+    assert is_greeting_like("good morning bhai")
+    assert is_greeting_like("good moring bhai")
+    assert not needs_live_knowledge("What can you do as a local OM model?")
+    assert is_om_self_query("What can you do as a local OM model?")
+
+
+def test_router_decision():
+    r = FreshnessRouter()
+    d = r.decide([{"role": "user", "content": "hello"}])
+    assert d.needs_live is False
+    d_morn = r.decide([{"role": "user", "content": "good moring how are you"}])
+    assert d_morn.needs_live is False
+    d_om = r.decide([{"role": "user", "content": "What can you do as a local OM model?"}])
+    assert d_om.needs_live is False
+    assert d_om.reason == "om_self"
+    d2 = r.decide([{"role": "user", "content": "Explain recursion"}])
+    assert d2.needs_live is True
 
 
 def test_enrich_injects_context_without_llm(monkeypatch):
@@ -72,10 +94,42 @@ def test_urls_for_nepal_pm():
     assert any("wikipedia.org" in u for u in urls)
 
 
-def test_router_decision():
-    r = FreshnessRouter()
-    d = r.decide([{"role": "user", "content": "Explain recursion"}])
-    assert d.needs_live is False
+def test_strip_live_knowledge_boilerplate():
+    from om_ai.live_knowledge.engine import strip_live_knowledge_boilerplate
+
+    raw = (
+        "Live knowledge (retrieved; not another LLM):\n"
+        "Question: latest version\n\n"
+        "1. Python releases\n"
+        "   Python 3.13 is the current series.\n"
+        "   Source: https://www.python.org/downloads/\n\n"
+        "OM-1.0 should treat the facts above as current retrieved context."
+    )
+    clean = strip_live_knowledge_boilerplate(raw)
+    assert "Live knowledge" not in clean
+    assert "Question:" not in clean
+    assert "OM-1.0 should treat" not in clean
+    assert "https://" not in clean
+    assert "Python 3.13" in clean
+
+
+def test_compose_grounded_reply_has_no_url():
+    from om_ai.live_knowledge.engine import Evidence, compose_grounded_reply
+
+    text = compose_grounded_reply(
+        "what is .gm",
+        [
+            Evidence(
+                title=".gm",
+                url="https://en.wikipedia.org/wiki/.gm",
+                text=".gm is the country code top-level domain (ccTLD) of The Gambia.",
+                source="wikipedia",
+                score=5.0,
+            )
+        ],
+    )
+    assert text == ".gm is the country code top-level domain (ccTLD) of The Gambia."
+    assert "http" not in (text or "")
 
 
 def test_engine_offline_time_sensitive():

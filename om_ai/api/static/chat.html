@@ -1,0 +1,2748 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>OM · Workspace</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --bg:#FFFFFF;--side:#F7F7F8;--border:#E5E7EB;--text:#111827;
+  --muted:#6B7280;--primary:#111827;--accent:#2563EB;--danger:#DC2626;
+  --success:#059669;--soft:#F1F5F9;--sans:"Plus Jakarta Sans",system-ui,sans-serif;--sw:260px;
+}
+body.dark{
+  --bg:#111827;--side:#1F2937;--border:#374151;--text:#F9FAFB;
+  --muted:#9CA3AF;--primary:#F9FAFB;--accent:#3B82F6;--danger:#F87171;
+  --success:#34D399;--soft:#1E293B;
+}
+*{box-sizing:border-box;}
+html,body{height:100%;margin:0;}
+body{font-family:var(--sans);color:var(--text);background:var(--bg);display:flex;overflow:hidden;}
+button,input,textarea,select{font:inherit;color:inherit;}
+button{cursor:pointer;}
+a{color:inherit;text-decoration:none;}
+.hidden{display:none!important;}
+svg.icon{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;}
+
+/* ── SIDEBAR ── */
+.sidebar{width:var(--sw);flex-shrink:0;background:var(--side);border-right:1px solid var(--border);display:flex;flex-direction:column;height:100%;z-index:40;transition:width .22s ease,transform .22s ease;position:relative;padding-bottom:60px;}
+body.collapsed .sidebar{width:64px;}
+body.collapsed .side-label,body.collapsed .nav-label,body.collapsed .user-meta,
+body.collapsed .brand-text,body.collapsed .ws-switcher{display:none!important;}
+body.collapsed .btn-new{justify-content:center;padding:10px;}
+body.collapsed .nav-btn{justify-content:center;padding:10px;}
+body.collapsed .conv-panel-wrap{display:none;}
+body.collapsed .side-nav-wrap{flex:1 1 0%;}
+body.collapsed .side-bottom{justify-content:center;}
+
+.side-top{padding:14px 12px 8px;display:flex;flex-direction:column;gap:8px;flex-shrink:0;}
+.brand-row{display:flex;align-items:center;justify-content:space-between;gap:8px;}
+.brand{display:flex;align-items:center;gap:10px;min-width:0;flex:1;}
+.logo{width:32px;height:32px;border-radius:9px;flex-shrink:0;background:linear-gradient(145deg,#1f2937,#111827);display:grid;place-items:center;color:#fff;font-size:11px;font-weight:700;letter-spacing:-.02em;}
+body.dark .logo{background:linear-gradient(145deg,#2563EB,#1D4ED8);}
+.brand-text{min-width:0;}
+.brand-text strong{display:block;font-size:15px;letter-spacing:-.03em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.brand-text span{font-size:11px;color:var(--muted);display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.ws-switcher{display:flex;gap:4px;margin-top:2px;}
+.ws-switcher button{border:1px solid var(--border);background:var(--bg);border-radius:8px;padding:4px 8px;font-size:11px;font-weight:600;color:var(--muted);}
+.ws-switcher button:hover{color:var(--text);border-color:#94A3B8;}
+.collapse-btn,.icon-btn,.ghost-btn{border:1px solid transparent;background:transparent;color:var(--muted);border-radius:8px;padding:6px;line-height:0;display:inline-flex;align-items:center;justify-content:center;}
+.collapse-btn:hover,.icon-btn:hover,.ghost-btn:hover{background:rgba(0,0,0,.06);color:var(--text);}
+body.dark .collapse-btn:hover,body.dark .icon-btn:hover,body.dark .ghost-btn:hover{background:rgba(255,255,255,.08);}
+.icon-btn.danger:hover{color:var(--danger);background:rgba(220,38,38,.1);}
+.btn-new{width:100%;border:1px solid var(--border);background:var(--bg);border-radius:10px;padding:10px 12px;font-weight:600;font-size:13.5px;text-align:left;display:flex;align-items:center;gap:8px;}
+.btn-new:hover{border-color:#94A3B8;box-shadow:0 2px 8px rgba(17,24,39,.06);}
+
+.side-nav-wrap{flex:1 1 0%;min-height:0;overflow-y:auto;padding:0 0 8px;display:flex;flex-direction:column;}
+.nav{display:flex;flex-direction:column;gap:1px;padding:0 8px;overflow:visible;max-height:none;}
+.nav-btn{display:flex;align-items:center;gap:10px;width:100%;border:0;background:transparent;border-radius:10px;padding:8px 10px;color:var(--muted);font-size:13px;font-weight:550;text-align:left;}
+.nav-btn:hover{background:rgba(0,0,0,.05);color:var(--text);}
+body.dark .nav-btn:hover{background:rgba(255,255,255,.06);}
+.nav-btn.active{background:#E8EEF7;color:var(--accent);font-weight:650;}
+body.dark .nav-btn.active{background:rgba(59,130,246,.15);color:#93C5FD;}
+
+.conv-panel-wrap{flex:1 1 0%;min-height:0;display:none;flex-direction:column;overflow:hidden;border-top:1px solid var(--border);}
+body.chat-mode .side-nav-wrap{flex:0 1 auto;max-height:42vh;}
+body.chat-mode .conv-panel-wrap{display:flex;flex:1 1 0%;}
+body:not(.chat-mode) .side-nav-wrap{flex:1 1 0%;max-height:none;}
+.conv-filter-bar{padding:6px 8px 2px;display:flex;gap:4px;flex-wrap:wrap;flex-shrink:0;}
+.conv-filter-btn{border:1px solid var(--border);background:transparent;border-radius:999px;padding:3px 10px;font-size:11px;font-weight:650;color:var(--muted);cursor:pointer;}
+.conv-filter-btn:hover{color:var(--text);}
+.conv-filter-btn.active{background:#EFF6FF;border-color:#BFDBFE;color:var(--accent);}
+body.dark .conv-filter-btn.active{background:rgba(59,130,246,.15);border-color:rgba(59,130,246,.3);color:#93C5FD;}
+.conv-panel{overflow-y:auto;padding:4px 8px 12px;flex:1;min-height:0;}
+.group-label{font-size:11px;font-weight:650;color:var(--muted);letter-spacing:.04em;text-transform:uppercase;padding:10px 10px 4px;}
+.conv-item{width:100%;border:0;background:transparent;text-align:left;padding:7px 10px;border-radius:10px;font-size:13px;display:flex;align-items:center;gap:6px;margin-bottom:1px;position:relative;}
+.conv-item:hover{background:rgba(0,0,0,.05);}
+body.dark .conv-item:hover{background:rgba(255,255,255,.06);}
+.conv-item.active{background:#E8EEF7;font-weight:600;}
+body.dark .conv-item.active{background:rgba(59,130,246,.12);}
+.conv-item .ci-title{flex:1;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;}
+.conv-pin-icon{color:var(--accent);flex-shrink:0;font-size:10px;}
+.conv-more-btn{border:0;background:transparent;color:var(--muted);border-radius:6px;padding:3px 4px;line-height:0;display:none;flex-shrink:0;align-items:center;}
+.conv-item:hover .conv-more-btn,.conv-item.active .conv-more-btn{display:inline-flex;}
+.conv-more-btn:hover{background:var(--soft);color:var(--text);}
+.conv-ctx{position:fixed;min-width:200px;background:var(--bg);border:1px solid var(--border);border-radius:12px;box-shadow:0 12px 32px rgba(17,24,39,.15);padding:6px;z-index:200;display:none;}
+.conv-ctx.open{display:block;}
+.conv-ctx button{width:100%;border:0;background:transparent;text-align:left;padding:9px 12px;border-radius:8px;font-size:13px;font-weight:550;display:flex;align-items:center;gap:8px;}
+.conv-ctx button:hover{background:var(--soft);}
+.conv-ctx .ctx-sep{height:1px;background:var(--border);margin:4px 8px;}
+.conv-ctx button.ctx-danger{color:var(--danger);}
+.conv-ctx button.ctx-danger:hover{background:rgba(220,38,38,.08);}
+
+.side-bottom{border-top:1px solid var(--border);padding:12px;display:flex;align-items:center;gap:10px;position:absolute;left:0;right:0;bottom:0;flex-shrink:0;background:var(--side);z-index:6;}
+.avatar{width:34px;height:34px;border-radius:50%;background:var(--primary);color:var(--bg);display:grid;place-items:center;font-size:13px;font-weight:700;flex-shrink:0;}
+.user-meta{flex:1;min-width:0;}
+.user-meta strong{display:block;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.menu{position:absolute;bottom:calc(100% + 8px);left:12px;right:12px;background:var(--bg);border:1px solid var(--border);border-radius:12px;box-shadow:0 12px 32px rgba(17,24,39,.12);padding:6px;z-index:50;display:none;}
+.menu.open{display:block;}
+.menu button,.menu a{width:100%;border:0;background:transparent;text-align:left;padding:10px 12px;border-radius:8px;font-size:13.5px;font-weight:550;display:flex;align-items:center;gap:8px;text-decoration:none;color:inherit;}
+.menu button:hover,.menu a:hover{background:var(--soft);}
+.drop-menu{position:absolute;top:calc(100% + 8px);right:0;min-width:220px;max-height:340px;overflow-y:auto;background:var(--bg);border:1px solid var(--border);border-radius:12px;box-shadow:0 12px 32px rgba(17,24,39,.12);padding:6px;display:none;z-index:60;}
+.drop-menu.open{display:block;}
+.drop-menu button,.drop-menu .drop-item{width:100%;border:0;background:transparent;text-align:left;padding:10px 12px;border-radius:8px;font-size:13px;font-weight:550;display:flex;align-items:center;gap:8px;}
+.drop-menu button:hover,.drop-menu .drop-item:hover{background:#EFF6FF;color:var(--accent);}
+body.dark .drop-menu button:hover,body.dark .drop-menu .drop-item:hover{background:rgba(59,130,246,.12);color:#93C5FD;}
+.drop-menu button.active{background:#EFF6FF;color:var(--accent);}
+body.dark .drop-menu button.active{background:rgba(59,130,246,.15);color:#93C5FD;}
+.drop-menu .drop-sep{height:1px;background:var(--border);margin:4px 8px;}
+.notif-item{padding:10px 12px;border-radius:8px;font-size:13px;cursor:pointer;}
+.notif-item:hover{background:var(--soft);}
+.notif-item.unread{background:#EFF6FF;}
+body.dark .notif-item.unread{background:rgba(59,130,246,.1);}
+.notif-item strong{display:block;font-size:13px;margin-bottom:2px;}
+.notif-item span{color:var(--muted);font-size:12px;}
+
+/* ── MAIN ── */
+.main{flex:1;min-width:0;display:flex;flex-direction:column;height:100%;background:var(--bg);}
+.topbar{height:56px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;padding:0 16px;flex-shrink:0;position:relative;}
+.hamburger{display:none;border:1px solid var(--border);background:var(--bg);border-radius:8px;width:36px;height:36px;place-items:center;flex-shrink:0;}
+.hamburger span,.hamburger span::before,.hamburger span::after{display:block;width:16px;height:1.5px;background:var(--text);position:relative;}
+.hamburger span::before,.hamburger span::after{content:"";position:absolute;left:0;}
+.hamburger span::before{top:-5px;}.hamburger span::after{top:5px;}
+.top-title{flex:1;font-size:15px;font-weight:650;letter-spacing:-.02em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:center;min-width:0;}
+.top-actions{display:flex;align-items:center;gap:4px;flex-shrink:0;}
+.model-wrap{position:relative;}
+.model-btn{border:1px solid var(--border);background:var(--bg);border-radius:999px;padding:6px 12px;font-size:12px;font-weight:650;color:var(--accent);display:flex;align-items:center;gap:6px;}
+.model-btn:hover{background:#EFF6FF;}
+body.dark .model-btn:hover{background:rgba(59,130,246,.1);}
+.badge-dot{width:8px;height:8px;border-radius:50%;background:var(--accent);position:absolute;top:4px;right:4px;}
+
+/* ── VIEWS ── */
+.view{flex:1;min-height:0;display:none;flex-direction:column;}
+.view.active{display:flex;}
+.messages{flex:1;overflow-y:auto;padding:24px 16px 12px;display:flex;flex-direction:column;gap:18px;}
+.empty-state{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;padding:32px 16px;text-align:center;}
+.empty-state h1{margin:0;font-size:26px;font-weight:700;letter-spacing:-.04em;}
+.empty-state p{margin:0;color:var(--muted);font-size:14px;max-width:420px;}
+.suggest-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;max-width:640px;width:100%;}
+.suggest-card{border:1px solid var(--border);background:var(--side);border-radius:14px;padding:14px;text-align:left;display:flex;flex-direction:column;gap:6px;}
+.suggest-card:hover{border-color:#94A3B8;background:var(--soft);}
+.suggest-card strong{font-size:13px;}
+.suggest-card span{font-size:12px;color:var(--muted);line-height:1.4;}
+.row{max-width:760px;width:100%;margin:0 auto;display:flex;gap:10px;}
+.row.user{flex-direction:row-reverse;}
+.om-tag{font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.06em;margin-bottom:4px;}
+.bubble{max-width:min(100%,640px);padding:12px 16px;border-radius:16px;font-size:14.5px;line-height:1.6;word-break:break-word;}
+.row.user .bubble{background:var(--primary);color:var(--bg);border-bottom-right-radius:6px;}
+.row.assistant .bubble{background:var(--side);border:1px solid var(--border);border-bottom-left-radius:6px;}
+.bubble pre{background:rgba(0,0,0,.07);border-radius:8px;padding:10px 14px;overflow-x:auto;margin:8px 0;font-size:13px;}
+body.dark .bubble pre{background:rgba(255,255,255,.07);}
+.bubble code{font-family:ui-monospace,"SF Mono",Consolas,monospace;font-size:13px;}
+.bubble pre code{background:none;padding:0;}
+.bubble :not(pre) > code{background:rgba(0,0,0,.07);border-radius:4px;padding:1px 5px;font-size:.9em;}
+body.dark .bubble :not(pre) > code{background:rgba(255,255,255,.1);}
+.msg-actions{display:flex;gap:2px;margin-top:6px;flex-wrap:wrap;align-items:center;}
+.msg-actions button{border:0;background:transparent;color:var(--muted);font-size:12px;padding:4px 8px;border-radius:6px;font-weight:600;display:inline-flex;align-items:center;gap:4px;}
+.msg-actions button:hover{background:var(--soft);color:var(--text);}
+.msg-actions button.active{color:var(--accent);}
+.tts-btn.speaking{color:var(--danger);}
+
+/* ── COMPOSER ── */
+.composer-wrap{padding:10px 16px 18px;flex-shrink:0;}
+.composer{max-width:760px;margin:0 auto;border:1px solid var(--border);background:var(--bg);border-radius:18px;padding:8px 10px;display:flex;flex-direction:column;gap:6px;box-shadow:0 8px 24px rgba(17,24,39,.05);}
+.composer:focus-within{border-color:#94A3B8;}
+.composer-tools{display:flex;gap:4px;flex-wrap:wrap;padding:0 2px;align-items:center;}
+.tool-toggle{border:1px solid var(--border);background:var(--side);border-radius:999px;padding:4px 10px;font-size:11px;font-weight:650;color:var(--muted);display:inline-flex;align-items:center;gap:4px;}
+.tool-toggle.on{background:#EFF6FF;border-color:#BFDBFE;color:var(--accent);}
+body.dark .tool-toggle.on{background:rgba(59,130,246,.15);border-color:rgba(59,130,246,.3);color:#93C5FD;}
+.composer-model-chip{border:1px solid var(--border);background:var(--side);border-radius:999px;padding:4px 10px;font-size:11px;font-weight:650;color:var(--muted);display:inline-flex;align-items:center;gap:4px;margin-left:auto;cursor:pointer;}
+.composer-model-chip:hover{color:var(--text);border-color:#94A3B8;}
+.composer-row{display:flex;gap:8px;align-items:flex-end;}
+.composer textarea{flex:1;border:0;outline:none;resize:none;max-height:160px;min-height:24px;padding:6px 0;background:transparent;line-height:1.45;}
+.btn-send,.btn-stop{height:36px;border:0;border-radius:10px;padding:0 14px;font-weight:650;font-size:13px;flex-shrink:0;}
+.btn-send{background:var(--primary);color:var(--bg);min-width:36px;display:grid;place-items:center;}
+.btn-send:disabled{opacity:.4;cursor:not-allowed;}
+.btn-send svg{width:16px;height:16px;fill:currentColor;stroke:none;}
+.btn-stop{background:#FEE2E2;color:var(--danger);display:none;}
+.btn-stop.show{display:inline-flex;align-items:center;gap:6px;}
+.hint{text-align:center;font-size:11px;color:var(--muted);margin:8px 0 0;}
+.attach-wrap{position:relative;display:inline-flex;}
+.attach-drop{position:absolute;bottom:calc(100% + 8px);left:0;min-width:190px;background:var(--bg);border:1px solid var(--border);border-radius:12px;box-shadow:0 12px 32px rgba(17,24,39,.12);padding:6px;z-index:80;display:none;}
+.attach-drop.open{display:block;}
+.attach-drop button{width:100%;border:0;background:transparent;text-align:left;padding:9px 12px;border-radius:8px;font-size:13px;font-weight:550;display:flex;align-items:center;gap:8px;}
+.attach-drop button:hover{background:var(--soft);}
+.mic-btn{border:0;background:transparent;color:var(--muted);border-radius:8px;padding:6px;line-height:0;display:inline-flex;align-items:center;}
+.mic-btn:hover{background:var(--soft);color:var(--text);}
+.mic-btn.listening{color:var(--danger);animation:micPulse 1s infinite;}
+@keyframes micPulse{0%,100%{opacity:1;}50%{opacity:.5;}}
+
+/* ── PANEL ── */
+.panel{flex:1;overflow-y:auto;padding:24px 20px 40px;}
+.panel-inner{max-width:760px;margin:0 auto;}
+.panel-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:20px;flex-wrap:wrap;}
+.panel h2{margin:0 0 4px;font-size:22px;letter-spacing:-.03em;}
+.panel .sub{color:var(--muted);font-size:14px;margin:0;}
+.back-btn{border:1px solid var(--border);background:var(--bg);border-radius:10px;padding:7px 12px;font-size:13px;font-weight:600;color:var(--muted);display:inline-flex;align-items:center;gap:6px;}
+.back-btn:hover{color:var(--text);}
+.card-list{display:flex;flex-direction:column;gap:10px;margin-bottom:20px;}
+.entity{border:1px solid var(--border);border-radius:14px;padding:14px 16px;background:var(--bg);display:flex;gap:12px;align-items:flex-start;}
+.entity h3{margin:0 0 4px;font-size:15px;}
+.entity p{margin:0;color:var(--muted);font-size:13px;line-height:1.45;white-space:pre-wrap;}
+.entity .grow{flex:1;min-width:0;}
+.entity-actions{display:flex;gap:6px;flex-wrap:wrap;flex-shrink:0;}
+
+/* ── TABS ── */
+.tabs{display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:20px;overflow-x:auto;}
+.tab{border:0;background:transparent;padding:9px 14px;font-size:13px;font-weight:600;color:var(--muted);border-bottom:2px solid transparent;margin-bottom:-1px;border-radius:0;white-space:nowrap;flex-shrink:0;}
+.tab:hover{color:var(--text);}
+.tab.active{color:var(--accent);border-bottom-color:var(--accent);}
+
+/* ── FORMS ── */
+.form-grid{display:grid;gap:10px;border:1px solid var(--border);border-radius:14px;padding:16px;background:var(--side);margin-top:16px;}
+.form-grid label,.settings-section label,.inline-label{display:grid;gap:6px;font-size:12px;font-weight:650;color:var(--muted);}
+.form-grid input,.form-grid textarea,.form-grid select,
+.settings-section input,.settings-section select,.settings-section textarea{border:1px solid var(--border);border-radius:10px;padding:10px 12px;background:var(--bg);outline:none;width:100%;}
+.form-grid input:focus,.form-grid textarea:focus,.form-grid select:focus,
+.settings-section input:focus,.settings-section select:focus,.settings-section textarea:focus{border-color:#94A3B8;}
+.settings-section{border:1px solid var(--border);border-radius:14px;padding:16px;background:var(--side);margin-bottom:14px;}
+.settings-section h3{margin:0 0 12px;font-size:14px;font-weight:700;}
+.settings-grid{display:grid;gap:10px;}
+.btn-primary{border:0;background:var(--primary);color:var(--bg);border-radius:10px;padding:10px 14px;font-weight:650;font-size:13.5px;display:inline-flex;align-items:center;gap:6px;}
+.btn-primary:hover{opacity:.9;}
+.btn-primary:disabled{opacity:.5;cursor:not-allowed;}
+.btn-outline{border:1px solid var(--border);background:var(--bg);border-radius:10px;padding:8px 12px;font-weight:600;font-size:13px;color:var(--muted);display:inline-flex;align-items:center;gap:6px;}
+.btn-outline:hover{color:var(--text);border-color:#94A3B8;}
+.btn-danger{border:0;background:rgba(220,38,38,.1);color:var(--danger);border-radius:10px;padding:8px 12px;font-weight:600;font-size:13px;display:inline-flex;align-items:center;gap:6px;}
+.btn-danger:hover{background:rgba(220,38,38,.18);}
+.toggle-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:6px 0;}
+.toggle-label{font-size:13px;font-weight:550;}
+.toggle-sub{font-size:12px;color:var(--muted);}
+.sw-wrap{position:relative;width:40px;height:22px;flex-shrink:0;}
+.sw-wrap input{opacity:0;width:0;height:0;position:absolute;}
+.sw-track{position:absolute;inset:0;background:#CBD5E1;border-radius:999px;transition:background .2s;cursor:pointer;}
+.sw-wrap input:checked + .sw-track{background:var(--accent);}
+.sw-thumb{position:absolute;top:3px;left:3px;width:16px;height:16px;background:#fff;border-radius:50%;pointer-events:none;transition:left .2s;}
+.sw-wrap input:checked + .sw-track + .sw-thumb{left:21px;}
+
+/* ── SEARCH ── */
+.search-bar{width:100%;border:1px solid var(--border);background:var(--bg);border-radius:12px;padding:12px 14px;font-size:14px;outline:none;margin-bottom:16px;}
+.search-bar:focus{border-color:#94A3B8;}
+.search-group{margin-bottom:20px;}
+.search-group h4{margin:0 0 8px;font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;}
+.search-hit{border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-bottom:8px;cursor:pointer;background:var(--bg);}
+.search-hit:hover{background:var(--soft);}
+.search-hit strong{display:block;font-size:14px;margin-bottom:2px;}
+.search-hit span{font-size:12px;color:var(--muted);}
+.tag{display:inline-block;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;padding:2px 6px;border-radius:4px;background:var(--soft);color:var(--muted);margin-right:6px;}
+
+/* ── STATUS BADGES ── */
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:999px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;}
+.badge.green{background:#DCFCE7;color:#166534;}
+.badge.yellow{background:#FEF9C3;color:#854D0E;}
+.badge.red{background:#FEE2E2;color:#991B1B;}
+.badge.gray{background:var(--soft);color:var(--muted);}
+.badge.blue{background:#EFF6FF;color:var(--accent);}
+body.dark .badge.green{background:rgba(16,185,129,.15);color:#34D399;}
+body.dark .badge.yellow{background:rgba(234,179,8,.15);color:#FCD34D;}
+body.dark .badge.red{background:rgba(239,68,68,.15);color:#F87171;}
+body.dark .badge.blue{background:rgba(59,130,246,.15);color:#93C5FD;}
+
+/* ── MISC ── */
+.skeleton{background:linear-gradient(90deg,var(--soft) 25%,#E2E8F0 50%,var(--soft) 75%);background-size:200% 100%;animation:shimmer 1.2s infinite;border-radius:10px;height:64px;margin-bottom:10px;}
+body.dark .skeleton{background:linear-gradient(90deg,rgba(255,255,255,.04) 25%,rgba(255,255,255,.08) 50%,rgba(255,255,255,.04) 75%);background-size:200% 100%;}
+@keyframes shimmer{0%{background-position:200% 0;}100%{background-position:-200% 0;}}
+.empty-panel{text-align:center;padding:40px 20px;color:var(--muted);}
+.empty-panel h3{margin:0 0 8px;color:var(--text);font-size:16px;}
+.empty-panel p{margin:0 0 16px;font-size:14px;}
+.history-item{border-left:2px solid var(--border);padding:0 0 16px 16px;margin-left:8px;position:relative;}
+.history-item::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--accent);position:absolute;left:-5px;top:4px;}
+.history-item strong{display:block;font-size:14px;}
+.history-item span{font-size:12px;color:var(--muted);}
+.profile-card{border:1px solid var(--border);border-radius:14px;padding:20px;display:flex;gap:16px;align-items:center;margin-bottom:20px;background:var(--side);}
+.profile-card .avatar{width:56px;height:56px;font-size:20px;}
+.profile-card h3{margin:0 0 4px;font-size:18px;}
+.profile-card p{margin:0;color:var(--muted);font-size:13px;}
+.stat-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:20px;}
+.stat{border:1px solid var(--border);border-radius:12px;padding:14px;background:var(--bg);}
+.stat strong{display:block;font-size:20px;margin-bottom:2px;}
+.stat span{font-size:12px;color:var(--muted);}
+.detail-header{border:1px solid var(--border);border-radius:14px;padding:20px;background:var(--side);margin-bottom:16px;}
+.detail-header h2{margin:0 0 6px;font-size:20px;font-weight:700;}
+.detail-header .sub{color:var(--muted);font-size:14px;margin:0;}
+.detail-meta{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;align-items:center;}
+.member-row{display:flex;align-items:center;gap:10px;padding:10px 14px;border:1px solid var(--border);border-radius:10px;background:var(--bg);margin-bottom:8px;}
+.member-row .avatar{width:30px;height:30px;font-size:11px;}
+.member-row .grow{flex:1;}
+.member-role{font-size:11px;color:var(--muted);}
+.version-row{padding:8px 0;border-bottom:1px solid var(--border);display:flex;gap:8px;align-items:center;font-size:13px;}
+.version-row:last-child{border-bottom:0;}
+.version-row .ver-n{font-weight:700;color:var(--accent);flex-shrink:0;}
+.version-row .ver-d{color:var(--muted);font-size:12px;flex-shrink:0;}
+.version-row .ver-c{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--muted);font-size:12px;}
+.chip{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:999px;font-size:12px;font-weight:600;background:var(--soft);color:var(--muted);border:1px solid var(--border);}
+.chip.on{background:#EFF6FF;border-color:#BFDBFE;color:var(--accent);}
+body.dark .chip.on{background:rgba(59,130,246,.15);border-color:rgba(59,130,246,.3);color:#93C5FD;}
+
+/* ── TOAST / MODAL ── */
+.toast-wrap{position:fixed;bottom:24px;right:24px;z-index:300;display:flex;flex-direction:column;gap:8px;pointer-events:none;}
+.toast{background:var(--primary);color:var(--bg);padding:12px 16px;border-radius:10px;font-size:13px;font-weight:600;box-shadow:0 8px 24px rgba(17,24,39,.18);transform:translateX(120%);transition:transform .25s ease;max-width:360px;}
+.toast.show{transform:translateX(0);}
+.toast.success{background:var(--success);}
+.toast.error{background:var(--danger);}
+.toast.info{background:var(--accent);}
+.backdrop{display:none;position:fixed;inset:0;background:rgba(15,23,42,.35);z-index:35;}
+.modal{position:fixed;inset:0;z-index:100;display:none;place-items:center;padding:20px;background:rgba(15,23,42,.4);}
+.modal.open{display:grid;}
+.modal-box{background:var(--bg);border-radius:16px;padding:24px;max-width:500px;width:100%;border:1px solid var(--border);box-shadow:0 20px 48px rgba(17,24,39,.18);}
+.modal-box h3{margin:0 0 12px;font-size:16px;font-weight:700;}
+.modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:16px;}
+
+/* ── RESPONSIVE ── */
+@media(max-width:860px){
+  .hamburger{display:grid;}
+  .sidebar{position:fixed;left:0;top:0;bottom:0;width:min(var(--sw),86vw);transform:translateX(-105%);}
+  body.collapsed .sidebar{width:min(var(--sw),86vw);}
+  .sidebar.open{transform:translateX(0);}
+  .backdrop.open{display:block;}
+  .collapse-btn{display:none;}
+  .top-title{text-align:left;}
+}
+</style>
+</head>
+<body>
+<div class="backdrop" id="backdrop"></div>
+
+<aside class="sidebar" id="sidebar">
+  <div class="side-top">
+    <div class="brand-row">
+      <div class="brand">
+        <div class="logo" aria-hidden="true">OM</div>
+        <div class="brand-text side-label">
+          <strong id="wsName">Workspace</strong>
+          <span id="wsSub">OM AI</span>
+        </div>
+      </div>
+      <button type="button" class="collapse-btn" id="collapseBtn" title="Collapse sidebar" aria-label="Collapse"></button>
+    </div>
+    <div class="ws-switcher side-label" id="wsSwitcher">
+      <button type="button" id="wsSwitchBtn">Switch</button>
+      <button type="button" id="wsCreateBtn">+ New</button>
+    </div>
+    <button type="button" class="btn-new" id="newChatBtn"></button>
+  </div>
+
+  <div class="side-nav-wrap" id="sideNavWrap">
+    <nav class="nav" id="navTabs"></nav>
+  </div>
+
+  <div class="conv-panel-wrap" id="convPanelWrap">
+    <div class="conv-filter-bar" id="convFilterBar">
+      <button type="button" class="conv-filter-btn active" data-filter="all">All</button>
+      <button type="button" class="conv-filter-btn" data-filter="pinned">Pinned</button>
+      <button type="button" class="conv-filter-btn" data-filter="archived">Archived</button>
+    </div>
+    <div class="conv-panel" id="convList"></div>
+  </div>
+
+  <div class="side-bottom">
+    <div class="avatar" id="userAvatar">O</div>
+    <div class="user-meta side-label"><strong id="userName">User</strong></div>
+    <button type="button" class="ghost-btn" id="sideMenuBtn" aria-label="Profile menu"></button>
+    <div class="menu" id="sideMenu"></div>
+  </div>
+</aside>
+
+<main class="main">
+  <header class="topbar" id="topbar">
+    <button type="button" class="hamburger" id="menuBtn" aria-label="Menu"><span></span></button>
+    <div class="model-wrap" id="modelWrap">
+      <button type="button" class="model-btn" id="modelBtn"></button>
+      <div class="drop-menu" id="modelDrop"></div>
+    </div>
+    <div class="top-title" id="topTitle">New chat</div>
+    <div class="top-actions">
+      <button type="button" class="icon-btn" id="searchTopBtn" title="Search"></button>
+      <button type="button" class="icon-btn" id="shareBtn" title="Share conversation"></button>
+      <div style="position:relative">
+        <button type="button" class="icon-btn" id="notifBtn" title="Notifications"></button>
+        <span class="badge-dot hidden" id="notifDot"></span>
+        <div class="drop-menu" id="notifDrop" style="width:320px;max-height:400px"></div>
+      </div>
+      <button type="button" class="icon-btn" id="helpBtn" title="Help"></button>
+      <div style="position:relative">
+        <button type="button" class="icon-btn" id="headerProfileBtn" aria-label="Profile">
+          <div class="avatar" id="headerAvatar" style="width:30px;height:30px;font-size:12px">O</div>
+        </button>
+        <div class="drop-menu" id="headerMenu" style="width:200px"></div>
+      </div>
+    </div>
+  </header>
+
+  <!-- CHAT -->
+  <section class="view active" id="view-chat">
+    <div class="messages" id="messages"></div>
+    <div class="composer-wrap">
+      <form class="composer" id="composer">
+        <input type="file" id="fileInput" accept="*/*" class="hidden"/>
+        <input type="file" id="fileUploadInput" accept="*/*" class="hidden"/>
+        <div class="composer-tools" id="composerTools">
+          <button type="button" class="tool-toggle" id="toolWeb" data-tool="web"></button>
+          <button type="button" class="tool-toggle" id="toolCode" data-tool="code"></button>
+          <button type="button" class="composer-model-chip" id="composerModelChip"></button>
+        </div>
+        <div class="composer-row">
+          <div class="attach-wrap">
+            <button type="button" class="icon-btn" id="attachBtn" title="Attach" aria-label="Attach"></button>
+            <div class="attach-drop" id="attachDrop">
+              <button type="button" id="attachUploadFile"></button>
+              <button type="button" id="attachTextFile"></button>
+            </div>
+          </div>
+          <button type="button" class="mic-btn" id="micBtn" title="Voice input" aria-label="Voice input"></button>
+          <textarea id="input" rows="1" placeholder="Message OM…" autocomplete="off"></textarea>
+          <button type="button" class="btn-stop" id="stopBtn">Stop</button>
+          <button type="submit" class="btn-send" id="sendBtn" aria-label="Send" disabled>
+            <svg viewBox="0 0 24 24"><path d="M3.4 20.6 21 12 3.4 3.4l.1 6.8L15 12 3.5 13.8z"/></svg>
+          </button>
+        </div>
+      </form>
+      <p class="hint">Enter to send · ⌘K search · Shift+Enter new line</p>
+    </div>
+  </section>
+
+  <!-- SEARCH -->
+  <section class="view" id="view-search"><div class="panel"><div class="panel-inner" id="searchPanel"></div></div></section>
+
+  <!-- LIBRARY -->
+  <section class="view" id="view-library"><div class="panel"><div class="panel-inner" id="libraryPanel"></div></div></section>
+
+  <!-- SCHEDULED -->
+  <section class="view" id="view-scheduled"><div class="panel"><div class="panel-inner" id="scheduledPanel"></div></div></section>
+
+  <!-- TOOLS -->
+  <section class="view" id="view-tools"><div class="panel"><div class="panel-inner" id="toolsPanel"></div></div></section>
+
+  <!-- PROJECTS -->
+  <section class="view" id="view-projects"><div class="panel"><div class="panel-inner" id="projectsPanel"></div></div></section>
+
+  <!-- ASSISTANTS -->
+  <section class="view" id="view-assistants"><div class="panel"><div class="panel-inner" id="assistantsPanel"></div></div></section>
+
+  <!-- EXPLORE -->
+  <section class="view" id="view-explore"><div class="panel"><div class="panel-inner" id="explorePanel"></div></div></section>
+
+  <!-- FILES -->
+  <section class="view" id="view-files"><div class="panel"><div class="panel-inner" id="filesPanel"></div></div></section>
+
+  <!-- KNOWLEDGE -->
+  <section class="view" id="view-knowledge"><div class="panel"><div class="panel-inner" id="knowledgePanel"></div></div></section>
+
+  <!-- PROMPTS -->
+  <section class="view" id="view-prompts"><div class="panel"><div class="panel-inner" id="promptsPanel"></div></div></section>
+
+  <!-- MODELS -->
+  <section class="view" id="view-models"><div class="panel"><div class="panel-inner" id="modelsPanel"></div></div></section>
+
+  <!-- MEMORY -->
+  <section class="view" id="view-memory"><div class="panel"><div class="panel-inner" id="memoryPanel"></div></div></section>
+
+  <!-- SETTINGS -->
+  <section class="view" id="view-settings"><div class="panel"><div class="panel-inner" id="settingsPanel"></div></div></section>
+
+  <!-- PROFILE -->
+  <section class="view" id="view-profile"><div class="panel"><div class="panel-inner" id="profilePanel"></div></div></section>
+</main>
+
+<div class="toast-wrap" id="toastWrap"></div>
+<div class="conv-ctx" id="convCtxMenu"></div>
+
+<div class="modal" id="modal">
+  <div class="modal-box">
+    <h3 id="modalTitle">Confirm</h3>
+    <div id="modalBody"></div>
+    <div class="modal-actions">
+      <button type="button" class="btn-outline" id="modalCancel">Cancel</button>
+      <button type="button" class="btn-primary" id="modalOk">OK</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+"use strict";
+
+/* ─── ICONS ─── */
+const ICONS = {
+  message:'<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>',
+  search:'<circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>',
+  folder:'<path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/>',
+  bot:'<path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2M20 14h2M15 13v2M9 13v2"/>',
+  compass:'<circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/>',
+  book:'<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>',
+  file:'<path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/>',
+  brain:'<path d="M12 5a3 3 0 1 0-5.997.125 4 4 0 0 0-2.526 5.77 4 4 0 0 0 .556 6.588A4 4 0 1 0 12 18Z"/><path d="M12 5a3 3 0 1 1 5.997.125 4 4 0 0 1 2.526 5.77 4 4 0 0 1-.556 6.588A4 4 0 1 1 12 18Z"/>',
+  scroll:'<path d="M8 21h12a2 2 0 0 0 2-2v-2H10v2a2 2 0 1 1-4 0V5a2 2 0 1 0-4 0v3h4"/><path d="M19 17V5a2 2 0 0 0-2-2H4"/>',
+  cpu:'<rect width="16" height="16" x="4" y="4" rx="2"/><rect width="6" height="6" x="9" y="9" rx="1"/><path d="M15 2v2M15 20v2M2 15h2M2 9h2M20 15h2M20 9h2M9 2v2M9 20v2"/>',
+  list:'<path d="M3 12h.01M3 18h.01M3 6h.01M8 12h13M8 18h13M8 6h13"/>',
+  database:'<ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5V19A9 3 0 0 0 21 19V5"/><path d="M3 12A9 3 0 0 0 21 12"/>',
+  settings:'<path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/>',
+  user:'<path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>',
+  plus:'<path d="M5 12h14M12 5v14"/>',
+  chevL:'<path d="m15 18-6-6 6-6"/>',
+  chevD:'<path d="m6 9 6 6 6-6"/>',
+  chevR:'<path d="m9 18 6-6-6-6"/>',
+  share:'<path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" x2="12" y1="2" y2="15"/>',
+  bell:'<path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/>',
+  help:'<circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/>',
+  paperclip:'<path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48"/>',
+  copy:'<rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/>',
+  thumbUp:'<path d="M7 10v12M15 5.88 14 10h5.83a2 2 0 0 1 1.92 2.56l-2.33 8A2 2 0 0 1 17.5 22H4a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h2.76a2 2 0 0 0 1.79-1.11L12 2a3.13 3.13 0 0 1 3 3.88Z"/>',
+  thumbDown:'<path d="M17 14V2M9 18.12 10 14H4.17a2 2 0 0 1-1.92-2.56l2.33-8A2 2 0 0 1 6.5 2H20a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-2.76a2 2 0 0 0-1.79 1.11L12 22a3.13 3.13 0 0 1-3-3.88Z"/>',
+  refresh:'<path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/>',
+  more:'<circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/>',
+  moreV:'<circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/>',
+  trash:'<path d="M3 6h18M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/>',
+  edit:'<path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/>',
+  download:'<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/>',
+  key:'<path d="m21 2-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0 3 3L22 7l-3-3m-3.5 3.5L19 4"/>',
+  logOut:'<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/>',
+  globe:'<circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20M2 12h20"/>',
+  code:'<polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/>',
+  check:'<path d="M20 6 9 17l-5-5"/>',
+  x:'<path d="M18 6 6 18M6 6l12 12"/>',
+  menu:'<line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/>',
+  calendar:'<rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/>',
+  wrench:'<path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>',
+  mic:'<path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="23"/><line x1="8" x2="16" y1="23" y2="23"/>',
+  volume:'<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>',
+  star:'<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>',
+  pin:'<line x1="12" x2="12" y1="17" y2="22"/><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z"/>',
+  archive:'<polyline points="21 8 21 21 3 21 3 8"/><rect width="22" height="5" x="1" y="3" rx="1"/><line x1="10" x2="14" y1="12" y2="12"/>',
+  users:'<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>',
+  link:'<path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>',
+  pause:'<rect width="4" height="16" x="6" y="4"/><rect width="4" height="16" x="14" y="4"/>',
+  play:'<polygon points="5 3 19 12 5 21 5 3"/>',
+  creditCard:'<rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/>',
+  shield:'<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>',
+  externalLink:'<path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" x2="21" y1="14" y2="3"/>',
+  move:'<polyline points="5 9 2 12 5 15"/><polyline points="9 5 12 2 15 5"/><line x1="2" x2="22" y1="12" y2="12"/><line x1="12" x2="12" y1="2" y2="22"/>',
+  image:'<rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><polyline points="21 15 16 10 5 21"/>',
+  moon:'<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>',
+  sun:'<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>',
+  activity:'<polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>',
+  history:'<path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/>',
+  zap:'<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>',
+};
+
+/* ─── NAV ORDER ─── */
+const NAV = [
+  ["chat","Chat","message"],
+  ["library","Library","book"],
+  ["scheduled","Scheduled","calendar"],
+  ["tools","Tools","wrench"],
+  ["projects","Projects","folder"],
+  ["assistants","Assistants","bot"],
+  ["explore","Explore","compass"],
+  ["files","Files","file"],
+  ["knowledge","Knowledge","brain"],
+  ["prompts","Prompts","scroll"],
+  ["models","Models","cpu"],
+  ["memory","Memory","database"],
+  ["settings","Settings","settings"],
+  ["profile","Profile","user"],
+];
+
+const SUGGESTIONS = [
+  { cat:"Write",   text:"Draft a concise product update email", prompt:"Help me draft a concise product update email for our team." },
+  { cat:"Research",text:"Summarize local vs cloud LLM trade-offs", prompt:"Summarize the key trade-offs between local and cloud LLMs for enterprise use." },
+  { cat:"Code",    text:"Review this function for bugs", prompt:"Review this function for bugs and suggest improvements:\n\nfunction merge(a, b) { return {...a, ...b}; }" },
+  { cat:"Analyze", text:"Break down this decision framework", prompt:"Break down a decision framework for choosing an AI deployment strategy." },
+  { cat:"Create",  text:"Brainstorm names for an AI workspace", prompt:"Brainstorm 10 creative names for an AI workspace product." },
+];
+
+/* ─── STATE ─── */
+const state = {
+  user:null, profile:null, settings:null, workspaces:[], workspaceId:null,
+  conversations:[], currentId:null, messages:[], busy:false,
+  model:"OM-1.0", models:[], catalog:[],
+  view:"chat", projects:[], assistants:[],
+  selectedAssistantId:null, notifications:[], unreadNotifs:0,
+  tools:{web:false,code:false}, abort:null, searchQuery:"",
+  convFilter:"all", recognition:null, ttsActive:false,
+};
+
+/* ─── DOM SHORTCUTS ─── */
+const $ = (id) => document.getElementById(id);
+const els = {
+  sidebar:$("sidebar"), backdrop:$("backdrop"), convList:$("convList"),
+  messages:$("messages"), input:$("input"), sendBtn:$("sendBtn"), stopBtn:$("stopBtn"),
+  composer:$("composer"), topTitle:$("topTitle"), modelBtn:$("modelBtn"), modelDrop:$("modelDrop"),
+  userName:$("userName"), userAvatar:$("userAvatar"), headerAvatar:$("headerAvatar"),
+  toastWrap:$("toastWrap"), notifDot:$("notifDot"), notifDrop:$("notifDrop"),
+  wsName:$("wsName"), navTabs:$("navTabs"), modal:$("modal"), modalBody:$("modalBody"),
+  modalTitle:$("modalTitle"), modalOk:$("modalOk"), modalCancel:$("modalCancel"),
+  convPanelWrap:$("convPanelWrap"), convCtxMenu:$("convCtxMenu"),
+};
+
+/* ─── UTILITIES ─── */
+function svg(name, size) {
+  return '<svg class="icon" width="'+(size||18)+'" height="'+(size||18)+'" viewBox="0 0 24 24">'+(ICONS[name]||"")+"</svg>";
+}
+function setIcon(el, name, size) { if (el) el.innerHTML = svg(name, size); }
+
+function escapeHtml(s) {
+  return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+}
+
+function renderMarkdown(raw) {
+  let s = String(raw)
+    .replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+  const codeBlocks = [];
+  s = s.replace(/```(\w*)\n([\s\S]*?)```/g, (_, lang, code) => {
+    const i = codeBlocks.length;
+    codeBlocks.push('<pre><code'+(lang?' class="language-'+lang+'"':'')+'>'+code+'</code></pre>');
+    return "\x00CB"+i+"\x00";
+  });
+  const inlines = [];
+  s = s.replace(/`([^`\n]+)`/g, (_, c) => {
+    const i = inlines.length;
+    inlines.push('<code>'+c+'</code>');
+    return "\x00IC"+i+"\x00";
+  });
+  s = s.replace(/\*\*\*([^*]+)\*\*\*/g,"<strong><em>$1</em></strong>");
+  s = s.replace(/\*\*([^*]+)\*\*/g,"<strong>$1</strong>");
+  s = s.replace(/\*([^*\n]+)\*/g,"<em>$1</em>");
+  s = s.replace(/\n/g,"<br>");
+  codeBlocks.forEach((b,i) => { s = s.split("\x00CB"+i+"\x00").join(b); });
+  inlines.forEach((c,i) => { s = s.split("\x00IC"+i+"\x00").join(c); });
+  return s;
+}
+
+function fmtDate(iso) {
+  if (!iso) return "";
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return iso;
+  return d.toLocaleString(undefined,{month:"short",day:"numeric",hour:"2-digit",minute:"2-digit"});
+}
+
+function toast(msg, type) {
+  const el = document.createElement("div");
+  el.className = "toast"+(type?" "+type:"");
+  el.textContent = msg;
+  els.toastWrap.appendChild(el);
+  requestAnimationFrame(() => el.classList.add("show"));
+  setTimeout(() => { el.classList.remove("show"); setTimeout(() => el.remove(),300); }, 3000);
+}
+
+function skeletons(n) {
+  let h=""; for (let i=0;i<(n||3);i++) h+='<div class="skeleton"></div>'; return h;
+}
+
+function closeMenus() {
+  document.querySelectorAll(".drop-menu.open,.menu.open").forEach(m => m.classList.remove("open"));
+  $("attachDrop").classList.remove("open");
+  els.convCtxMenu.classList.remove("open");
+}
+function closeSidebar() { els.sidebar.classList.remove("open"); els.backdrop.classList.remove("open"); }
+function openSidebar()  { els.sidebar.classList.add("open");    els.backdrop.classList.add("open"); }
+
+function setBusy(v) {
+  state.busy = v;
+  els.sendBtn.disabled = v || !els.input.value.trim();
+  els.stopBtn.classList.toggle("show", v);
+  els.sendBtn.style.display = v ? "none" : "";
+}
+
+function displayName() {
+  if (state.profile && state.profile.display_name) return state.profile.display_name;
+  const u = state.user;
+  if (!u) return "User";
+  if (u.user && (u.user.display_name || u.user.email)) return u.user.display_name || u.user.email;
+  if (u.actor) return u.actor.replace(/^user:/,"");
+  return "User";
+}
+function avatarInitial() {
+  if (state.profile && state.profile.avatar_initial) return state.profile.avatar_initial.slice(0,2).toUpperCase();
+  return (displayName().charAt(0)||"O").toUpperCase();
+}
+function applyUserChrome() {
+  const n = displayName(), init = avatarInitial();
+  els.userName.textContent = n;
+  els.userAvatar.textContent = init;
+  els.headerAvatar.textContent = init;
+}
+
+function applyDarkMode() {
+  const s = state.settings;
+  const app = s && s.appearance;
+  const sysDark = window.matchMedia && window.matchMedia("(prefers-color-scheme:dark)").matches;
+  const dark = app === "dark" || (app !== "light" && sysDark);
+  document.body.classList.toggle("dark", dark);
+}
+
+/* ─── API ─── */
+async function api(path, opts, meta) {
+  meta = meta || {};
+  const headers = Object.assign({}, (opts && opts.headers) || {});
+  if (opts && opts.body != null && !headers["Content-Type"] && !(opts.body instanceof FormData)) {
+    headers["Content-Type"] = "application/json";
+  }
+  try {
+    const res = await fetch(path, Object.assign({credentials:"include"}, opts||{}, {headers}));
+    let data = null;
+    const ct = res.headers.get("content-type") || "";
+    if (ct.includes("application/json")) { try { data = await res.json(); } catch (_) {} }
+    if (res.status === 401) { location.replace("/login"); throw new Error("unauthorized"); }
+    if (!res.ok && meta.error !== false) {
+      const detail = (data && (data.detail || data.error)) || ("HTTP "+res.status);
+      toast(typeof detail === "string" ? detail : JSON.stringify(detail), "error");
+    } else if (meta.success && res.ok) {
+      toast(meta.success, "success");
+    }
+    return { res, data };
+  } catch (e) {
+    if (e.message !== "unauthorized") toast(e.message||"Request failed","error");
+    throw e;
+  }
+}
+
+/* ─── LOGOUT / PERSIST ─── */
+async function logout() {
+  try { await api("/v1/auth/logout",{method:"POST",body:"{}"},{ error:false }); } catch (_) {}
+  location.replace("/login");
+}
+async function persistLast(id) {
+  if (!id) return;
+  try { await api("/v1/profile",{method:"PUT",body:JSON.stringify({last_conversation_id:id})},{error:false}); } catch (_) {}
+}
+
+/* ─── TITLE ─── */
+function updateTopTitle() {
+  if (state.view !== "chat") {
+    const nav = NAV.find(n => n[0] === state.view);
+    els.topTitle.textContent = nav ? nav[1] : state.view;
+    return;
+  }
+  els.topTitle.textContent = state.currentId
+    ? ((state.conversations.find(c => c.id === state.currentId)||{}).title||"Chat")
+    : "New chat";
+}
+
+/* ─── NAV ─── */
+function buildNav() {
+  els.navTabs.innerHTML = "";
+  NAV.forEach(([id, label, iconName]) => {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "nav-btn"+(state.view === id ? " active":"");
+    b.dataset.view = id;
+    b.innerHTML = svg(iconName)+'<span class="nav-label">'+escapeHtml(label)+"</span>";
+    b.addEventListener("click", () => setView(id));
+    els.navTabs.appendChild(b);
+  });
+  setIcon($("newChatBtn"), "plus", 16);
+  $("newChatBtn").appendChild(Object.assign(document.createElement("span"),{className:"side-label",textContent:"New chat"}));
+  setIcon($("collapseBtn"), "chevL", 18);
+  setIcon($("sideMenuBtn"), "menu", 18);
+  setIcon($("shareBtn"), "share", 18);
+  setIcon($("notifBtn"), "bell", 18);
+  setIcon($("helpBtn"), "help", 18);
+  setIcon($("searchTopBtn"), "search", 18);
+  $("sideMenu").innerHTML =
+    '<button type="button" data-goto="profile">'+svg("user",16)+' Profile</button>'+
+    '<button type="button" data-goto="settings">'+svg("settings",16)+' Settings</button>'+
+    '<a href="/ui/tokens">'+svg("key",16)+' API Keys</a>'+
+    '<button type="button" id="sideLogout">'+svg("logOut",16)+' Sign out</button>';
+  $("headerMenu").innerHTML =
+    '<button type="button" data-goto="profile">'+svg("user",16)+' Profile</button>'+
+    '<button type="button" data-goto="settings">'+svg("settings",16)+' Settings</button>'+
+    '<a href="/ui/tokens">'+svg("key",16)+' API Keys</a>'+
+    '<button type="button" id="headerLogout">'+svg("logOut",16)+' Sign out</button>';
+  $("sideLogout").addEventListener("click", logout);
+  $("headerLogout").addEventListener("click", logout);
+  document.querySelectorAll("[data-goto]").forEach(el => {
+    el.addEventListener("click", () => setView(el.getAttribute("data-goto")));
+  });
+  // Attach menu
+  $("attachUploadFile").innerHTML = svg("file",14)+" Upload file to OM";
+  $("attachTextFile").innerHTML   = svg("paperclip",14)+" Attach text to message";
+  setIcon($("attachBtn"), "paperclip", 18);
+  setIcon($("micBtn"), "mic", 18);
+  $("toolWeb").innerHTML  = svg("globe",14)+" Web";
+  $("toolCode").innerHTML = svg("code",14)+" Code";
+}
+
+/* ─── CONVERSATION LIST ─── */
+function dayBucket(iso) {
+  const d = iso ? new Date(iso) : null;
+  if (!d || Number.isNaN(d.getTime())) return "Previous";
+  const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const yesterday = new Date(today); yesterday.setDate(yesterday.getDate()-1);
+  if (d >= today) return "Today";
+  if (d >= yesterday) return "Yesterday";
+  return "Previous";
+}
+
+function showConvCtxMenu(e, c) {
+  e.stopPropagation();
+  closeMenus();
+  const menu = els.convCtxMenu;
+  const isPinned   = !!c.pinned;
+  const isArchived = !!c.archived;
+
+  menu.innerHTML =
+    '<button id="ctxRename">'+svg("edit",14)+" Rename</button>"+
+    '<button id="ctxPin">'+svg("pin",14)+" "+(isPinned?"Unpin":"Pin")+"</button>"+
+    '<button id="ctxArchive">'+svg("archive",14)+" "+(isArchived?"Unarchive":"Archive")+"</button>"+
+    '<button id="ctxMove">'+svg("folder",14)+" Move to Project</button>"+
+    '<div class="ctx-sep"></div>'+
+    '<button id="ctxShare">'+svg("share",14)+" Share</button>"+
+    '<button id="ctxExport">'+svg("download",14)+" Export</button>"+
+    '<div class="ctx-sep"></div>'+
+    '<button id="ctxDelete" class="ctx-danger">'+svg("trash",14)+" Delete</button>";
+
+  const rect = e.currentTarget.getBoundingClientRect();
+  menu.style.left = Math.min(rect.right+4, window.innerWidth-220)+"px";
+  menu.style.top  = Math.min(rect.top, window.innerHeight-320)+"px";
+  menu.classList.add("open");
+
+  $("ctxRename").onclick  = () => { menu.classList.remove("open"); renameConv(c); };
+  $("ctxPin").onclick     = () => { menu.classList.remove("open"); pinConv(c, !isPinned); };
+  $("ctxArchive").onclick = () => { menu.classList.remove("open"); archiveConv(c, !isArchived); };
+  $("ctxMove").onclick    = () => { menu.classList.remove("open"); moveToProject(c); };
+  $("ctxShare").onclick   = () => { menu.classList.remove("open"); shareConvViaAPI(c); };
+  $("ctxExport").onclick  = () => { menu.classList.remove("open"); exportConv(c); };
+  $("ctxDelete").onclick  = () => { menu.classList.remove("open"); deleteConv(c); };
+}
+
+function renderConvList() {
+  els.convList.innerHTML = "";
+  const showWrap = state.view === "chat";
+  document.body.classList.toggle("chat-mode", showWrap);
+  $("newChatBtn").style.display = "";
+  if (!showWrap) return;
+
+  let items = state.conversations.slice();
+  if (state.convFilter === "pinned")   items = items.filter(c => c.pinned);
+  if (state.convFilter === "archived") items = items.filter(c => c.archived);
+  else if (state.convFilter === "all") items = items.filter(c => !c.archived);
+
+  if (!items.length) {
+    const empty = document.createElement("div");
+    empty.style.cssText = "padding:16px 12px;color:var(--muted);font-size:13px;";
+    empty.textContent = state.convFilter === "archived" ? "No archived chats" : "No chats yet";
+    els.convList.appendChild(empty);
+    return;
+  }
+  const groups = {Today:[],Yesterday:[],Previous:[]};
+  items.forEach(c => groups[dayBucket(c.updated_at)].push(c));
+  ["Today","Yesterday","Previous"].forEach(label => {
+    const list = groups[label];
+    if (!list.length) return;
+    const h = document.createElement("div");
+    h.className = "group-label"; h.textContent = label;
+    els.convList.appendChild(h);
+    list.forEach(c => {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "conv-item"+(c.id === state.currentId ? " active":"");
+      btn.innerHTML =
+        (c.pinned ? '<span class="conv-pin-icon">'+svg("pin",10)+"</span>" : "")+
+        '<span class="ci-title"></span>'+
+        '<button type="button" class="conv-more-btn" title="More options">'+svg("moreV",14)+"</button>";
+      btn.querySelector(".ci-title").textContent = c.title||"New chat";
+      btn.querySelector(".conv-more-btn").addEventListener("click", e => showConvCtxMenu(e, c));
+      btn.addEventListener("click", e => {
+        if (e.target.closest(".conv-more-btn")) return;
+        loadConversation(c.id); closeSidebar();
+      });
+      els.convList.appendChild(btn);
+    });
+  });
+}
+
+/* ─── CONVERSATION ACTIONS ─── */
+async function renameConv(c) {
+  const next = prompt("Rename chat", c.title||"New chat");
+  if (next == null) return;
+  const title = next.trim(); if (!title) return;
+  const { res } = await api("/v1/conversations/"+encodeURIComponent(c.id),
+    {method:"PATCH",body:JSON.stringify({title})},{success:"Chat renamed"});
+  if (!res.ok) return;
+  if (state.currentId === c.id) updateTopTitle();
+  await refreshConversations();
+}
+
+async function pinConv(c, pinned) {
+  const { res } = await api("/v1/conversations/"+encodeURIComponent(c.id),
+    {method:"PATCH",body:JSON.stringify({pinned})},{success: pinned?"Pinned":"Unpinned"});
+  if (res.ok) await refreshConversations();
+}
+
+async function archiveConv(c, archived) {
+  const { res } = await api("/v1/conversations/"+encodeURIComponent(c.id),
+    {method:"PATCH",body:JSON.stringify({archived})},{success: archived?"Archived":"Restored"});
+  if (res.ok) {
+    if (archived && state.currentId === c.id) {
+      state.currentId = null; state.messages = [];
+      updateTopTitle(); renderMessages();
+    }
+    await refreshConversations();
+  }
+}
+
+async function moveToProject(c) {
+  const { res, data } = await api("/v1/projects",{},{error:false});
+  const projects = (res.ok && data && data.projects)||[];
+  if (!projects.length) { toast("No projects yet — create one first","error"); setView("projects"); return; }
+  const names = projects.map((p,i) => (i+1)+". "+p.name).join("\n");
+  const pick = prompt("Move to project:\n"+names,"1");
+  const idx = parseInt(pick,10)-1;
+  if (Number.isNaN(idx)||!projects[idx]) return;
+  await api("/v1/conversations/"+encodeURIComponent(c.id),
+    {method:"PATCH",body:JSON.stringify({project_id:projects[idx].id})},{success:"Moved to "+projects[idx].name});
+  await refreshConversations();
+}
+
+async function shareConvViaAPI(c) {
+  const id = c ? c.id : state.currentId;
+  if (!id) { toast("No active conversation","error"); return; }
+  try {
+    const { res, data } = await api("/v1/conversations/"+encodeURIComponent(id)+"/share",{method:"POST",body:"{}"},{error:false});
+    if (res.ok && data && data.share_url) {
+      await navigator.clipboard.writeText(data.share_url);
+      toast("Share link copied to clipboard","success");
+    } else {
+      // fallback: copy current URL
+      const url = location.origin+location.pathname+"?c="+encodeURIComponent(id);
+      await navigator.clipboard.writeText(url);
+      toast("Conversation link copied","success");
+    }
+  } catch (err) {
+    toast("Share failed","error");
+  }
+}
+
+async function exportConv(c) {
+  const id = c ? c.id : state.currentId;
+  if (!id) return;
+  try {
+    const { res, data } = await api("/v1/conversations/"+encodeURIComponent(id)+"/export",{},{error:false});
+    if (res.ok && data) {
+      const content = typeof data === "string" ? data : (data.content || data.markdown || JSON.stringify(data, null, 2));
+      const blob = new Blob([content],{type:"text/markdown"});
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = "conversation-"+id+".md";
+      a.click(); URL.revokeObjectURL(a.href);
+      toast("Export downloaded","success");
+    } else {
+      // Export from local messages
+      const conv = state.conversations.find(x => x.id === id);
+      const lines = [(conv && conv.title ? "# "+conv.title : "# Conversation"),""];
+      state.messages.forEach(m => {
+        if (m.role === "user") lines.push("**You:** "+m.content,"");
+        else if (m.role === "assistant") lines.push("**OM:** "+m.content,"");
+      });
+      const blob = new Blob([lines.join("\n")],{type:"text/markdown"});
+      const a = document.createElement("a"); a.href = URL.createObjectURL(blob);
+      a.download = "conversation-"+id+".md"; a.click(); URL.revokeObjectURL(a.href);
+      toast("Exported from local data","success");
+    }
+  } catch (_) { toast("Export failed","error"); }
+}
+
+async function deleteConv(c) {
+  if (!confirm('Delete "'+escapeHtml(c.title||"chat")+'"?')) return;
+  const { res } = await api("/v1/conversations/"+encodeURIComponent(c.id),{method:"DELETE"},{success:"Chat deleted"});
+  if (!res.ok) return;
+  if (state.currentId === c.id) {
+    state.currentId = null; state.messages = [];
+    updateTopTitle(); renderMessages();
+  }
+  await refreshConversations();
+}
+
+/* ─── MESSAGES ─── */
+function renderMessages() {
+  els.messages.innerHTML = "";
+  if (!state.messages.length) {
+    const wrap = document.createElement("div");
+    wrap.className = "empty-state";
+    wrap.innerHTML = "<h1>How can I help?</h1><p>Start a conversation or try a suggestion.</p>";
+    const grid = document.createElement("div");
+    grid.className = "suggest-grid";
+    SUGGESTIONS.forEach(s => {
+      const b = document.createElement("button");
+      b.type = "button"; b.className = "suggest-card";
+      b.innerHTML = "<strong>"+escapeHtml(s.cat)+"</strong><span>"+escapeHtml(s.text)+"</span>";
+      b.addEventListener("click", () => { els.input.value = s.prompt; autosize(); els.input.focus(); });
+      grid.appendChild(b);
+    });
+    wrap.appendChild(grid);
+    els.messages.appendChild(wrap);
+    return;
+  }
+  state.messages.forEach((m, idx) => {
+    if (m.role !== "user" && m.role !== "assistant") return;
+    const row = document.createElement("div");
+    row.className = "row "+m.role;
+    const col = document.createElement("div");
+    if (m.role === "assistant") {
+      const tag = document.createElement("div");
+      tag.className = "om-tag"; tag.textContent = "OM";
+      col.appendChild(tag);
+    }
+    const bubble = document.createElement("div");
+    bubble.className = "bubble";
+    if (m._streaming) bubble.dataset.stream = "1";
+    bubble.innerHTML = m._streaming ? "…" : (m.role === "assistant" ? renderMarkdown(m.content||"") : escapeHtml(m.content||"").replace(/\n/g,"<br>"));
+    col.appendChild(bubble);
+    if (m.role === "assistant" && !m._streaming) {
+      col.appendChild(buildMsgActions(m, idx));
+    }
+    row.appendChild(col);
+    els.messages.appendChild(row);
+  });
+  els.messages.scrollTop = els.messages.scrollHeight;
+}
+
+function updateStreamBubble(text) {
+  const bubble = els.messages.querySelector('.bubble[data-stream="1"]');
+  if (bubble) { bubble.innerHTML = renderMarkdown(text||"…"); els.messages.scrollTop = els.messages.scrollHeight; }
+  else renderMessages();
+}
+
+function buildMsgActions(m, idx) {
+  const actions = document.createElement("div");
+  actions.className = "msg-actions";
+  const mk = (label, iconName, fn, cls) => {
+    const b = document.createElement("button");
+    b.type = "button";
+    if (cls) b.className = cls;
+    b.innerHTML = (iconName ? svg(iconName,14):"") + label;
+    b.addEventListener("click", fn);
+    return b;
+  };
+  // Read aloud
+  const ttsBtn = mk("", "volume", () => {
+    if (state.ttsActive) { speechSynthesis.cancel(); state.ttsActive = false; ttsBtn.classList.remove("speaking"); return; }
+    const utt = new SpeechSynthesisUtterance(m.content||"");
+    utt.onend = () => { state.ttsActive = false; ttsBtn.classList.remove("speaking"); };
+    utt.onerror = () => { state.ttsActive = false; ttsBtn.classList.remove("speaking"); };
+    speechSynthesis.speak(utt);
+    state.ttsActive = true; ttsBtn.classList.add("speaking");
+  }, "tts-btn");
+  ttsBtn.title = "Read aloud";
+  actions.append(
+    mk("Copy","copy", async () => {
+      try { await navigator.clipboard.writeText(m.content||""); toast("Copied","success"); }
+      catch (_) { toast("Copy failed","error"); }
+    }),
+    mk("","thumbUp",   () => sendFeedback(idx, 5)),
+    mk("","thumbDown", () => sendFeedback(idx, 1)),
+    mk("Regenerate","refresh", () => regenerate(idx)),
+    ttsBtn,
+    mk("Share","share", () => shareMessage(m.content)),
+    mk("More","more", e => showMsgMore(e, m, idx))
+  );
+  return actions;
+}
+
+function showMsgMore(e, m, idx) {
+  closeMenus();
+  const menu = document.createElement("div");
+  menu.className = "drop-menu open";
+  Object.assign(menu.style, {position:"fixed",left:Math.min(e.clientX,window.innerWidth-240)+"px",top:e.clientY+"px",zIndex:"250"});
+  [
+    ["Save to library", () => saveToLibrary(m.content)],
+    ["Add to project",  () => addToProject(m.content)],
+    ["Export",          () => exportMessage(m.content)],
+    ["Report",          () => toast("Report submitted — thank you","success")],
+  ].forEach(([label, fn]) => {
+    const b = document.createElement("button"); b.type = "button"; b.textContent = label;
+    b.addEventListener("click", () => { menu.remove(); fn(); });
+    menu.appendChild(b);
+  });
+  document.body.appendChild(menu);
+  const close = ev => { if (!menu.contains(ev.target)) { menu.remove(); document.removeEventListener("click",close); } };
+  setTimeout(() => document.addEventListener("click",close), 0);
+}
+
+async function saveToLibrary(content) {
+  const title = prompt("Library item title","Saved response");
+  if (!title||!title.trim()) return;
+  await api("/v1/library",{method:"POST",body:JSON.stringify({title:title.trim(),content:content||"",kind:"chat"})},{success:"Saved to library"});
+}
+async function addToProject(content) {
+  const { res, data } = await api("/v1/projects",{},{error:false});
+  const projects = (res.ok && data && data.projects)||[];
+  if (!projects.length) { toast("No projects — create one first","error"); setView("projects"); return; }
+  const names = projects.map((p,i) => (i+1)+". "+p.name).join("\n");
+  const pick = prompt("Select project:\n"+names,"1");
+  const idx = parseInt(pick,10)-1;
+  if (Number.isNaN(idx)||!projects[idx]) return;
+  await api("/v1/library",{method:"POST",body:JSON.stringify({title:"Note for "+projects[idx].name,content:content||"",kind:"note",source_ref:"project:"+projects[idx].id})},{success:"Added to project"});
+}
+function exportMessage(content) {
+  const blob = new Blob([content||""],{type:"text/plain"});
+  const a = document.createElement("a"); a.href = URL.createObjectURL(blob);
+  a.download = "om-export-"+Date.now()+".txt"; a.click(); URL.revokeObjectURL(a.href);
+  toast("Download started","success");
+}
+function shareMessage(content) {
+  navigator.clipboard.writeText(content||"").then(() => toast("Message copied","success")).catch(() => toast("Copy failed","error"));
+}
+
+async function sendFeedback(assistantIdx, rating) {
+  if (!state.currentId) { toast("No active conversation","error"); return; }
+  const { res } = await api("/v1/conversations/"+encodeURIComponent(state.currentId)+"/feedback",
+    {method:"POST",body:JSON.stringify({rating,comment:rating>=4?"thumbs_up":"thumbs_down"})},{error:false});
+  toast(res.ok ? "Feedback saved":"Feedback unavailable", res.ok?"success":"error");
+}
+
+async function regenerate(assistantIdx) {
+  if (state.busy) return;
+  let userIdx = -1;
+  for (let i = assistantIdx-1; i >= 0; i--) {
+    if (state.messages[i].role === "user") { userIdx = i; break; }
+  }
+  if (userIdx < 0) return;
+  const prompt = state.messages[userIdx].content;
+  state.messages = state.messages.slice(0,assistantIdx);
+  if (state.messages.length && state.messages[state.messages.length-1].role === "user") state.messages.pop();
+  renderMessages();
+  await sendPrompt(prompt);
+}
+
+/* ─── STREAMING ─── */
+async function streamCompletion(messages) {
+  const controller = new AbortController();
+  state.abort = controller;
+  const res = await fetch("/api/v1/chat/completions", {
+    method:"POST", credentials:"include", signal:controller.signal,
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({
+      model:state.model||"OM-1.0", messages,
+      max_tokens:1024, temperature:state.settings?state.settings.temperature:0.8, stream:true,
+    }),
+  });
+  if (res.status === 401) { location.replace("/login"); throw new Error("unauthorized"); }
+  if (!res.ok) {
+    let detail = "HTTP "+res.status;
+    try { const err = await res.json(); detail = err.detail||err.error||detail; if (typeof detail !== "string") detail = JSON.stringify(detail); } catch (_) {}
+    throw new Error(detail);
+  }
+  const reader = res.body.getReader(), decoder = new TextDecoder();
+  let buffer = "", full = "";
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    buffer += decoder.decode(value,{stream:true});
+    const parts = buffer.split("\n"); buffer = parts.pop()||"";
+    for (const line of parts) {
+      const trimmed = line.trim();
+      if (!trimmed.startsWith("data:")) continue;
+      const payload = trimmed.slice(5).trim();
+      if (payload === "[DONE]") continue;
+      try {
+        const json = JSON.parse(payload);
+        const delta = json.choices && json.choices[0] && json.choices[0].delta;
+        if (delta && typeof delta.content === "string") {
+          full += delta.content;
+          const last = state.messages[state.messages.length-1];
+          if (last && last.role === "assistant") last.content = full;
+          updateStreamBubble(full);
+        }
+        if (json.model) state.model = json.model;
+      } catch (_) {}
+    }
+  }
+  return full;
+}
+
+async function sendPrompt(text) {
+  const prompt = String(text||"").trim();
+  if (!prompt || state.busy) return;
+  els.input.value = ""; autosize();
+  setView("chat", true);
+  if (!state.currentId) {
+    try { await createChat("New chat"); } catch (e) { return; }
+  }
+  state.messages.push({role:"user",content:prompt});
+  state.messages.push({role:"assistant",content:"",_streaming:true});
+  renderMessages(); setBusy(true);
+  const reqMsgs = buildRequestMessages();
+  try {
+    const reply = await streamCompletion(reqMsgs);
+    const clean = String(reply||"").trim()||"(empty reply)";
+    const last = state.messages[state.messages.length-1];
+    if (last && last.role === "assistant") { last.content = clean; delete last._streaming; }
+    renderMessages();
+    try { await appendTurn(prompt, clean); } catch (_) { toast("Reply ok, save failed","error"); }
+  } catch (e) {
+    if (e.name === "AbortError") {
+      const last = state.messages[state.messages.length-1];
+      if (last && last.role === "assistant") { last.content = (last.content||"").trim()||"(stopped)"; delete last._streaming; }
+      renderMessages();
+      const final = state.messages[state.messages.length-1];
+      if (final && final.role === "assistant" && final.content && final.content !== "(stopped)") {
+        try { await appendTurn(prompt, final.content); } catch (_) {}
+      }
+    } else {
+      if (state.messages.length && state.messages[state.messages.length-1].role === "assistant") state.messages.pop();
+      if (state.messages.length && state.messages[state.messages.length-1].role === "user") state.messages.pop();
+      renderMessages();
+      if (e.message !== "unauthorized") toast(e.message||"Request failed","error");
+    }
+  } finally { state.abort = null; setBusy(false); }
+}
+
+function stopStream() { if (state.abort) state.abort.abort(); }
+
+function buildRequestMessages() {
+  const history = state.messages
+    .filter(m => (m.role==="user"||m.role==="assistant") && !m._streaming)
+    .map(m => ({role:m.role,content:m.content}));
+  if (state.selectedAssistantId) {
+    const a = state.assistants.find(x => x.id === state.selectedAssistantId);
+    if (a && a.system_prompt) return [{role:"system",content:a.system_prompt},...history];
+  }
+  const extras = [];
+  if (state.tools.web)  extras.push("[web search enabled]");
+  if (state.tools.code) extras.push("[code interpreter enabled]");
+  if (extras.length && history.length) {
+    const last = history[history.length-1];
+    if (last.role === "user") last.content = extras.join(" ")+" "+last.content;
+  }
+  return history;
+}
+
+function autosize() {
+  const ta = els.input;
+  ta.style.height = "auto";
+  ta.style.height = Math.min(ta.scrollHeight,160)+"px";
+  els.sendBtn.disabled = state.busy || !ta.value.trim();
+}
+
+/* ─── CONVERSATION API ─── */
+async function refreshConversations() {
+  const filter = state.convFilter === "archived" ? "?archived_only=1" : "";
+  const { res, data } = await api("/v1/conversations"+filter,{},{error:false});
+  if (!res.ok) return;
+  state.conversations = (data && data.conversations)||[];
+  renderConvList();
+}
+
+async function createChat(title) {
+  const { res, data } = await api("/v1/conversations",{method:"POST",body:JSON.stringify({title:title||"New chat"})},{success:"New chat created"});
+  if (!res.ok) throw new Error((data && data.detail)||"Create failed");
+  state.currentId = data.id; state.messages = [];
+  updateTopTitle(); await refreshConversations();
+  await persistLast(data.id); renderMessages();
+  return data;
+}
+
+async function loadConversation(id) {
+  const { res, data } = await api("/v1/conversations/"+encodeURIComponent(id),{},{error:false});
+  if (!res.ok) { toast("Could not load chat","error"); return; }
+  state.currentId = data.id;
+  state.messages = (data.messages||[]).map(m => ({role:m.role,content:m.content}));
+  updateTopTitle(); setView("chat",true);
+  renderConvList(); renderMessages();
+  await persistLast(id);
+}
+
+async function appendTurn(userText, assistantText) {
+  if (!state.currentId) return;
+  const { res, data } = await api("/v1/conversations/"+encodeURIComponent(state.currentId)+"/messages",
+    {method:"POST",body:JSON.stringify({messages:[{role:"user",content:userText},{role:"assistant",content:assistantText}],auto_title:true})},{error:false});
+  if (res.ok && data && data.conversation) {
+    const conv = state.conversations.find(c => c.id === state.currentId);
+    if (conv) conv.title = data.conversation.title;
+    updateTopTitle(); await refreshConversations();
+  }
+}
+
+/* ─── MODELS ─── */
+function renderModels() {
+  els.modelDrop.innerHTML = "";
+  const list = state.catalog.length ? state.catalog : [{id:state.model,name:state.model}];
+  list.forEach(m => {
+    const id = m.id||m;
+    const b = document.createElement("button"); b.type = "button";
+    b.className = id === state.model ? "active":"";
+    b.textContent = m.name||id;
+    b.addEventListener("click", async () => {
+      state.model = id;
+      els.modelBtn.innerHTML = escapeHtml(m.name||id)+svg("chevD",14);
+      updateComposerChip();
+      els.modelDrop.classList.remove("open");
+      await api("/v1/settings",{method:"PATCH",body:JSON.stringify({default_model:id})},{success:"Default model updated"});
+      renderModels();
+    });
+    els.modelDrop.appendChild(b);
+  });
+  const cur = list.find(m => (m.id||m) === state.model)||list[0];
+  els.modelBtn.innerHTML = escapeHtml((cur&&(cur.name||cur.id))||state.model)+svg("chevD",14);
+  updateComposerChip();
+}
+
+function updateComposerChip() {
+  const chip = $("composerModelChip");
+  if (chip) chip.textContent = state.model;
+}
+
+async function loadModelsCatalog() {
+  const { res, data } = await api("/v1/models/catalog",{},{error:false});
+  if (res.ok && data) {
+    state.catalog = data.models||[];
+    if (data.default_model) state.model = data.default_model;
+  }
+  renderModels();
+}
+
+/* ─── NOTIFICATIONS ─── */
+async function loadNotifications() {
+  const { res, data } = await api("/v1/notifications",{},{error:false});
+  if (!res.ok) return;
+  state.notifications = (data && data.notifications)||[];
+  state.unreadNotifs = data.unread||0;
+  els.notifDot.classList.toggle("hidden",!state.unreadNotifs);
+  renderNotifDrop();
+}
+
+function renderNotifDrop() {
+  els.notifDrop.innerHTML = "";
+  if (!state.notifications.length) {
+    els.notifDrop.innerHTML = '<div style="padding:12px;color:var(--muted);font-size:13px">No notifications</div>'; return;
+  }
+  state.notifications.slice(0,20).forEach(n => {
+    const d = document.createElement("div");
+    d.className = "notif-item"+(n.read?"":" unread");
+    d.innerHTML = "<strong></strong><span></span>";
+    d.querySelector("strong").textContent = n.title||"Notification";
+    d.querySelector("span").textContent = (n.body||"")+" · "+fmtDate(n.created_at);
+    d.addEventListener("click", async () => {
+      if (!n.read) {
+        await api("/v1/notifications/"+encodeURIComponent(n.id)+"/read",{method:"POST",body:"{}"},{error:false});
+        n.read = true; state.unreadNotifs = Math.max(0,state.unreadNotifs-1);
+        els.notifDot.classList.toggle("hidden",!state.unreadNotifs);
+        d.classList.remove("unread");
+      }
+    });
+    els.notifDrop.appendChild(d);
+  });
+}
+
+/* ─── WORKSPACES ─── */
+async function loadWorkspaces() {
+  const { res, data } = await api("/v1/workspaces",{},{error:false});
+  state.workspaces = (res.ok && data && data.workspaces)||[];
+  const ws = state.workspaces[0];
+  els.wsName.textContent = (ws && ws.name)||"My Workspace";
+  $("wsSub").textContent = state.workspaces.length+" workspace"+(state.workspaces.length===1?"":"s");
+  if (ws) state.workspaceId = ws.id;
+}
+
+/* ─── HELPER BUILDERS ─── */
+function entityCard(title, desc, meta, actions) {
+  const el = document.createElement("div");
+  el.className = "entity";
+  el.innerHTML = '<div class="grow"><h3></h3><p></p>'+(meta?'<small style="color:var(--muted);font-size:11px"></small>':"")+
+    '</div><div class="entity-actions"></div>';
+  el.querySelector("h3").textContent = title||"Untitled";
+  el.querySelector("p").textContent  = desc||"";
+  if (meta) el.querySelector("small").textContent = meta;
+  const act = el.querySelector(".entity-actions");
+  (actions||[]).forEach(a => act.appendChild(a));
+  return el;
+}
+
+function btnOutline(label, iconName, fn) {
+  const b = document.createElement("button");
+  b.type = "button"; b.className = "btn-outline";
+  b.innerHTML = (iconName?svg(iconName,14):"")+label;
+  b.addEventListener("click", fn);
+  return b;
+}
+function btnPrimary(label, iconName, fn) {
+  const b = document.createElement("button");
+  b.type = "button"; b.className = "btn-primary";
+  b.innerHTML = (iconName?svg(iconName,14):"")+label;
+  b.addEventListener("click", fn);
+  return b;
+}
+
+function emptyPanel(title, desc, actionLabel, actionFn) {
+  const d = document.createElement("div"); d.className = "empty-panel";
+  d.innerHTML = "<h3></h3><p></p>";
+  d.querySelector("h3").textContent = title;
+  d.querySelector("p").textContent  = desc;
+  if (actionLabel) {
+    const b = document.createElement("button");
+    b.type = "button"; b.className = "btn-primary"; b.textContent = actionLabel;
+    b.addEventListener("click", actionFn);
+    d.appendChild(b);
+  }
+  return d;
+}
+
+function buildTabs(container, tabs, onChange, defaultTab) {
+  const bar = document.createElement("div"); bar.className = "tabs";
+  const activeId = defaultTab||tabs[0][0];
+  tabs.forEach(([id, label]) => {
+    const b = document.createElement("button");
+    b.type = "button"; b.className = "tab"+(id === activeId?" active":"");
+    b.dataset.tab = id; b.textContent = label;
+    b.addEventListener("click", () => {
+      bar.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+      b.classList.add("active");
+      onChange(id);
+    });
+    bar.appendChild(b);
+  });
+  container.appendChild(bar);
+  return activeId;
+}
+
+/* ─── VIEW: SEARCH ─── */
+async function loadSearchView() {
+  const panel = $("searchPanel");
+  panel.innerHTML = '<div class="panel-head"><div><h2>Search</h2><p class="sub">Search across your workspace.</p></div></div>'+
+    '<input class="search-bar" id="globalSearchInput" placeholder="Search conversations, files, projects…" value="'+escapeHtml(state.searchQuery)+'"/>'+
+    '<div id="searchResults">'+skeletons(4)+"</div>";
+  const input = $("globalSearchInput");
+  const run = async () => {
+    const q = input.value.trim(); state.searchQuery = q;
+    const box = $("searchResults");
+    if (!q) { box.innerHTML = emptyPanel("Start typing","Search chats, files, projects, assistants, and more.").outerHTML; return; }
+    box.innerHTML = skeletons(3);
+    const { res, data } = await api("/v1/search?q="+encodeURIComponent(q),{},{error:false});
+    if (!res.ok) { box.innerHTML = '<div class="empty-panel"><p>Search failed. Try again.</p></div>'; return; }
+    const results = (data && data.results)||{};
+    box.innerHTML = "";
+    const sections = [
+      ["conversations","Chats"],["projects","Projects"],["assistants","Assistants"],
+      ["files","Files"],["library","Library"],["prompts","Prompts"],["memories","Memories"],
+    ];
+    let any = false;
+    sections.forEach(([key, label]) => {
+      const items = results[key]||[]; if (!items.length) return; any = true;
+      const g = document.createElement("div"); g.className = "search-group";
+      g.innerHTML = "<h4>"+escapeHtml(label)+"</h4>";
+      items.forEach(item => {
+        const hit = document.createElement("div"); hit.className = "search-hit";
+        hit.innerHTML = '<span class="tag">'+escapeHtml(label.slice(0,-1))+"</span><strong></strong><span></span>";
+        hit.querySelector("strong").textContent = item.title||item.name||item.id||"Item";
+        hit.querySelector("span").textContent   = item.description||item.content||item.body||fmtDate(item.updated_at||item.created_at);
+        hit.addEventListener("click", () => {
+          if (key==="conversations"&&item.id) loadConversation(item.id);
+          else setView(key==="memories"?"memory":key);
+        });
+        g.appendChild(hit);
+      });
+      box.appendChild(g);
+    });
+    if (!any) box.appendChild(emptyPanel("No results",'Nothing matched "'+q+'".'));
+  };
+  input.addEventListener("keydown", e => { if (e.key==="Enter") run(); });
+  let t; input.addEventListener("input", () => { clearTimeout(t); t = setTimeout(run,300); });
+  input.focus();
+  if (state.searchQuery) run();
+  else $("searchResults").innerHTML = emptyPanel("Start typing","Search chats, files, projects, assistants, and more.").outerHTML;
+}
+
+/* ─── VIEW: LIBRARY (tabbed) ─── */
+async function loadLibraryView() {
+  const panel = $("libraryPanel");
+  panel.innerHTML = '<div class="panel-head"><div><h2>Library</h2><p class="sub">Saved snippets, files, and generated content.</p></div>'+
+    '<button type="button" class="btn-primary" id="libAddBtn">'+svg("plus",14)+" Add item</button></div>"+
+    '<div id="libTabs"></div><div id="libContent">'+skeletons(3)+"</div>"+
+    '<div id="libAddForm" class="hidden"><form class="form-grid" id="libForm">'+
+    '<label>Title<input name="title" required maxlength="200" placeholder="Title…"/></label>'+
+    '<label>Content<textarea name="content" rows="6" maxlength="500000" placeholder="Paste content…"></textarea></label>'+
+    '<label>Kind<select name="kind"><option value="document">Document</option><option value="snippet">Snippet</option><option value="note">Note</option></select></label>'+
+    '<div style="display:flex;gap:8px"><button type="submit" class="btn-primary">'+svg("plus",14)+" Save</button>"+
+    '<button type="button" class="btn-outline" id="libCancelBtn">Cancel</button></div></form></div>';
+
+  $("libAddBtn").addEventListener("click", () => { $("libAddForm").classList.remove("hidden"); $("libAddBtn").classList.add("hidden"); });
+  $("libCancelBtn").addEventListener("click", () => { $("libAddForm").classList.add("hidden"); $("libAddBtn").classList.remove("hidden"); });
+  $("libForm").addEventListener("submit", async e => {
+    e.preventDefault();
+    const fd = new FormData(e.target);
+    await api("/v1/library",{method:"POST",body:JSON.stringify({title:String(fd.get("title")||"").trim(),content:String(fd.get("content")||""),kind:String(fd.get("kind"))})},{success:"Added to library"});
+    e.target.reset(); $("libAddForm").classList.add("hidden"); $("libAddBtn").classList.remove("hidden");
+    loadLibTab(activeLibTab);
+  });
+
+  let activeLibTab = "all";
+  const tabs = [["all","All"],["generated","Generated"],["saved","Saved"],["documents","Documents"],["images","Images"],["favorites","Favorites"]];
+  buildTabs($("libTabs"), tabs, id => { activeLibTab = id; loadLibTab(id); }, "all");
+  loadLibTab("all");
+}
+
+async function loadLibTab(tabId) {
+  const box = $("libContent");
+  box.innerHTML = skeletons(3);
+  const params = [];
+  if (tabId !== "all" && tabId !== "favorites") params.push("kind="+encodeURIComponent(tabId));
+  if (tabId === "favorites") params.push("favorite=1");
+  const url = "/v1/library"+(params.length?"?"+params.join("&"):"");
+  const { res, data } = await api(url,{},{error:false});
+  box.innerHTML = "";
+  const items = (res.ok && data && data.items)||[];
+  if (!items.length) { box.appendChild(emptyPanel("Nothing here","Add items to your library.")); return; }
+  items.forEach(item => {
+    box.appendChild(entityCard(
+      item.title,
+      (item.content||"").slice(0,200),
+      (item.kind||"")+" · "+(item.favorite?"★ Favorite · ":"")+fmtDate(item.created_at),
+      [
+        btnOutline("Use","",() => { els.input.value = item.content||""; autosize(); setView("chat"); toast("Loaded into composer","success"); }),
+        btnOutline(item.favorite?"Unfav":"Fav","star", async () => {
+          await api("/v1/library/"+encodeURIComponent(item.id),{method:"PATCH",body:JSON.stringify({favorite:!item.favorite})},{success:item.favorite?"Removed from favorites":"Added to favorites"});
+          loadLibTab(activeLibTab);
+        }),
+        btnOutline("Delete","trash", async () => {
+          if (!confirm("Delete item?")) return;
+          await api("/v1/library/"+encodeURIComponent(item.id),{method:"DELETE"},{success:"Deleted"});
+          loadLibTab(activeLibTab);
+        }),
+      ]
+    ));
+  });
+}
+let activeLibTab = "all";
+
+/* ─── VIEW: SCHEDULED ─── */
+async function loadScheduledView() {
+  const panel = $("scheduledPanel");
+  panel.innerHTML = '<div class="panel-head"><div><h2>Scheduled</h2><p class="sub">Recurring tasks and automations.</p></div>'+
+    '<button type="button" class="btn-primary" id="schedAddBtn">'+svg("plus",14)+" New task</button></div>"+
+    '<div id="schedList">'+skeletons(3)+"</div>"+
+    '<form class="form-grid hidden" id="schedForm">'+
+    '<label>Title<input name="title" required maxlength="200" placeholder="Daily summary…"/></label>'+
+    '<label>Cron or interval<input name="schedule" placeholder="0 9 * * * or every 1h" maxlength="100"/></label>'+
+    '<label>Prompt / Payload<textarea name="payload" rows="4" maxlength="4000" placeholder="System prompt or task payload…"></textarea></label>'+
+    '<div style="display:flex;gap:8px">'+
+    '<button type="submit" class="btn-primary">'+svg("plus",14)+" Create</button>"+
+    '<button type="button" class="btn-outline" id="schedCancelBtn">Cancel</button></div></form>';
+
+  $("schedAddBtn").addEventListener("click", () => {
+    $("schedForm").classList.remove("hidden"); $("schedAddBtn").classList.add("hidden");
+  });
+  $("schedCancelBtn").addEventListener("click", () => {
+    $("schedForm").classList.add("hidden"); $("schedAddBtn").classList.remove("hidden");
+  });
+  $("schedForm").addEventListener("submit", async e => {
+    e.preventDefault();
+    const fd = new FormData(e.target);
+    await api("/v1/scheduled-tasks",{method:"POST",body:JSON.stringify({
+      title:String(fd.get("title")||"").trim(),
+      schedule:String(fd.get("schedule")||"").trim(),
+      payload:{prompt:String(fd.get("payload")||"").trim()},
+    })},{success:"Scheduled task created"});
+    e.target.reset(); $("schedForm").classList.add("hidden"); $("schedAddBtn").classList.remove("hidden");
+    loadScheduledList();
+  });
+  loadScheduledList();
+}
+
+async function loadScheduledList() {
+  const box = $("schedList"); if (!box) return;
+  box.innerHTML = skeletons(3);
+  const { res, data } = await api("/v1/scheduled-tasks",{},{error:false});
+  box.innerHTML = "";
+  const items = (res.ok && data && (data.tasks||data.scheduled_tasks||data.items))||[];
+  if (!items.length) { box.appendChild(emptyPanel("No scheduled tasks","Create recurring automations.")); return; }
+  items.forEach(t => {
+    const isPaused = t.status === "paused" || t.paused;
+    const badgeClass = isPaused?"yellow":t.status==="error"?"red":"green";
+    box.appendChild(entityCard(
+      t.title||t.name||"Untitled",
+      (t.schedule||"")+(t.payload&&t.payload.prompt?" · "+String(t.payload.prompt).slice(0,80):""),
+      fmtDate(t.updated_at||t.created_at),
+      [
+        Object.assign(document.createElement("span"),{
+          innerHTML:'<span class="badge '+badgeClass+'">'+escapeHtml(t.status||"active")+"</span>",
+        }),
+        btnOutline(isPaused?"Resume":"Pause", isPaused?"play":"pause", async () => {
+          await api("/v1/tasks/"+encodeURIComponent(t.id),{method:"PATCH",body:JSON.stringify({status:isPaused?"active":"paused"})},{success:isPaused?"Resumed":"Paused"});
+          loadScheduledList();
+        }),
+        btnOutline("Delete","trash", async () => {
+          if (!confirm("Delete task?")) return;
+          await api("/v1/tasks/"+encodeURIComponent(t.id),{method:"DELETE"},{success:"Task deleted"});
+          loadScheduledList();
+        }),
+      ]
+    ));
+  });
+}
+
+/* ─── VIEW: TOOLS ─── */
+async function loadToolsView() {
+  const panel = $("toolsPanel");
+  panel.innerHTML = '<div class="panel-head"><div><h2>Tools</h2><p class="sub">Enable or configure available tools.</p></div></div>'+
+    '<div id="toolsList">'+skeletons(4)+"</div>";
+  const { res, data } = await api("/v1/tools",{},{error:false});
+  const box = $("toolsList"); box.innerHTML = "";
+  const items = (res.ok && data && (data.tools||data.items))||[];
+  if (!items.length) { box.appendChild(emptyPanel("No tools available","Tools registered in your workspace will appear here.")); return; }
+  items.forEach(t => {
+    const enabled = t.enabled !== false;
+    const card = entityCard(
+      t.name||t.id,
+      t.description||"",
+      (t.category||"")+(t.version?" v"+t.version:""),
+      [
+        btnOutline(enabled?"Disable":"Enable", enabled?"x":"check", async () => {
+          await api("/v1/tools/"+encodeURIComponent(t.id),{method:"PATCH",body:JSON.stringify({enabled:!enabled})},{success:enabled?"Tool disabled":"Tool enabled"});
+          loadToolsView();
+        }),
+        ...(t.installable && !t.installed ? [btnOutline("Install","download", async () => {
+          await api("/v1/tools/"+encodeURIComponent(t.id),{method:"PATCH",body:JSON.stringify({install:true})},{success:"Installing…"});
+          setTimeout(loadToolsView,1500);
+        })] : []),
+      ]
+    );
+    // add enabled chip
+    const chipEl = document.createElement("span");
+    chipEl.innerHTML = '<span class="badge '+(enabled?"green":"gray")+'">'+(enabled?"Enabled":"Disabled")+"</span>";
+    card.querySelector(".entity-actions").prepend(chipEl);
+    box.appendChild(card);
+  });
+}
+
+/* ─── VIEW: PROJECTS ─── */
+async function loadProjectsView() {
+  const panel = $("projectsPanel");
+  panel.innerHTML = '<div class="panel-head"><div><h2>Projects</h2><p class="sub">Organize work and context.</p></div>'+
+    '<button type="button" class="btn-primary" id="projCreateBtn">'+svg("plus",14)+" New project</button></div>"+
+    '<div id="projectsList">'+skeletons(3)+"</div>"+
+    '<form class="form-grid hidden" id="projectForm">'+
+    '<label>Name<input id="projName" name="name" required maxlength="120" placeholder="Project name"/></label>'+
+    '<label>Description<textarea name="description" rows="2" maxlength="2000" placeholder="Optional description"></textarea></label>'+
+    '<div style="display:flex;gap:8px"><button type="submit" class="btn-primary">'+svg("plus",14)+" Create</button>"+
+    '<button type="button" class="btn-outline" id="projCancelBtn">Cancel</button></div></form>';
+
+  $("projCreateBtn").addEventListener("click", () => {
+    $("projectForm").classList.remove("hidden"); $("projCreateBtn").classList.add("hidden");
+    $("projName").focus();
+  });
+  $("projCancelBtn").addEventListener("click", () => {
+    $("projectForm").classList.add("hidden"); $("projCreateBtn").classList.remove("hidden");
+  });
+  $("projectForm").addEventListener("submit", async e => {
+    e.preventDefault();
+    const fd = new FormData(e.target);
+    await api("/v1/projects",{method:"POST",body:JSON.stringify({name:String(fd.get("name")||"").trim(),description:String(fd.get("description")||"").trim()})},{success:"Project created"});
+    e.target.reset(); $("projectForm").classList.add("hidden"); $("projCreateBtn").classList.remove("hidden");
+    loadProjectsView();
+  });
+
+  const { res, data } = await api("/v1/projects",{},{error:false});
+  const list = $("projectsList"); list.innerHTML = "";
+  state.projects = (res.ok && data && data.projects)||[];
+  if (!state.projects.length) { list.appendChild(emptyPanel("No projects","Create your first project.","New project", () => { $("projCreateBtn").click(); })); return; }
+  state.projects.forEach(p => {
+    list.appendChild(entityCard(p.name, p.description, fmtDate(p.updated_at||p.created_at), [
+      btnOutline("Open","folder", () => loadProjectDetail(p)),
+      btnOutline("Delete","trash", async () => {
+        if (!confirm("Delete project?")) return;
+        await api("/v1/projects/"+encodeURIComponent(p.id),{method:"DELETE"},{success:"Project deleted"});
+        loadProjectsView();
+      }),
+    ]));
+  });
+}
+
+/* ─── PROJECT DETAIL ─── */
+async function loadProjectDetail(p) {
+  const panel = $("projectsPanel");
+  panel.innerHTML =
+    '<button type="button" class="back-btn" id="projBackBtn">'+svg("chevL",14)+" Projects</button>"+
+    '<div class="detail-header">'+
+    '<h2 id="projDetailTitle"></h2>'+
+    '<p class="sub" id="projDetailDesc"></p>'+
+    '<div class="detail-meta">'+
+    '<span class="badge blue">'+svg("folder",12)+" Project</span>"+
+    '<span style="font-size:12px;color:var(--muted)">'+fmtDate(p.updated_at||p.created_at)+'</span>'+
+    '</div></div>'+
+    '<div id="projDetailTabs"></div><div id="projDetailContent">'+skeletons(2)+"</div>";
+
+  $("projDetailTitle").textContent = p.name;
+  $("projDetailDesc").textContent  = p.description||"";
+  $("projBackBtn").addEventListener("click", loadProjectsView);
+
+  const tabs = [["overview","Overview"],["chats","Chats"],["files","Files"],["instructions","Instructions"],["knowledge","Knowledge"],["members","Members"],["activity","Activity"],["settings","Settings"]];
+  let activeTab = "overview";
+  buildTabs($("projDetailTabs"), tabs, id => { activeTab = id; loadProjectTab(p, id); }, "overview");
+  loadProjectTab(p, "overview");
+}
+
+async function loadProjectTab(p, tab) {
+  const box = $("projDetailContent"); box.innerHTML = skeletons(2);
+  if (tab === "overview") {
+    const { res, data } = await api("/v1/projects/"+encodeURIComponent(p.id),{},{error:false});
+    const proj = (res.ok && data) || p;
+    box.innerHTML = "";
+    const info = document.createElement("div");
+    info.className = "settings-section";
+    info.innerHTML = "<h3>Overview</h3>"+
+      "<p style='margin:0;font-size:14px;line-height:1.6'>"+escapeHtml(proj.description||"No description.")+"</p>"+
+      "<div class='stat-row' style='margin-top:12px'>"+
+      "<div class='stat'><strong>"+(proj.chat_count||0)+"</strong><span>Chats</span></div>"+
+      "<div class='stat'><strong>"+(proj.file_count||0)+"</strong><span>Files</span></div>"+
+      "<div class='stat'><strong>"+(proj.member_count||0)+"</strong><span>Members</span></div>"+
+      "</div>";
+    box.appendChild(info);
+    // recent chats
+    const { res: r2, data: d2 } = await api("/v1/conversations?project_id="+encodeURIComponent(p.id),{},{error:false});
+    const chats = (r2.ok && d2 && d2.conversations)||[];
+    if (chats.length) {
+      const h4 = document.createElement("h4"); h4.textContent = "Recent chats"; h4.style.cssText = "margin:16px 0 8px;font-size:14px;";
+      box.appendChild(h4);
+      chats.slice(0,5).forEach(c => {
+        const row = document.createElement("div");
+        row.style.cssText = "display:flex;align-items:center;gap:8px;padding:8px 12px;border:1px solid var(--border);border-radius:10px;margin-bottom:6px;background:var(--bg);cursor:pointer;";
+        row.innerHTML = svg("message",14)+"<span style='flex:1'>"+escapeHtml(c.title||"Chat")+"</span><small style='color:var(--muted)'>"+fmtDate(c.updated_at)+"</small>";
+        row.addEventListener("click", () => loadConversation(c.id));
+        box.appendChild(row);
+      });
+    }
+  } else if (tab === "chats") {
+    const { res, data } = await api("/v1/conversations?project_id="+encodeURIComponent(p.id),{},{error:false});
+    box.innerHTML = "";
+    const chats = (res.ok && data && data.conversations)||[];
+    const btnNew = document.createElement("button"); btnNew.type = "button"; btnNew.className = "btn-primary";
+    btnNew.innerHTML = svg("plus",14)+" New chat in project";
+    btnNew.style.marginBottom = "12px";
+    btnNew.addEventListener("click", async () => {
+      const { res: r2, data: d2 } = await api("/v1/conversations",{method:"POST",body:JSON.stringify({title:"New chat",project_id:p.id})},{success:"Chat created"});
+      if (r2.ok) { loadConversation(d2.id); }
+    });
+    box.appendChild(btnNew);
+    if (!chats.length) { box.appendChild(emptyPanel("No chats","Start a new chat in this project.")); return; }
+    chats.forEach(c => {
+      box.appendChild(entityCard(c.title||"Chat","",fmtDate(c.updated_at),[
+        btnOutline("Open","message", () => loadConversation(c.id)),
+      ]));
+    });
+  } else if (tab === "files") {
+    const { res, data } = await api("/v1/files?project_id="+encodeURIComponent(p.id),{},{error:false});
+    box.innerHTML = "";
+    const files = (res.ok && data && data.files)||[];
+    if (!files.length) { box.appendChild(emptyPanel("No files","Upload files to this project.")); return; }
+    files.forEach(f => {
+      box.appendChild(entityCard(f.name,f.mime+" · "+(f.size||0)+" bytes",fmtDate(f.created_at),[
+        btnOutline("Delete","trash", async () => {
+          if (!confirm("Delete file?")) return;
+          await api("/v1/files/"+encodeURIComponent(f.id),{method:"DELETE"},{success:"Deleted"});
+          loadProjectTab(p,"files");
+        }),
+      ]));
+    });
+  } else if (tab === "instructions") {
+    box.innerHTML = "";
+    const { res, data } = await api("/v1/instructions/versions?owner_type=project&owner_id="+encodeURIComponent(p.id),{},{error:false});
+    const versions = (res.ok && data && (data.versions||data.items))||[];
+    const form = document.createElement("form"); form.className = "form-grid";
+    const latestContent = versions.length ? (versions[0].content||"") : "";
+    form.innerHTML = "<label>Instructions<textarea name='content' rows='10' maxlength='16000' placeholder='Project-level instructions for OM…'>"+escapeHtml(latestContent)+"</textarea></label>"+
+      '<button type="submit" class="btn-primary">'+svg("check",14)+" Save version</button>";
+    form.addEventListener("submit", async e => {
+      e.preventDefault();
+      const fd = new FormData(e.target);
+      await api("/v1/instructions/versions",{method:"POST",body:JSON.stringify({owner_type:"project",owner_id:p.id,content:String(fd.get("content"))})},{success:"Instructions saved"});
+      loadProjectTab(p,"instructions");
+    });
+    box.appendChild(form);
+    if (versions.length) {
+      const h4 = document.createElement("h4"); h4.textContent = "Version history"; h4.style.cssText = "margin:16px 0 8px;font-size:14px;";
+      box.appendChild(h4);
+      const verBox = document.createElement("div");
+      versions.slice(0,10).forEach((v,i) => {
+        const row = document.createElement("div"); row.className = "version-row";
+        row.innerHTML = '<span class="ver-n">v'+(versions.length-i)+'</span>'+
+          '<span class="ver-d">'+fmtDate(v.created_at)+"</span>"+
+          '<span class="ver-c">'+escapeHtml((v.content||"").slice(0,80))+"…</span>";
+        verBox.appendChild(row);
+      });
+      box.appendChild(verBox);
+    }
+  } else if (tab === "knowledge") {
+    const { res, data } = await api("/v1/knowledge/sources?project_id="+encodeURIComponent(p.id),{},{error:false});
+    box.innerHTML = "";
+    const sources = (res.ok && data && data.sources)||[];
+    if (!sources.length) { box.appendChild(emptyPanel("No knowledge sources","Link knowledge to this project.")); return; }
+    sources.forEach(s => {
+      box.appendChild(entityCard(s.name,s.source_type+" · "+(s.status||""),fmtDate(s.created_at),[]));
+    });
+  } else if (tab === "members") {
+    const { res, data } = await api("/v1/projects/"+encodeURIComponent(p.id)+"/members",{},{error:false});
+    box.innerHTML = "";
+    const members = (res.ok && data && (data.members||data.users))||[];
+    const invForm = document.createElement("form");
+    invForm.style.cssText = "display:flex;gap:8px;margin-bottom:16px;";
+    invForm.innerHTML = '<input name="email" type="email" placeholder="user@example.com" style="flex:1;border:1px solid var(--border);border-radius:10px;padding:8px 12px;background:var(--bg);outline:none;"/>'+
+      '<button type="submit" class="btn-primary">'+svg("users",14)+" Invite</button>";
+    invForm.addEventListener("submit", async e => {
+      e.preventDefault();
+      const fd = new FormData(e.target);
+      await api("/v1/projects/"+encodeURIComponent(p.id)+"/members",{method:"POST",body:JSON.stringify({email:String(fd.get("email")).trim()})},{success:"Member invited"});
+      e.target.reset(); loadProjectTab(p,"members");
+    });
+    box.appendChild(invForm);
+    if (!members.length) { box.appendChild(emptyPanel("No members","Invite team members.")); return; }
+    members.forEach(m => {
+      const row = document.createElement("div"); row.className = "member-row";
+      row.innerHTML = '<div class="avatar">'+escapeHtml((m.name||m.email||"?").charAt(0).toUpperCase())+"</div>"+
+        '<div class="grow"><strong style="display:block;font-size:13px">'+escapeHtml(m.name||m.email||m.id)+"</strong>"+
+        '<span class="member-role">'+escapeHtml(m.role||"member")+"</span></div>";
+      const del = document.createElement("button"); del.type = "button"; del.className = "btn-outline";
+      del.innerHTML = svg("x",14)+" Remove";
+      del.addEventListener("click", async () => {
+        if (!confirm("Remove member?")) return;
+        await api("/v1/projects/"+encodeURIComponent(p.id)+"/members/"+encodeURIComponent(m.id||m.user_id),{method:"DELETE"},{success:"Member removed"});
+        loadProjectTab(p,"members");
+      });
+      row.appendChild(del); box.appendChild(row);
+    });
+  } else if (tab === "activity") {
+    const { res, data } = await api("/v1/history?project_id="+encodeURIComponent(p.id),{},{error:false});
+    box.innerHTML = "";
+    const events = (res.ok && data && data.events)||[];
+    if (!events.length) { box.appendChild(emptyPanel("No activity","Actions in this project will appear here.")); return; }
+    events.forEach(ev => {
+      const d = document.createElement("div"); d.className = "history-item";
+      d.innerHTML = "<strong></strong><span></span>";
+      d.querySelector("strong").textContent = ev.title||ev.kind||"Event";
+      d.querySelector("span").textContent   = (ev.body||"")+" · "+fmtDate(ev.created_at);
+      box.appendChild(d);
+    });
+  } else if (tab === "settings") {
+    box.innerHTML = "";
+    const form = document.createElement("form"); form.className = "form-grid";
+    form.innerHTML = "<label>Project name<input name='name' value='"+escapeHtml(p.name||"")+"' required maxlength='120'/></label>"+
+      "<label>Description<textarea name='description' rows='3' maxlength='2000'>"+escapeHtml(p.description||"")+"</textarea></label>"+
+      "<label>Visibility<select name='visibility'><option value='private'>Private</option><option value='team'>Team</option><option value='public'>Public</option></select></label>"+
+      '<div style="display:flex;gap:8px">'+
+      '<button type="submit" class="btn-primary">'+svg("check",14)+" Save</button>"+
+      '<button type="button" class="btn-danger" id="projDeleteBtn">'+svg("trash",14)+" Delete project</button></div>";
+    form.addEventListener("submit", async e => {
+      e.preventDefault();
+      const fd = new FormData(e.target);
+      await api("/v1/projects/"+encodeURIComponent(p.id),{method:"PATCH",body:JSON.stringify({name:String(fd.get("name")||"").trim(),description:String(fd.get("description")||"").trim()})},{success:"Project updated"});
+    });
+    box.appendChild(form);
+    $("projDeleteBtn").addEventListener("click", async () => {
+      if (!confirm("Delete project permanently?")) return;
+      await api("/v1/projects/"+encodeURIComponent(p.id),{method:"DELETE"},{success:"Project deleted"});
+      loadProjectsView();
+    });
+  }
+}
+
+/* ─── VIEW: ASSISTANTS ─── */
+async function loadAssistantsView() {
+  const panel = $("assistantsPanel");
+  panel.innerHTML = '<div class="panel-head"><div><h2>Assistants</h2><p class="sub">Custom system prompts for specialized chats.</p></div>'+
+    '<button type="button" class="btn-primary" id="asstCreateBtn">'+svg("plus",14)+" New assistant</button></div>"+
+    '<div id="assistantsList">'+skeletons(3)+"</div>"+
+    '<form class="form-grid hidden" id="asstForm">'+
+    '<label>Name<input id="asstName" name="name" required maxlength="120"/></label>'+
+    '<label>Description<textarea name="description" rows="2" maxlength="2000"></textarea></label>'+
+    '<label>System prompt<textarea name="system_prompt" rows="5" maxlength="8000"></textarea></label>'+
+    '<div style="display:flex;gap:8px"><button type="submit" class="btn-primary">'+svg("plus",14)+" Create</button>"+
+    '<button type="button" class="btn-outline" id="asstCancelBtn">Cancel</button></div></form>';
+
+  $("asstCreateBtn").addEventListener("click", () => {
+    $("asstForm").classList.remove("hidden"); $("asstCreateBtn").classList.add("hidden");
+    $("asstName").focus();
+  });
+  $("asstCancelBtn").addEventListener("click", () => {
+    $("asstForm").classList.add("hidden"); $("asstCreateBtn").classList.remove("hidden");
+  });
+  $("asstForm").addEventListener("submit", async e => {
+    e.preventDefault();
+    const fd = new FormData(e.target);
+    await api("/v1/assistants",{method:"POST",body:JSON.stringify({name:String(fd.get("name")||"").trim(),description:String(fd.get("description")||"").trim(),system_prompt:String(fd.get("system_prompt")||"").trim(),model:state.model})},{success:"Assistant created"});
+    e.target.reset(); $("asstForm").classList.add("hidden"); $("asstCreateBtn").classList.remove("hidden");
+    loadAssistantsView();
+  });
+
+  const { res, data } = await api("/v1/assistants",{},{error:false});
+  const list = $("assistantsList"); list.innerHTML = "";
+  state.assistants = (res.ok && data && data.assistants)||[];
+  if (!state.assistants.length) { list.appendChild(emptyPanel("No assistants","Create a custom assistant.")); return; }
+  state.assistants.forEach(a => {
+    const isActive = state.selectedAssistantId === a.id;
+    list.appendChild(entityCard(a.name, a.description||a.system_prompt, "Model: "+(a.model||"OM-1.0"), [
+      btnOutline(isActive?"Active":"Use","",() => {
+        state.selectedAssistantId = isActive ? null : a.id;
+        toast(state.selectedAssistantId?"Assistant active":"Assistant cleared","success");
+        loadAssistantsView();
+      }),
+      btnOutline("Open","bot", () => loadAssistantDetail(a)),
+      btnOutline("Duplicate","copy", async () => {
+        await api("/v1/assistants/"+encodeURIComponent(a.id)+"/duplicate",{method:"POST",body:"{}"},{success:"Duplicated"});
+        loadAssistantsView();
+      }),
+      btnOutline("Delete","trash", async () => {
+        if (!confirm("Delete assistant?")) return;
+        if (state.selectedAssistantId === a.id) state.selectedAssistantId = null;
+        await api("/v1/assistants/"+encodeURIComponent(a.id),{method:"DELETE"},{success:"Deleted"});
+        loadAssistantsView();
+      }),
+    ]));
+  });
+}
+
+/* ─── ASSISTANT DETAIL ─── */
+function loadAssistantDetail(a) {
+  const panel = $("assistantsPanel");
+  panel.innerHTML =
+    '<button type="button" class="back-btn" id="asstBackBtn">'+svg("chevL",14)+" Assistants</button>"+
+    '<div class="detail-header"><h2>'+escapeHtml(a.name)+"</h2>"+
+    '<p class="sub">'+escapeHtml(a.description||"")+"</p>"+
+    '<div class="detail-meta"><span class="badge blue">'+svg("bot",12)+" Assistant</span>"+
+    '<span style="font-size:12px;color:var(--muted)">Model: '+escapeHtml(a.model||"OM-1.0")+"</span></div></div>"+
+    '<div id="asstDetailTabs"></div><div id="asstDetailContent">'+skeletons(2)+"</div>";
+
+  $("asstBackBtn").addEventListener("click", loadAssistantsView);
+  const tabs = [["chat","Chat"],["instructions","Instructions"],["knowledge","Knowledge"],["tools","Tools"],["settings","Settings"]];
+  buildTabs($("asstDetailTabs"), tabs, id => loadAssistantTab(a, id), "chat");
+  loadAssistantTab(a, "chat");
+}
+
+async function loadAssistantTab(a, tab) {
+  const box = $("asstDetailContent"); box.innerHTML = skeletons(2);
+  if (tab === "chat") {
+    box.innerHTML = "";
+    const info = document.createElement("div"); info.className = "settings-section";
+    const isActive = state.selectedAssistantId === a.id;
+    info.innerHTML = "<h3>Use this assistant</h3>"+
+      "<p style='margin:0 0 12px;font-size:13px;color:var(--muted)'>When active, this assistant's system prompt will be applied to all new messages.</p>";
+    const btn = document.createElement("button"); btn.type = "button";
+    btn.className = isActive?"btn-danger":"btn-primary";
+    btn.innerHTML = isActive ? svg("x",14)+" Deactivate" : svg("check",14)+" Activate for chat";
+    btn.addEventListener("click", () => {
+      state.selectedAssistantId = isActive ? null : a.id;
+      toast(state.selectedAssistantId?"Assistant active":"Assistant cleared","success");
+      if (!isActive) { setView("chat"); } else loadAssistantTab(a,"chat");
+    });
+    info.appendChild(btn); box.appendChild(info);
+  } else if (tab === "instructions") {
+    box.innerHTML = "";
+    const { res, data } = await api("/v1/instructions/versions?owner_type=assistant&owner_id="+encodeURIComponent(a.id),{},{error:false});
+    const versions = (res.ok && data && (data.versions||data.items))||[];
+    const form = document.createElement("form"); form.className = "form-grid";
+    form.innerHTML = "<label>System prompt<textarea name='system_prompt' rows='12' maxlength='16000'>"+escapeHtml(a.system_prompt||"")+"</textarea></label>"+
+      '<button type="submit" class="btn-primary">'+svg("check",14)+" Save version</button>";
+    form.addEventListener("submit", async e => {
+      e.preventDefault();
+      const fd = new FormData(e.target);
+      const sp = String(fd.get("system_prompt"));
+      await api("/v1/assistants/"+encodeURIComponent(a.id),{method:"PATCH",body:JSON.stringify({system_prompt:sp})},{success:"System prompt updated"});
+      await api("/v1/instructions/versions",{method:"POST",body:JSON.stringify({owner_type:"assistant",owner_id:a.id,content:sp})},{error:false});
+      a.system_prompt = sp;
+    });
+    box.appendChild(form);
+    if (versions.length) {
+      const h4 = document.createElement("h4"); h4.textContent = "Version history"; h4.style.cssText = "margin:16px 0 8px;font-size:14px;";
+      box.appendChild(h4);
+      versions.slice(0,5).forEach((v,i) => {
+        const row = document.createElement("div"); row.className = "version-row";
+        row.innerHTML = '<span class="ver-n">v'+(versions.length-i)+"</span>"+
+          '<span class="ver-d">'+fmtDate(v.created_at)+"</span>"+
+          '<span class="ver-c">'+escapeHtml((v.content||"").slice(0,80))+"…</span>";
+        box.appendChild(row);
+      });
+    }
+  } else if (tab === "knowledge") {
+    const { res, data } = await api("/v1/knowledge/sources?assistant_id="+encodeURIComponent(a.id),{},{error:false});
+    box.innerHTML = "";
+    const sources = (res.ok && data && data.sources)||[];
+    if (!sources.length) { box.appendChild(emptyPanel("No knowledge linked","Attach knowledge sources to this assistant.")); return; }
+    sources.forEach(s => box.appendChild(entityCard(s.name, s.source_type+" · "+(s.status||""), fmtDate(s.created_at), [])));
+  } else if (tab === "tools") {
+    const { res, data } = await api("/v1/tools",{},{error:false});
+    box.innerHTML = "";
+    const tools = (res.ok && data && (data.tools||data.items))||[];
+    const asstTools = new Set(a.tools||[]);
+    if (!tools.length) { box.appendChild(emptyPanel("No tools","No tools available in this workspace.")); return; }
+    tools.forEach(t => {
+      const enabled = asstTools.has(t.id);
+      box.appendChild(entityCard(t.name, t.description||"", t.category||"", [
+        btnOutline(enabled?"Remove":"Add", enabled?"x":"plus", async () => {
+          const next = new Set(asstTools);
+          if (enabled) next.delete(t.id); else next.add(t.id);
+          await api("/v1/assistants/"+encodeURIComponent(a.id),{method:"PATCH",body:JSON.stringify({tools:[...next]})},{success:enabled?"Tool removed":"Tool added"});
+          a.tools = [...next]; loadAssistantTab(a,"tools");
+        }),
+      ]));
+    });
+  } else if (tab === "settings") {
+    box.innerHTML = "";
+    const form = document.createElement("form"); form.className = "form-grid";
+    form.innerHTML = "<label>Name<input name='name' value='"+escapeHtml(a.name||"")+"' required maxlength='120'/></label>"+
+      "<label>Description<textarea name='description' rows='2'>"+escapeHtml(a.description||"")+"</textarea></label>"+
+      "<label>Model<input name='model' value='"+escapeHtml(a.model||state.model)+"'/></label>"+
+      '<div style="display:flex;gap:8px">'+
+      '<button type="submit" class="btn-primary">'+svg("check",14)+" Save</button>"+
+      '<button type="button" class="btn-danger" id="asstDeleteBtn2">'+svg("trash",14)+" Delete</button></div>";
+    form.addEventListener("submit", async e => {
+      e.preventDefault();
+      const fd = new FormData(e.target);
+      await api("/v1/assistants/"+encodeURIComponent(a.id),{method:"PATCH",body:JSON.stringify({name:String(fd.get("name")||"").trim(),description:String(fd.get("description")||"").trim(),model:String(fd.get("model")||"").trim()})},{success:"Assistant updated"});
+    });
+    box.appendChild(form);
+    $("asstDeleteBtn2").addEventListener("click", async () => {
+      if (!confirm("Delete assistant permanently?")) return;
+      if (state.selectedAssistantId === a.id) state.selectedAssistantId = null;
+      await api("/v1/assistants/"+encodeURIComponent(a.id),{method:"DELETE"},{success:"Deleted"});
+      loadAssistantsView();
+    });
+  }
+}
+
+/* ─── VIEW: EXPLORE ─── */
+async function loadExploreView() {
+  const panel = $("explorePanel");
+  panel.innerHTML = '<div class="panel-head"><div><h2>Explore</h2><p class="sub">Templates and community starters.</p></div></div><div id="exploreList">'+skeletons(4)+"</div>";
+  const { res, data } = await api("/v1/explore",{},{error:false});
+  const list = $("exploreList"); list.innerHTML = "";
+  const items = (res.ok && data && data.items)||[];
+  if (!items.length) { list.appendChild(emptyPanel("Nothing to explore","Templates and starters appear here.")); return; }
+  items.forEach(item => {
+    list.appendChild(entityCard(item.title, item.description, item.category, [
+      btnOutline("Use","compass", async () => {
+        const { res: r2, data: d2 } = await api("/v1/explore/"+encodeURIComponent(item.id)+"/use",{method:"POST",body:"{}"},{success:"Added to workspace"});
+        if (r2.ok && d2 && d2.assistant) { setView("assistants"); loadAssistantsView(); }
+        else if (r2.ok && d2 && d2.prompt) { setView("prompts"); loadPromptsView(); }
+      }),
+    ]));
+  });
+}
+
+/* ─── VIEW: FILES (tabbed) ─── */
+async function loadFilesView() {
+  const panel = $("filesPanel");
+  panel.innerHTML = '<div class="panel-head"><div><h2>Files</h2><p class="sub">Upload and manage files.</p></div>'+
+    '<div style="display:flex;gap:6px">'+
+    '<button type="button" class="btn-outline" id="filesUploadBtn">'+svg("paperclip",14)+" Upload</button>"+
+    '<button type="button" class="btn-primary" id="filesCreateBtn">'+svg("plus",14)+" Create</button></div></div>"+
+    '<input type="file" id="filesUpload" class="hidden" accept="*/*"/>'+
+    '<div id="filesTabs"></div><div id="filesContent">'+skeletons(3)+"</div>"+
+    '<form class="form-grid hidden" id="filesCreateForm">'+
+    '<label>File name<input name="name" required maxlength="240" placeholder="notes.txt"/></label>'+
+    '<label>Content<textarea name="content" rows="8" maxlength="2000000" placeholder="Paste text content…"></textarea></label>'+
+    '<div style="display:flex;gap:8px"><button type="submit" class="btn-primary">'+svg("plus",14)+" Create file</button>"+
+    '<button type="button" class="btn-outline" id="filesCancelBtn">Cancel</button></div></form>';
+
+  $("filesUploadBtn").addEventListener("click", () => $("filesUpload").click());
+  $("filesCreateBtn").addEventListener("click", () => {
+    $("filesCreateForm").classList.remove("hidden"); $("filesCreateBtn").classList.add("hidden");
+  });
+  $("filesCancelBtn").addEventListener("click", () => {
+    $("filesCreateForm").classList.add("hidden"); $("filesCreateBtn").classList.remove("hidden");
+  });
+  $("filesUpload").addEventListener("change", async e => {
+    const file = e.target.files && e.target.files[0]; e.target.value = "";
+    if (!file) return;
+    const isText = !file.type||file.type.startsWith("text/")||/\.(txt|md|json|csv)$/i.test(file.name);
+    if (isText) {
+      const text = await file.text();
+      await api("/v1/files",{method:"POST",body:JSON.stringify({name:file.name,content:text,mime:file.type||"text/plain"})},{success:"File uploaded"});
+    } else {
+      const buf = await file.arrayBuffer();
+      const b64 = btoa(String.fromCharCode(...new Uint8Array(buf)));
+      await api("/v1/files",{method:"POST",body:JSON.stringify({name:file.name,content_base64:b64,mime:file.type||"application/octet-stream"})},{success:"File uploaded"});
+    }
+    loadFilesTab(activeFilesTab);
+  });
+  $("filesCreateForm").addEventListener("submit", async e => {
+    e.preventDefault();
+    const fd = new FormData(e.target);
+    await api("/v1/files",{method:"POST",body:JSON.stringify({name:String(fd.get("name")||"").trim(),content:String(fd.get("content")||""),mime:"text/plain"})},{success:"File created"});
+    e.target.reset(); $("filesCreateForm").classList.add("hidden"); $("filesCreateBtn").classList.remove("hidden");
+    loadFilesTab(activeFilesTab);
+  });
+
+  const fileTabs = [["all","All"],["documents","Documents"],["images","Images"],["code","Code"],["recent","Recent"]];
+  buildTabs($("filesTabs"), fileTabs, id => { activeFilesTab = id; loadFilesTab(id); }, "all");
+  loadFilesTab("all");
+}
+let activeFilesTab = "all";
+
+async function loadFilesTab(tabId) {
+  const box = $("filesContent"); if (!box) return;
+  box.innerHTML = skeletons(3);
+  const params = [];
+  if (tabId === "documents") params.push("kind=document");
+  if (tabId === "images")    params.push("kind=image");
+  if (tabId === "code")      params.push("kind=code");
+  if (tabId === "recent")    params.push("sort=recent&limit=20");
+  const url = "/v1/files"+(params.length?"?"+params.join("&"):"");
+  const { res, data } = await api(url,{},{error:false});
+  box.innerHTML = "";
+  const items = (res.ok && data && data.files)||[];
+  if (!items.length) { box.appendChild(emptyPanel("No files","Upload or create files.")); return; }
+  items.forEach(f => {
+    box.appendChild(entityCard(f.name, f.mime+" · "+(f.size||0)+" bytes", fmtDate(f.updated_at||f.created_at), [
+      btnOutline("View","file", async () => {
+        const { res: r2, data: d2 } = await api("/v1/files/"+encodeURIComponent(f.id),{},{error:false});
+        if (r2.ok) {
+          const content = d2.content||d2.text||JSON.stringify(d2);
+          showModal("File: "+f.name, '<textarea style="width:100%;height:280px;border:1px solid var(--border);border-radius:8px;padding:10px;font-family:monospace;font-size:12px;background:var(--side)">'+escapeHtml(content.slice(0,4000))+"</textarea>", null);
+        }
+      }),
+      btnOutline("Rename","edit", async () => {
+        const name = prompt("File name",f.name); if (!name) return;
+        await api("/v1/files/"+encodeURIComponent(f.id),{method:"PATCH",body:JSON.stringify({name})},{success:"Renamed"});
+        loadFilesTab(tabId);
+      }),
+      btnOutline("Delete","trash", async () => {
+        if (!confirm("Delete file?")) return;
+        await api("/v1/files/"+encodeURIComponent(f.id),{method:"DELETE"},{success:"Deleted"});
+        loadFilesTab(tabId);
+      }),
+    ]));
+  });
+}
+
+function showModal(title, bodyHtml, onOk) {
+  els.modalTitle.textContent = title;
+  els.modalBody.innerHTML = bodyHtml;
+  els.modal.classList.add("open");
+  els.modalOk.onclick = () => { els.modal.classList.remove("open"); if (onOk) onOk(); };
+}
+
+/* ─── VIEW: KNOWLEDGE ─── */
+async function loadKnowledgeView() {
+  const panel = $("knowledgePanel");
+  panel.innerHTML = '<div class="panel-head"><div><h2>Knowledge</h2><p class="sub">Sources indexed for retrieval.</p></div></div><div id="knowledgeList">'+skeletons(3)+"</div>"+
+    '<form class="form-grid" id="knForm">'+
+    '<label>Name<input id="knName" name="name" required maxlength="200"/></label>'+
+    '<label>Source type<select name="source_type"><option value="document">Document</option><option value="url">URL</option><option value="file">File</option></select></label>'+
+    '<label>URI<input name="uri" maxlength="1000" placeholder="https://…"/></label>'+
+    '<label>Content<textarea name="content" rows="6" maxlength="2000000" placeholder="Paste document text…"></textarea></label>'+
+    '<button type="submit" class="btn-primary">'+svg("plus",14)+" Add source</button></form>";
+
+  $("knForm").addEventListener("submit", async e => {
+    e.preventDefault();
+    const fd = new FormData(e.target);
+    await api("/v1/knowledge/sources",{method:"POST",body:JSON.stringify({name:String(fd.get("name")||"").trim(),source_type:String(fd.get("source_type")||"document"),uri:String(fd.get("uri")||"").trim(),content:String(fd.get("content")||"")})},{success:"Source added"});
+    e.target.reset(); loadKnowledgeView();
+  });
+
+  const { res, data } = await api("/v1/knowledge/sources",{},{error:false});
+  const list = $("knowledgeList"); list.innerHTML = "";
+  const items = (res.ok && data && data.sources)||[];
+  if (!items.length) { list.appendChild(emptyPanel("No sources","Add a document or URL source.")); return; }
+  items.forEach(s => {
+    list.appendChild(entityCard(s.name, s.source_type+" · "+(s.status||""), (s.doc_count||0)+" docs · "+fmtDate(s.created_at), [
+      btnOutline("Delete","trash", async () => {
+        if (!confirm("Delete source?")) return;
+        await api("/v1/knowledge/sources/"+encodeURIComponent(s.id),{method:"DELETE"},{success:"Deleted"});
+        loadKnowledgeView();
+      }),
+    ]));
+  });
+}
+
+/* ─── VIEW: PROMPTS (tabbed) ─── */
+async function loadPromptsView() {
+  const panel = $("promptsPanel");
+  panel.innerHTML = '<div class="panel-head"><div><h2>Prompts</h2><p class="sub">Reusable prompt templates.</p></div>'+
+    '<button type="button" class="btn-primary" id="prCreateBtn">'+svg("plus",14)+" New prompt</button></div>"+
+    '<div id="promptsTabs"></div><div id="promptsContent">'+skeletons(3)+"</div>"+
+    '<form class="form-grid hidden" id="prForm">'+
+    '<label>Name<input id="prName" name="name" required maxlength="120"/></label>'+
+    '<label>Content<textarea name="content" rows="6" required maxlength="16000"></textarea></label>'+
+    '<label>Kind<select name="kind"><option value="user">My prompt</option><option value="template">Template</option></select></label>'+
+    '<div style="display:flex;gap:8px"><button type="submit" class="btn-primary">'+svg("plus",14)+" Create</button>"+
+    '<button type="button" class="btn-outline" id="prCancelBtn">Cancel</button></div></form>';
+
+  $("prCreateBtn").addEventListener("click", () => {
+    $("prForm").classList.remove("hidden"); $("prCreateBtn").classList.add("hidden"); $("prName").focus();
+  });
+  $("prCancelBtn").addEventListener("click", () => {
+    $("prForm").classList.add("hidden"); $("prCreateBtn").classList.remove("hidden");
+  });
+  $("prForm").addEventListener("submit", async e => {
+    e.preventDefault();
+    const fd = new FormData(e.target);
+    await api("/v1/prompts",{method:"POST",body:JSON.stringify({name:String(fd.get("name")||"").trim(),content:String(fd.get("content")||"").trim(),kind:String(fd.get("kind"))})},{success:"Prompt created"});
+    e.target.reset(); $("prForm").classList.add("hidden"); $("prCreateBtn").classList.remove("hidden");
+    loadPromptsTab(activePromptsTab);
+  });
+
+  const ptabs = [["my","My"],["templates","Templates"],["favorites","Favorites"]];
+  buildTabs($("promptsTabs"), ptabs, id => { activePromptsTab = id; loadPromptsTab(id); }, "my");
+  loadPromptsTab("my");
+}
+let activePromptsTab = "my";
+
+async function loadPromptsTab(tabId) {
+  const box = $("promptsContent"); if (!box) return;
+  box.innerHTML = skeletons(3);
+  const params = [];
+  if (tabId === "my")        params.push("kind=user");
+  if (tabId === "templates") params.push("kind=template");
+  if (tabId === "favorites") params.push("favorite=1");
+  const url = "/v1/prompts"+(params.length?"?"+params.join("&"):"");
+  const { res, data } = await api(url,{},{error:false});
+  box.innerHTML = "";
+  const items = (res.ok && data && data.prompts)||[];
+  if (!items.length) { box.appendChild(emptyPanel("No prompts","Create prompt templates.")); return; }
+  items.forEach(p => {
+    box.appendChild(entityCard(p.name, (p.content||"").slice(0,180), (p.kind||"")+" · "+fmtDate(p.updated_at||p.created_at), [
+      btnOutline("Use","",() => { els.input.value = p.content||""; autosize(); setView("chat"); toast("Prompt loaded","success"); }),
+      btnOutline(p.favorite?"Unfav":"Fav","star", async () => {
+        await api("/v1/prompts/"+encodeURIComponent(p.id),{method:"PATCH",body:JSON.stringify({favorite:!p.favorite})},{success:p.favorite?"Removed":"Added to favorites"});
+        loadPromptsTab(tabId);
+      }),
+      btnOutline("Edit","edit", async () => {
+        const name = prompt("Name",p.name); if (!name) return;
+        const content = prompt("Content",p.content||""); if (content == null) return;
+        await api("/v1/prompts/"+encodeURIComponent(p.id),{method:"PATCH",body:JSON.stringify({name,content})},{success:"Updated"});
+        loadPromptsTab(tabId);
+      }),
+      btnOutline("Delete","trash", async () => {
+        if (!confirm("Delete prompt?")) return;
+        await api("/v1/prompts/"+encodeURIComponent(p.id),{method:"DELETE"},{success:"Deleted"});
+        loadPromptsTab(tabId);
+      }),
+    ]));
+  });
+}
+
+/* ─── VIEW: MODELS ─── */
+async function loadModelsView() {
+  const panel = $("modelsPanel");
+  panel.innerHTML = '<div class="panel-head"><div><h2>Models</h2><p class="sub">Available models and defaults.</p></div></div><div id="modelsList">'+skeletons(3)+"</div>";
+  const { res, data } = await api("/v1/models/catalog",{},{error:false});
+  const list = $("modelsList"); list.innerHTML = "";
+  const models = (res.ok && data && data.models)||[];
+  const def = (data && data.default_model)||state.model;
+  if (!models.length) { list.appendChild(emptyPanel("No models","Models available in your deployment appear here.")); return; }
+  models.forEach(m => {
+    const isDefault = m.id === def;
+    list.appendChild(entityCard(m.name, m.description||"", "Context: "+(m.context_length||"—")+"k · Temp "+(m.temperature||"—"), [
+      ...(isDefault ? [Object.assign(document.createElement("span"),{innerHTML:'<span class="badge green">Default</span>'})] : []),
+      ...(!isDefault ? [btnOutline("Set default","cpu", async () => {
+        state.model = m.id;
+        await api("/v1/settings",{method:"PATCH",body:JSON.stringify({default_model:m.id})},{success:m.name+" set as default"});
+        renderModels(); loadModelsView();
+      })] : []),
+    ]));
+  });
+}
+
+/* ─── VIEW: MEMORY ─── */
+async function loadMemoryView() {
+  const panel = $("memoryPanel");
+  panel.innerHTML = '<div class="panel-head"><div><h2>Memory</h2><p class="sub">Persistent facts OM remembers.</p></div></div><div id="memoryList">'+skeletons(3)+"</div>"+
+    '<form class="form-grid" id="memForm">'+
+    '<label>Content<input id="memContent" name="content" required maxlength="4000" placeholder="Remember that I prefer concise answers…"/></label>'+
+    '<label>Importance (0–1)<input name="importance" type="number" min="0" max="1" step="0.1" value="0.5"/></label>'+
+    '<button type="submit" class="btn-primary">'+svg("plus",14)+" Add memory</button></form>";
+
+  $("memForm").addEventListener("submit", async e => {
+    e.preventDefault();
+    const fd = new FormData(e.target);
+    await api("/v1/memories",{method:"POST",body:JSON.stringify({content:String(fd.get("content")||"").trim(),importance:parseFloat(fd.get("importance"))||0.5,kind:"semantic"})},{success:"Memory added"});
+    e.target.reset(); loadMemoryView();
+  });
+
+  const { res, data } = await api("/v1/memories",{},{error:false});
+  const list = $("memoryList"); list.innerHTML = "";
+  const items = (res.ok && data && data.memories)||[];
+  if (!items.length) { list.appendChild(emptyPanel("No memories","Add facts OM should remember.")); return; }
+  items.forEach(m => {
+    const enabled = !(m.enabled===false||m.enabled===0||m.enabled==="0");
+    list.appendChild(entityCard((m.content||"").slice(0,120),"Importance: "+(m.importance??0.5)+" · "+m.kind,(!enabled?"Disabled · ":"")+fmtDate(m.updated_at||m.created_at),[
+      btnOutline(enabled?"Disable":"Enable","", async () => {
+        await api("/v1/memories/"+encodeURIComponent(m.id),{method:"PATCH",body:JSON.stringify({enabled:!enabled})},{success:"Updated"});
+        loadMemoryView();
+      }),
+      btnOutline("Edit","edit", async () => {
+        const content = prompt("Memory content",m.content||""); if (!content) return;
+        await api("/v1/memories/"+encodeURIComponent(m.id),{method:"PATCH",body:JSON.stringify({content})},{success:"Updated"});
+        loadMemoryView();
+      }),
+      btnOutline("Delete","trash", async () => {
+        if (!confirm("Delete memory?")) return;
+        await api("/v1/memories/"+encodeURIComponent(m.id),{method:"DELETE"},{success:"Deleted"});
+        loadMemoryView();
+      }),
+    ]));
+  });
+}
+
+/* ─── VIEW: SETTINGS (full) ─── */
+async function loadSettingsView() {
+  const panel = $("settingsPanel");
+  panel.innerHTML = '<div class="panel-head"><div><h2>Settings</h2><p class="sub">Configure OM AI to your preferences.</p></div></div>'+
+    '<div id="settingsTabs"></div><div id="settingsContent">'+skeletons(2)+"</div>";
+
+  const tabs = [["account","Account"],["personalization","Personalization"],["appearance","Appearance"],["ai","AI"],["privacy","Privacy"],["security","Security"],["notifications","Notifications"],["billing","Billing"]];
+  buildTabs($("settingsTabs"), tabs, id => loadSettingsTab(id), "account");
+  loadSettingsTab("account");
+}
+
+async function loadSettingsTab(tab) {
+  const box = $("settingsContent"); if (!box) return;
+  box.innerHTML = skeletons(2);
+  const { res, data } = await api("/v1/settings",{},{error:false});
+  state.settings = (res.ok && data && data.settings)||state.settings||{};
+  const s = state.settings;
+  box.innerHTML = "";
+
+  if (tab === "account") {
+    const [me, prof] = await Promise.all([
+      api("/v1/auth/me",{},{error:false}),
+      api("/v1/profile",{},{error:false}),
+    ]);
+    if (prof.res.ok) state.profile = prof.data;
+    const u = (me.res.ok && me.data)||{};
+    box.innerHTML = '';
+    const pCard = document.createElement("div"); pCard.className = "profile-card";
+    pCard.innerHTML = '<div class="avatar" style="width:56px;height:56px;font-size:20px">'+escapeHtml(avatarInitial())+"</div>"+
+      "<div><h3>"+escapeHtml(displayName())+"</h3>"+
+      "<p>"+escapeHtml(u.user&&u.user.email ? u.user.email : (u.actor||""))+"</p>"+
+      "<p>Role: "+escapeHtml(u.role||"user")+"</p></div>";
+    box.appendChild(pCard);
+    const form = document.createElement("form"); form.className = "form-grid";
+    form.innerHTML = "<label>Display name<input name='display_name' maxlength='80' value='"+escapeHtml((state.profile&&state.profile.display_name)||"")+"'/></label>"+
+      "<label>Avatar initial<input name='avatar_initial' maxlength='2' value='"+escapeHtml((state.profile&&state.profile.avatar_initial)||"")+"'/></label>"+
+      '<button type="submit" class="btn-primary">'+svg("check",14)+" Save profile</button>";
+    form.addEventListener("submit", async e => {
+      e.preventDefault();
+      const fd = new FormData(e.target);
+      const { res: r2, data: d2 } = await api("/v1/profile",{method:"PUT",body:JSON.stringify({display_name:String(fd.get("display_name")||"").trim(),avatar_initial:String(fd.get("avatar_initial")||"").trim()})},{success:"Profile saved"});
+      if (r2.ok) { state.profile = d2; applyUserChrome(); }
+    });
+    box.appendChild(form);
+    const sep = document.createElement("div"); sep.className = "settings-section"; sep.style.marginTop = "16px";
+    sep.innerHTML = "<h3>Account actions</h3>"+
+      '<div style="display:flex;gap:8px;flex-wrap:wrap">'+
+      '<a class="btn-outline" href="/ui/tokens">'+svg("key",14)+" API Keys</a>"+
+      '<button type="button" class="btn-danger" id="settLogout">'+svg("logOut",14)+" Sign out</button></div>";
+    box.appendChild(sep);
+    $("settLogout").addEventListener("click", logout);
+  } else if (tab === "personalization") {
+    const form = document.createElement("form"); form.className = "form-grid";
+    form.innerHTML = "<label>Language<input name='language' value='"+escapeHtml(s.language||"en")+"'/></label>"+
+      "<label>Response style<select name='response_style'>"+
+      ["balanced","concise","detailed"].map(v => '<option value="'+v+'"'+(s.response_style===v?" selected":"")+">"+v.charAt(0).toUpperCase()+v.slice(1)+"</option>").join("")+"</select></label>"+
+      '<button type="submit" class="btn-primary">'+svg("check",14)+" Save</button>";
+    form.addEventListener("submit", async e => {
+      e.preventDefault();
+      const fd = new FormData(e.target);
+      await api("/v1/settings",{method:"PATCH",body:JSON.stringify({language:fd.get("language"),response_style:fd.get("response_style")})},{success:"Saved"});
+    });
+    box.appendChild(form);
+  } else if (tab === "appearance") {
+    const sec = document.createElement("div"); sec.className = "settings-section";
+    sec.innerHTML = "<h3>Theme</h3><div class='settings-grid'>"+
+      "<label>Appearance<select id='appTheme'>"+
+      ["system","light","dark"].map(v => '<option value="'+v+'"'+(s.appearance===v?" selected":"")+">"+v.charAt(0).toUpperCase()+v.slice(1)+"</option>").join("")+"</select></label></div>";
+    box.appendChild(sec);
+    const saveBtn = document.createElement("button"); saveBtn.type = "button"; saveBtn.className = "btn-primary";
+    saveBtn.innerHTML = svg("check",14)+" Save appearance";
+    saveBtn.addEventListener("click", async () => {
+      const val = $("appTheme").value;
+      const { res } = await api("/v1/settings",{method:"PATCH",body:JSON.stringify({appearance:val})},{success:"Appearance saved"});
+      if (res.ok) { state.settings.appearance = val; applyDarkMode(); }
+    });
+    box.appendChild(saveBtn);
+  } else if (tab === "ai") {
+    const form = document.createElement("form"); form.className = "form-grid";
+    form.innerHTML = "<label>Default model<input name='default_model' value='"+escapeHtml(s.default_model||"OM-1.0")+"'/></label>"+
+      "<label>Temperature<input name='temperature' type='number' min='0' max='2' step='0.1' value='"+(s.temperature??0.7)+"'/></label>"+
+      "<label>Max tokens<input name='max_tokens' type='number' min='64' max='8192' value='"+(s.max_tokens||1024)+"'/></label>"+
+      '<div class="toggle-row"><div><div class="toggle-label">Memory</div><div class="toggle-sub">Remember facts across conversations</div></div>'+
+      '<label class="sw-wrap"><input type="checkbox" name="memory_enabled"'+(s.memory_enabled!==false?" checked":"")+'><div class="sw-track"></div><div class="sw-thumb"></div></label></div>'+
+      '<button type="submit" class="btn-primary">'+svg("check",14)+" Save</button>";
+    form.addEventListener("submit", async e => {
+      e.preventDefault();
+      const fd = new FormData(e.target);
+      const { res: r2, data: d2 } = await api("/v1/settings",{method:"PATCH",body:JSON.stringify({default_model:String(fd.get("default_model")||"").trim(),temperature:parseFloat(fd.get("temperature")),max_tokens:parseInt(fd.get("max_tokens")),memory_enabled:!!fd.get("memory_enabled")})},{success:"AI settings saved"});
+      if (r2.ok && d2) { state.settings = d2.settings; state.model = d2.settings.default_model||state.model; renderModels(); }
+    });
+    box.appendChild(form);
+  } else if (tab === "privacy") {
+    const form = document.createElement("form"); form.className = "form-grid";
+    form.innerHTML =
+      '<div class="toggle-row"><div><div class="toggle-label">Save chat history</div><div class="toggle-sub">Store conversations on OM servers</div></div>'+
+      '<label class="sw-wrap"><input type="checkbox" name="privacy_history"'+(s.privacy_history!==false?" checked":"")+'><div class="sw-track"></div><div class="sw-thumb"></div></label></div>'+
+      '<div class="toggle-row"><div><div class="toggle-label">Data collection</div><div class="toggle-sub">Help improve OM AI with usage data</div></div>'+
+      '<label class="sw-wrap"><input type="checkbox" name="data_collection"'+(s.data_collection?" checked":"")+'><div class="sw-track"></div><div class="sw-thumb"></div></label></div>'+
+      '<button type="submit" class="btn-primary">'+svg("check",14)+" Save</button>";
+    form.addEventListener("submit", async e => {
+      e.preventDefault();
+      const fd = new FormData(e.target);
+      await api("/v1/settings",{method:"PATCH",body:JSON.stringify({privacy_history:!!fd.get("privacy_history"),data_collection:!!fd.get("data_collection")})},{success:"Privacy settings saved"});
+    });
+    box.appendChild(form);
+  } else if (tab === "security") {
+    const sec = document.createElement("div"); sec.className = "settings-section";
+    sec.innerHTML = "<h3>Security</h3>"+
+      "<p style='margin:0 0 12px;font-size:13px;color:var(--muted)'>Manage API keys and session security.</p>"+
+      '<div style="display:flex;gap:8px;flex-wrap:wrap">'+
+      '<a class="btn-outline" href="/ui/tokens">'+svg("key",14)+" Manage API Keys</a>"+
+      '<a class="btn-outline" href="/ui/register">'+svg("shield",14)+" Change Password</a></div>"+
+      "<div style='margin-top:16px;padding:12px;background:rgba(37,99,235,.06);border-radius:10px;border:1px solid rgba(37,99,235,.15)'>"+
+      "<p style='margin:0;font-size:13px'>"+svg("shield",14)+" <strong>Security note:</strong> Never share your API keys. Rotate them regularly. All connections use TLS.</p></div>";
+    box.appendChild(sec);
+  } else if (tab === "notifications") {
+    const form = document.createElement("form"); form.className = "form-grid";
+    form.innerHTML =
+      '<div class="toggle-row"><div><div class="toggle-label">Email notifications</div></div>'+
+      '<label class="sw-wrap"><input type="checkbox" name="notifications_email"'+(s.notifications_email?" checked":"")+'><div class="sw-track"></div><div class="sw-thumb"></div></label></div>'+
+      '<div class="toggle-row"><div><div class="toggle-label">Push notifications</div></div>'+
+      '<label class="sw-wrap"><input type="checkbox" name="notifications_push"'+(s.notifications_push!==false?" checked":"")+'><div class="sw-track"></div><div class="sw-thumb"></div></label></div>'+
+      '<div class="toggle-row"><div><div class="toggle-label">Task notifications</div></div>'+
+      '<label class="sw-wrap"><input type="checkbox" name="notifications_tasks"'+(s.notifications_tasks!==false?" checked":"")+'><div class="sw-track"></div><div class="sw-thumb"></div></label></div>'+
+      '<button type="submit" class="btn-primary">'+svg("check",14)+" Save</button>";
+    form.addEventListener("submit", async e => {
+      e.preventDefault();
+      const fd = new FormData(e.target);
+      await api("/v1/settings",{method:"PATCH",body:JSON.stringify({notifications_email:!!fd.get("notifications_email"),notifications_push:!!fd.get("notifications_push"),notifications_tasks:!!fd.get("notifications_tasks")})},{success:"Notifications saved"});
+    });
+    box.appendChild(form);
+  } else if (tab === "billing") {
+    const { res: r2, data: d2 } = await api("/v1/billing",{},{error:false});
+    const billing = (r2.ok && d2)||{};
+    box.innerHTML = "";
+    const sec = document.createElement("div"); sec.className = "settings-section";
+    sec.innerHTML = "<h3>Billing &amp; Plan</h3>"+
+      "<div class='stat-row'>"+
+      "<div class='stat'><strong>"+escapeHtml(billing.plan||"Free")+"</strong><span>Current plan</span></div>"+
+      "<div class='stat'><strong>$"+(billing.balance||"0.00")+"</strong><span>Balance</span></div>"+
+      "<div class='stat'><strong>"+(billing.calls_this_month||0)+"</strong><span>API calls this month</span></div></div>"+
+      '<div style="margin-top:12px;display:flex;gap:8px">'+
+      '<a class="btn-outline" href="/ui/tokens">'+svg("key",14)+" API Keys</a>"+
+      (billing.billing_url ? '<a class="btn-primary" href="'+escapeHtml(billing.billing_url)+'" target="_blank">'+svg("creditCard",14)+" Manage billing</a>" : "")+
+      "</div>";
+    box.appendChild(sec);
+    if (!r2.ok) {
+      const note = document.createElement("div"); note.className = "settings-section";
+      note.innerHTML = "<h3>Billing</h3><p style='margin:0;font-size:13px;color:var(--muted)'>Billing information is not available. Contact your administrator or visit the billing portal.</p>";
+      box.appendChild(note);
+    }
+  }
+}
+
+/* ─── VIEW: PROFILE ─── */
+async function loadProfileView() {
+  const panel = $("profilePanel");
+  panel.innerHTML = '<div class="panel-head"><div><h2>Profile</h2><p class="sub">Your account and workspace identity.</p></div></div><div id="profileBody">'+skeletons(2)+"</div>";
+  const [me, settings, prof] = await Promise.all([
+    api("/v1/auth/me",{},{error:false}),
+    api("/v1/settings",{},{error:false}),
+    api("/v1/profile",{},{error:false}),
+  ]);
+  if (prof.res.ok) state.profile = prof.data;
+  applyUserChrome();
+  const u = (me.res.ok && me.data)||{};
+  const sett = (settings.res.ok && settings.data && settings.data.settings)||{};
+  const body = $("profileBody");
+  body.innerHTML =
+    '<div class="profile-card"><div class="avatar" style="width:56px;height:56px;font-size:20px">'+escapeHtml(avatarInitial())+"</div>"+
+    "<div><h3>"+escapeHtml(displayName())+"</h3>"+
+    "<p>"+escapeHtml(u.user&&u.user.email ? u.user.email : (u.actor||""))+"</p>"+
+    "<p style='margin-top:4px'>Role: "+escapeHtml(u.role||"user")+"</p></div></div>"+
+    '<div class="stat-row">'+
+    '<div class="stat"><strong>'+state.conversations.length+"</strong><span>Conversations</span></div>"+
+    '<div class="stat"><strong>'+state.projects.length+"</strong><span>Projects</span></div>"+
+    '<div class="stat"><strong>'+state.assistants.length+"</strong><span>Assistants</span></div></div>"+
+    '<form class="form-grid" id="profileForm">'+
+    '<label>Display name<input name="display_name" maxlength="80" value="'+escapeHtml((state.profile&&state.profile.display_name)||"")+'"/></label>'+
+    '<label>Avatar initial<input name="avatar_initial" maxlength="2" value="'+escapeHtml((state.profile&&state.profile.avatar_initial)||"")+'"/></label>'+
+    '<button type="submit" class="btn-primary">'+svg("check",14)+" Save profile</button></form>"+
+    '<div class="settings-section" style="margin-top:16px"><h3>Preferences</h3>'+
+    "<p style='margin:0;font-size:13px;color:var(--muted)'>Model: "+escapeHtml(sett.default_model||"OM-1.0")+" · Memory: "+(sett.memory_enabled!==false?"On":"Off")+"</p></div>"+
+    '<div style="margin-top:16px;display:flex;gap:8px;flex-wrap:wrap">'+
+    '<button type="button" class="btn-outline" data-goto="settings">'+svg("settings",14)+" Settings</button>"+
+    '<a class="btn-outline" href="/ui/tokens">'+svg("key",14)+" API Keys</a>"+
+    '<button type="button" class="btn-outline" id="profileLogout">'+svg("logOut",14)+" Sign out</button></div>";
+  body.querySelector("#profileForm").addEventListener("submit", async e => {
+    e.preventDefault();
+    const fd = new FormData(e.target);
+    const { res, data } = await api("/v1/profile",{method:"PUT",body:JSON.stringify({display_name:String(fd.get("display_name")||"").trim(),avatar_initial:String(fd.get("avatar_initial")||"").trim()})},{success:"Profile saved"});
+    if (res.ok) { state.profile = data; applyUserChrome(); }
+  });
+  body.querySelector("#profileLogout").addEventListener("click", logout);
+  body.querySelectorAll("[data-goto]").forEach(el => el.addEventListener("click", () => setView(el.getAttribute("data-goto"))));
+}
+
+/* ─── VIEW LOADERS MAP ─── */
+const VIEW_LOADERS = {
+  search:loadSearchView, library:loadLibraryView, scheduled:loadScheduledView,
+  tools:loadToolsView, projects:loadProjectsView, assistants:loadAssistantsView,
+  explore:loadExploreView, files:loadFilesView, knowledge:loadKnowledgeView,
+  prompts:loadPromptsView, models:loadModelsView, memory:loadMemoryView,
+  settings:loadSettingsView, profile:loadProfileView,
+};
+
+/* ─── SET VIEW ─── */
+function setView(view, silent) {
+  state.view = view;
+  document.body.classList.toggle("chat-mode", view === "chat");
+  document.querySelectorAll(".nav-btn").forEach(b => b.classList.toggle("active", b.dataset.view === view));
+  document.querySelectorAll(".view").forEach(v => v.classList.toggle("active", v.id === "view-"+view));
+  updateTopTitle();
+  renderConvList();
+  closeMenus();
+  closeSidebar();
+  if (VIEW_LOADERS[view]) VIEW_LOADERS[view]();
+  if (!silent && view === "chat") renderMessages();
+}
+
+/* ─── MIC / SPEECH ─── */
+function initMic() {
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  const micBtn = $("micBtn");
+  if (!SpeechRecognition) {
+    micBtn.addEventListener("click", () => toast("Speech recognition not supported in this browser","error"));
+    return;
+  }
+  const recog = new SpeechRecognition();
+  recog.continuous = false; recog.interimResults = false; recog.lang = "en-US";
+  state.recognition = recog;
+  recog.onresult = e => {
+    const transcript = e.results[e.results.length-1][0].transcript;
+    els.input.value += (els.input.value ? " " : "")+transcript;
+    autosize(); els.input.focus();
+    micBtn.classList.remove("listening");
+  };
+  recog.onend  = () => micBtn.classList.remove("listening");
+  recog.onerror = () => { micBtn.classList.remove("listening"); toast("Voice input error","error"); };
+  micBtn.addEventListener("click", () => {
+    if (micBtn.classList.contains("listening")) {
+      recog.stop(); micBtn.classList.remove("listening");
+    } else {
+      try { recog.start(); micBtn.classList.add("listening"); }
+      catch (_) { toast("Could not start voice input","error"); }
+    }
+  });
+}
+
+/* ─── INIT ─── */
+async function init() {
+  buildNav();
+  document.body.classList.add("chat-mode");
+  const me = await api("/v1/auth/me",{},{error:false});
+  if (!me.res.ok) { location.replace("/login"); return; }
+  state.user = me.data;
+  try {
+    const prof = await api("/v1/profile",{},{error:false});
+    if (prof.res.ok) state.profile = prof.data;
+    const sett = await api("/v1/settings",{},{error:false});
+    if (sett.res.ok) state.settings = (sett.data && sett.data.settings)||{};
+  } catch (_) {}
+  applyUserChrome();
+  applyDarkMode();
+  await Promise.all([loadWorkspaces(), loadModelsCatalog(), loadNotifications()]);
+  try {
+    const asst = await api("/v1/assistants",{},{error:false});
+    if (asst.res.ok) state.assistants = (asst.data && asst.data.assistants)||[];
+    const proj = await api("/v1/projects",{},{error:false});
+    if (proj.res.ok) state.projects = (proj.data && proj.data.projects)||[];
+  } catch (_) {}
+  await refreshConversations();
+  const params = new URLSearchParams(location.search);
+  const deepLink = params.get("c");
+  if (deepLink) await loadConversation(deepLink);
+  else {
+    const last = (me.data && me.data.last_conversation_id)||(state.profile && state.profile.last_conversation_id);
+    if (last && state.conversations.some(c => c.id === last)) await loadConversation(last);
+    else renderMessages();
+  }
+  updateTopTitle();
+  initMic();
+  // composer model chip
+  updateComposerChip();
+  $("composerModelChip").addEventListener("click", e => {
+    e.stopPropagation();
+    els.modelDrop.classList.toggle("open");
+  });
+  // system dark mode listener
+  if (window.matchMedia) {
+    window.matchMedia("(prefers-color-scheme:dark)").addEventListener("change", applyDarkMode);
+  }
+}
+
+/* ─── EVENT LISTENERS ─── */
+$("newChatBtn").addEventListener("click", async () => {
+  try { await createChat("New chat"); closeSidebar(); els.input.focus(); } catch (_) {}
+});
+
+$("collapseBtn").addEventListener("click", () => {
+  document.body.classList.toggle("collapsed");
+  setIcon($("collapseBtn"), document.body.classList.contains("collapsed") ? "chevR":"chevL", 18);
+});
+
+$("menuBtn").addEventListener("click", openSidebar);
+els.backdrop.addEventListener("click", () => { closeSidebar(); closeMenus(); });
+
+els.input.addEventListener("input", autosize);
+els.input.addEventListener("keydown", e => {
+  if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); els.composer.requestSubmit(); }
+});
+els.composer.addEventListener("submit", e => { e.preventDefault(); sendPrompt(els.input.value); });
+els.stopBtn.addEventListener("click", stopStream);
+
+// Attach menu
+$("attachBtn").addEventListener("click", e => {
+  e.stopPropagation();
+  $("attachDrop").classList.toggle("open");
+});
+$("attachUploadFile").addEventListener("click", () => { $("attachDrop").classList.remove("open"); $("fileUploadInput").click(); });
+$("attachTextFile").addEventListener("click", () => { $("attachDrop").classList.remove("open"); $("fileInput").click(); });
+
+// File inputs
+$("fileInput").addEventListener("change", async e => {
+  const file = e.target.files && e.target.files[0]; e.target.value = "";
+  if (!file) return;
+  try {
+    const text = await file.text();
+    const cur = els.input.value;
+    els.input.value = cur+(cur && !cur.endsWith("\n") ? "\n\n":"")+text;
+    autosize(); toast("File attached to message","success");
+  } catch (_) { toast("Could not read file","error"); }
+});
+$("fileUploadInput").addEventListener("change", async e => {
+  const file = e.target.files && e.target.files[0]; e.target.value = "";
+  if (!file) return;
+  try {
+    const isText = !file.type||file.type.startsWith("text/")||/\.(txt|md|json|csv)$/i.test(file.name);
+    if (isText) {
+      const text = await file.text();
+      await api("/v1/files",{method:"POST",body:JSON.stringify({name:file.name,content:text,mime:file.type||"text/plain"})},{success:"File uploaded to OM"});
+    } else {
+      const buf = await file.arrayBuffer();
+      const b64 = btoa(String.fromCharCode(...new Uint8Array(buf)));
+      await api("/v1/files",{method:"POST",body:JSON.stringify({name:file.name,content_base64:b64,mime:file.type||"application/octet-stream"})},{success:"File uploaded to OM"});
+    }
+  } catch (_) { toast("Upload failed","error"); }
+});
+
+// Tool toggles
+["toolWeb","toolCode"].forEach(id => {
+  $(id).addEventListener("click", () => {
+    const key = id === "toolWeb" ? "web":"code";
+    state.tools[key] = !state.tools[key];
+    $(id).classList.toggle("on", state.tools[key]);
+    toast((key==="web"?"Web":"Code")+" "+(state.tools[key]?"enabled":"disabled"),"success");
+  });
+});
+
+// Share
+$("shareBtn").addEventListener("click", () => shareConvViaAPI(null));
+
+// Notifications
+$("notifBtn").addEventListener("click", e => {
+  e.stopPropagation();
+  els.notifDrop.classList.toggle("open");
+  els.modelDrop.classList.remove("open");
+  $("headerMenu").classList.remove("open");
+});
+
+// Help
+$("helpBtn").addEventListener("click", () => toast("See README.md in the repo for OM AI docs","success"));
+
+// Header profile
+$("headerProfileBtn").addEventListener("click", e => {
+  e.stopPropagation();
+  $("headerMenu").classList.toggle("open");
+  els.notifDrop.classList.remove("open");
+  els.modelDrop.classList.remove("open");
+});
+
+// Model btn
+els.modelBtn.addEventListener("click", e => {
+  e.stopPropagation();
+  els.modelDrop.classList.toggle("open");
+  els.notifDrop.classList.remove("open");
+  $("headerMenu").classList.remove("open");
+});
+
+// Side menu
+$("sideMenuBtn").addEventListener("click", e => { e.stopPropagation(); $("sideMenu").classList.toggle("open"); });
+
+// Search top button
+$("searchTopBtn").addEventListener("click", () => setView("search"));
+
+// Workspace actions
+$("wsCreateBtn").addEventListener("click", async () => {
+  const name = prompt("Workspace name","New workspace");
+  if (!name||!name.trim()) return;
+  await api("/v1/workspaces",{method:"POST",body:JSON.stringify({name:name.trim()})},{success:"Workspace created"});
+  loadWorkspaces();
+});
+$("wsSwitchBtn").addEventListener("click", async () => {
+  await loadWorkspaces();
+  if (state.workspaces.length <= 1) { toast("Only one workspace — create another to switch","error"); return; }
+  const names = state.workspaces.map((w,i) => (i+1)+". "+w.name).join("\n");
+  const pick = prompt("Select workspace:\n"+names,"1");
+  const idx = parseInt(pick,10)-1;
+  if (!Number.isNaN(idx) && state.workspaces[idx]) {
+    state.workspaceId = state.workspaces[idx].id;
+    els.wsName.textContent = state.workspaces[idx].name;
+    toast("Switched to "+state.workspaces[idx].name,"success");
+  }
+});
+
+// Conv filter buttons
+document.querySelectorAll(".conv-filter-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".conv-filter-btn").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    state.convFilter = btn.dataset.filter;
+    refreshConversations();
+  });
+});
+
+// Global close / keyboard
+document.addEventListener("click", e => {
+  closeMenus();
+  if (!els.convCtxMenu.contains(e.target)) els.convCtxMenu.classList.remove("open");
+});
+document.addEventListener("keydown", e => {
+  if (e.key === "Escape") { closeMenus(); els.convCtxMenu.classList.remove("open"); }
+  if ((e.metaKey||e.ctrlKey) && e.key.toLowerCase() === "k") {
+    e.preventDefault();
+    if (state.view === "search") { const i = $("globalSearchInput"); if (i) i.focus(); }
+    else setView("search");
+  }
+});
+
+els.modalCancel.addEventListener("click", () => els.modal.classList.remove("open"));
+els.modalOk.addEventListener("click", () => els.modal.classList.remove("open"));
+
+init().catch(() => location.replace("/login"));
+})();
+</script>
+</body>
+</html>

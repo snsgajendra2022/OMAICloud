@@ -38,6 +38,36 @@ OM_SYSTEM_IDENTITY = (
 OM_SYSTEM_IDENTITY_COMPACT = "You are OM AI (OM-1.0 native language model)."
 
 
+def _latest_user_text(messages: list[dict]) -> str:
+    for m in reversed(messages or []):
+        if str(m.get("role") or "") == "user":
+            return str(m.get("content") or "").strip()
+    return ""
+
+
+def looks_like_web_spam(text: str) -> bool:
+    """Detect pasted search/wiki marketing text that must never be shown as chat."""
+    s = (text or "").strip()
+    if not s:
+        return False
+    low = s.lower()
+    spam_bits = (
+        "enjoy the videos and music you love",
+        "upload original content",
+        "the correct form is",
+        "the preferred form",
+        "preferred form",
+        "country code top-level domain",
+        "live knowledge (retrieved",
+        "om-1.0 should treat the facts",
+        "youtube.com",
+        "en.wikipedia.org",
+        "upgrade upgrade",
+        "membership of",
+    )
+    return any(b in low for b in spam_bits)
+
+
 @dataclass(frozen=True)
 class ChatBackendInfo:
     backend: BackendName
@@ -242,80 +272,203 @@ def chat_reply(
     local_loaded: bool = False,
     native_chat: Callable[..., str] | None = None,
     native_ready: bool = False,
-    max_new_tokens: int = 256,
-    temperature: float = 0.8,
-    top_p: float = 1.0,
+    max_new_tokens: int | None = None,
+    temperature: float | None = None,
+    top_p: float | None = None,
     top_k: int | None = None,
     repetition_penalty: float | None = None,
+    tenant_id: str = "default",
+    actor: str = "",
+    assistant_instructions: str = "",
+    project_instructions: str = "",
 ) -> tuple[str, ChatBackendInfo]:
     """Generate a chat reply and return ``(text, backend_info)``."""
-    messages = with_runtime_date_context(messages)
+    from om_ai.runtime.chat_orchestrator import (
+        build_chat_messages,
+        generation_config,
+        is_low_quality_reply,
+        looks_like_assistant_chitchat,
+        policy_recovery_reply,
+    )
+    from om_ai.runtime.intelligence import enrich_for_chat
+
     info = resolve_backend(local_loaded=local_loaded, native_ready=native_ready)
+    gen = generation_config(
+        max_new_tokens=max_new_tokens,
+        temperature=temperature,
+        top_p=top_p,
+        top_k=top_k,
+        repetition_penalty=repetition_penalty,
+    )
     kwargs: dict[str, Any] = {
-        "max_new_tokens": max_new_tokens,
-        "temperature": temperature,
-        "top_p": top_p,
+        "max_new_tokens": int(gen["max_new_tokens"]),
+        "temperature": float(gen["temperature"]),
+        "top_p": float(gen["top_p"]),
+        "top_k": int(gen["top_k"]),
+        "repetition_penalty": float(gen["repetition_penalty"]),
+        "min_new_tokens": int(gen["min_new_tokens"]),
     }
+
+    if not assistant_instructions:
+        for m in messages or []:
+            if str(m.get("role") or "") == "system":
+                content = str(m.get("content") or "").strip()
+                if content and "Today's date" not in content:
+                    assistant_instructions = content
+                    break
+
+    intel = enrich_for_chat(
+        messages,
+        tenant_id=tenant_id or "default",
+        actor=actor or "",
+        assistant_instructions=assistant_instructions or "",
+        project_instructions=project_instructions or "",
+        compact=True,
+    )
 
     # --- OM native: NO silent Ollama/OpenAI fallback ---
     if info.backend == "om_native":
         if native_chat is None or not native_ready:
             raise NativeCheckpointError("OM-1.0 checkpoint unavailable.")
-        # Live knowledge (HTTP/search/local) — never another LLM.
-        lk_meta: dict[str, Any] = {}
-        try:
-            from om_ai.live_knowledge import enrich_messages_for_live_knowledge
+        from om_ai.runtime.engine import EMPTY_GENERATION_FALLBACK, usable_generation_text
 
-            messages, lk_meta = enrich_messages_for_live_knowledge(messages)
-        except Exception as exc:
-            logger.debug("live_knowledge enrich skipped: %s", exc)
+        user_text = _latest_user_text(messages)
+        from om_ai.live_knowledge.freshness import is_greeting_like, is_om_self_query
+
+        info_base = ChatBackendInfo(
+            backend=info.backend,
+            model=info.model,
+            detail=info.detail,
+            provider=info.provider,
+            live_knowledge={"intelligence": intel.meta} if intel.meta else None,
+        )
+        if intel.direct_reply:
+            return intel.direct_reply, info_base
+
+        extra = runtime_date_system_text_compact()
+        if intel.extra_system:
+            extra = f"{extra}\n\n{intel.extra_system}"
+
+        # Chat template: system + turns. Compact for tiny local windows.
+        messages = build_chat_messages(
+            messages,
+            compact=True,
+            extra_system=extra,
+        )
+        # Skip live web for greetings / OM-self so chat never becomes paste spam.
+        skip_live = is_greeting_like(user_text) or is_om_self_query(user_text)
+
+        lk_meta: dict[str, Any] = {}
+        if not skip_live:
+            try:
+                from om_ai.live_knowledge import enrich_messages_for_live_knowledge
+
+                messages, lk_meta = enrich_messages_for_live_knowledge(messages)
+            except Exception as exc:
+                logger.debug("live_knowledge enrich skipped: %s", exc)
 
         grounded = (lk_meta.get("grounded_reply") or "").strip()
+        if grounded:
+            from om_ai.live_knowledge.engine import strip_live_knowledge_boilerplate
+
+            grounded = strip_live_knowledge_boilerplate(grounded)
+            if looks_like_web_spam(grounded):
+                grounded = ""
         prefer_grounded = bool(lk_meta.get("prefer_grounded_reply")) and bool(grounded)
-        # Tiny OM-1.0 windows often cannot synthesize long retrieval context.
-        # When live retrieval succeeded, return the grounded extractive answer
-        # (still not an external LLM). Set OM_LIVE_KNOWLEDGE_GROUNDED=0 to force
-        # native-only synthesis of the injected facts.
-        grounded_env = (_env("OM_LIVE_KNOWLEDGE_GROUNDED") or "1").lower()
-        grounded_allowed = grounded_env not in {"0", "false", "no", "off"}
+        grounded_env = (_env("OM_LIVE_KNOWLEDGE_GROUNDED") or "0").lower()
+        grounded_allowed = (
+            grounded_env not in {"0", "false", "no", "off"} and not skip_live
+        )
+        merged_lk = {
+            **({k: v for k, v in lk_meta.items() if k != "grounded_reply"} or {}),
+            "intelligence": intel.meta,
+        }
         info_lk = ChatBackendInfo(
             backend=info.backend,
             model=info.model,
             detail=info.detail,
             provider=info.provider,
-            live_knowledge={
-                k: v
-                for k, v in lk_meta.items()
-                if k != "grounded_reply"  # full text already returned as reply
-            }
-            or None,
+            live_knowledge=merged_lk or None,
         )
-        if prefer_grounded and grounded_allowed:
+        if prefer_grounded and grounded_allowed and grounded:
             return grounded, info_lk
 
-        local_kwargs = dict(kwargs)
-        if top_k is not None:
-            local_kwargs["top_k"] = top_k
-        if repetition_penalty is not None:
-            local_kwargs["repetition_penalty"] = repetition_penalty
         try:
-            text = native_chat(messages, **local_kwargs)
+            text = native_chat(messages, **kwargs)
         except NativeCheckpointError:
             raise
         except Exception as exc:
             raise NativeCheckpointError(
                 f"OM-1.0 checkpoint unavailable. ({exc})"
             ) from exc
-        # Harden API/UI: never return whitespace-only (UI labels that "(empty reply)").
-        if not (text or "").strip():
-            if grounded:
-                text = grounded
-            else:
-                text = "OM-1.0 produced no text; try again."
-        return text, info_lk
 
+        fail = is_low_quality_reply(text)
+        if not fail and is_greeting_like(user_text) and not looks_like_assistant_chitchat(text):
+            fail = "degenerate"
+        if not fail and is_om_self_query(user_text):
+            low = (text or "").lower()
+            if "om" not in low and is_low_quality_reply(text) == "":
+                # Self-intro expected; reject unrelated corpus dumps.
+                if not looks_like_assistant_chitchat(text) or "buy" in low:
+                    fail = "degenerate"
+        if not fail:
+            cleaned = usable_generation_text(text) or ""
+            cleaned = cleaned.lstrip(" ,.;:\"'`-—–")
+            if cleaned:
+                return cleaned, info_lk
+
+        if grounded_allowed and grounded and not looks_like_web_spam(grounded):
+            return grounded, info_lk
+
+        # Safer OM-1.0 retry with stronger anti-repetition.
+        try:
+            retry_kwargs = dict(kwargs)
+            retry_kwargs.update(
+                {
+                    "max_new_tokens": max(int(kwargs["max_new_tokens"]), 96),
+                    "temperature": 0.4,
+                    "top_p": 0.9,
+                    "top_k": 40,
+                    "repetition_penalty": max(float(kwargs["repetition_penalty"]), 1.2),
+                    "min_new_tokens": 8,
+                }
+            )
+            retry = native_chat(messages, **retry_kwargs)
+            retry_fail = is_low_quality_reply(retry)
+            if (
+                not retry_fail
+                and is_greeting_like(user_text)
+                and not looks_like_assistant_chitchat(retry)
+            ):
+                retry_fail = "degenerate"
+            if not retry_fail:
+                retry = (usable_generation_text(retry) or "").lstrip(" ,.;:\"'`-—–")
+                if retry:
+                    return retry, info_lk
+            else:
+                fail = retry_fail
+        except Exception as exc:
+            logger.debug("native retry skipped: %s", exc)
+
+        # Orchestration safety net (greetings / identity / clarify) when base
+        # model still dumps web-corpus junk. Real ChatGPT quality still needs SFT.
+        recovered = policy_recovery_reply(
+            user_text, reason=fail or "empty", language=intel.language
+        )
+        if recovered:
+            return recovered, info_lk
+
+        return EMPTY_GENERATION_FALLBACK, info_lk
+
+    messages = with_runtime_date_context(messages)
     if info.backend == "openai":
-        text = chat_via_openai(messages, model=info.model, **kwargs)
+        text = chat_via_openai(
+            messages,
+            model=info.model,
+            max_new_tokens=int(kwargs["max_new_tokens"]),
+            temperature=float(kwargs["temperature"]),
+            top_p=float(kwargs["top_p"]),
+        )
         return text, info
 
     if local_chat is None or not local_loaded:
@@ -324,12 +477,7 @@ def chat_reply(
             "OM-1.0 checkpoint, load a local OM checkpoint (OM_AI_AUTOLOAD=1), or set "
             "OM_AI_OPENAI_API_KEY / OPENAI_API_KEY with OM_AI_CHAT_BACKEND=openai."
         )
-    local_kwargs = dict(kwargs)
-    if top_k is not None:
-        local_kwargs["top_k"] = top_k
-    if repetition_penalty is not None:
-        local_kwargs["repetition_penalty"] = repetition_penalty
-    return local_chat(messages, **local_kwargs), info
+    return local_chat(messages, **kwargs), info
 
 
 def backend_status(*, local_loaded: bool = False, native_ready: bool = False) -> dict[str, Any]:

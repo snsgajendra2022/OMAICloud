@@ -54,6 +54,17 @@ def test_encode_chat_generation_prompt_ends_assistant_open():
     assert ids[-1] == tok.assistant_id
 
 
+def test_degenerate_generation_detects_possessive_collapse():
+    from om_ai.runtime.engine import is_degenerate_generation
+
+    garbage = (
+        "The Cubs: Mrs and Jerry Dacosta's daughter. During the eve’s1916th "
+        "seed couldn’t stop’s daughter’s brother’s lap’s parents’s sister’s mom’s."
+    )
+    assert is_degenerate_generation(garbage)
+    assert not is_degenerate_generation("Hello — I’m OM AI.")
+
+
 def test_resolve_om_native_forced(monkeypatch):
     monkeypatch.setenv("OM_MODEL_PROVIDER", "om_native")
     monkeypatch.setenv("OM_AI_CHAT_BACKEND", "openai")
@@ -61,6 +72,110 @@ def test_resolve_om_native_forced(monkeypatch):
     assert info.backend == "om_native"
     assert info.provider == "OM AI"
     assert info.model == "OM-1.0" or "OM" in info.model
+
+
+def test_om_native_capability_question_uses_model_not_static(monkeypatch):
+    monkeypatch.setenv("OM_MODEL_PROVIDER", "om_native")
+    monkeypatch.setenv("OM_LIVE_KNOWLEDGE", "0")
+
+    def native(messages, **_k):
+        assert messages
+        return "I am OM-1.0 running locally on your checkpoint."
+
+    text, used = cb.chat_reply(
+        [{"role": "user", "content": "What can you do as a local OM model?"}],
+        native_chat=native,
+        native_ready=True,
+        local_chat=None,
+        local_loaded=False,
+    )
+    assert "OM-1.0" in text
+    assert "Live knowledge" not in text
+    assert "Enjoy the videos" not in text
+    assert used.backend == "om_native"
+
+
+def test_om_native_good_morning_bhai_uses_model_not_static(monkeypatch):
+    monkeypatch.setenv("OM_MODEL_PROVIDER", "om_native")
+    monkeypatch.setenv("OM_LIVE_KNOWLEDGE", "0")
+
+    def native(messages, **_k):
+        return "Good morning! How are you?"
+
+    text, used = cb.chat_reply(
+        [{"role": "user", "content": "good morning bhai"}],
+        native_chat=native,
+        native_ready=True,
+        local_chat=None,
+        local_loaded=False,
+    )
+    assert text == "Good morning! How are you?"
+    assert "YouTube" not in text
+    assert "correct form" not in text.lower()
+    assert "Enjoy the videos" not in text
+    assert used.backend == "om_native"
+
+
+def test_om_native_greeting_is_not_web_dump(monkeypatch):
+    monkeypatch.setenv("OM_MODEL_PROVIDER", "om_native")
+    monkeypatch.setenv("OM_LIVE_KNOWLEDGE", "0")
+
+    def native(_messages, **_k):
+        return "Hello — I'm OM AI."
+
+    text, used = cb.chat_reply(
+        [{"role": "user", "content": "good moring how are you"}],
+        native_chat=native,
+        native_ready=True,
+        local_chat=None,
+        local_loaded=False,
+    )
+    assert "OM AI" in text
+    assert "Live knowledge" not in text
+    assert "howtosayguide" not in text.lower()
+    assert used.backend == "om_native"
+
+
+def test_om_native_garbage_falls_back_to_grounded_live_knowledge(monkeypatch):
+    monkeypatch.setenv("OM_MODEL_PROVIDER", "om_native")
+    monkeypatch.setenv("OM_LIVE_KNOWLEDGE", "1")
+    monkeypatch.setenv("OM_LIVE_KNOWLEDGE_GROUNDED", "1")
+
+    garbage = (
+        "The Cubs: Mrs and Jerry Dacosta's daughter. During the eve’s1916th "
+        "seed couldn’t stop’s daughter’s brother’s lap’s parents’s sister’s mom’s."
+    )
+
+    def native(_messages, **_k):
+        return garbage
+
+    def fake_enrich(messages, **kwargs):
+        force = bool(kwargs.get("force"))
+        blob = " ".join(str(m.get("content") or "") for m in messages)
+        if force or "basketball" in blob.lower() or "cubs" in blob.lower():
+            return list(messages), {
+                "needs_live": True,
+                "llm_used": None,
+                "prefer_grounded_reply": True,
+                "grounded_reply": "Cubs are an MLB team.",
+            }
+        return list(messages), {"needs_live": False, "llm_used": None, "prefer_grounded_reply": False}
+
+    monkeypatch.setattr(
+        "om_ai.live_knowledge.enrich_messages_for_live_knowledge",
+        fake_enrich,
+    )
+
+    text, used = cb.chat_reply(
+        [{"role": "user", "content": "Who won the Cubs championship?"}],
+        native_chat=native,
+        native_ready=True,
+        local_chat=None,
+        local_loaded=False,
+    )
+    assert "Cubs are an MLB team" in text
+    assert used.backend == "om_native"
+    assert "couldn’t stop’s" not in text
 
 
 def test_om_native_no_silent_third_party_fallback(monkeypatch):

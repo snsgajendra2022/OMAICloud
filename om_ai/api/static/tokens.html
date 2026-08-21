@@ -16,17 +16,17 @@
   </script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <style>
     :root {
       --bg-0: #ffffff;
-      --bg-1: #f9f9f9;
-      --bg-2: #ececec;
+      --bg-1: #f7f7f8;
+      --bg-2: #ececf1;
       --panel: #ffffff;
-      --sidebar: #f9f9f9;
+      --sidebar: #f7f7f8;
       --line: #e5e5e5;
       --text: #0d0d0d;
-      --muted: #8f8f8f;
+      --muted: #6e6e80;
       --accent: #0d0d0d;
       --accent-dim: rgba(13, 13, 13, 0.06);
       --accent-hot: #2f2f2f;
@@ -37,15 +37,15 @@
       --user-bg: #f4f4f4;
       --user-line: transparent;
       --bot-bg: transparent;
-      --hover: #ececec;
-      --active: #e8e8e8;
+      --hover: #ececf1;
+      --active: #e8e8ed;
       --menu: #ffffff;
       --menu-shadow: 0 8px 28px rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(0, 0, 0, 0.06);
       --shadow: 0 0 0 1px rgba(0, 0, 0, 0.04), 0 8px 24px rgba(0, 0, 0, 0.06);
       --radius: 16px;
-      --mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
-      --sans: "Inter", "Segoe UI", system-ui, sans-serif;
-      --sidebar-w: 260px;
+      --mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+      --sans: "Plus Jakarta Sans", "Segoe UI", system-ui, sans-serif;
+      --sidebar-w: 280px;
     }
     html[data-theme="dark"] {
       --bg-0: #212121;
@@ -451,6 +451,20 @@
     .settings-section .key-row { margin-bottom: 0; }
     .settings-section .key-row input { margin-bottom: 0; }
     .settings-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 14px; }
+    .account-auth-msg {
+      margin: 0 0 14px; min-height: 18px; font-size: 13px; color: var(--muted); line-height: 1.4;
+    }
+    .account-auth-msg.err { color: var(--err); }
+    .account-auth-msg.ok { color: var(--ok); }
+    .btn-link-primary, .btn-link-secondary {
+      display: inline-flex; align-items: center; justify-content: center;
+      text-decoration: none; font: inherit; font-weight: 650; font-size: 14px;
+      padding: 10px 16px; border-radius: 11px;
+    }
+    .btn-link-primary { background: var(--text); color: var(--bg-0); }
+    .btn-link-secondary {
+      background: var(--bg-2); color: var(--text); border: 1px solid var(--line);
+    }
     .settings-advanced {
       border: 1px solid var(--line); border-radius: 16px; background: var(--panel);
       margin-bottom: 16px; overflow: hidden;
@@ -479,6 +493,58 @@
     .token-table-wrap table { margin: 0; }
     .token-table-wrap th:last-child, .token-table-wrap td:last-child { text-align: right; }
     .token-table-wrap button { padding: 6px 10px; font-size: 12px; }
+    .token-once {
+      display: none;
+      margin-top: 16px;
+      padding: 16px 18px;
+      border: 1px solid rgba(16, 163, 127, 0.35);
+      background: rgba(16, 163, 127, 0.06);
+      border-radius: 14px;
+    }
+    .token-once.show { display: block; }
+    .token-once h4 {
+      margin: 0 0 6px;
+      font-size: 14px;
+      font-weight: 650;
+      letter-spacing: -0.02em;
+    }
+    .token-once p {
+      margin: 0 0 12px;
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.45;
+    }
+    .token-once .secret-row {
+      display: flex;
+      gap: 8px;
+      align-items: stretch;
+    }
+    .token-once .secret-row code {
+      flex: 1;
+      min-width: 0;
+      font-family: var(--mono);
+      font-size: 12px;
+      line-height: 1.4;
+      word-break: break-all;
+      padding: 12px 14px;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      color: var(--text);
+    }
+    .token-once .secret-row button {
+      flex-shrink: 0;
+      align-self: stretch;
+      padding: 0 14px;
+    }
+    .token-err {
+      margin-top: 12px;
+      font-size: 13px;
+      color: var(--err);
+      line-height: 1.45;
+      display: none;
+    }
+    .token-err.show { display: block; }
 
     .stage { min-width: 0; min-height: 0; display: flex; flex-direction: column; position: relative; background: var(--bg-0); }
     .view { display: none; flex: 1; min-height: 0; flex-direction: column; }
@@ -486,14 +552,15 @@
 
     .chat-shell {
       flex: 1; min-height: 0; display: flex; flex-direction: column;
-      max-width: 768px; width: 100%; margin: 0 auto;
+      max-width: 820px; width: 100%; margin: 0 auto;
+      position: relative;
     }
     .chat-header {
-      padding: 10px 16px 4px;
+      padding: 14px 20px 8px;
       display: flex; align-items: center; justify-content: space-between; gap: 12px;
     }
     .chat-header h2 {
-      margin: 0; font-size: 16px; font-weight: 600; letter-spacing: -0.02em;
+      margin: 0; font-size: 17px; font-weight: 650; letter-spacing: -0.03em;
       overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 70%;
     }
     .chat-header .meta { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
@@ -531,21 +598,79 @@
     }
     .chat-empty .hero-orb::before { content: "OM"; position: relative; z-index: 1; }
     .chat-empty strong {
-      display: block; font-size: 28px; font-weight: 600; letter-spacing: -0.04em; margin-bottom: 8px;
+      display: block; font-size: 32px; font-weight: 650; letter-spacing: -0.045em; margin-bottom: 10px;
     }
     .chat-empty span {
-      display: block; font-size: 14px; color: var(--muted); line-height: 1.55;
+      display: block; font-size: 15px; color: var(--muted); line-height: 1.55;
+      max-width: 36ch; margin: 0 auto;
     }
     .suggest-row {
-      display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-top: 22px;
+      display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-top: 26px;
     }
     .suggest {
-      appearance: none; border: 1px solid var(--line); background: var(--panel); color: var(--text);
-      border-radius: 999px; padding: 8px 14px; font: inherit; font-size: 13px; cursor: pointer;
-      transition: border-color 0.15s ease, background 0.15s ease;
+      appearance: none; border: 1px solid var(--line); background: transparent; color: var(--text);
+      border-radius: 999px; padding: 9px 15px; font: inherit; font-size: 13px; font-weight: 500; cursor: pointer;
+      transition: border-color 0.15s ease, background 0.15s ease, transform 0.15s ease;
       box-shadow: none;
     }
-    .suggest:hover { border-color: var(--muted); background: var(--hover); }
+    .suggest:hover { border-color: var(--muted); background: var(--hover); transform: translateY(-1px); }
+
+    .sidebar-search {
+      display: flex; align-items: center; gap: 8px;
+      margin: 6px 4px 10px;
+      padding: 9px 12px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--panel);
+    }
+    .sidebar-search svg {
+      width: 15px; height: 15px; color: var(--muted); flex-shrink: 0;
+    }
+    .sidebar-search input {
+      flex: 1; min-width: 0; border: 0; outline: 0; background: transparent;
+      color: var(--text); font: inherit; font-size: 13px; font-weight: 500;
+    }
+    .sidebar-search input::placeholder { color: var(--muted); font-weight: 400; }
+
+    .history-more {
+      appearance: none; border: 0; background: transparent; color: var(--muted);
+      font: inherit; font-size: 12px; font-weight: 600; cursor: pointer;
+      padding: 10px 12px; border-radius: 10px; width: 100%; text-align: left;
+    }
+    .history-more:hover { background: var(--hover); color: var(--text); }
+
+    .jump-latest {
+      position: absolute;
+      left: 50%;
+      bottom: 118px;
+      transform: translateX(-50%) translateY(12px);
+      z-index: 5;
+      appearance: none;
+      border: 1px solid var(--line);
+      background: var(--panel);
+      color: var(--text);
+      box-shadow: var(--shadow);
+      border-radius: 999px;
+      padding: 8px 14px;
+      font: inherit;
+      font-size: 13px;
+      font-weight: 600;
+      display: none;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+    .jump-latest svg { width: 14px; height: 14px; }
+    .jump-latest.show {
+      display: inline-flex;
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateX(-50%) translateY(0);
+    }
+    .jump-latest:hover { background: var(--hover); }
 
     .msg {
       max-width: min(92%, 680px); padding: 10px 16px; border-radius: 22px;
@@ -614,7 +739,7 @@
     }
     .composer textarea {
       width: 100%; border: 0; background: transparent; color: var(--text);
-      resize: none; min-height: 52px; max-height: 180px; padding: 8px 8px 4px;
+      resize: none; min-height: 52px; max-height: 180px; padding: 4px 4px 0px;
       font: inherit; font-size: 15px; line-height: 1.45; outline: none; margin: 0;
     }
     .composer-bar {
@@ -669,7 +794,7 @@
 
     input, select, textarea {
       width: 100%; background: var(--bg-1); border: 1px solid var(--line); color: var(--text);
-      border-radius: 10px; padding: 10px 11px; font-size: 14px; margin-bottom: 10px;
+      border-radius: 10px; padding: 5px 6px; font-size: 14px; margin-bottom: 10px;
       font-family: inherit; outline: none;
       transition: border-color 0.15s ease, box-shadow 0.15s ease;
     }
@@ -800,7 +925,14 @@
         New chat
       </button>
 
-      <div class="sidebar-scroll">
+      <div class="sidebar-search" role="search">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/>
+        </svg>
+        <input id="chatSearch" type="search" placeholder="Search chats…" autocomplete="off" aria-label="Search chats" />
+      </div>
+
+      <div class="sidebar-scroll" id="sidebarScroll">
         <div>
           <div class="section-label">
             <span>Projects</span>
@@ -851,7 +983,7 @@
             <div class="chat-empty" id="chatEmpty">
               <div class="hero-orb" aria-hidden="true"></div>
               <strong>How can I help you?</strong>
-              <span>Your local operating brain. Open Settings to connect, then start chatting.</span>
+              <span>Your local OM brain. Connect in Settings, then start chatting.</span>
               <div class="suggest-row">
                 <button type="button" class="suggest" data-prompt="Say hello in one short sentence.">Say hello</button>
                 <button type="button" class="suggest" data-prompt="What can you do as a local OM model?">What can you do?</button>
@@ -859,6 +991,11 @@
               </div>
             </div>
           </div>
+
+          <button type="button" class="jump-latest" id="jumpLatestBtn" title="Jump to latest message" aria-label="Jump to latest">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M6 9l6 6 6-6"/></svg>
+            Next
+          </button>
 
           <div class="composer-wrap">
             <div class="composer">
@@ -926,27 +1063,50 @@
               </div>
             </section>
 
-            <section class="settings-section">
-              <h3>API key</h3>
-              <p class="section-desc">Paste your key to connect chat and history. Stored only in this browser.</p>
+            <section class="settings-section" id="accountAuthBlock">
+              <h3>Account</h3>
+              <p class="section-desc">You are signed in. Sign out returns to the login page.</p>
+
+              <div id="accountSignedIn">
+                <div class="profile-preview">
+                  <div class="avatar" id="accountAvatar">?</div>
+                  <div class="account-meta">
+                    <strong id="accountEmailLabel">Signed in</strong>
+                    <span id="accountSessionRole">Role: —</span>
+                  </div>
+                </div>
+                <div class="settings-actions">
+                  <button type="button" class="secondary" id="logoutBtn">Sign out</button>
+                </div>
+              </div>
+            </section>
+
+            <section class="settings-section" id="machineKeyBlock" hidden>
+              <h3>Machine API key</h3>
+              <p class="section-desc">Optional env/admin key for operators. Prefer account sign-in.</p>
               <label class="field" for="adminKey">API key</label>
               <div class="key-row">
                 <input id="adminKey" type="password" placeholder="Paste key…" autocomplete="off" />
                 <button id="toggleKeyBtn" class="secondary" type="button" title="Show or hide key">Show</button>
               </div>
-              <div class="auth-badge missing" id="authBadge"><span class="dot"></span><span id="authBadgeText">Not connected</span></div>
+              <div class="auth-badge missing" id="authBadge"><span class="dot"></span><span id="authBadgeText">Cookie session</span></div>
               <div class="settings-actions">
-                <button type="button" id="saveKeyBtn">Save &amp; connect</button>
+                <button type="button" id="saveKeyBtn">Use machine key</button>
               </div>
             </section>
 
             <section class="settings-section">
               <h3>Token console</h3>
-              <p class="section-desc">Create and revoke named API tokens. Requires an admin key.</p>
-              <div class="row" style="margin-bottom:4px">
+              <p class="section-desc">Create named API tokens. The full key is shown once when created.</p>
+              <label class="field" for="tokenAdminKey">Admin key</label>
+              <div class="key-row">
+                <input id="tokenAdminKey" type="password" placeholder="Paste admin key…" autocomplete="off" />
+                <button id="toggleTokenAdminBtn" class="secondary" type="button" title="Show or hide key">Show</button>
+              </div>
+              <div class="row" style="margin-top:14px;margin-bottom:4px">
                 <div>
                   <label class="field" for="tokenName">Token name</label>
-                  <input id="tokenName" placeholder="e.g. memories-app" />
+                  <input id="tokenName" placeholder="e.g. Ai Kids" />
                 </div>
                 <div>
                   <label class="field" for="tokenRole">Role</label>
@@ -962,8 +1122,15 @@
                 <button id="createBtn" type="button">Create</button>
                 <button id="listBtn" class="secondary" type="button">Refresh</button>
               </div>
-              <label class="field" style="margin-top:16px">Result</label>
-              <div class="result" id="result">Ready.</div>
+              <div class="token-err" id="tokenErr" role="alert"></div>
+              <div class="token-once" id="tokenOnce" aria-live="polite">
+                <h4>API key created — copy it now</h4>
+                <p>This full key is shown once. After you leave this page it cannot be recovered.</p>
+                <div class="secret-row">
+                  <code id="tokenOnceValue"></code>
+                  <button type="button" class="secondary" id="copyTokenBtn">Copy</button>
+                </div>
+              </div>
               <label class="field" style="margin-top:16px">Existing tokens</label>
               <div class="token-table-wrap" id="listBox"><div class="empty-hint" style="padding:12px">Click Refresh</div></div>
             </section>
@@ -998,6 +1165,12 @@
     (function () {
       const resultEl = document.getElementById("result");
       const listBox = document.getElementById("listBox");
+      const tokenAdminKeyEl = document.getElementById("tokenAdminKey");
+      const tokenOnceEl = document.getElementById("tokenOnce");
+      const tokenOnceValue = document.getElementById("tokenOnceValue");
+      const tokenErrEl = document.getElementById("tokenErr");
+      const copyTokenBtn = document.getElementById("copyTokenBtn");
+      const toggleTokenAdminBtn = document.getElementById("toggleTokenAdminBtn");
       const chatLog = document.getElementById("chatLog");
       const chatInput = document.getElementById("chatInput");
       const chatSendBtn = document.getElementById("chatSendBtn");
@@ -1022,6 +1195,9 @@
       const accountChip = document.getElementById("accountChip");
       const historyList = document.getElementById("historyList");
       const folderList = document.getElementById("folderList");
+      const chatSearch = document.getElementById("chatSearch");
+      const sidebarScroll = document.getElementById("sidebarScroll");
+      const jumpLatestBtn = document.getElementById("jumpLatestBtn");
       const chatTitleEl = document.getElementById("chatTitle");
       const debugBody = document.getElementById("debugBody");
       const debugStatusBadge = document.getElementById("debugStatusBadge");
@@ -1086,16 +1262,23 @@
       let currentFolderFilter = null;
       let foldersCache = [];
       let conversationsCache = [];
+      let chatSearchQuery = "";
+      let historyVisibleCount = 24;
+      const HISTORY_PAGE = 24;
       let currentView = "chat";
       let modalResolver = null;
+      let stickToBottom = true;
       const expandedProjects = new Set();
       try {
         JSON.parse(localStorage.getItem(LS_EXPANDED) || "[]").forEach(function (id) { expandedProjects.add(id); });
       } catch (_) {}
       const DEFAULT_HINT = "Ready";
-      const LS_KEY = "om_ai_api_key";
-      const LS_CONV = "om_ai_conversation_id";
-      const CONNECT_HINT = "Open Settings to connect";
+      const LS_THEME = "om_ai_theme";
+      const LS_EXPANDED = "om_ai_expanded_projects";
+      const CONNECT_HINT = "Sign in to see your chats";
+      let sessionAuthed = false;
+      let machineKeyOverride = "";
+      let lastConversationId = null;
 
       function persistExpanded() {
         try { localStorage.setItem(LS_EXPANDED, JSON.stringify(Array.from(expandedProjects))); } catch (_) {}
@@ -1161,30 +1344,48 @@
         return key;
       }
 
-      function readStoredKey() {
-        try { return normalizeApiKey(localStorage.getItem(LS_KEY)); } catch (_) { return ""; }
+      function currentApiKey() {
+        return normalizeApiKey(machineKeyOverride || (adminKeyEl && adminKeyEl.value) || "");
       }
 
-      function currentApiKey() {
-        const fromInput = normalizeApiKey(adminKeyEl.value);
-        if (fromInput) return fromInput;
-        return readStoredKey();
+      function hasAuth() {
+        return sessionAuthed || !!currentApiKey();
       }
 
       function updateAuthUi() {
-        const key = currentApiKey();
-        if (key) {
+        if (hasAuth()) {
           authBadge.className = "auth-badge ready";
-          authBadgeText.textContent = "Connected";
+          authBadgeText.textContent = sessionAuthed ? "Signed in · cookie" : "Machine key";
           const hint = document.getElementById("sidebarHint");
-          if (hint) hint.textContent = "Connected";
+          if (hint) hint.textContent = sessionAuthed ? "Signed in" : "Connected";
         } else {
           authBadge.className = "auth-badge missing";
-          authBadgeText.textContent = "Not connected";
+          authBadgeText.textContent = "Not signed in";
           const hint = document.getElementById("sidebarHint");
-          if (hint) hint.textContent = "Open Settings";
+          if (hint) hint.textContent = "Sign in";
         }
         if (!chatBusy) chatSendBtn.disabled = false;
+      }
+
+      function requireLoginRedirect() {
+        location.replace("/login");
+      }
+
+      function adminHeaders() {
+        const headers = { "Content-Type": "application/json" };
+        const key = currentApiKey();
+        if (key) headers["Authorization"] = "Bearer " + key;
+        return headers;
+      }
+
+      function tokenHeaders() {
+        const key = tokenAdminKey();
+        if (!key && !sessionAuthed) {
+          throw new Error("Sign in as admin or paste an admin key.");
+        }
+        const headers = { "Content-Type": "application/json" };
+        if (key) headers["Authorization"] = "Bearer " + key;
+        return headers;
       }
 
       function setDebug(status, kind, lines) {
@@ -1194,25 +1395,32 @@
         debugBody.textContent = Array.isArray(lines) ? lines.join("\n") : String(lines || "");
       }
 
-      function adminHeaders() {
-        const key = currentApiKey();
-        if (!key) {
-          throw new Error("Not connected — open Settings and paste your API key.");
+      function show(msg, ok) {
+        if (tokenErrEl) {
+          tokenErrEl.textContent = ok ? "" : String(msg || "");
+          tokenErrEl.classList.toggle("show", !ok && !!msg);
         }
-        if (adminKeyEl.value.trim() !== key) {
-          adminKeyEl.value = key;
-          persistKey();
+        if (resultEl) {
+          resultEl.textContent = msg;
+          resultEl.className = "result " + (ok ? "ok" : "err");
         }
-        return {
-          "Authorization": "Bearer " + key,
-          "Content-Type": "application/json",
-        };
       }
 
-      function show(msg, ok) {
-        if (!resultEl) return;
-        resultEl.textContent = msg;
-        resultEl.className = "result " + (ok ? "ok" : "err");
+      function clearTokenOnce() {
+        if (tokenOnceEl) tokenOnceEl.classList.remove("show");
+        if (tokenOnceValue) tokenOnceValue.textContent = "";
+      }
+
+      function showCreatedToken(token) {
+        if (!tokenOnceEl || !tokenOnceValue) return;
+        tokenOnceValue.textContent = token;
+        tokenOnceEl.classList.add("show");
+        if (tokenErrEl) tokenErrEl.classList.remove("show");
+      }
+
+      function tokenAdminKey() {
+        if (!tokenAdminKeyEl) return "";
+        return normalizeApiKey(tokenAdminKeyEl.value);
       }
 
       function setChatStatus(msg, kind) {
@@ -1238,7 +1446,13 @@
         }
         if (status === 403) {
           const reason = detail && detail !== "Request failed" ? detail : "forbidden";
+          if (/admin\.tokens/i.test(String(reason))) {
+            return "Paste the admin key in Token console (Admin key field), then try again.";
+          }
           return "403 — " + reason;
+        }
+        if (status === 404) {
+          return "404 — chat not found (deleted, or saved under a different API key). Starting fresh is fine.";
         }
         if (status === 503 || /not loaded|autoload|checkpoint/i.test(String(detail)) || String(detail).includes("OM model not loaded")) {
           return "503 — model not loaded. Check chat backend / autoload settings.";
@@ -1255,18 +1469,44 @@
         empty.innerHTML =
           '<div class="hero-orb" aria-hidden="true"></div>' +
           "<strong>How can I help you?</strong>" +
-          "<span>Your local operating brain. Open Settings to connect, then start chatting.</span>" +
+          "<span>Your local OM brain. Connect in Settings, then start chatting.</span>" +
           '<div class="suggest-row">' +
           '<button type="button" class="suggest" data-prompt="Say hello in one short sentence.">Say hello</button>' +
           '<button type="button" class="suggest" data-prompt="What can you do as a local OM model?">What can you do?</button>' +
           '<button type="button" class="suggest" data-prompt="Summarize yourself in one line.">One-line summary</button>' +
           "</div>";
         chatLog.appendChild(empty);
+        updateJumpLatest();
       }
 
       function removeEmptyState() {
         const empty = document.getElementById("chatEmpty");
         if (empty) empty.remove();
+      }
+
+      function nearBottom(el, pad) {
+        pad = pad == null ? 80 : pad;
+        return el.scrollHeight - el.scrollTop - el.clientHeight <= pad;
+      }
+
+      function scrollChatToLatest(force) {
+        if (!force && !stickToBottom) return;
+        chatLog.scrollTop = chatLog.scrollHeight;
+        stickToBottom = true;
+        updateJumpLatest();
+      }
+
+      function updateJumpLatest() {
+        if (!jumpLatestBtn) return;
+        const hasMsgs = !!chatLog.querySelector(".msg");
+        const show = hasMsgs && !nearBottom(chatLog, 100);
+        jumpLatestBtn.classList.toggle("show", show);
+      }
+
+      function matchesSearch(text) {
+        const q = (chatSearchQuery || "").trim().toLowerCase();
+        if (!q) return true;
+        return String(text || "").toLowerCase().indexOf(q) !== -1;
       }
 
       function appendBubble(role, content, whenIso) {
@@ -1292,7 +1532,7 @@
         el.appendChild(head);
         el.appendChild(body);
         chatLog.appendChild(el);
-        chatLog.scrollTop = chatLog.scrollHeight;
+        scrollChatToLatest(false);
         return el;
       }
 
@@ -1306,7 +1546,7 @@
           '<div class="msg-head"><span class="who">OM AI</span><span class="when">thinking</span></div>' +
           '<div class="body"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>';
         chatLog.appendChild(el);
-        chatLog.scrollTop = chatLog.scrollHeight;
+        scrollChatToLatest(true);
         typingEl = el;
       }
 
@@ -1320,6 +1560,7 @@
         chatMessages.length = 0;
         chatLog.innerHTML = "";
         typingEl = null;
+        stickToBottom = true;
         if (!messages || !messages.length) {
           ensureEmptyState();
           return;
@@ -1329,17 +1570,43 @@
           chatMessages.push({ role: m.role, content: m.content });
           appendBubble(m.role, m.content, m.created_at);
         });
+        scrollChatToLatest(true);
       }
 
       function persistKey() {
-        try { localStorage.setItem(LS_KEY, currentApiKey()); } catch (_) {}
+        machineKeyOverride = currentApiKey();
       }
 
       function persistConvId(id) {
-        try {
-          if (id) localStorage.setItem(LS_CONV, id);
-          else localStorage.removeItem(LS_CONV);
-        } catch (_) {}
+        lastConversationId = id || null;
+        if (!hasAuth()) return;
+        api("/v1/profile", {
+          method: "PUT",
+          body: JSON.stringify(
+            id
+              ? { last_conversation_id: id }
+              : { clear_last_conversation: true }
+          ),
+        }).catch(function () {});
+      }
+
+      async function api(path, opts) {
+        opts = opts || {};
+        if (!hasAuth()) {
+          throw new Error("Not signed in — open Sign in.");
+        }
+        const headers = Object.assign({}, adminHeaders(), opts.headers || {});
+        const res = await fetch(path, Object.assign({}, opts, {
+          headers: headers,
+          credentials: "include",
+        }));
+        let data = null;
+        try { data = await res.json(); } catch (_) { data = null; }
+        if (res.status === 401) {
+          sessionAuthed = false;
+          updateAuthUi();
+        }
+        return { res: res, data: data };
       }
 
       function pulseSend() {
@@ -1361,14 +1628,6 @@
         const t = String(s || "").trim();
         if (!t) return t;
         return t.charAt(0).toUpperCase() + t.slice(1);
-      }
-
-      async function api(path, opts) {
-        const headers = adminHeaders();
-        const res = await fetch(path, Object.assign({ headers }, opts || {}));
-        let data = null;
-        try { data = await res.json(); } catch (_) { data = null; }
-        return { res, data };
       }
 
       async function ensureConversation() {
@@ -1429,13 +1688,23 @@
       }
 
       function renderProjects() {
-        if (!foldersCache.length) {
-          folderList.innerHTML = '<div class="empty-hint">No projects yet</div>';
+        const folders = foldersCache.filter(function (f) {
+          if (matchesSearch(f.name)) return true;
+          return conversationsCache.some(function (c) {
+            return c.folder_id === f.id && matchesSearch(c.title || "New chat");
+          });
+        });
+        if (!folders.length) {
+          folderList.innerHTML = chatSearchQuery
+            ? '<div class="empty-hint">No matching projects</div>'
+            : '<div class="empty-hint">No projects yet</div>';
           return;
         }
-        folderList.innerHTML = foldersCache.map(function (f) {
-          const expanded = expandedProjects.has(f.id);
-          const nested = conversationsCache.filter(function (c) { return c.folder_id === f.id; });
+        folderList.innerHTML = folders.map(function (f) {
+          const expanded = expandedProjects.has(f.id) || !!chatSearchQuery;
+          const nested = conversationsCache.filter(function (c) {
+            return c.folder_id === f.id && matchesSearch(c.title || "New chat");
+          });
           const chatsHtml = nested.length
             ? nested.map(chatRowHtml).join("")
             : '<div class="empty-hint">No chats yet</div>';
@@ -1453,12 +1722,24 @@
       }
 
       function renderChats() {
-        const unfiled = conversationsCache.filter(function (c) { return !c.folder_id; });
+        const unfiled = conversationsCache.filter(function (c) {
+          return !c.folder_id && matchesSearch(c.title || "New chat");
+        });
         if (!unfiled.length) {
-          historyList.innerHTML = '<div class="empty-hint">No chats yet</div>';
+          historyList.innerHTML = chatSearchQuery
+            ? '<div class="empty-hint">No matching chats</div>'
+            : '<div class="empty-hint">No chats yet</div>';
           return;
         }
-        historyList.innerHTML = unfiled.map(chatRowHtml).join("");
+        const slice = unfiled.slice(0, historyVisibleCount);
+        let html = slice.map(chatRowHtml).join("");
+        if (unfiled.length > historyVisibleCount) {
+          html +=
+            '<button type="button" class="history-more" id="historyMoreBtn">' +
+            "Next · load " + Math.min(HISTORY_PAGE, unfiled.length - historyVisibleCount) + " more" +
+            "</button>";
+        }
+        historyList.innerHTML = html;
       }
 
       function closeItemMenu() {
@@ -1537,7 +1818,7 @@
       }
 
       async function refreshSidebar() {
-        if (!currentApiKey()) {
+        if (!hasAuth()) {
           historyList.innerHTML = '<div class="empty-hint">' + CONNECT_HINT + "</div>";
           folderList.innerHTML = '<div class="empty-hint">' + CONNECT_HINT + "</div>";
           return;
@@ -1572,6 +1853,20 @@
       async function loadConversation(id) {
         showView("chat");
         const { res, data } = await api("/v1/conversations/" + id);
+        if (res.status === 404) {
+          // Stale localStorage / deleted chat / different API key actor — recover quietly.
+          persistConvId(null);
+          currentConversationId = null;
+          chatMessages.length = 0;
+          chatLog.innerHTML = "";
+          typingEl = null;
+          chatTitleEl.textContent = "New chat";
+          ensureEmptyState();
+          setChatStatus("That chat is gone — starting a new one.", "ok");
+          await refreshHistory();
+          chatInput.focus();
+          return;
+        }
         if (!res.ok) throw new Error(friendlyHttpError(res.status, data));
         currentConversationId = data.id;
         persistConvId(id);
@@ -1597,7 +1892,7 @@
         setChatStatus(DEFAULT_HINT, "");
         setDebug("idle", "", "No requests yet.");
         try {
-          if (currentApiKey()) {
+          if (hasAuth()) {
             await ensureConversation();
             if (folderId) expandedProjects.add(folderId);
             persistExpanded();
@@ -1620,8 +1915,9 @@
       }
 
       async function loadProfile() {
-        if (!currentApiKey()) {
+        if (!hasAuth()) {
           syncSidebarProfile("Account", "?");
+          setAccountSignedInUi(null);
           return;
         }
         try {
@@ -1634,8 +1930,110 @@
           document.getElementById("displayNameInput").value = data.display_name || "";
           document.getElementById("avatarInitialInput").value = data.avatar_initial || "";
           document.getElementById("accountRole").textContent = "Role: " + (data.role || "—");
+          if (authBadgeText && hasAuth()) {
+            authBadge.className = "auth-badge ready";
+            authBadgeText.textContent = sessionAuthed
+              ? ("Signed in · " + (data.role || "ready"))
+              : ("Connected · " + (data.role || "ready"));
+          }
           syncSidebarProfile(name, initial);
         } catch (_) {}
+        await refreshAccountSessionUi();
+      }
+
+      function setAccountAuthMsg(msg, kind) {
+        const el = document.getElementById("accountAuthMsg");
+        if (!el) return;
+        el.textContent = msg || "";
+        el.className = "account-auth-msg" + (kind ? " " + kind : "");
+      }
+
+      function setAccountSignedInUi(user) {
+        const inn = document.getElementById("accountSignedIn");
+        if (!inn) return;
+        if (user) {
+          inn.hidden = false;
+          const label = user.display_name || user.email || "Signed in";
+          const emailEl = document.getElementById("accountEmailLabel");
+          const roleEl = document.getElementById("accountSessionRole");
+          const av = document.getElementById("accountAvatar");
+          if (emailEl) emailEl.textContent = label;
+          if (roleEl) roleEl.textContent = (user.email ? user.email + " · " : "") + "Role: " + (user.role || "—");
+          if (av) av.textContent = (label[0] || "?").toUpperCase();
+        } else {
+          inn.hidden = true;
+        }
+      }
+
+      async function refreshAccountSessionUi() {
+        if (!hasAuth()) {
+          setAccountSignedInUi(null);
+          return;
+        }
+        try {
+          const { res, data } = await api("/v1/auth/me");
+          if (res.status === 404) {
+            setAccountSignedInUi(null);
+            return;
+          }
+          if (!res.ok || !data.account || !data.user) {
+            setAccountSignedInUi(null);
+            return;
+          }
+          setAccountSignedInUi(data.user);
+          const name = data.user.display_name || data.user.email;
+          syncSidebarProfile(name, (name[0] || "?").toUpperCase());
+        } catch (_) {
+          setAccountSignedInUi(null);
+        }
+      }
+
+      async function loadAuthStatus() {
+        try {
+          const res = await fetch("/v1/auth/status");
+          if (!res.ok) return;
+          const data = await res.json();
+          const regBtn = document.getElementById("registerBtn");
+          const regTab = document.querySelector('[data-account-tab="register"]');
+          if (data.register_enabled === false) {
+            if (regBtn) regBtn.disabled = true;
+            if (regTab) regTab.style.display = "none";
+          }
+        } catch (_) {}
+      }
+
+      async function applySessionAuth(user) {
+        sessionAuthed = true;
+        machineKeyOverride = "";
+        if (adminKeyEl) adminKeyEl.value = "";
+        updateAuthUi();
+        setAccountSignedInUi(user || null);
+        setChatStatus("Signed in", "ok");
+        await bootstrapHistory();
+        await refreshModelBadge();
+        setTimeout(function () { if (!chatBusy) setChatStatus(DEFAULT_HINT, ""); }, 1200);
+      }
+
+      async function logoutAccount() {
+        try {
+          await fetch("/v1/auth/logout", {
+            method: "POST",
+            credentials: "include",
+            headers: adminHeaders(),
+          }).catch(function () {});
+        } finally {
+          sessionAuthed = false;
+          machineKeyOverride = "";
+          if (adminKeyEl) adminKeyEl.value = "";
+          lastConversationId = null;
+          currentConversationId = null;
+          chatMessages.length = 0;
+          chatLog.innerHTML = "";
+          typingEl = null;
+          setAccountSignedInUi(null);
+          updateAuthUi();
+          location.replace("/login");
+        }
       }
 
       async function saveProfile() {
@@ -1772,43 +2170,33 @@
 
       async function createToken() {
         try {
+          clearTokenOnce();
+          show("", true);
           const name = document.getElementById("tokenName").value.trim();
           const role = document.getElementById("tokenRole").value;
           if (!name) throw new Error("Token name is required");
           const res = await fetch("/v1/tokens", {
             method: "POST",
-            headers: adminHeaders(),
+            headers: tokenHeaders(),
             body: JSON.stringify({ name, role, tenant_id: "default" }),
           });
           const data = await res.json();
           if (!res.ok) throw new Error(friendlyHttpError(res.status, data));
-          const env = data.usage?.env || {};
-          show(
-            [
-              "CREATED",
-              "label: " + data.label,
-              "name: " + data.name,
-              "role: " + data.role,
-              "id: " + data.id,
-              "",
-              "OM_API_KEY=" + data.token,
-              "OM_API_BASE=" + (env.OM_API_BASE || "http://127.0.0.1:8080/api/v1"),
-              "OM_MODEL=om:free",
-              "",
-              data.note,
-            ].join("\n"),
-            true
-          );
+          const secret = data.token || "";
+          if (!secret) throw new Error("Server did not return an API key.");
+          showCreatedToken(secret);
           document.getElementById("tokenName").value = "";
           await listTokens();
         } catch (e) {
+          clearTokenOnce();
           show(String(e.message || e), false);
         }
       }
 
       async function listTokens() {
         try {
-          const res = await fetch("/v1/tokens", { headers: adminHeaders() });
+          show("", true);
+          const res = await fetch("/v1/tokens", { headers: tokenHeaders() });
           const data = await res.json();
           if (!res.ok) throw new Error(friendlyHttpError(res.status, data));
           const tokens = data.tokens || [];
@@ -1842,11 +2230,11 @@
         try {
           const res = await fetch("/v1/tokens/" + id, {
             method: "DELETE",
-            headers: adminHeaders(),
+            headers: tokenHeaders(),
           });
           const data = await res.json();
           if (!res.ok) throw new Error(friendlyHttpError(res.status, data));
-          show("Revoked: " + (data.name || id), true);
+          show("", true);
           await listTokens();
         } catch (e) {
           show(String(e.message || e), false);
@@ -1869,17 +2257,12 @@
 
       /** Clean chat URL: `/` or `/ui/chat` (etc.) with no hash — never `#chat`. */
       function chatUrl() {
-        const path = location.pathname || "/";
-        const base =
-          path === "/" || path === "/ui/chat" || path === "/ui/tokens" ? path : "/";
-        return base + (location.search || "");
+        return "/chat" + (location.search || "");
       }
 
       /** Settings: keep path, use `#settings` (or `/#settings` from `/ui/settings`). */
       function settingsUrl() {
-        let path = location.pathname || "/";
-        if (/\/ui\/settings\/?$/.test(path)) path = "/";
-        return path + (location.search || "") + "#settings";
+        return "/chat" + (location.search || "") + "#settings";
       }
 
       function showView(view, opts) {
@@ -1911,13 +2294,10 @@
         }
         document.title = next === "settings" ? "OM AI — Settings" : "OM AI — Chat";
         if (next === "settings") {
-          if (currentApiKey()) {
+          if (hasAuth()) {
             listTokens().catch(function () {});
             loadProfile().catch(function () {});
           }
-          setTimeout(function () {
-            if (adminKeyEl && !currentApiKey()) adminKeyEl.focus();
-          }, 40);
         } else {
           setTimeout(function () { if (chatInput) chatInput.focus(); }, 40);
         }
@@ -1928,13 +2308,12 @@
 
       async function saveAndConnect() {
         const cleaned = currentApiKey();
-        adminKeyEl.value = cleaned;
-        persistKey();
+        if (adminKeyEl) adminKeyEl.value = cleaned;
+        machineKeyOverride = cleaned;
+        sessionAuthed = false;
         updateAuthUi();
         if (!cleaned) {
-          historyList.innerHTML = '<div class="empty-hint">' + CONNECT_HINT + "</div>";
-          folderList.innerHTML = '<div class="empty-hint">' + CONNECT_HINT + "</div>";
-          setChatStatus("Paste an API key to connect.", "error");
+          requireLoginRedirect();
           return;
         }
         setChatStatus("Connecting…", "busy");
@@ -1946,15 +2325,14 @@
       }
 
       async function bootstrapHistory() {
-        if (!currentApiKey()) {
+        if (!hasAuth()) {
           historyList.innerHTML = '<div class="empty-hint">' + CONNECT_HINT + "</div>";
           folderList.innerHTML = '<div class="empty-hint">' + CONNECT_HINT + "</div>";
           return;
         }
         await refreshSidebar();
         await loadProfile();
-        let saved = null;
-        try { saved = localStorage.getItem(LS_CONV); } catch (_) {}
+        const saved = lastConversationId;
         if (saved) {
           try {
             await loadConversation(saved);
@@ -1965,15 +2343,58 @@
         }
       }
 
+      async function ensureSessionOrRedirect() {
+        try {
+          const res = await fetch("/v1/auth/me", { credentials: "include" });
+          if (res.ok) {
+            const data = await res.json();
+            sessionAuthed = true;
+            lastConversationId = data.last_conversation_id || null;
+            if (data.user) setAccountSignedInUi(data.user);
+            updateAuthUi();
+            return true;
+          }
+        } catch (_) {}
+        if (currentApiKey()) {
+          sessionAuthed = false;
+          updateAuthUi();
+          return true;
+        }
+        requireLoginRedirect();
+        return false;
+      }
+
       document.getElementById("createBtn").addEventListener("click", createToken);
       document.getElementById("listBtn").addEventListener("click", listTokens);
+      const logoutBtn = document.getElementById("logoutBtn");
+      if (logoutBtn) logoutBtn.addEventListener("click", logoutAccount);
+      if (copyTokenBtn) {
+        copyTokenBtn.addEventListener("click", async function () {
+          const val = (tokenOnceValue && tokenOnceValue.textContent) || "";
+          if (!val) return;
+          try {
+            await navigator.clipboard.writeText(val);
+            copyTokenBtn.textContent = "Copied";
+            setTimeout(function () { copyTokenBtn.textContent = "Copy"; }, 1400);
+          } catch (_) {
+            copyTokenBtn.textContent = "Select & copy";
+          }
+        });
+      }
+      if (toggleTokenAdminBtn && tokenAdminKeyEl) {
+        toggleTokenAdminBtn.addEventListener("click", function () {
+          const showing = tokenAdminKeyEl.type === "text";
+          tokenAdminKeyEl.type = showing ? "password" : "text";
+          toggleTokenAdminBtn.textContent = showing ? "Show" : "Hide";
+        });
+      }
       document.getElementById("newChatBtn").addEventListener("click", function (e) {
         e.preventDefault();
         startNewChat();
       });
       document.getElementById("saveProfileBtn").addEventListener("click", saveProfile);
       document.getElementById("newFolderBtn").addEventListener("click", async function () {
-        if (!currentApiKey()) { openSettings(); return; }
+        if (!hasAuth()) { requireLoginRedirect(); return; }
         try {
           const name = await openModal({
             title: "New project",
@@ -2254,6 +2675,31 @@
         const prompt = btn.getAttribute("data-prompt") || btn.textContent;
         sendChat(prompt);
       });
+      chatLog.addEventListener("scroll", function () {
+        stickToBottom = nearBottom(chatLog, 80);
+        updateJumpLatest();
+      }, { passive: true });
+      if (jumpLatestBtn) {
+        jumpLatestBtn.addEventListener("click", function () {
+          scrollChatToLatest(true);
+        });
+      }
+      if (chatSearch) {
+        chatSearch.addEventListener("input", function () {
+          chatSearchQuery = chatSearch.value || "";
+          historyVisibleCount = HISTORY_PAGE;
+          renderProjects();
+          renderChats();
+        });
+      }
+      if (historyList) {
+        historyList.addEventListener("click", function (e) {
+          const more = e.target.closest("#historyMoreBtn");
+          if (!more) return;
+          historyVisibleCount += HISTORY_PAGE;
+          renderChats();
+        });
+      }
 
       menuBtn.addEventListener("click", openSidebar);
       backdrop.addEventListener("click", closeSidebar);
@@ -2317,24 +2763,22 @@
       }).catch(() => {});
       refreshModelBadge();
 
-      try {
-        const saved = readStoredKey();
-        if (saved) adminKeyEl.value = saved;
-      } catch (_) {}
-      updateAuthUi();
-      bootstrapHistory();
-      const bootHash = (location.hash || "").replace(/^#/, "").toLowerCase();
-      if (bootHash === "settings" || /\/ui\/settings\/?$/.test(location.pathname)) {
-        showView("settings", { skipHash: bootHash === "settings" });
-        if (/\/ui\/settings\/?$/.test(location.pathname) && bootHash !== "settings") {
-          try { history.replaceState(null, "", "/#settings"); } catch (_) {}
+      (async function boot() {
+        updateAuthUi();
+        const ok = await ensureSessionOrRedirect();
+        if (!ok) return;
+        await bootstrapHistory();
+        const bootHash = (location.hash || "").replace(/^#/, "").toLowerCase();
+        if (bootHash === "settings" || /\/ui\/settings\/?$/.test(location.pathname)) {
+          showView("settings", { skipHash: bootHash === "settings" });
+          if (/\/ui\/settings\/?$/.test(location.pathname) && bootHash !== "settings") {
+            try { history.replaceState(null, "", "/#settings"); } catch (_) {}
+          }
+        } else {
+          showView("chat");
         }
-      } else {
-        // Default view = chat when hash is empty, "/", "chat", or anything else.
-        // showView clears #chat so the address bar stays clean.
-        showView("chat");
-      }
-      if (currentView === "chat") chatInput.focus();
+        if (currentView === "chat") chatInput.focus();
+      })();
     })();
   </script>
 </body>

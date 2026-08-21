@@ -13,6 +13,41 @@ from om_ai.model import OMTransformer
 from om_ai.tokenizer import load_tokenizer, tokenizer_fingerprint
 from om_ai.training.trainer import Trainer, TrainingConfig, build_dataset
 
+# Apple Silicon / CPU sanity: looping 70e12 steps on 100MB FineWeb cannot
+# produce ChatGPT-class English and will never finish.
+_MAC_MAX_STEPS = 250_000
+_MAC_MAX_TOKENS = 2_000_000
+_MAC_MAX_DOCS = 25_000
+
+
+def _clamp_mac_train(
+    *,
+    steps: int,
+    max_tokens: int | None,
+    max_docs: int | None,
+    device: str,
+    allow_unbounded: bool,
+) -> tuple[int, int | None, int | None, dict]:
+    note: dict = {}
+    cuda = device == "cuda" or (device or "").startswith("cuda")
+    if cuda or allow_unbounded:
+        return steps, max_tokens, max_docs, note
+    if steps > _MAC_MAX_STEPS:
+        note["steps_clamped_from"] = steps
+        steps = _MAC_MAX_STEPS
+    if max_tokens is not None and max_tokens > _MAC_MAX_TOKENS:
+        note["max_tokens_clamped_from"] = max_tokens
+        max_tokens = _MAC_MAX_TOKENS
+    if max_docs is not None and max_docs > _MAC_MAX_DOCS:
+        note["max_docs_clamped_from"] = max_docs
+        max_docs = _MAC_MAX_DOCS
+    if note:
+        note["reason"] = (
+            "OM-1.0-local is ~20M params / 128 context on this Mac. "
+            "Unbounded steps do not become ChatGPT. Pass --allow-unbounded-steps to override."
+        )
+    return steps, max_tokens, max_docs, note
+
 
 def _pick_device(device: str | None) -> str:
     if device:
@@ -67,6 +102,7 @@ def run_train_om1(
     log_every: int = 1,
     precision: str = "auto",
     resume: str | None = None,
+    allow_unbounded: bool = False,
 ) -> dict:
     root = Path(__file__).resolve().parents[2]
     config = config or str(root / "configs/om-1.0-local.json")
@@ -81,6 +117,13 @@ def run_train_om1(
     cfg.vocab_size = len(tok.vocab)
     tok_fp = tokenizer_fingerprint(tokenizer)
     dev = _pick_device(device)
+    steps, max_tokens, max_docs, clamp_note = _clamp_mac_train(
+        steps=steps,
+        max_tokens=max_tokens,
+        max_docs=max_docs,
+        device=dev,
+        allow_unbounded=allow_unbounded,
+    )
 
     model = OMTransformer(cfg)
     tc = TrainingConfig(
@@ -138,6 +181,8 @@ def run_train_om1(
                 "max_docs": max_docs,
                 "output": str(out_dir),
                 "not_70b": True,
+                "not_chatgpt": True,
+                "clamp": clamp_note or None,
             }
         ),
         flush=True,

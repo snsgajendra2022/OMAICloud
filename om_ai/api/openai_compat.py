@@ -76,15 +76,17 @@ class ChatMessage(BaseModel):
 class ChatCompletionsRequest(BaseModel):
     model: str = Field(default="om-tiny")
     messages: list[ChatMessage]
-    temperature: float | None = 0.8
-    top_p: float | None = 1.0
-    max_tokens: int | None = Field(default=128, ge=1, le=4096)
+    temperature: float | None = None
+    top_p: float | None = None
+    max_tokens: int | None = Field(default=None, ge=1, le=4096)
     stream: bool = False
     stop: str | list[str] | None = None
     frequency_penalty: float | None = 0.0
     presence_penalty: float | None = 0.0
     n: int | None = 1
     user: str | None = None
+    top_k: int | None = None
+    repetition_penalty: float | None = None
 
 
 class CompletionsRequest(BaseModel):
@@ -163,9 +165,13 @@ def _sse(data: dict) -> str:
 def _run_chat(
     messages: list[dict],
     *,
-    max_new: int,
-    temperature: float,
-    top_p: float,
+    max_new: int | None,
+    temperature: float | None,
+    top_p: float | None,
+    top_k: int | None = None,
+    repetition_penalty: float | None = None,
+    tenant_id: str = "default",
+    actor: str = "",
 ) -> tuple[str, str, str, str]:
     """Return (text, response_model_id, backend_name, provider)."""
     info = resolve_backend(local_loaded=_local_loaded(), native_ready=_native_ready())
@@ -179,6 +185,10 @@ def _run_chat(
             max_new_tokens=max_new,
             temperature=temperature,
             top_p=top_p,
+            top_k=top_k,
+            repetition_penalty=repetition_penalty,
+            tenant_id=tenant_id,
+            actor=actor,
         )
     except NativeCheckpointError as exc:
         raise HTTPException(
@@ -270,9 +280,13 @@ async def chat_completions(
     ctx: TenantContext = Depends(require_permission("model.generate")),
 ):
     messages = _messages_to_dicts(req.messages)
-    max_new = int(req.max_tokens or 128)
-    temperature = float(req.temperature if req.temperature is not None else 0.8)
-    top_p = float(req.top_p if req.top_p is not None else 1.0)
+    max_new = int(req.max_tokens) if req.max_tokens is not None else None
+    temperature = float(req.temperature) if req.temperature is not None else None
+    top_p = float(req.top_p) if req.top_p is not None else None
+    top_k = int(req.top_k) if req.top_k is not None else None
+    repetition_penalty = (
+        float(req.repetition_penalty) if req.repetition_penalty is not None else None
+    )
 
     # When native is forced and checkpoint missing, fail fast with 503 (no third-party LLM).
     if configured_backend() == "om_native" and not _native_ready():
@@ -305,6 +319,10 @@ async def chat_completions(
                     max_new=max_new,
                     temperature=temperature,
                     top_p=top_p,
+                    top_k=top_k,
+                    repetition_penalty=repetition_penalty,
+                    tenant_id=ctx.tenant_id,
+                    actor=ctx.actor,
                 )
             except HTTPException as exc:
                 yield _sse({"error": {"message": str(exc.detail), "type": "server_error"}})
@@ -355,6 +373,10 @@ async def chat_completions(
         max_new=max_new,
         temperature=temperature,
         top_p=top_p,
+        top_k=top_k,
+        repetition_penalty=repetition_penalty,
+        tenant_id=ctx.tenant_id,
+        actor=ctx.actor,
     )
     return _chat_response(model_name, text, backend=backend, provider=provider)
 

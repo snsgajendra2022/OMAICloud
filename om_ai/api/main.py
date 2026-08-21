@@ -40,6 +40,9 @@ from om_ai.security.auth import TenantContext
 from om_ai.api.deps import require_auth, require_permission
 from om_ai.tenancy import TenantDirectory
 from om_ai.api.conversations import router as conversations_router, bind_conversation_store
+from om_ai.api.auth_routes import router as auth_router
+from om_ai.api.workspace_routes import router as workspace_router
+from om_ai.api.platform_routes import router as platform_router
 from om_ai.continuous.feedback import FeedbackStore
 
 logger = logging.getLogger(__name__)
@@ -92,6 +95,9 @@ feedback_store = FeedbackStore(_FEEDBACK_DB)
 
 bind_conversation_store(conversations)
 app.include_router(conversations_router)
+app.include_router(auth_router)
+app.include_router(workspace_router)
+app.include_router(platform_router)
 rate_limiter = RateLimiter(
     max_requests=int(os.getenv("OM_AI_RATE_LIMIT", "120")),
     window_seconds=60,
@@ -707,8 +713,8 @@ def run_goal(
         raise HTTPException(status_code=400, detail=str(exc)) from exc
 
 
-@app.get("/v1/tools", tags=["Agent"])
-def list_tools(ctx: TenantContext = Depends(require_auth)):
+@app.get("/v1/agent/tools", tags=["Agent"])
+def list_agent_tools(ctx: TenantContext = Depends(require_auth)):
     """Return metadata for all registered agent tools."""
     names = agent.available_tools()
     tools = []
@@ -786,19 +792,44 @@ class CreateTokenRequest(BaseModel):
     tenant_id: str = "default"
 
 
-def _serve_tokens_chat_ui():
+def _serve_static_html(name: str):
     from fastapi.responses import HTMLResponse
-    html_path = Path(__file__).parent / "static" / "tokens.html"
+    html_path = Path(__file__).parent / "static" / name
     return HTMLResponse(
         html_path.read_text(encoding="utf-8"),
         headers={"Cache-Control": "no-store, no-cache, must-revalidate"},
     )
 
 
+def _serve_tokens_chat_ui():
+    return _serve_static_html("tokens.html")
+
+
 @app.get("/", tags=["UI"])
 def ui_home():
-    """Primary app surface: same chat console as /ui/chat."""
-    return _serve_tokens_chat_ui()
+    """Entry point: login first. Chat lives at /chat after sign-in."""
+    from fastapi.responses import RedirectResponse
+    return RedirectResponse(
+        url="/login",
+        headers={"Cache-Control": "no-store, no-cache, must-revalidate"},
+    )
+
+
+@app.get("/login", tags=["UI"])
+def login_page():
+    return _serve_static_html("login.html")
+
+
+@app.get("/register", tags=["UI"])
+def register_page():
+    return _serve_static_html("register.html")
+
+
+@app.get("/chat", tags=["UI"])
+@app.get("/ui/chat", tags=["UI"])
+def chat_ui():
+    """Chat console — only useful after account sign-in."""
+    return _serve_static_html("chat.html")
 
 
 @app.get("/ui/tokens", tags=["UI"])
@@ -806,18 +837,11 @@ def tokens_ui():
     return _serve_tokens_chat_ui()
 
 
-@app.get("/ui/chat", tags=["UI"])
-def chat_ui():
-    """Same OM AI chat console as / (chat-first product surface)."""
-    return _serve_tokens_chat_ui()
-
-
 @app.get("/ui/settings", tags=["UI"])
 def settings_ui():
-    """Settings opens the same SPA; client routes via #settings (chat stays at / with no hash)."""
     from fastapi.responses import RedirectResponse
     return RedirectResponse(
-        url="/#settings",
+        url="/chat#settings",
         headers={"Cache-Control": "no-store, no-cache, must-revalidate"},
     )
 
@@ -837,13 +861,21 @@ def tokens_meta():
         "database": store.path,
         "chat_database": conversations.path,
         "feedback_database": _FEEDBACK_DB,
+        "accounts_database": os.getenv("OM_AI_ACCOUNTS_DB", "artifacts/accounts.sqlite3"),
         "model": model_label,
         "provider": "OM AI" if native else None,
         "backend": "om_native" if native else configured_backend(),
         "create_uri": "POST /v1/tokens",
         "list_uri": "GET /v1/tokens",
         "revoke_uri": "DELETE /v1/tokens/{id}",
-        "ui": "/ui/chat",
+        "auth_status_uri": "GET /v1/auth/status",
+        "register_uri": "POST /v1/auth/register",
+        "login_uri": "POST /v1/auth/login",
+        "logout_uri": "POST /v1/auth/logout",
+        "me_uri": "GET /v1/auth/me",
+        "ui": "/chat",
+        "login_page": "/login",
+        "register_page": "/register",
         "conversations_uri": "/v1/conversations",
     }
 

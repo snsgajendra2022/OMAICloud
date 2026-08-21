@@ -139,6 +139,25 @@ def usable_generation_text(text: str | None) -> str:
     return cleaned
 
 
+def is_degenerate_generation(text: str | None) -> bool:
+    """True when local OM-1.0 collapsed into repeated possessives / token soup."""
+    s = (text or "").strip()
+    if not s:
+        return True
+    if not usable_generation_text(s):
+        return True
+    words = re.findall(r"\S+", s)
+    if len(words) < 12:
+        return False
+    poss = sum(1 for w in words if "'s" in w or "’s" in w)
+    if poss / len(words) >= 0.18:
+        return True
+    uniq = len({re.sub(r"[^\w]+", "", w.lower()) for w in words} - {""})
+    if uniq / len(words) < 0.22:
+        return True
+    return False
+
+
 def fit_messages_to_context(
     messages: list[dict],
     tokenizer,
@@ -411,10 +430,10 @@ class LocalLLMEngine:
 
         if self.tokenizer.inspect().get("chat_tokens_available"):
             max_new = int(gen_kwargs.get("max_new_tokens", 256))
-            temperature = float(gen_kwargs.get("temperature", 0.8))
+            temperature = float(gen_kwargs.get("temperature", 0.7))
             top_k = int(gen_kwargs.get("top_k", 50))
-            top_p = float(gen_kwargs.get("top_p", 1.0))
-            repetition_penalty = float(gen_kwargs.get("repetition_penalty", 1.0))
+            top_p = float(gen_kwargs.get("top_p", 0.9))
+            repetition_penalty = float(gen_kwargs.get("repetition_penalty", 1.15))
             min_new = int(gen_kwargs.get("min_new_tokens", 4))
 
             text = self._chat_once(

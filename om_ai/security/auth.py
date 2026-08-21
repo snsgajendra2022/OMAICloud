@@ -147,10 +147,18 @@ class APIKeyAuth:
         return self._keys.get(key)
 
     def validate_full(self, key: str) -> Optional[dict]:
-        """Validate env or DB token. Returns {role, name, tenant_id, source}."""
+        """Validate env key, account session, or DB API token."""
         role = self._keys.get(key)
         if role:
             return {"role": role, "name": "env-key", "tenant_id": "default", "source": "env"}
+        try:
+            from om_ai.security.accounts import get_account_store
+
+            session = get_account_store().validate_session(key)
+            if session:
+                return session
+        except Exception:
+            logger.exception("account session validate failed")
         try:
             from om_ai.security.tokens import get_token_store
             rec = get_token_store().validate(key)
@@ -163,6 +171,8 @@ class APIKeyAuth:
                     "id": rec["id"],
                 }
         except Exception:
+            # Never treat a token-store glitch as a hard crash; env keys already
+            # matched above. Log and fall through to unauthorized.
             logger.exception("token DB validate failed")
         return None
 
@@ -208,9 +218,13 @@ def _resolve_context_from_request(request) -> TenantContext:
     if not raw_key and auth_header.lower().startswith("bearer "):
         raw_key = auth_header[7:].strip()
     if not raw_key:
+        from om_ai.security.session_cookie import read_session_cookie
+
+        raw_key = read_session_cookie(request)
+    if not raw_key:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Missing API key. Provide X-OM-API-Key or Bearer token.",
+            detail="Not signed in. Open /login or provide a Bearer token.",
             headers={"WWW-Authenticate": "Bearer"},
         )
     info = auth.validate_full(raw_key)
@@ -221,9 +235,14 @@ def _resolve_context_from_request(request) -> TenantContext:
             detail="Invalid API key.",
             headers={"WWW-Authenticate": "Bearer"},
         )
+    source = info.get("source", "key")
+    if source == "session" and info.get("id"):
+        actor = f"user:{info['id']}"
+    else:
+        actor = f"{source}:{info.get('name', raw_key[:6])}…"
     ctx = TenantContext(
         tenant_id=request.headers.get("X-Tenant-Id", info.get("tenant_id", "default")),
-        actor=f"{info.get('source', 'key')}:{info.get('name', raw_key[:6])}…",
+        actor=actor,
         role=info["role"],
         request_id=request_id,
     )

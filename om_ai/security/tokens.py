@@ -9,6 +9,7 @@ only once at creation time.
 from __future__ import annotations
 
 import hashlib
+import logging
 import os
 import secrets
 import sqlite3
@@ -19,6 +20,8 @@ from pathlib import Path
 from typing import Optional
 
 from om_ai.security.auth import VALID_ROLES
+
+logger = logging.getLogger(__name__)
 
 
 def _utc_now() -> str:
@@ -47,9 +50,17 @@ class TokenStore:
     def __init__(self, path: str | None = None) -> None:
         self.path = path or os.getenv("OM_AI_TOKENS_DB", "artifacts/tokens.sqlite3")
         Path(self.path).parent.mkdir(parents=True, exist_ok=True)
-        self._lock = threading.Lock()
-        self._conn = sqlite3.connect(self.path, check_same_thread=False)
+        self._lock = threading.RLock()
+        # timeout waits on SQLITE_BUSY instead of failing auth under concurrent load.
+        self._conn = sqlite3.connect(
+            self.path,
+            check_same_thread=False,
+            timeout=30.0,
+        )
         self._conn.row_factory = sqlite3.Row
+        self._conn.execute("PRAGMA journal_mode=WAL")
+        self._conn.execute("PRAGMA busy_timeout=30000")
+        self._conn.execute("PRAGMA synchronous=NORMAL")
         self._conn.execute(
             """
             CREATE TABLE IF NOT EXISTS api_tokens (
@@ -171,7 +182,11 @@ class TokenStore:
         return {"id": token_id, "name": row["name"], "revoked": True, "revoked_at": now}
 
     def validate(self, raw_token: str) -> Optional[dict]:
-        """Return {role, name, id, tenant_id} if valid active token."""
+        """Return {role, name, id, tenant_id} if valid active token.
+
+        Auth must succeed even if updating last_used_at hits a lock — a locked
+        write must never turn a valid key into HTTP 401.
+        """
         if not raw_token:
             return None
         digest = _hash_token(raw_token)
@@ -182,24 +197,38 @@ class TokenStore:
             ).fetchone()
             if not row or row["revoked_at"]:
                 return None
-            self._conn.execute(
-                "UPDATE api_tokens SET last_used_at=? WHERE id=?",
-                (_utc_now(), row["id"]),
-            )
-            self._conn.commit()
+            token_id = row["id"]
+            name = row["name"]
+            role = row["role"]
+            tenant_id = row["tenant_id"]
+            try:
+                self._conn.execute(
+                    "UPDATE api_tokens SET last_used_at=? WHERE id=?",
+                    (_utc_now(), token_id),
+                )
+                self._conn.commit()
+            except sqlite3.OperationalError as exc:
+                logger.warning("token last_used_at update skipped: %s", exc)
+                try:
+                    self._conn.rollback()
+                except sqlite3.Error:
+                    pass
         return {
-            "id": row["id"],
-            "name": row["name"],
-            "role": row["role"],
-            "tenant_id": row["tenant_id"],
+            "id": token_id,
+            "name": name,
+            "role": role,
+            "tenant_id": tenant_id,
         }
 
 
 _store: TokenStore | None = None
+_store_lock = threading.Lock()
 
 
 def get_token_store() -> TokenStore:
     global _store
     if _store is None:
-        _store = TokenStore()
+        with _store_lock:
+            if _store is None:
+                _store = TokenStore()
     return _store

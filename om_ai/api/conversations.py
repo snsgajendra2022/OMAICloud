@@ -29,18 +29,29 @@ def get_store() -> ConversationStore:
     return _store
 
 
+def get_bound_conversation_store() -> ConversationStore | None:
+    return _store
+
+
 # ── Request models ───────────────────────────────────────────────────────────
 
 
 class CreateConversationRequest(BaseModel):
     title: str = "New chat"
     folder_id: str | None = None
+    project_id: str | None = None
 
 
 class UpdateConversationRequest(BaseModel):
     title: str | None = None
     folder_id: str | None = None
     clear_folder: bool = False
+    pinned: bool | None = None
+    archived: bool | None = None
+    project_id: str | None = None
+    clear_project: bool = False
+    enable_share: bool = False
+    clear_share: bool = False
 
 
 class AppendMessagesRequest(BaseModel):
@@ -59,6 +70,8 @@ class RenameFolderRequest(BaseModel):
 class ProfileUpdateRequest(BaseModel):
     display_name: str | None = None
     avatar_initial: str | None = None
+    last_conversation_id: str | None = None
+    clear_last_conversation: bool = False
 
 
 class ConversationFeedbackRequest(BaseModel):
@@ -73,6 +86,9 @@ class ConversationFeedbackRequest(BaseModel):
 def list_conversations(
     folder_id: str | None = None,
     unfiled: bool = False,
+    project_id: str | None = None,
+    include_archived: bool = False,
+    archived_only: bool = False,
     ctx: TenantContext = Depends(require_auth),
 ):
     store = get_store()
@@ -81,6 +97,9 @@ def list_conversations(
         ctx.actor,
         folder_id=folder_id,
         unfiled_only=unfiled,
+        project_id=project_id,
+        include_archived=include_archived,
+        archived_only=archived_only,
     )
     return {
         "conversations": [c.to_dict() for c in items],
@@ -101,6 +120,13 @@ def create_conversation(
             title=req.title,
             folder_id=req.folder_id,
         )
+        if req.project_id:
+            conv = store.update_conversation(
+                conv.id,
+                ctx.tenant_id,
+                ctx.actor,
+                project_id=req.project_id,
+            )
     except KeyError as exc:
         raise HTTPException(status_code=404, detail=str(exc)) from exc
     return conv.to_dict()
@@ -115,6 +141,7 @@ def get_conversation(
     try:
         conv = store.get_conversation(conversation_id, ctx.tenant_id, ctx.actor)
         messages = store.list_messages(conversation_id, ctx.tenant_id, ctx.actor)
+        store.set_last_conversation(ctx.tenant_id, ctx.actor, conversation_id)
     except KeyError as exc:
         raise HTTPException(status_code=404, detail=str(exc)) from exc
     return {
@@ -135,6 +162,11 @@ def update_conversation(
         folder_arg = None
     elif req.folder_id is not None:
         folder_arg = req.folder_id
+    project_arg: Any = ...
+    if req.clear_project:
+        project_arg = None
+    elif req.project_id is not None:
+        project_arg = req.project_id
     try:
         conv = store.update_conversation(
             conversation_id,
@@ -142,6 +174,11 @@ def update_conversation(
             ctx.actor,
             title=req.title,
             folder_id=folder_arg,
+            pinned=req.pinned,
+            archived=req.archived,
+            project_id=project_arg,
+            enable_share=req.enable_share,
+            clear_share=req.clear_share,
         )
     except KeyError as exc:
         raise HTTPException(status_code=404, detail=str(exc)) from exc
@@ -159,6 +196,87 @@ def delete_conversation(
     except KeyError as exc:
         raise HTTPException(status_code=404, detail=str(exc)) from exc
     return {"ok": True, "id": conversation_id}
+
+
+@router.get("/v1/conversations/{conversation_id}/export")
+def export_conversation(
+    conversation_id: str,
+    ctx: TenantContext = Depends(require_auth),
+):
+    store = get_store()
+    try:
+        md = store.export_conversation_markdown(
+            conversation_id, ctx.tenant_id, ctx.actor
+        )
+        conv = store.get_conversation(conversation_id, ctx.tenant_id, ctx.actor)
+    except KeyError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+    return {
+        "id": conversation_id,
+        "title": conv.title,
+        "format": "markdown",
+        "content": md,
+    }
+
+
+@router.post("/v1/conversations/{conversation_id}/share")
+def share_conversation(
+    conversation_id: str,
+    ctx: TenantContext = Depends(require_auth),
+):
+    store = get_store()
+    try:
+        conv = store.update_conversation(
+            conversation_id,
+            ctx.tenant_id,
+            ctx.actor,
+            enable_share=True,
+        )
+    except KeyError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+    token = conv.share_token
+    return {
+        "id": conversation_id,
+        "share_token": token,
+        "share_path": f"/share/{token}" if token else None,
+        "share_url": f"/share/{token}" if token else None,
+    }
+
+
+@router.delete("/v1/conversations/{conversation_id}/share")
+def unshare_conversation(
+    conversation_id: str,
+    ctx: TenantContext = Depends(require_auth),
+):
+    store = get_store()
+    try:
+        conv = store.update_conversation(
+            conversation_id,
+            ctx.tenant_id,
+            ctx.actor,
+            clear_share=True,
+        )
+    except KeyError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+    return {"ok": True, "id": conversation_id, "share_token": conv.share_token}
+
+
+@router.get("/share/{share_token}")
+def public_shared_conversation(share_token: str):
+    """Public read-only share view (no auth)."""
+    store = get_store()
+    conv = store.get_conversation_by_share_token(share_token)
+    if not conv:
+        raise HTTPException(status_code=404, detail="Share link not found")
+    messages = store.list_messages(conv.id, conv.tenant_id, conv.actor)
+    return {
+        "title": conv.title,
+        "created_at": conv.created_at,
+        "messages": [
+            {"role": m.role, "content": m.content, "created_at": m.created_at}
+            for m in messages
+        ],
+    }
 
 
 @router.post("/v1/conversations/{conversation_id}/messages")
@@ -303,7 +421,7 @@ def get_profile(ctx: TenantContext = Depends(require_auth)):
     return {
         **profile.to_dict(),
         "role": ctx.role,
-        "api_key_hint": "API key is stored only in your browser (Settings).",
+        "account_actor": ctx.actor.startswith("user:"),
     }
 
 
@@ -313,10 +431,17 @@ def update_profile(
     ctx: TenantContext = Depends(require_auth),
 ):
     store = get_store()
+    kwargs: dict[str, Any] = {
+        "display_name": req.display_name,
+        "avatar_initial": req.avatar_initial,
+    }
+    if req.clear_last_conversation:
+        kwargs["last_conversation_id"] = None
+    elif req.last_conversation_id is not None:
+        kwargs["last_conversation_id"] = req.last_conversation_id
     profile = store.upsert_profile(
         ctx.tenant_id,
         ctx.actor,
-        display_name=req.display_name,
-        avatar_initial=req.avatar_initial,
+        **kwargs,
     )
     return {**profile.to_dict(), "role": ctx.role}

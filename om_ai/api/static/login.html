@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Sign in · OM</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #F8FAFC; --panel: #FFFFFF; --border: #E5E7EB;
+      --text: #111827; --muted: #6B7280; --primary: #111827;
+      --accent: #2563EB; --ok: #059669; --err: #DC2626;
+      --sans: "Plus Jakarta Sans", system-ui, sans-serif;
+    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; margin: 0; }
+    body {
+      font-family: var(--sans); color: var(--text); background: var(--bg);
+      display: grid; place-items: center; padding: 24px;
+    }
+    .shell {
+      width: min(420px, 100%); background: var(--panel); border: 1px solid var(--border);
+      border-radius: 20px; padding: 36px 32px 28px;
+      box-shadow: 0 20px 50px rgba(17, 24, 39, 0.06);
+    }
+    .brand { display: flex; align-items: center; gap: 12px; margin-bottom: 28px; }
+    .mark { width: 36px; height: 36px; border-radius: 10px; background: linear-gradient(145deg, #1f2937, #111827); }
+    .brand h1 { margin: 0; font-size: 20px; letter-spacing: -0.03em; }
+    .brand p { margin: 2px 0 0; color: var(--muted); font-size: 13px; }
+    h2 { margin: 0 0 6px; font-size: 24px; letter-spacing: -0.03em; font-weight: 650; }
+    .sub { margin: 0 0 22px; color: var(--muted); font-size: 14px; line-height: 1.45; }
+    label { display: block; font-size: 13px; font-weight: 600; margin: 0 0 6px; color: var(--muted); }
+    input {
+      width: 100%; border: 1px solid var(--border); background: #fff;
+      border-radius: 12px; padding: 12px 14px; font: inherit; font-size: 15px;
+      margin-bottom: 14px; outline: none; color: var(--text);
+    }
+    input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(37,99,235,0.12); }
+    button.primary {
+      width: 100%; border: 0; border-radius: 12px; padding: 13px 16px;
+      background: var(--primary); color: #fff; font: inherit; font-weight: 650;
+      font-size: 15px; cursor: pointer; margin-top: 4px;
+    }
+    button.primary:hover { background: #1f2937; }
+    button.primary:disabled { opacity: 0.55; cursor: not-allowed; }
+    .msg { min-height: 20px; margin: 12px 0 0; font-size: 13px; color: var(--muted); }
+    .msg.err { color: var(--err); }
+    .msg.ok { color: var(--ok); }
+    .foot {
+      margin-top: 22px; padding-top: 18px; border-top: 1px solid var(--border);
+      text-align: center; font-size: 14px; color: var(--muted);
+    }
+    .foot a { color: var(--accent); font-weight: 650; text-decoration: none; }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <div class="brand">
+      <div class="mark" aria-hidden="true"></div>
+      <div><h1>OM</h1><p>AI workspace</p></div>
+    </div>
+    <h2>Sign in</h2>
+    <p class="sub">Continue to your chats with OM-1.0.</p>
+    <form id="loginForm">
+      <label for="email">Email</label>
+      <input id="email" type="email" required autocomplete="username" placeholder="you@example.com" />
+      <label for="password">Password</label>
+      <input id="password" type="password" required minlength="8" autocomplete="current-password" placeholder="••••••••" />
+      <button class="primary" id="submitBtn" type="submit">Sign in &amp; open chat</button>
+      <p class="msg" id="msg" role="status"></p>
+    </form>
+    <div class="foot">New here? <a href="/register">Create account</a></div>
+  </main>
+  <script>
+    (function () {
+      const next = "/chat";
+      const msg = document.getElementById("msg");
+      const btn = document.getElementById("submitBtn");
+      fetch("/v1/auth/me", { credentials: "include" })
+        .then(function (r) { if (r.ok) location.replace(next); }).catch(function () {});
+      document.getElementById("loginForm").addEventListener("submit", async function (e) {
+        e.preventDefault();
+        msg.textContent = ""; msg.className = "msg"; btn.disabled = true;
+        try {
+          const res = await fetch("/v1/auth/login", {
+            method: "POST", credentials: "include",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              email: document.getElementById("email").value.trim(),
+              password: document.getElementById("password").value,
+            }),
+          });
+          const data = await res.json().catch(function () { return {}; });
+          if (!res.ok) throw new Error(typeof data.detail === "string" ? data.detail : "Sign in failed");
+          msg.textContent = "Opening chat…"; msg.className = "msg ok";
+          location.replace(next);
+        } catch (err) {
+          msg.textContent = String(err.message || err); msg.className = "msg err"; btn.disabled = false;
+        }
+      });
+    })();
+  </script>
+</body>
+</html>

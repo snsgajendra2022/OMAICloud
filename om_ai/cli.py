@@ -340,6 +340,7 @@ def train_om1(args):
         log_every=args.log_every,
         precision=args.precision,
         resume=args.resume,
+        allow_unbounded=args.allow_unbounded_steps,
     )
     print(json.dumps(payload, indent=2))
 
@@ -643,6 +644,11 @@ def main():
     t1.add_argument("--log-every", type=int, default=1)
     t1.add_argument("--precision", default="auto", choices=["auto", "fp32", "fp16", "bf16"])
     t1.add_argument("--resume")
+    t1.add_argument(
+        "--allow-unbounded-steps",
+        action="store_true",
+        help="Allow >250k steps on MPS/CPU. Still cannot match ChatGPT on this architecture.",
+    )
     t1.set_defaults(func=train_om1)
 
     t70 = sp.add_parser(

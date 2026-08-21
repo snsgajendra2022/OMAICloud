@@ -124,12 +124,18 @@ class OMNativeBackend:
             self._load_error = "OM-1.0 checkpoint unavailable."
             raise NativeCheckpointError(self._load_error)
 
-        # Bind tokenizer_sha256 from registry metadata when present.
+        # Bind tokenizer_sha256 from registry only when loading that same checkpoint.
         try:
             from om_ai.backends.om_registry import load_registry_metadata
 
             reg = load_registry_metadata()
-            if reg and tokenizer_path and Path(tokenizer_path).is_file():
+            reg_ckpt = str(reg.get("checkpoint") or "") if reg else ""
+            same_ckpt = bool(
+                reg_ckpt
+                and checkpoint_path
+                and Path(reg_ckpt).resolve() == Path(checkpoint_path).resolve()
+            )
+            if same_ckpt and reg and tokenizer_path and Path(tokenizer_path).is_file():
                 expected = reg.get("tokenizer_sha256") or reg.get("tokenizer_fingerprint")
                 actual = tokenizer_fingerprint(tokenizer_path)
                 if expected and expected != actual:

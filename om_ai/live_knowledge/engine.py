@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import os
+import re
 from dataclasses import dataclass, field
 from functools import lru_cache
 from typing import Any
@@ -60,32 +61,63 @@ def _compact(text: str, limit: int) -> str:
     text = " ".join((text or "").split())
     if len(text) <= limit:
         return text
-    return text[: limit - 1].rstrip() + "…"
+    cut = text[:limit].rsplit(" ", 1)[0]
+    return (cut or text[:limit]).rstrip(".,;:") + "…"
+
+
+def strip_live_knowledge_boilerplate(text: str) -> str:
+    """Remove old dump headers and source URLs from user-facing replies."""
+    s = (text or "").strip()
+    if not s:
+        return s
+    s = re.sub(
+        r"(?is)^Live knowledge\s*\(retrieved[^)]*\)\s*:?\s*",
+        "",
+        s,
+    ).strip()
+    s = re.sub(r"(?im)^Question:\s*.+$", "", s).strip()
+    s = re.sub(
+        r"(?is)\n*OM-1\.0 should treat the facts above[\s\S]*$",
+        "",
+        s,
+    ).strip()
+    # Drop bare URL lines and "Source: …" lines.
+    s = re.sub(r"(?im)^\s*Source:\s*\S+\s*$", "", s)
+    s = re.sub(r"(?im)^\s*https?://\S+\s*$", "", s)
+    s = re.sub(r"\s*\(https?://[^)]+\)", "", s)
+    s = re.sub(r"(?m)^\d+\.\s+.+\n", "", s)  # numbered titles
+    if re.match(r"(?m)^\d+\.\s+", s):
+        chunks: list[str] = []
+        for m in re.finditer(
+            r"(?ms)^\d+\.\s+(.+?)\n\s*(.+?)(?:\n\s*Source:\s*\S+)?(?:\n\n|\Z)",
+            s,
+        ):
+            body = re.sub(r"\s+", " ", m.group(2).strip())
+            if body:
+                chunks.append(body)
+        if chunks:
+            return chunks[0]
+    return re.sub(r"\n{3,}", "\n\n", s).strip()
 
 
 def compose_grounded_reply(query: str, evidence: list[Evidence]) -> str | None:
-    """Deterministic answer from retrieved text — not an LLM."""
+    """Direct natural answer — plain text only, no URLs / no numbered dump."""
     if not evidence:
         return None
-    top = evidence[:3]
-    lines = [
-        "Live knowledge (retrieved; not another LLM):",
-        f"Question: {_compact(query, 240)}",
-        "",
-    ]
-    for i, ev in enumerate(top, 1):
-        body = _compact(ev.text, 480)
-        title = ev.title or ev.source
-        lines.append(f"{i}. {title}")
-        lines.append(f"   {body}")
-        if ev.url:
-            lines.append(f"   Source: {ev.url}")
-        lines.append("")
-    lines.append(
-        "OM-1.0 should treat the facts above as current retrieved context. "
-        "If details conflict, prefer the newest cited source."
-    )
-    return "\n".join(lines).strip()
+    filtered: list[Evidence] = []
+    for ev in evidence:
+        blob = f"{ev.title} {ev.text} {ev.url}".lower()
+        if any(x in blob for x in ("ollama", "chatgpt", "openai.com", "gpt-4", "claude")):
+            continue
+        filtered.append(ev)
+    if not filtered:
+        filtered = list(evidence)
+
+    top = filtered[0]
+    answer = _compact(top.text, 650)
+    if not answer:
+        return None
+    return answer
 
 
 def compose_context_block(evidence: list[Evidence], *, max_chars: int = 900) -> str:
@@ -119,8 +151,8 @@ class LiveKnowledgeEngine:
         self.index = index if index is not None else _default_local_index()
         self.allow_network = network_enabled() if allow_network is None else allow_network
 
-    def collect(self, messages: list[dict]) -> LiveKnowledgeResult:
-        decision = self.router.decide(messages)
+    def collect(self, messages: list[dict], *, force: bool = False) -> LiveKnowledgeResult:
+        decision = self.router.decide(messages, force=force)
         result = LiveKnowledgeResult(
             needs_live=decision.needs_live,
             reason=decision.reason,
