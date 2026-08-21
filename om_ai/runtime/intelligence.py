@@ -141,11 +141,22 @@ def aligned_memory_reply(user_text: str, memories: list[dict[str, Any]]) -> str 
 
 # ── Retrieval helpers ────────────────────────────────────────────────────────
 
-def load_ui_memories(tenant_id: str, actor: str, *, limit: int = 12) -> list[dict[str, Any]]:
+def load_ui_memories(
+    tenant_id: str,
+    actor: str,
+    *,
+    limit: int = 12,
+    project_id: str | None = None,
+) -> list[dict[str, Any]]:
     try:
         from om_ai.api.platform_store import get_platform_store
 
-        items = get_platform_store().list_memories(tenant_id, actor)
+        store = get_platform_store()
+        if project_id:
+            items = store.list_project_memories(project_id, tenant_id, actor)
+            items.sort(key=lambda m: float(m.get("importance") or 0.5), reverse=True)
+            return items[:limit]
+        items = store.list_memories(tenant_id, actor)
         enabled = [m for m in items if m.get("enabled") not in (0, False, "0")]
         enabled.sort(key=lambda m: float(m.get("importance") or 0.5), reverse=True)
         return enabled[:limit]
@@ -161,12 +172,27 @@ def save_ui_memory(
     content: str,
     importance: float = 0.7,
     kind: str = "semantic",
+    project_id: str | None = None,
 ) -> None:
     try:
         from om_ai.api.platform_store import get_platform_store
 
         store = get_platform_store()
-        # De-dupe exact content
+        if project_id:
+            existing = store.list_project_memories(project_id, tenant_id, actor)
+            if any(
+                str(m.get("content") or "").strip().lower() == content.strip().lower()
+                for m in existing
+            ):
+                return
+            store.create_project_memory(
+                project_id,
+                tenant_id,
+                actor,
+                content=content,
+                importance=importance,
+            )
+            return
         existing = store.list_memories(tenant_id, actor)
         if any(str(m.get("content") or "").strip().lower() == content.strip().lower() for m in existing):
             return
@@ -201,7 +227,14 @@ def retrieve_rag(query: str, *, tenant_id: str = "default", k: int = 3) -> list[
         return []
 
 
-def retrieve_file_snippets(query: str, *, tenant_id: str, actor: str, k: int = 2) -> list[str]:
+def retrieve_file_snippets(
+    query: str,
+    *,
+    tenant_id: str,
+    actor: str,
+    k: int = 2,
+    project_id: str | None = None,
+) -> list[str]:
     """Lightweight local file RAG from uploaded platform files."""
     if not _env_flag("OM_CHAT_FILE_RAG", True):
         return []
@@ -211,9 +244,11 @@ def retrieve_file_snippets(query: str, *, tenant_id: str, actor: str, k: int = 2
     try:
         from om_ai.api.platform_store import get_platform_store
 
-        files = get_platform_store().list_files(tenant_id, actor, q=q)[:k]
+        files = get_platform_store().list_files(
+            tenant_id, actor, q=q, project_id=project_id
+        )[: max(k, 4 if project_id else k)]
         out = []
-        for f in files:
+        for f in files[:k]:
             preview = str(f.get("preview") or f.get("content_text") or "").strip()
             if preview:
                 out.append(f"File {f.get('name')}: {preview[:350]}")
@@ -250,6 +285,7 @@ def enrich_for_chat(
     actor: str = "",
     assistant_instructions: str = "",
     project_instructions: str = "",
+    project_id: str | None = None,
     compact: bool = True,
 ) -> IntelligenceBundle:
     """Build instruction + memory + RAG context for one chat turn."""
@@ -271,6 +307,7 @@ def enrich_for_chat(
                 content=cand["content"],
                 importance=float(cand.get("importance") or 0.7),
                 kind=str(cand.get("kind") or "semantic"),
+                project_id=project_id,
             )
             bundle.meta.setdefault("saved_memories", []).append(cand["content"])
             # Aligned acknowledgment (instruction following) instead of base-model junk.
@@ -290,7 +327,7 @@ def enrich_for_chat(
 
     memories: list[dict[str, Any]] = []
     if actor and _env_flag("OM_CHAT_MEMORY", True):
-        memories = load_ui_memories(tenant_id, actor)
+        memories = load_ui_memories(tenant_id, actor, project_id=project_id)
     bundle.memories = memories
 
     if bundle.direct_reply:
@@ -317,10 +354,11 @@ def enrich_for_chat(
         parts.append("Project instructions:\n" + project_instructions.strip()[:1500])
 
     if memories:
+        label = "Project memory:" if project_id else "Memory about this user:"
         mem_lines = [f"- {str(m.get('content') or '').strip()}" for m in memories[:6]]
         mem_lines = [x for x in mem_lines if len(x) > 3]
         if mem_lines:
-            block = "Memory about this user:\n" + "\n".join(mem_lines)
+            block = label + "\n" + "\n".join(mem_lines)
             if compact:
                 block = block[:500]
             parts.append(block)
@@ -329,7 +367,15 @@ def enrich_for_chat(
     if _env_flag("OM_CHAT_RAG", True) and user_text:
         rag = retrieve_rag(user_text, tenant_id=tenant_id, k=2)
         if actor:
-            rag.extend(retrieve_file_snippets(user_text, tenant_id=tenant_id, actor=actor, k=1))
+            rag.extend(
+                retrieve_file_snippets(
+                    user_text,
+                    tenant_id=tenant_id,
+                    actor=actor,
+                    k=2 if project_id else 1,
+                    project_id=project_id,
+                )
+            )
     bundle.rag_snippets = rag
     if rag:
         rag_block = "Knowledge (use only if relevant):\n" + "\n".join(
@@ -356,6 +402,7 @@ def enrich_for_chat(
             "rag_count": len(rag),
             "has_assistant_instructions": bool(assistant_instructions.strip()),
             "has_project_instructions": bool(project_instructions.strip()),
+            "project_id": project_id or "",
         }
     )
     return bundle

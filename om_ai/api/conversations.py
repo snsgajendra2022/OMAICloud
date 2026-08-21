@@ -89,6 +89,7 @@ def list_conversations(
     project_id: str | None = None,
     include_archived: bool = False,
     archived_only: bool = False,
+    pinned_only: bool = False,
     ctx: TenantContext = Depends(require_auth),
 ):
     store = get_store()
@@ -100,6 +101,7 @@ def list_conversations(
         project_id=project_id,
         include_archived=include_archived,
         archived_only=archived_only,
+        pinned_only=pinned_only,
     )
     return {
         "conversations": [c.to_dict() for c in items],

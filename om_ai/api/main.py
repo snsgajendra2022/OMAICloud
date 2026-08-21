@@ -801,7 +801,7 @@ def _serve_static_html(name: str):
     )
 
 
-def _serve_tokens_chat_ui():
+def _serve_tokens_ui():
     return _serve_static_html("tokens.html")
 
 
@@ -833,8 +833,10 @@ def chat_ui():
 
 
 @app.get("/ui/tokens", tags=["UI"])
+@app.get("/tokens", tags=["UI"])
 def tokens_ui():
-    return _serve_tokens_chat_ui()
+    """Dedicated API key management page (not the chat UI)."""
+    return _serve_tokens_ui()
 
 
 @app.get("/ui/settings", tags=["UI"])
@@ -887,11 +889,19 @@ def create_token(
 ):
     """Create a named API token. Plaintext secret is returned once."""
     from om_ai.security.tokens import get_token_store
+    role = (req.role or "agent").strip().lower()
+    # Non-admin sessions cannot mint admin tokens.
+    if role == "admin" and ctx.role != "admin":
+        raise HTTPException(
+            status_code=403,
+            detail="Only admin accounts can create admin API keys.",
+        )
     try:
         created = get_token_store().create(
             name=req.name,
-            role=req.role,
+            role=role,
             tenant_id=req.tenant_id or ctx.tenant_id,
+            owner_actor=ctx.actor,
         )
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
@@ -900,7 +910,7 @@ def create_token(
         ctx.actor,
         ctx.tenant_id,
         resource="/v1/tokens",
-        detail={"name": req.name, "role": req.role, "id": created["id"]},
+        detail={"name": req.name, "role": role, "id": created["id"]},
     )
     return created
 
@@ -912,9 +922,11 @@ def list_tokens(
 ):
     from om_ai.security.tokens import get_token_store
     return {
-        "database": get_token_store().path,
-        "model": os.getenv("OM_AI_MODEL_ID", "om:free"),
-        "tokens": get_token_store().list(include_revoked=include_revoked),
+        "tokens": get_token_store().list(
+            include_revoked=include_revoked,
+            owner_actor=ctx.actor,
+            tenant_id=ctx.tenant_id,
+        ),
     }
 
 
@@ -925,7 +937,11 @@ def revoke_token(
 ):
     from om_ai.security.tokens import get_token_store
     try:
-        result = get_token_store().revoke(token_id)
+        result = get_token_store().revoke(
+            token_id,
+            owner_actor=ctx.actor,
+            tenant_id=ctx.tenant_id,
+        )
     except KeyError as exc:
         raise HTTPException(status_code=404, detail=str(exc)) from exc
     _audit(

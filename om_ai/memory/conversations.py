@@ -316,6 +316,7 @@ class ConversationStore:
         project_id: str | None = None,
         include_archived: bool = False,
         archived_only: bool = False,
+        pinned_only: bool = False,
     ) -> list[Conversation]:
         q = """
             SELECT c.id, c.tenant_id, c.actor, c.title, c.folder_id,
@@ -332,6 +333,8 @@ class ConversationStore:
             q += " AND COALESCE(c.archived, 0) = 1"
         elif not include_archived:
             q += " AND COALESCE(c.archived, 0) = 0"
+        if pinned_only:
+            q += " AND COALESCE(c.pinned, 0) = 1"
         if unfiled_only:
             q += " AND c.folder_id IS NULL"
         elif folder_id is not None:

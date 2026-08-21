@@ -87,6 +87,8 @@ class ChatCompletionsRequest(BaseModel):
     user: str | None = None
     top_k: int | None = None
     repetition_penalty: float | None = None
+    project_id: str | None = None
+    conversation_id: str | None = None
 
 
 class CompletionsRequest(BaseModel):
@@ -162,6 +164,48 @@ def _sse(data: dict) -> str:
     return f"data: {json.dumps(data, ensure_ascii=False)}\n\n"
 
 
+def _resolve_project_context(
+    *,
+    tenant_id: str,
+    actor: str,
+    project_id: str | None = None,
+    conversation_id: str | None = None,
+) -> tuple[str | None, str]:
+    """Return (project_id, project_instructions)."""
+    pid = (project_id or "").strip() or None
+    if not pid and conversation_id:
+        try:
+            from om_ai.api.conversations import get_bound_conversation_store
+
+            store = get_bound_conversation_store()
+            if store is not None:
+                conv = store.get_conversation(conversation_id, tenant_id, actor)
+                pid = getattr(conv, "project_id", None) or None
+        except Exception:
+            pid = None
+    if not pid:
+        return None, ""
+    try:
+        from om_ai.api.workspace_store import get_workspace_store
+
+        proj = get_workspace_store().get_project(pid, tenant_id, actor)
+        instructions = str(proj.get("instructions") or "").strip()
+        if not instructions:
+            try:
+                from om_ai.api.platform_store import get_platform_store
+
+                versions = get_platform_store().list_instruction_versions(
+                    tenant_id, actor, owner_type="project", owner_id=pid
+                )
+                if versions:
+                    instructions = str(versions[0].get("content") or "").strip()
+            except Exception:
+                pass
+        return pid, instructions
+    except Exception:
+        return pid, ""
+
+
 def _run_chat(
     messages: list[dict],
     *,
@@ -172,6 +216,8 @@ def _run_chat(
     repetition_penalty: float | None = None,
     tenant_id: str = "default",
     actor: str = "",
+    project_id: str | None = None,
+    project_instructions: str = "",
 ) -> tuple[str, str, str, str]:
     """Return (text, response_model_id, backend_name, provider)."""
     info = resolve_backend(local_loaded=_local_loaded(), native_ready=_native_ready())
@@ -189,6 +235,8 @@ def _run_chat(
             repetition_penalty=repetition_penalty,
             tenant_id=tenant_id,
             actor=actor,
+            project_id=project_id,
+            project_instructions=project_instructions,
         )
     except NativeCheckpointError as exc:
         raise HTTPException(
@@ -287,6 +335,12 @@ async def chat_completions(
     repetition_penalty = (
         float(req.repetition_penalty) if req.repetition_penalty is not None else None
     )
+    project_id, project_instructions = _resolve_project_context(
+        tenant_id=ctx.tenant_id,
+        actor=ctx.actor,
+        project_id=req.project_id,
+        conversation_id=req.conversation_id,
+    )
 
     # When native is forced and checkpoint missing, fail fast with 503 (no third-party LLM).
     if configured_backend() == "om_native" and not _native_ready():
@@ -323,6 +377,8 @@ async def chat_completions(
                     repetition_penalty=repetition_penalty,
                     tenant_id=ctx.tenant_id,
                     actor=ctx.actor,
+                    project_id=project_id,
+                    project_instructions=project_instructions,
                 )
             except HTTPException as exc:
                 yield _sse({"error": {"message": str(exc.detail), "type": "server_error"}})
@@ -377,6 +433,8 @@ async def chat_completions(
         repetition_penalty=repetition_penalty,
         tenant_id=ctx.tenant_id,
         actor=ctx.actor,
+        project_id=project_id,
+        project_instructions=project_instructions,
     )
     return _chat_response(model_name, text, backend=backend, provider=provider)
 

@@ -33,6 +33,9 @@ class WorkspaceStore:
                 name TEXT NOT NULL,
                 description TEXT NOT NULL DEFAULT '',
                 instructions TEXT NOT NULL DEFAULT '',
+                model TEXT NOT NULL DEFAULT 'OM-1.0',
+                favorite INTEGER NOT NULL DEFAULT 0,
+                archived INTEGER NOT NULL DEFAULT 0,
                 created_at TEXT NOT NULL,
                 updated_at TEXT NOT NULL
             );
@@ -54,17 +57,57 @@ class WorkspaceStore:
             """
         )
         self._conn.commit()
+        self._migrate_projects()
 
-    def list_projects(self, tenant_id: str, actor: str) -> list[dict[str, Any]]:
+    def _migrate_projects(self) -> None:
+        cols = {r[1] for r in self._conn.execute("PRAGMA table_info(workspace_projects)").fetchall()}
+        for col, decl in (
+            ("model", "TEXT NOT NULL DEFAULT 'OM-1.0'"),
+            ("favorite", "INTEGER NOT NULL DEFAULT 0"),
+            ("archived", "INTEGER NOT NULL DEFAULT 0"),
+        ):
+            if col not in cols:
+                self._conn.execute(f"ALTER TABLE workspace_projects ADD COLUMN {col} {decl}")
+        self._conn.commit()
+
+    def list_projects(
+        self,
+        tenant_id: str,
+        actor: str,
+        *,
+        q: str = "",
+        sort: str = "updated",
+        filter_mode: str = "all",
+    ) -> list[dict[str, Any]]:
         with self._lock:
-            rows = self._conn.execute(
-                """
+            sql = """
                 SELECT * FROM workspace_projects
                 WHERE tenant_id=? AND actor=?
-                ORDER BY updated_at DESC
-                """,
-                (tenant_id, actor),
-            ).fetchall()
+            """
+            params: list[Any] = [tenant_id, actor]
+            mode = (filter_mode or "all").strip().lower()
+            if mode == "favorites":
+                sql += " AND COALESCE(favorite,0)=1 AND COALESCE(archived,0)=0"
+            elif mode == "archived":
+                sql += " AND COALESCE(archived,0)=1"
+            elif mode == "recent":
+                sql += " AND COALESCE(archived,0)=0"
+            else:
+                sql += " AND COALESCE(archived,0)=0"
+            if q.strip():
+                like = f"%{q.strip()}%"
+                sql += " AND (name LIKE ? OR description LIKE ? OR instructions LIKE ?)"
+                params.extend([like, like, like])
+            sort_key = (sort or "updated").strip().lower()
+            if sort_key == "name":
+                sql += " ORDER BY name COLLATE NOCASE ASC"
+            elif sort_key == "created":
+                sql += " ORDER BY created_at DESC"
+            elif sort_key == "favorite":
+                sql += " ORDER BY COALESCE(favorite,0) DESC, updated_at DESC"
+            else:
+                sql += " ORDER BY updated_at DESC"
+            rows = self._conn.execute(sql, params).fetchall()
         return [dict(r) for r in rows]
 
     def get_project(self, project_id: str, tenant_id: str, actor: str) -> dict[str, Any]:
@@ -88,6 +131,7 @@ class WorkspaceStore:
         name: str,
         description: str = "",
         instructions: str = "",
+        model: str = "OM-1.0",
     ) -> dict[str, Any]:
         name = (name or "").strip() or "Untitled project"
         pid = uuid.uuid4().hex
@@ -96,10 +140,21 @@ class WorkspaceStore:
             self._conn.execute(
                 """
                 INSERT INTO workspace_projects
-                (id, tenant_id, actor, name, description, instructions, created_at, updated_at)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                (id, tenant_id, actor, name, description, instructions, model,
+                 favorite, archived, created_at, updated_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, 0, 0, ?, ?)
                 """,
-                (pid, tenant_id, actor, name[:120], description[:2000], instructions[:8000], now, now),
+                (
+                    pid,
+                    tenant_id,
+                    actor,
+                    name[:120],
+                    description[:2000],
+                    instructions[:8000],
+                    (model or "OM-1.0")[:64],
+                    now,
+                    now,
+                ),
             )
             self._conn.commit()
             row = self._conn.execute(
@@ -245,6 +300,9 @@ class WorkspaceStore:
         name: str | None = None,
         description: str | None = None,
         instructions: str | None = None,
+        model: str | None = None,
+        favorite: bool | None = None,
+        archived: bool | None = None,
     ) -> dict[str, Any]:
         with self._lock:
             row = self._conn.execute(
@@ -253,16 +311,26 @@ class WorkspaceStore:
             ).fetchone()
             if not row:
                 raise KeyError("project not found")
+            fav = int(row["favorite"]) if "favorite" in row.keys() else 0
+            arch = int(row["archived"]) if "archived" in row.keys() else 0
+            mdl = row["model"] if "model" in row.keys() else "OM-1.0"
+            if favorite is not None:
+                fav = 1 if favorite else 0
+            if archived is not None:
+                arch = 1 if archived else 0
             self._conn.execute(
                 """
                 UPDATE workspace_projects
-                SET name=?, description=?, instructions=?, updated_at=?
+                SET name=?, description=?, instructions=?, model=?, favorite=?, archived=?, updated_at=?
                 WHERE id=?
                 """,
                 (
                     (name if name is not None else row["name"])[:120],
                     (description if description is not None else row["description"])[:2000],
                     (instructions if instructions is not None else row["instructions"])[:8000],
+                    (model if model is not None else mdl)[:64],
+                    fav,
+                    arch,
                     _utc(),
                     project_id,
                 ),
@@ -272,6 +340,26 @@ class WorkspaceStore:
                 "SELECT * FROM workspace_projects WHERE id=?", (project_id,)
             ).fetchone()
         return dict(out)
+
+    def duplicate_project(
+        self, project_id: str, tenant_id: str, actor: str
+    ) -> dict[str, Any]:
+        with self._lock:
+            row = self._conn.execute(
+                "SELECT * FROM workspace_projects WHERE id=? AND tenant_id=? AND actor=?",
+                (project_id, tenant_id, actor),
+            ).fetchone()
+            if not row:
+                raise KeyError("project not found")
+            src = dict(row)
+        return self.create_project(
+            tenant_id,
+            actor,
+            name=f"{src['name']} (copy)",
+            description=src.get("description") or "",
+            instructions=src.get("instructions") or "",
+            model=src.get("model") or "OM-1.0",
+        )
 
 
 _store: WorkspaceStore | None = None

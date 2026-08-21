@@ -20,11 +20,11 @@ _ROLE_PERMISSIONS: dict[str, frozenset[str]] = {
     }),
     "operator": frozenset({
         "model.load", "model.generate", "agent.run", "memory.write",
-        "knowledge.write", "feedback.write", "tool.openapi",
+        "knowledge.write", "feedback.write", "tool.openapi", "admin.tokens",
     }),
     "agent": frozenset({
         "model.generate", "agent.run", "memory.write",
-        "knowledge.write", "feedback.write", "tool.openapi",
+        "knowledge.write", "feedback.write", "tool.openapi", "admin.tokens",
     }),
     "viewer": frozenset({"model.generate"}),
 }

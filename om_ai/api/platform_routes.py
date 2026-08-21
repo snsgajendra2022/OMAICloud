@@ -77,6 +77,7 @@ class KnowledgeCreate(BaseModel):
     source_type: str = Field("document", max_length=40)
     uri: str = Field("", max_length=1000)
     content: str = Field("", max_length=2_000_000)
+    project_id: str | None = None
 
 
 class SettingsPatch(BaseModel):
@@ -85,11 +86,13 @@ class SettingsPatch(BaseModel):
     response_style: str | None = None
     language: str | None = None
     temperature: float | None = None
+    max_tokens: int | None = None
     memory_enabled: bool | None = None
     notifications_email: bool | None = None
     notifications_push: bool | None = None
     notifications_tasks: bool | None = None
     privacy_history: bool | None = None
+    data_collection: bool | None = None
 
 
 class AssistantUpdate(BaseModel):
@@ -171,8 +174,16 @@ def global_search(
 
 # ---------- Files ----------
 @router.get("/v1/files")
-def list_files(q: str = "", ctx: TenantContext = Depends(require_auth)) -> dict[str, Any]:
-    return {"files": get_platform_store().list_files(ctx.tenant_id, ctx.actor, q=q)}
+def list_files(
+    q: str = "",
+    project_id: str | None = None,
+    ctx: TenantContext = Depends(require_auth),
+) -> dict[str, Any]:
+    return {
+        "files": get_platform_store().list_files(
+            ctx.tenant_id, ctx.actor, q=q, project_id=project_id or None
+        )
+    }
 
 
 @router.post("/v1/files", status_code=status.HTTP_201_CREATED)
@@ -383,7 +394,7 @@ def get_settings(ctx: TenantContext = Depends(require_auth)) -> dict[str, Any]:
 def patch_settings(
     req: SettingsPatch, ctx: TenantContext = Depends(require_auth)
 ) -> dict[str, Any]:
-    patch = {k: v for k, v in req.model_dump().items() if v is not None}
+    patch = req.model_dump(exclude_unset=True)
     return {
         "settings": get_platform_store().update_settings(ctx.tenant_id, ctx.actor, patch)
     }
@@ -391,9 +402,14 @@ def patch_settings(
 
 # ---------- Knowledge ----------
 @router.get("/v1/knowledge/sources")
-def list_knowledge_sources(ctx: TenantContext = Depends(require_auth)) -> dict[str, Any]:
+def list_knowledge_sources(
+    project_id: str | None = None,
+    ctx: TenantContext = Depends(require_auth),
+) -> dict[str, Any]:
     return {
-        "sources": get_platform_store().list_knowledge_sources(ctx.tenant_id, ctx.actor)
+        "sources": get_platform_store().list_knowledge_sources(
+            ctx.tenant_id, ctx.actor, project_id=project_id or None
+        )
     }
 
 
@@ -437,6 +453,7 @@ def create_knowledge_source(
         uri=req.uri,
         doc_count=doc_count,
         status=status_name,
+        project_id=req.project_id,
     )
     store.create_notification(
         ctx.tenant_id,
@@ -703,7 +720,8 @@ def create_scheduled_task(
 
 # ---------- Project members ----------
 class MemberCreate(BaseModel):
-    member_email: str = Field(..., min_length=3, max_length=200)
+    member_email: str | None = Field(None, min_length=3, max_length=200)
+    email: str | None = Field(None, min_length=3, max_length=200)
     role: str = Field("viewer", max_length=40)
 
 
@@ -720,12 +738,15 @@ def list_members(project_id: str, ctx: TenantContext = Depends(require_auth)) ->
 def add_member(
     project_id: str, req: MemberCreate, ctx: TenantContext = Depends(require_auth)
 ) -> dict[str, Any]:
+    email = (req.member_email or req.email or "").strip()
+    if not email:
+        raise HTTPException(status_code=400, detail="member_email required")
     try:
         return get_platform_store().add_project_member(
             project_id,
             ctx.tenant_id,
             ctx.actor,
-            member_email=req.member_email,
+            member_email=email,
             role=req.role,
         )
     except ValueError as exc:

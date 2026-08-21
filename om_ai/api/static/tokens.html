@@ -1,2784 +1,368 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta http-equiv="Cache-Control" content="no-store" />
-  <title>OM AI — Chat</title>
-  <script>
-    (function () {
-      try {
-        var mode = localStorage.getItem("om_ai_theme") || "system";
-        var dark = mode === "dark" || (mode === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches);
-        document.documentElement.setAttribute("data-theme", dark ? "dark" : "light");
-      } catch (e) {}
-    })();
-  </script>
+  <title>API Keys · OM</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <style>
     :root {
-      --bg-0: #ffffff;
-      --bg-1: #f7f7f8;
-      --bg-2: #ececf1;
-      --panel: #ffffff;
-      --sidebar: #f7f7f8;
-      --line: #e5e5e5;
-      --text: #0d0d0d;
-      --muted: #6e6e80;
-      --accent: #0d0d0d;
-      --accent-dim: rgba(13, 13, 13, 0.06);
-      --accent-hot: #2f2f2f;
-      --accent-ink: #ffffff;
-      --ok: #10a37f;
-      --warn: #d97706;
-      --err: #ef4146;
-      --user-bg: #f4f4f4;
-      --user-line: transparent;
-      --bot-bg: transparent;
-      --hover: #ececf1;
-      --active: #e8e8ed;
-      --menu: #ffffff;
-      --menu-shadow: 0 8px 28px rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(0, 0, 0, 0.06);
-      --shadow: 0 0 0 1px rgba(0, 0, 0, 0.04), 0 8px 24px rgba(0, 0, 0, 0.06);
-      --radius: 16px;
-      --mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
-      --sans: "Plus Jakarta Sans", "Segoe UI", system-ui, sans-serif;
-      --sidebar-w: 280px;
+      --bg: #F8FAFC; --panel: #FFFFFF; --side: #F8FAFC; --border: #E5E7EB;
+      --text: #111827; --muted: #6B7280; --primary: #111827;
+      --accent: #2563EB; --ok: #059669; --err: #DC2626; --soft: #F1F5F9;
+      --sans: "Plus Jakarta Sans", system-ui, sans-serif;
     }
-    html[data-theme="dark"] {
-      --bg-0: #212121;
-      --bg-1: #171717;
-      --bg-2: #2f2f2f;
-      --panel: #212121;
-      --sidebar: #171717;
-      --line: #2f2f2f;
-      --text: #ececec;
-      --muted: #8f8f8f;
-      --accent: #ececec;
-      --accent-dim: rgba(255, 255, 255, 0.08);
-      --accent-hot: #ffffff;
-      --accent-ink: #0d0d0d;
-      --ok: #10a37f;
-      --warn: #f59e0b;
-      --err: #ef4146;
-      --user-bg: #2f2f2f;
-      --user-line: transparent;
-      --bot-bg: transparent;
-      --hover: #2f2f2f;
-      --active: #323232;
-      --menu: #2f2f2f;
-      --menu-shadow: 0 8px 28px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(255, 255, 255, 0.08);
-      --shadow: 0 0 0 1px rgba(255, 255, 255, 0.06), 0 8px 24px rgba(0, 0, 0, 0.35);
-    }
-
-    html[data-theme="dark"] { color-scheme: dark; }
-    html[data-theme="light"] { color-scheme: light; }
+    * { box-sizing: border-box; }
     html, body { height: 100%; margin: 0; }
     body {
-      font-family: var(--sans);
-      color: var(--text);
-      background: var(--bg-0);
-      overflow: hidden;
-    }
-    html[data-theme="dark"] { color-scheme: dark; }
-    html[data-theme="light"] { color-scheme: light; }
-
-    .atmosphere {
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      z-index: 0;
-      background: var(--bg-0);
-    }
-    .atmosphere-grid { display: none; }
-
-    .app {
-      position: relative;
-      z-index: 1;
-      display: grid;
-      grid-template-columns: var(--sidebar-w) 1fr;
-      height: 100vh;
-      height: 100dvh;
-    }
-
-    .sidebar {
-      display: flex;
-      flex-direction: column;
-      background: var(--sidebar);
-      padding: 10px 8px 12px;
-      gap: 4px;
-      min-height: 0;
-    }
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 4px 6px 4px;
-    }
-    .brand-mark {
-      width: 32px; height: 32px;
-      border-radius: 10px;
-      background: var(--text);
-      display: grid; place-items: center;
-      flex-shrink: 0;
-      color: var(--bg-0);
-      font-size: 11px; font-weight: 700; letter-spacing: -0.06em;
-    }
-    .brand-mark::before { content: "OM"; }
-    .brand-text h1 {
-      margin: 0; font-size: 15px; font-weight: 600; letter-spacing: -0.03em; line-height: 1.1;
-    }
-    .brand-text p { margin: 2px 0 0; font-size: 11px; color: var(--muted); }
-
-    .btn-new-chat {
-      width: 100%;
-      display: flex; align-items: center; gap: 10px;
-      background: transparent; color: var(--text);
-      border: 0; border-radius: 10px;
-      padding: 10px 10px; font: inherit; font-size: 14px; font-weight: 500;
-      cursor: pointer;
-      box-shadow: none;
-      transition: background 0.12s ease;
-    }
-    .btn-new-chat svg { width: 18px; height: 18px; flex-shrink: 0; }
-    .btn-new-chat:hover { background: var(--hover); }
-    .btn-new-chat:active { transform: none; }
-
-    .brand-row {
-      display: flex; align-items: center; justify-content: space-between; gap: 8px;
-    }
-    .icon-btn {
-      appearance: none; border: 0; background: transparent !important;
-      color: var(--muted) !important; width: 32px; height: 32px; border-radius: 8px;
-      display: grid; place-items: center; cursor: pointer; padding: 0; flex-shrink: 0;
-      box-shadow: none !important; font-weight: 500;
-      transition: background 0.12s ease, color 0.12s ease;
-    }
-    .icon-btn:hover {
-      background: var(--hover) !important; color: var(--text) !important;
-    }
-    .icon-btn svg { width: 18px; height: 18px; }
-
-    .sidebar-scroll {
-      flex: 1; min-height: 0; overflow-y: auto;
-      display: flex; flex-direction: column; gap: 18px;
-      padding: 6px 4px 8px;
-    }
-    .sidebar-scroll::-webkit-scrollbar { width: 6px; }
-    .sidebar-scroll::-webkit-scrollbar-thumb { background: transparent; border-radius: 6px; }
-    .sidebar-scroll:hover::-webkit-scrollbar-thumb { background: var(--bg-2); }
-
-    .section-label {
-      display: flex; align-items: center; justify-content: space-between;
-      font-size: 12px; letter-spacing: 0; text-transform: none;
-      color: var(--muted); font-weight: 600; padding: 4px 8px 6px;
-    }
-    .section-label button {
-      appearance: none; border: 0; background: transparent; color: var(--muted);
-      font: inherit; font-size: 12px; font-weight: 500; cursor: pointer; padding: 2px 6px;
-      text-transform: none; letter-spacing: 0; border-radius: 6px;
-    }
-    .section-label button:hover { color: var(--text); background: var(--hover); }
-
-    .folder-list, .history-list, .project-chats { display: flex; flex-direction: column; gap: 1px; }
-    .project-item { display: flex; flex-direction: column; }
-    .project-item.collapsed .project-chats { display: none; }
-    .project-chats {
-      padding: 1px 0 4px 22px;
-    }
-    .folder-item, .hist-item {
-      display: grid;
-      grid-template-columns: 1fr auto;
-      align-items: center;
-      gap: 0;
-      border-radius: 10px;
-      padding: 0;
-      position: relative;
-    }
-    .folder-item button.main, .hist-item button.main {
-      appearance: none; border: 0; background: transparent;
-      text-align: left; padding: 8px 10px; border-radius: 10px;
-      font: inherit; font-size: 14px; font-weight: 400; color: var(--text); cursor: pointer;
-      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-      min-width: 0; width: 100%;
-      display: flex; align-items: center; gap: 8px;
-    }
-    .folder-item button.main svg, .hist-item button.main svg {
-      width: 16px; height: 16px; flex-shrink: 0; color: var(--muted);
-    }
-    .folder-item button.main .chevron {
-      width: 12px; height: 12px; transition: transform 0.15s ease; color: var(--muted);
-    }
-    .project-item.collapsed .chevron { transform: rotate(-90deg); }
-    .item-title { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
-    .folder-item button.main:hover, .hist-item button.main:hover {
-      background: var(--hover);
-    }
-    .hist-item.active button.main,
-    .folder-item.active button.main {
-      background: var(--active); font-weight: 500;
-    }
-    .hist-item .meta-line { display: none; }
-    .more-btn {
-      appearance: none; border: 0; background: transparent !important;
-      color: var(--muted) !important; width: 28px; height: 28px; border-radius: 8px;
-      display: grid; place-items: center; cursor: pointer; padding: 0;
-      opacity: 0; flex-shrink: 0; margin-right: 4px;
-      box-shadow: none !important; font-weight: 500;
-      transition: opacity 0.12s, background 0.12s, color 0.12s;
-    }
-    .more-btn svg { width: 16px; height: 16px; }
-    .folder-item:hover .more-btn, .hist-item:hover .more-btn,
-    .folder-item:focus-within .more-btn, .hist-item:focus-within .more-btn,
-    .more-btn.open, .more-btn:focus-visible { opacity: 1; }
-    .more-btn:hover, .more-btn.open {
-      background: var(--bg-2) !important; color: var(--text) !important;
-    }
-    .item-actions { display: none; }
-    .empty-hint { font-size: 13px; color: var(--muted); padding: 6px 10px; line-height: 1.4; }
-
-    .key-row { display: grid; grid-template-columns: 1fr auto; gap: 6px; }
-    .key-row input { margin: 0; font-size: 12px; padding: 8px 10px; }
-    .key-row button { padding: 8px 10px; font-size: 12px; min-width: 52px; }
-
-    .item-menu {
-      position: fixed; z-index: 80; min-width: 196px;
-      background: var(--menu); color: var(--text);
-      border-radius: 12px; padding: 6px;
-      box-shadow: var(--menu-shadow);
-      display: none; flex-direction: column; gap: 1px;
-    }
-    .item-menu.open { display: flex !important; }
-    .item-menu button {
-      appearance: none; border: 0; background: transparent;
-      color: var(--text); font: inherit; font-size: 14px; font-weight: 400;
-      text-align: left; padding: 9px 10px; border-radius: 8px;
-      cursor: pointer; display: flex; align-items: center; gap: 10px;
-      width: 100%; box-shadow: none;
-    }
-    .item-menu button:hover { background: var(--hover); }
-    .item-menu button.danger { color: var(--err); }
-    .item-menu button.danger:hover { background: rgba(239, 65, 70, 0.1); }
-    .item-menu button svg { width: 16px; height: 16px; flex-shrink: 0; opacity: 0.85; }
-    .item-menu .menu-sep {
-      height: 1px; background: var(--line); margin: 4px 6px;
-    }
-    .item-menu .menu-label {
-      font-size: 11px; color: var(--muted); font-weight: 600;
-      padding: 6px 10px 4px;
-    }
-
-    .modal-overlay {
-      position: fixed; inset: 0; z-index: 90;
-      background: rgba(0, 0, 0, 0.4);
-      display: none; align-items: center; justify-content: center;
-      padding: 20px;
-    }
-    .modal-overlay.open { display: flex; }
-    .modal {
-      width: min(420px, 100%);
-      background: var(--panel); color: var(--text);
-      border-radius: 16px; padding: 22px 22px 18px;
-      box-shadow: var(--menu-shadow);
-    }
-    .modal h3 {
-      margin: 0 0 6px; font-size: 17px; font-weight: 600; letter-spacing: -0.02em;
-    }
-    .modal p {
-      margin: 0 0 14px; font-size: 13px; color: var(--muted); line-height: 1.45;
-    }
-    .modal input { margin-bottom: 16px; }
-    .modal-actions { display: flex; justify-content: flex-end; gap: 8px; }
-    .modal-actions button { min-width: 84px; }
-
-    .theme-seg {
-      display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px;
-    }
-    .theme-seg button {
-      appearance: none; border: 1px solid var(--line); background: var(--bg-1);
-      color: var(--text); font: inherit; font-size: 13px; font-weight: 500;
-      padding: 10px 8px; border-radius: 10px; cursor: pointer;
-      box-shadow: none;
-    }
-    .theme-seg button:hover { background: var(--hover); }
-    .theme-seg button.active {
-      background: var(--text); color: var(--bg-0); border-color: var(--text);
-    }
-
-    .account-chip {
-      display: flex; align-items: center; gap: 10px;
-      padding: 8px 8px; border-radius: 10px; cursor: pointer;
-      border: 0; width: 100%; text-align: left;
-      background: transparent !important; color: var(--text) !important;
-      box-shadow: none !important; font-weight: 500;
-      transition: background 0.12s ease;
-    }
-    .account-chip:hover {
-      background: var(--hover) !important;
-    }
-    .avatar {
-      width: 28px; height: 28px; border-radius: 50%;
-      background: var(--text);
-      color: var(--bg-0); display: grid; place-items: center;
-      font-weight: 600; font-size: 12px; flex-shrink: 0;
-    }
-    .account-meta { min-width: 0; flex: 1; }
-    .account-meta strong {
-      display: block; font-size: 13px; font-weight: 600;
-      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-    }
-    .account-meta span { font-size: 11px; color: var(--muted); }
-
-    .sidebar-footer {
-      display: flex; flex-direction: column; gap: 4px;
-      padding-top: 6px;
-    }
-
-    .auth-badge {
-      display: inline-flex; align-items: center; gap: 6px; margin-top: 8px;
-      font-size: 12px; color: var(--muted); line-height: 1.35;
-    }
-    .auth-badge .dot { width: 7px; height: 7px; border-radius: 50%; background: #94a3b8; flex-shrink: 0; }
-    .auth-badge.ready .dot { background: var(--ok); box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.15); }
-    .auth-badge.ready { color: #047857; }
-    .auth-badge.missing .dot { background: var(--warn); }
-    .auth-badge.missing { color: #b45309; }
-
-    .nav-stack {
-      display: flex; flex-direction: column; gap: 2px;
-      margin: 2px 0 4px;
-    }
-    .nav-item {
-      appearance: none; border: 0; background: transparent;
-      display: flex; align-items: center; gap: 10px;
-      width: 100%; text-align: left; padding: 9px 10px; border-radius: 10px;
-      font: inherit; font-size: 13px; font-weight: 550; color: var(--text);
-      cursor: pointer; transition: background 0.12s ease, color 0.12s ease;
-    }
-    .nav-item:hover { background: var(--hover); }
-    .nav-item.active {
-      background: var(--active); font-weight: 600;
-    }
-    .nav-stack { display: none !important; }
-    .sidebar .btn-new-chat,
-    .sidebar .btn-new-chat:hover:not(:disabled) {
-      background: transparent; color: var(--text); box-shadow: none; transform: none;
-    }
-    .sidebar .btn-new-chat:hover:not(:disabled) { background: var(--hover); }
-    .sidebar button.main,
-    .sidebar button.main:hover:not(:disabled) {
-      background: transparent; color: var(--text); box-shadow: none; transform: none; font-weight: 400;
-    }
-    .sidebar .folder-item button.main:hover:not(:disabled),
-    .sidebar .hist-item button.main:hover:not(:disabled) { background: var(--hover); }
-    .sidebar .hist-item.active button.main,
-    .sidebar .hist-item.active button.main:hover:not(:disabled) { background: var(--active); font-weight: 500; }
-    .item-menu button,
-    .item-menu button:hover:not(:disabled) {
-      background: transparent; color: var(--text); box-shadow: none; transform: none; font-weight: 400;
-    }
-    .item-menu button:hover:not(:disabled) { background: var(--hover); }
-    .item-menu button.danger { color: var(--err); }
-    .item-menu button.danger:hover:not(:disabled) { background: rgba(239, 65, 70, 0.1); color: var(--err); }
-    .theme-seg button,
-    .theme-seg button:hover:not(:disabled) {
-      background: var(--bg-1); color: var(--text); box-shadow: none; transform: none;
-    }
-    .theme-seg button:hover:not(:disabled) { background: var(--hover); }
-    .theme-seg button.active,
-    .theme-seg button.active:hover:not(:disabled) {
-      background: var(--text); color: var(--bg-0); border-color: var(--text);
-    }
-    .modal-actions button.danger,
-    .modal-actions button.danger:hover:not(:disabled) {
-      background: var(--err); color: #fff;
-    }
-
-    .settings-shell {
-      flex: 1; min-height: 0; overflow-y: auto;
-      padding: 28px 32px 56px;
-    }
-    .settings-shell::-webkit-scrollbar { width: 8px; }
-    .settings-shell::-webkit-scrollbar-thumb { background: var(--bg-2); border-radius: 8px; }
-    .settings-inner { max-width: 680px; margin: 0 auto; width: 100%; }
-    .settings-page-head {
-      display: flex; align-items: flex-start; justify-content: space-between;
-      gap: 16px; margin-bottom: 28px;
-    }
-    .settings-page-head h2 {
-      margin: 0; font-size: 28px; font-weight: 700; letter-spacing: -0.035em; line-height: 1.15;
-    }
-    .settings-page-head .sub {
-      margin: 8px 0 0; font-size: 14px; color: var(--muted); line-height: 1.5;
-    }
-    .btn-back-chat {
-      appearance: none; border: 1px solid var(--line); background: var(--panel);
-      color: var(--text); font: inherit; font-size: 13px; font-weight: 600;
-      padding: 8px 12px; border-radius: 10px; cursor: pointer;
-      display: inline-flex; align-items: center; gap: 6px; flex-shrink: 0;
-      transition: background 0.15s ease, border-color 0.15s ease;
-    }
-    .btn-back-chat:hover { background: var(--hover); }
-    .btn-back-chat svg { width: 14px; height: 14px; }
-
-    .settings-section {
-      border: 1px solid var(--line); border-radius: 16px;
-      padding: 22px 24px 20px; background: var(--panel);
-      margin-bottom: 16px;
-    }
-    .settings-section h3 {
-      margin: 0 0 4px; font-size: 16px; font-weight: 650; letter-spacing: -0.02em;
-      color: var(--text); text-transform: none;
-    }
-    .settings-section .section-desc {
-      margin: 0 0 18px; font-size: 13px; color: var(--muted); line-height: 1.5;
-    }
-    .profile-preview {
-      display: flex; align-items: center; gap: 14px;
-      margin-bottom: 18px; padding: 12px 14px;
-      background: var(--bg-1); border: 1px solid var(--line); border-radius: 14px;
-    }
-    .profile-preview .avatar { width: 44px; height: 44px; font-size: 16px; }
-    .profile-preview .account-meta strong { font-size: 15px; }
-    .profile-preview .account-meta span { font-size: 12px; }
-    .profile-grid {
-      display: grid; grid-template-columns: 1fr auto; gap: 12px; align-items: end;
-    }
-    .profile-grid .field-block { min-width: 0; }
-    .profile-grid .field-block.initial { width: 88px; }
-    .settings-section .key-row { margin-bottom: 0; }
-    .settings-section .key-row input { margin-bottom: 0; }
-    .settings-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 14px; }
-    .account-auth-msg {
-      margin: 0 0 14px; min-height: 18px; font-size: 13px; color: var(--muted); line-height: 1.4;
-    }
-    .account-auth-msg.err { color: var(--err); }
-    .account-auth-msg.ok { color: var(--ok); }
-    .btn-link-primary, .btn-link-secondary {
-      display: inline-flex; align-items: center; justify-content: center;
-      text-decoration: none; font: inherit; font-weight: 650; font-size: 14px;
-      padding: 10px 16px; border-radius: 11px;
-    }
-    .btn-link-primary { background: var(--text); color: var(--bg-0); }
-    .btn-link-secondary {
-      background: var(--bg-2); color: var(--text); border: 1px solid var(--line);
-    }
-    .settings-advanced {
-      border: 1px solid var(--line); border-radius: 16px; background: var(--panel);
-      margin-bottom: 16px; overflow: hidden;
-    }
-    .settings-advanced summary {
-      cursor: pointer; list-style: none; padding: 16px 24px;
-      font-size: 14px; font-weight: 650; color: var(--muted);
-      user-select: none; display: flex; align-items: center; justify-content: space-between;
-    }
-    .settings-advanced summary::-webkit-details-marker { display: none; }
-    .settings-advanced[open] summary {
-      color: var(--text); border-bottom: 1px solid var(--line);
-    }
-    .settings-advanced .advanced-body {
-      padding: 16px 24px 20px; font-size: 13px; color: var(--muted); line-height: 1.5;
-    }
-    .settings-advanced code {
-      font-family: var(--mono); font-size: 12px; color: var(--text);
-      word-break: break-all; display: block; margin-top: 6px;
-      padding: 10px 12px; background: var(--bg-1); border-radius: 10px; border: 1px solid var(--line);
-    }
-    .token-table-wrap {
-      margin-top: 14px; overflow-x: auto; border: 1px solid var(--line);
-      border-radius: 12px; background: var(--panel);
-    }
-    .token-table-wrap table { margin: 0; }
-    .token-table-wrap th:last-child, .token-table-wrap td:last-child { text-align: right; }
-    .token-table-wrap button { padding: 6px 10px; font-size: 12px; }
-    .token-once {
-      display: none;
-      margin-top: 16px;
-      padding: 16px 18px;
-      border: 1px solid rgba(16, 163, 127, 0.35);
-      background: rgba(16, 163, 127, 0.06);
-      border-radius: 14px;
-    }
-    .token-once.show { display: block; }
-    .token-once h4 {
-      margin: 0 0 6px;
-      font-size: 14px;
-      font-weight: 650;
-      letter-spacing: -0.02em;
-    }
-    .token-once p {
-      margin: 0 0 12px;
-      font-size: 13px;
-      color: var(--muted);
-      line-height: 1.45;
-    }
-    .token-once .secret-row {
-      display: flex;
-      gap: 8px;
-      align-items: stretch;
-    }
-    .token-once .secret-row code {
-      flex: 1;
-      min-width: 0;
-      font-family: var(--mono);
-      font-size: 12px;
-      line-height: 1.4;
-      word-break: break-all;
-      padding: 12px 14px;
-      background: var(--panel);
-      border: 1px solid var(--line);
-      border-radius: 10px;
-      color: var(--text);
-    }
-    .token-once .secret-row button {
-      flex-shrink: 0;
-      align-self: stretch;
-      padding: 0 14px;
-    }
-    .token-err {
-      margin-top: 12px;
-      font-size: 13px;
-      color: var(--err);
-      line-height: 1.45;
-      display: none;
-    }
-    .token-err.show { display: block; }
-
-    .stage { min-width: 0; min-height: 0; display: flex; flex-direction: column; position: relative; background: var(--bg-0); }
-    .view { display: none; flex: 1; min-height: 0; flex-direction: column; }
-    .view.active { display: flex; }
-
-    .chat-shell {
-      flex: 1; min-height: 0; display: flex; flex-direction: column;
-      max-width: 820px; width: 100%; margin: 0 auto;
-      position: relative;
-    }
-    .chat-header {
-      padding: 14px 20px 8px;
-      display: flex; align-items: center; justify-content: space-between; gap: 12px;
-    }
-    .chat-header h2 {
-      margin: 0; font-size: 17px; font-weight: 650; letter-spacing: -0.03em;
-      overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 70%;
-    }
-    .chat-header .meta { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
-    .model-badge {
-      font-size: 0.72rem;
-      letter-spacing: 0.02em;
-      color: var(--muted, #6b7280);
-      max-width: min(420px, 55vw);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    .model-badge.native { color: var(--fg, #111827); font-weight: 600; }
-    .header-actions { display: flex; gap: 6px; flex-wrap: wrap; }
-    .header-actions button {
-      font-size: 12px; padding: 7px 11px; border-radius: 9px;
-    }
-
-    .chat-log {
-      flex: 1; overflow-y: auto; padding: 8px 24px 20px;
-      display: flex; flex-direction: column; gap: 16px; scroll-behavior: smooth;
-    }
-    .chat-log::-webkit-scrollbar { width: 8px; }
-    .chat-log::-webkit-scrollbar-thumb { background: var(--bg-2); border-radius: 8px; }
-
-    .chat-empty {
-      margin: auto; text-align: center; max-width: 440px; padding: 40px 16px;
-      animation: msgEnter 0.45s ease-out;
-    }
-    .chat-empty .hero-orb {
-      width: 56px; height: 56px; margin: 0 auto 18px; border-radius: 16px;
-      background: var(--text);
-      position: relative; display: grid; place-items: center;
-      color: var(--bg-0); font-size: 16px; font-weight: 700; letter-spacing: -0.06em;
-    }
-    .chat-empty .hero-orb::before { content: "OM"; position: relative; z-index: 1; }
-    .chat-empty strong {
-      display: block; font-size: 32px; font-weight: 650; letter-spacing: -0.045em; margin-bottom: 10px;
-    }
-    .chat-empty span {
-      display: block; font-size: 15px; color: var(--muted); line-height: 1.55;
-      max-width: 36ch; margin: 0 auto;
-    }
-    .suggest-row {
-      display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-top: 26px;
-    }
-    .suggest {
-      appearance: none; border: 1px solid var(--line); background: transparent; color: var(--text);
-      border-radius: 999px; padding: 9px 15px; font: inherit; font-size: 13px; font-weight: 500; cursor: pointer;
-      transition: border-color 0.15s ease, background 0.15s ease, transform 0.15s ease;
-      box-shadow: none;
-    }
-    .suggest:hover { border-color: var(--muted); background: var(--hover); transform: translateY(-1px); }
-
-    .sidebar-search {
-      display: flex; align-items: center; gap: 8px;
-      margin: 6px 4px 10px;
-      padding: 9px 12px;
-      border: 1px solid var(--line);
-      border-radius: 12px;
-      background: var(--panel);
-    }
-    .sidebar-search svg {
-      width: 15px; height: 15px; color: var(--muted); flex-shrink: 0;
-    }
-    .sidebar-search input {
-      flex: 1; min-width: 0; border: 0; outline: 0; background: transparent;
-      color: var(--text); font: inherit; font-size: 13px; font-weight: 500;
-    }
-    .sidebar-search input::placeholder { color: var(--muted); font-weight: 400; }
-
-    .history-more {
-      appearance: none; border: 0; background: transparent; color: var(--muted);
-      font: inherit; font-size: 12px; font-weight: 600; cursor: pointer;
-      padding: 10px 12px; border-radius: 10px; width: 100%; text-align: left;
-    }
-    .history-more:hover { background: var(--hover); color: var(--text); }
-
-    .jump-latest {
-      position: absolute;
-      left: 50%;
-      bottom: 118px;
-      transform: translateX(-50%) translateY(12px);
-      z-index: 5;
-      appearance: none;
-      border: 1px solid var(--line);
-      background: var(--panel);
-      color: var(--text);
-      box-shadow: var(--shadow);
-      border-radius: 999px;
-      padding: 8px 14px;
-      font: inherit;
-      font-size: 13px;
-      font-weight: 600;
-      display: none;
-      align-items: center;
-      gap: 8px;
-      cursor: pointer;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.2s ease, transform 0.2s ease;
-    }
-    .jump-latest svg { width: 14px; height: 14px; }
-    .jump-latest.show {
-      display: inline-flex;
-      opacity: 1;
-      pointer-events: auto;
-      transform: translateX(-50%) translateY(0);
-    }
-    .jump-latest:hover { background: var(--hover); }
-
-    .msg {
-      max-width: min(92%, 680px); padding: 10px 16px; border-radius: 22px;
-      font-size: 15px; line-height: 1.7; white-space: pre-wrap; word-break: break-word;
-      animation: msgEnter 0.28s cubic-bezier(0.22, 1, 0.36, 1);
-    }
-    @keyframes msgEnter {
-      from { opacity: 0; transform: translateY(8px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    .msg.user {
-      align-self: flex-end;
-      background: var(--user-bg);
-      border: 0; color: var(--text);
-    }
-    .msg.assistant {
-      align-self: flex-start; background: transparent;
-      border: 0; color: var(--text); padding-left: 4px; padding-right: 4px; border-radius: 0;
-      max-width: 100%;
-    }
-    .msg.system {
-      align-self: stretch; max-width: 100%;
-      background: rgba(239, 65, 70, 0.08); border: 1px solid rgba(239, 65, 70, 0.28);
-      color: var(--err); font-size: 13px; font-family: var(--mono);
-    }
-    .msg .msg-head {
-      display: flex; align-items: baseline; justify-content: space-between; gap: 10px; margin-bottom: 4px;
-    }
-    .msg.assistant .msg-head, .msg.user .msg-head { display: none; }
-    .msg .who {
-      display: block; font-size: 11px; color: var(--muted); text-transform: uppercase;
-      letter-spacing: 0.06em; font-weight: 600;
-    }
-    .msg .when {
-      font-size: 11px; color: #94a3b8; font-family: var(--mono); font-weight: 400;
-      text-transform: none; letter-spacing: 0;
-    }
-    .msg.user .who { color: var(--muted); }
-    .msg.assistant .who { color: var(--muted); }
-    .msg.typing .body {
-      display: inline-flex; gap: 6px; align-items: center; min-height: 20px; padding: 2px 0;
-    }
-    .msg.typing .dot {
-      width: 7px; height: 7px; border-radius: 50%; background: var(--muted);
-      animation: typingDots 1.15s infinite ease-in-out;
-    }
-    .msg.typing .dot:nth-child(2) { animation-delay: 0.16s; }
-    .msg.typing .dot:nth-child(3) { animation-delay: 0.32s; }
-    @keyframes typingDots {
-      0%, 80%, 100% { opacity: 0.25; transform: translateY(0) scale(0.85); }
-      40% { opacity: 1; transform: translateY(-4px) scale(1); }
-    }
-
-    .composer-wrap {
-      position: sticky; bottom: 0; padding: 0 12px 16px;
-      background: linear-gradient(180deg, transparent 0%, var(--bg-0) 28%);
-    }
-    .composer {
-      border: 1px solid var(--line); background: var(--panel);
-      border-radius: 28px; padding: 10px 12px 8px; box-shadow: var(--shadow);
-      transition: border-color 0.2s ease, box-shadow 0.2s ease;
-    }
-    .composer:focus-within {
-      border-color: var(--muted);
-      box-shadow: var(--shadow);
-    }
-    .composer textarea {
-      width: 100%; border: 0; background: transparent; color: var(--text);
-      resize: none; min-height: 52px; max-height: 180px; padding: 4px 4px 0px;
-      font: inherit; font-size: 15px; line-height: 1.45; outline: none; margin: 0;
-    }
-    .composer-bar {
-      display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 4px 4px 2px;
-    }
-    .composer-hint { font-size: 12px; color: var(--muted); }
-    .kbd {
-      font-family: var(--mono); font-size: 10px; border: 1px solid var(--line);
-      border-bottom-width: 2px; border-radius: 5px; padding: 1px 5px; color: var(--muted); background: var(--bg-1);
-    }
-    .composer-actions { display: flex; gap: 8px; align-items: center; }
-
-    .debug-panel {
-      margin-top: 8px; border: 1px solid var(--line); border-radius: 12px;
-      background: var(--panel); overflow: hidden;
-    }
-    .debug-panel summary {
-      cursor: pointer; list-style: none; padding: 8px 12px;
-      font-size: 12px; font-weight: 600; color: var(--muted);
-      display: flex; align-items: center; justify-content: space-between; gap: 8px;
-      user-select: none;
-    }
-    .debug-panel summary::-webkit-details-marker { display: none; }
-    .debug-panel[open] summary { border-bottom: 1px solid var(--line); color: var(--text); }
-    .debug-body {
-      padding: 10px 12px; font-family: var(--mono); font-size: 11px; line-height: 1.5;
-      color: var(--text); white-space: pre-wrap; word-break: break-word; max-height: 140px; overflow-y: auto;
-      background: var(--bg-2);
-    }
-    .debug-status {
-      font-size: 11px; font-weight: 650; padding: 2px 8px; border-radius: 999px;
-      background: var(--bg-2); border: 1px solid var(--line);
-    }
-    .debug-status.ok { color: var(--ok); border-color: rgba(5, 150, 105, 0.3); background: rgba(5, 150, 105, 0.06); }
-    .debug-status.err { color: var(--err); border-color: rgba(220, 38, 38, 0.3); background: rgba(220, 38, 38, 0.06); }
-    .debug-status.busy { color: var(--warn); border-color: rgba(217, 119, 6, 0.3); background: rgba(217, 119, 6, 0.06); }
-
-    .chat-status {
-      min-height: 18px; font-size: 12px; color: var(--muted); margin-top: 8px;
-      padding: 0 8px; display: flex; align-items: center; gap: 8px;
-    }
-    .chat-status.busy { color: var(--warn); }
-    .chat-status.error { color: var(--err); }
-    .chat-status.ok { color: var(--ok); }
-    .spinner {
-      width: 12px; height: 12px; border: 2px solid rgba(217, 119, 6, 0.25);
-      border-top-color: var(--warn); border-radius: 50%;
-      animation: spin 0.7s linear infinite; display: none;
-    }
-    .chat-status.busy .spinner { display: inline-block; }
-    @keyframes spin { to { transform: rotate(360deg); } }
-
-    input, select, textarea {
-      width: 100%; background: var(--bg-1); border: 1px solid var(--line); color: var(--text);
-      border-radius: 10px; padding: 5px 6px; font-size: 14px; margin-bottom: 10px;
-      font-family: inherit; outline: none;
-      transition: border-color 0.15s ease, box-shadow 0.15s ease;
-    }
-    input:focus, select:focus, textarea:focus {
-      border-color: var(--muted); box-shadow: 0 0 0 3px var(--accent-dim);
-    }
-    button {
-      appearance: none; border: 0; background: var(--text); color: var(--bg-0);
-      font-weight: 600; font-size: 14px; padding: 10px 16px; border-radius: 11px;
-      cursor: pointer; font-family: inherit;
-      transition: background 0.15s ease, opacity 0.15s ease, transform 0.08s ease, box-shadow 0.2s ease;
-    }
-    button:hover:not(:disabled) { background: var(--accent-hot); }
-    button:active:not(:disabled) { transform: translateY(1px); }
-    button.secondary {
-      background: var(--bg-2); color: var(--text); border: 1px solid var(--line);
-    }
-    button.secondary:hover:not(:disabled) { background: var(--hover); }
-    button:disabled { opacity: 0.45; cursor: not-allowed; }
-    button.send-btn {
-      min-width: 36px; width: 36px; height: 36px; border-radius: 50%; padding: 0;
-      display: grid; place-items: center; position: relative; overflow: hidden;
-    }
-    button.send-btn.pulse { animation: sendPulse 0.55s ease-out; }
-    @keyframes sendPulse {
-      0% { box-shadow: 0 0 0 0 rgba(13, 13, 13, 0.25); }
-      70% { box-shadow: 0 0 0 14px rgba(13, 13, 13, 0); }
-      100% { box-shadow: 0 0 0 0 rgba(13, 13, 13, 0); }
-    }
-
-    .tokens-shell { flex: 1; min-height: 0; overflow-y: auto; padding: 28px 28px 48px; }
-    .tokens-inner { max-width: 720px; margin: 0 auto; }
-    .tokens-inner h2 { margin: 0 0 6px; font-size: 24px; letter-spacing: -0.03em; }
-    .tokens-inner .sub { color: var(--muted); margin: 0 0 22px; line-height: 1.45; font-size: 14px; }
+      font-family: var(--sans); color: var(--text); background:
+        radial-gradient(1200px 500px at 10% -10%, rgba(37,99,235,.08), transparent 55%),
+        radial-gradient(900px 420px at 100% 0%, rgba(15,23,42,.05), transparent 50%),
+        var(--bg);
+      min-height: 100%;
+    }
+    .top {
+      height: 56px; border-bottom: 1px solid var(--border); background: rgba(255,255,255,.9);
+      backdrop-filter: blur(10px); display: flex; align-items: center; gap: 12px; padding: 0 20px;
+      position: sticky; top: 0; z-index: 10;
+    }
+    .brand { display: flex; align-items: center; gap: 10px; text-decoration: none; color: inherit; font-weight: 700; }
+    .mark {
+      width: 28px; height: 28px; border-radius: 8px;
+      background: linear-gradient(145deg,#1f2937,#111827); color: #fff;
+      display: grid; place-items: center; font-size: 11px; font-weight: 800; letter-spacing: .04em;
+    }
+    .top nav { margin-left: auto; display: flex; gap: 8px; align-items: center; }
+    .btn, .top a {
+      border: 1px solid var(--border); background: var(--panel); color: inherit;
+      border-radius: 10px; padding: 8px 12px; font: inherit; font-size: 13px;
+      font-weight: 600; text-decoration: none; cursor: pointer; display: inline-flex;
+      align-items: center; gap: 6px; line-height: 1.2;
+    }
+    .btn:hover, .top a:hover { border-color: #94A3B8; }
+    .btn-primary { background: var(--primary); color: #fff; border-color: var(--primary); }
+    .btn-primary:hover { opacity: .92; }
+    .btn-primary:disabled { opacity: .5; cursor: not-allowed; }
+    .btn-danger { color: var(--err); border-color: #FECACA; background: #FEF2F2; }
+    .btn-danger:hover { background: #FEE2E2; }
+    .btn-ghost { background: transparent; }
+    .btn-sm { padding: 6px 10px; font-size: 12px; }
+    .wrap { width: min(880px, 100%); margin: 0 auto; padding: 28px 20px 56px; }
+    .hero { margin-bottom: 22px; }
+    h1 { margin: 0 0 6px; font-size: 28px; letter-spacing: -0.03em; }
+    .sub { margin: 0; color: var(--muted); font-size: 14px; line-height: 1.55; max-width: 62ch; }
     .card {
-      background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius);
-      padding: 18px 20px; margin-bottom: 14px; box-shadow: var(--shadow);
+      background: var(--panel); border: 1px solid var(--border); border-radius: 16px;
+      padding: 20px; margin-bottom: 16px; box-shadow: 0 8px 24px rgba(17,24,39,.04);
     }
-    .card-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
-    .card-head h3 { margin: 0; font-size: 16px; font-weight: 600; }
-    label.field { display: block; font-size: 13px; color: var(--muted); margin-bottom: 6px; }
-    .row { display: grid; grid-template-columns: 1.4fr 1fr; gap: 12px; }
-    .actions { display: flex; gap: 10px; flex-wrap: wrap; }
-    .result {
-      white-space: pre-wrap; word-break: break-all; background: var(--bg-2);
-      border: 1px solid var(--line); border-radius: 10px; padding: 14px;
-      font-family: var(--mono); font-size: 13px; line-height: 1.45; min-height: 80px; color: var(--text);
+    .card-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
+    .card h2 { margin: 0; font-size: 16px; }
+    .card .hint { margin: 4px 0 0; color: var(--muted); font-size: 13px; }
+    .grid { display: grid; grid-template-columns: 1.4fr 0.9fr auto; gap: 12px; align-items: end; }
+    @media (max-width: 720px) { .grid { grid-template-columns: 1fr; } }
+    label { display: block; font-size: 12px; font-weight: 650; color: var(--muted); margin-bottom: 6px; }
+    input, select {
+      width: 100%; border: 1px solid var(--border); border-radius: 10px;
+      padding: 11px 12px; font: inherit; background: #fff; outline: none;
     }
-    .ok { color: var(--ok); }
-    .err { color: var(--err); }
-    table { width: 100%; border-collapse: collapse; font-size: 14px; }
-    th, td { text-align: left; padding: 10px 8px; border-bottom: 1px solid var(--line); }
-    th { color: var(--muted); font-weight: 500; }
-    .hint { font-size: 12px; color: var(--muted); margin-top: 8px; line-height: 1.45; }
-    .hint code, .sub code { font-family: var(--mono); font-size: 0.92em; color: var(--text); }
-
-    .mobile-bar {
-      display: none; align-items: center; justify-content: space-between;
-      padding: 12px 14px; border-bottom: 1px solid var(--line);
-      background: var(--bg-0); backdrop-filter: blur(12px);
+    input:focus, select:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(37,99,235,.12); }
+    .msg { min-height: 18px; margin: 12px 0 0; font-size: 13px; color: var(--muted); }
+    .msg.err { color: var(--err); }
+    .msg.ok { color: var(--ok); }
+    .secret {
+      margin-top: 14px; padding: 16px; border-radius: 14px; background: #EFF6FF;
+      border: 1px solid #BFDBFE; display: none;
     }
-    .mobile-bar .brand-text h1 { font-size: 16px; }
-    .menu-btn {
-      background: var(--bg-2); color: var(--text); border: 1px solid var(--line);
-      padding: 8px 12px; font-size: 13px;
+    .secret.show { display: block; }
+    .secret strong { display: block; font-size: 13.5px; margin-bottom: 8px; }
+    .secret-row { display: flex; gap: 8px; align-items: stretch; flex-wrap: wrap; }
+    .secret code, .prefix-code {
+      flex: 1; min-width: 0; display: block; padding: 11px 12px; border-radius: 10px;
+      background: #fff; border: 1px solid var(--border); word-break: break-all;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12.5px;
     }
-
-    @media (max-width: 860px) {
-      .app { grid-template-columns: 1fr; }
-      .sidebar {
-        position: fixed; inset: 0 auto 0 0; width: min(88vw, var(--sidebar-w));
-        z-index: 40; transform: translateX(-105%); transition: transform 0.22s ease;
-        box-shadow: var(--shadow);
-      }
-      .sidebar.open { transform: translateX(0); }
-      .mobile-bar { display: flex; }
-      .backdrop {
-        display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.28); z-index: 30;
-      }
-      .backdrop.show { display: block; }
-      .chat-log { padding: 8px 14px 20px; }
-      .composer-wrap { padding: 0 12px 12px; }
-      .settings-shell { padding: 18px 16px 40px; }
-      .settings-page-head { flex-direction: column; align-items: stretch; }
-      .settings-section { padding: 18px 16px 16px; }
-      .profile-grid { grid-template-columns: 1fr; }
-      .profile-grid .field-block.initial { width: 100%; }
-      .row { grid-template-columns: 1fr; }
-      .item-actions { opacity: 1; }
-      .more-btn { opacity: 1; }
+    .list { display: flex; flex-direction: column; gap: 10px; }
+    .key-card {
+      border: 1px solid var(--border); border-radius: 14px; padding: 14px 16px;
+      display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 12px 16px; align-items: center;
+      background: var(--side);
+    }
+    .key-main { min-width: 0; }
+    .key-main h3 { margin: 0 0 4px; font-size: 15px; font-weight: 700; }
+    .key-meta { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-top: 8px; }
+    .key-actions { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; }
+    .badge {
+      display: inline-flex; align-items: center; gap: 4px; padding: 3px 8px; border-radius: 999px;
+      font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .03em;
+    }
+    .badge.ok { background: #DCFCE7; color: #166534; }
+    .badge.off { background: var(--soft); color: var(--muted); }
+    .badge.blue { background: #EFF6FF; color: var(--accent); }
+    .badge.gray { background: var(--soft); color: var(--muted); }
+    .empty { padding: 36px 16px; text-align: center; color: var(--muted); font-size: 14px; }
+    .empty strong { display: block; color: var(--text); margin-bottom: 6px; font-size: 15px; }
+    .toast {
+      position: fixed; right: 16px; bottom: 16px; background: #111827; color: #fff;
+      padding: 10px 14px; border-radius: 10px; font-size: 13px; font-weight: 600;
+      box-shadow: 0 12px 30px rgba(17,24,39,.25); opacity: 0; transform: translateY(8px);
+      transition: .18s ease; pointer-events: none; z-index: 50;
+    }
+    .toast.show { opacity: 1; transform: translateY(0); }
+    @media (max-width: 640px) {
+      .key-card { grid-template-columns: 1fr; }
+      .key-actions { justify-content: flex-start; }
     }
   </style>
 </head>
 <body>
-  <div class="atmosphere" aria-hidden="true"><div class="atmosphere-grid"></div></div>
-  <div class="backdrop" id="backdrop"></div>
+  <header class="top">
+    <a class="brand" href="/chat"><span class="mark" aria-hidden="true">OM</span> OM</a>
+    <nav>
+      <a href="/chat">← Back to chat</a>
+    </nav>
+  </header>
 
-  <div class="app">
-    <aside class="sidebar" id="sidebar">
-      <div class="brand-row">
-        <div class="brand">
-          <div class="brand-mark" aria-hidden="true"></div>
-          <div class="brand-text">
-            <h1>OM</h1>
-            <!-- <p>Local chat</p> -->
-          </div>
-        </div>
-        <button type="button" class="icon-btn" id="settingsBtn" title="Settings" aria-label="Open settings">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-            <circle cx="12" cy="12" r="3"/>
-            <path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V20a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H4a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V4a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9c.3.6.9 1 1.5 1H20a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/>
-          </svg>
-        </button>
-      </div>
-
-      <nav class="nav-stack" aria-label="Primary" hidden>
-        <button type="button" class="nav-item" id="navSettingsBtn" data-view="settings">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-            <circle cx="12" cy="12" r="3"/>
-            <path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V20a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H4a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V4a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9c.3.6.9 1 1.5 1H20a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/>
-          </svg>
-          Settings
-        </button>
-      </nav>
-
-      <button type="button" class="btn-new-chat" id="newChatBtn" title="Start a new conversation">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
-        New chat
-      </button>
-
-      <div class="sidebar-search" role="search">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-          <circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/>
-        </svg>
-        <input id="chatSearch" type="search" placeholder="Search chats…" autocomplete="off" aria-label="Search chats" />
-      </div>
-
-      <div class="sidebar-scroll" id="sidebarScroll">
-        <div>
-          <div class="section-label">
-            <span>Projects</span>
-            <button type="button" id="newFolderBtn">New project</button>
-          </div>
-          <div class="folder-list" id="folderList"><div class="empty-hint">Open Settings to connect</div></div>
-        </div>
-
-        <div>
-          <div class="section-label"><span>Chats</span></div>
-          <div class="history-list" id="historyList"><div class="empty-hint">Open Settings to connect</div></div>
-        </div>
-      </div>
-
-      <div class="sidebar-footer">
-        <button type="button" class="account-chip" id="accountChip" title="Open settings">
-          <div class="avatar" id="sidebarAvatar">?</div>
-          <div class="account-meta">
-            <strong id="sidebarName">Account</strong>
-            <span id="sidebarHint">Settings</span>
-          </div>
-        </button>
-      </div>
-    </aside>
-
-    <main class="stage">
-      <div class="mobile-bar">
-        <div class="brand-text"><h1>OM AI</h1></div>
-        <div style="display:flex;gap:6px">
-          <button type="button" class="menu-btn" id="menuBtn">Menu</button>
-          <button type="button" class="menu-btn" id="mobileSettingsBtn" title="Settings">Settings</button>
-        </div>
-      </div>
-
-      <section class="view active" id="viewChat" aria-label="Chat">
-        <div class="chat-shell">
-          <div class="chat-header">
-            <h2 id="chatTitle">New chat</h2>
-            <div class="meta">
-              <div id="modelBadge" class="model-badge" title="Active model runtime">Model —</div>
-              <div class="header-actions">
-                <button type="button" class="secondary" id="saveFeedbackBtn" title="Export turns to feedback DB">Save feedback</button>
-              </div>
-            </div>
-          </div>
-
-          <div class="chat-log" id="chatLog" aria-live="polite">
-            <div class="chat-empty" id="chatEmpty">
-              <div class="hero-orb" aria-hidden="true"></div>
-              <strong>How can I help you?</strong>
-              <span>Your local OM brain. Connect in Settings, then start chatting.</span>
-              <div class="suggest-row">
-                <button type="button" class="suggest" data-prompt="Say hello in one short sentence.">Say hello</button>
-                <button type="button" class="suggest" data-prompt="What can you do as a local OM model?">What can you do?</button>
-                <button type="button" class="suggest" data-prompt="Summarize yourself in one line.">One-line summary</button>
-              </div>
-            </div>
-          </div>
-
-          <button type="button" class="jump-latest" id="jumpLatestBtn" title="Jump to latest message" aria-label="Jump to latest">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M6 9l6 6 6-6"/></svg>
-            Next
-          </button>
-
-          <div class="composer-wrap">
-            <div class="composer">
-              <textarea id="chatInput" rows="2" placeholder="Ask anything" aria-label="Chat message"></textarea>
-              <div class="composer-bar">
-                <div class="composer-hint">Enter to send · Shift+Enter for a new line</div>
-                <div class="composer-actions">
-                  <button id="chatClearBtn" class="secondary" type="button" title="Start a new chat" hidden>New chat</button>
-                  <button id="chatSendBtn" class="send-btn" type="button" title="Send" aria-label="Send">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section class="view" id="viewSettings" aria-label="Settings">
-        <div class="settings-shell">
-          <div class="settings-inner">
-            <div class="settings-page-head">
-              <div>
-                <h2>Settings</h2>
-                <p class="sub">Profile, connection, and API tokens.</p>
-              </div>
-              <button type="button" class="btn-back-chat" id="backToChatBtn" title="Back to chat">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
-                Back to chat
-              </button>
-            </div>
-
-            <section class="settings-section">
-              <h3>Appearance</h3>
-              <p class="section-desc">Match ChatGPT: light, dark, or follow your system.</p>
-              <div class="theme-seg" id="themeSeg" role="group" aria-label="Theme">
-                <button type="button" data-theme="light">Light</button>
-                <button type="button" data-theme="dark">Dark</button>
-                <button type="button" data-theme="system">System</button>
-              </div>
-            </section>
-
-            <section class="settings-section" id="accountBlock">
-              <h3>Profile</h3>
-              <p class="section-desc">How you appear in this browser.</p>
-              <div class="profile-preview">
-                <div class="avatar" id="avatarInitial">?</div>
-                <div class="account-meta">
-                  <strong id="displayNameLabel">Local user</strong>
-                  <span id="accountRole">Role: —</span>
-                </div>
-              </div>
-              <div class="profile-grid">
-                <div class="field-block">
-                  <label class="field" for="displayNameInput">Display name</label>
-                  <input id="displayNameInput" type="text" placeholder="Your name" maxlength="80" />
-                </div>
-                <div class="field-block initial">
-                  <label class="field" for="avatarInitialInput">Initial</label>
-                  <input id="avatarInitialInput" type="text" placeholder="OM" maxlength="2" />
-                </div>
-              </div>
-              <div class="settings-actions">
-                <button id="saveProfileBtn" type="button">Save</button>
-              </div>
-            </section>
-
-            <section class="settings-section" id="accountAuthBlock">
-              <h3>Account</h3>
-              <p class="section-desc">You are signed in. Sign out returns to the login page.</p>
-
-              <div id="accountSignedIn">
-                <div class="profile-preview">
-                  <div class="avatar" id="accountAvatar">?</div>
-                  <div class="account-meta">
-                    <strong id="accountEmailLabel">Signed in</strong>
-                    <span id="accountSessionRole">Role: —</span>
-                  </div>
-                </div>
-                <div class="settings-actions">
-                  <button type="button" class="secondary" id="logoutBtn">Sign out</button>
-                </div>
-              </div>
-            </section>
-
-            <section class="settings-section" id="machineKeyBlock" hidden>
-              <h3>Machine API key</h3>
-              <p class="section-desc">Optional env/admin key for operators. Prefer account sign-in.</p>
-              <label class="field" for="adminKey">API key</label>
-              <div class="key-row">
-                <input id="adminKey" type="password" placeholder="Paste key…" autocomplete="off" />
-                <button id="toggleKeyBtn" class="secondary" type="button" title="Show or hide key">Show</button>
-              </div>
-              <div class="auth-badge missing" id="authBadge"><span class="dot"></span><span id="authBadgeText">Cookie session</span></div>
-              <div class="settings-actions">
-                <button type="button" id="saveKeyBtn">Use machine key</button>
-              </div>
-            </section>
-
-            <section class="settings-section">
-              <h3>Token console</h3>
-              <p class="section-desc">Create named API tokens. The full key is shown once when created.</p>
-              <label class="field" for="tokenAdminKey">Admin key</label>
-              <div class="key-row">
-                <input id="tokenAdminKey" type="password" placeholder="Paste admin key…" autocomplete="off" />
-                <button id="toggleTokenAdminBtn" class="secondary" type="button" title="Show or hide key">Show</button>
-              </div>
-              <div class="row" style="margin-top:14px;margin-bottom:4px">
-                <div>
-                  <label class="field" for="tokenName">Token name</label>
-                  <input id="tokenName" placeholder="e.g. Ai Kids" />
-                </div>
-                <div>
-                  <label class="field" for="tokenRole">Role</label>
-                  <select id="tokenRole">
-                    <option value="admin">admin</option>
-                    <option value="operator" selected>operator</option>
-                    <option value="agent">agent</option>
-                    <option value="viewer">viewer</option>
-                  </select>
-                </div>
-              </div>
-              <div class="actions">
-                <button id="createBtn" type="button">Create</button>
-                <button id="listBtn" class="secondary" type="button">Refresh</button>
-              </div>
-              <div class="token-err" id="tokenErr" role="alert"></div>
-              <div class="token-once" id="tokenOnce" aria-live="polite">
-                <h4>API key created — copy it now</h4>
-                <p>This full key is shown once. After you leave this page it cannot be recovered.</p>
-                <div class="secret-row">
-                  <code id="tokenOnceValue"></code>
-                  <button type="button" class="secondary" id="copyTokenBtn">Copy</button>
-                </div>
-              </div>
-              <label class="field" style="margin-top:16px">Existing tokens</label>
-              <div class="token-table-wrap" id="listBox"><div class="empty-hint" style="padding:12px">Click Refresh</div></div>
-            </section>
-
-            <details class="settings-advanced" id="advancedBlock">
-              <summary>Advanced</summary>
-              <div class="advanced-body">
-                <div>Chat database path</div>
-                <code id="dbPath">artifacts/om_ai.sqlite3</code>
-              </div>
-            </details>
-          </div>
-        </div>
-      </section>
-    </main>
-  </div>
-
-  <div class="item-menu" id="itemMenu" role="menu" hidden></div>
-  <div class="modal-overlay" id="uiModal">
-    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
-      <h3 id="modalTitle">Rename</h3>
-      <p id="modalDesc"></p>
-      <input id="modalInput" type="text" maxlength="120" />
-      <div class="modal-actions">
-        <button type="button" class="secondary" id="modalCancel">Cancel</button>
-        <button type="button" id="modalConfirm">Save</button>
-      </div>
+  <main class="wrap">
+    <div class="hero">
+      <h1>API Keys</h1>
+      <p class="sub">Create machine tokens for scripts, SDKs, and OpenAI-compatible clients. The full secret is shown only once after create.</p>
     </div>
-  </div>
+
+    <section class="card">
+      <div class="card-head">
+        <div>
+          <h2>Create key</h2>
+          <p class="hint">Pick a name and role, then copy the secret immediately.</p>
+        </div>
+      </div>
+      <div class="grid">
+        <div>
+          <label for="tokenName">Name</label>
+          <input id="tokenName" maxlength="64" placeholder="mac-cli" autocomplete="off" />
+        </div>
+        <div>
+          <label for="tokenRole">Role</label>
+          <select id="tokenRole">
+            <option value="agent">agent</option>
+            <option value="operator">operator</option>
+            <option value="viewer">viewer</option>
+          </select>
+        </div>
+        <button type="button" class="btn btn-primary" id="createBtn">Create key</button>
+      </div>
+      <div class="msg" id="msg"></div>
+      <div class="secret" id="secretBox">
+        <strong>Copy this key now — it will not be shown again.</strong>
+        <div class="secret-row">
+          <code id="secretValue"></code>
+          <button type="button" class="btn btn-primary" id="copyBtn">Copy key</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="card-head">
+        <div>
+          <h2>Your keys</h2>
+          <p class="hint">Full secrets are never stored in plain text. Copy the prefix for reference, or create a new key if you lost the secret.</p>
+        </div>
+      </div>
+      <div class="list" id="listBox"><div class="empty">Loading…</div></div>
+    </section>
+  </main>
+
+  <div class="toast" id="toast"></div>
 
   <script>
-    (function () {
-      const resultEl = document.getElementById("result");
-      const listBox = document.getElementById("listBox");
-      const tokenAdminKeyEl = document.getElementById("tokenAdminKey");
-      const tokenOnceEl = document.getElementById("tokenOnce");
-      const tokenOnceValue = document.getElementById("tokenOnceValue");
-      const tokenErrEl = document.getElementById("tokenErr");
-      const copyTokenBtn = document.getElementById("copyTokenBtn");
-      const toggleTokenAdminBtn = document.getElementById("toggleTokenAdminBtn");
-      const chatLog = document.getElementById("chatLog");
-      const chatInput = document.getElementById("chatInput");
-      const chatSendBtn = document.getElementById("chatSendBtn");
-      const chatClearBtn = document.getElementById("chatClearBtn");
-      const chatStatus = document.getElementById("chatStatus");
-      const chatStatusText = document.getElementById("chatStatusText");
-      const adminKeyEl = document.getElementById("adminKey");
-      const authBadge = document.getElementById("authBadge");
-      const authBadgeText = document.getElementById("authBadgeText");
-      const toggleKeyBtn = document.getElementById("toggleKeyBtn");
-      const sidebar = document.getElementById("sidebar");
-      const backdrop = document.getElementById("backdrop");
-      const menuBtn = document.getElementById("menuBtn");
-      const settingsBtn = document.getElementById("settingsBtn");
-      const mobileSettingsBtn = document.getElementById("mobileSettingsBtn");
-      const navChatBtn = document.getElementById("navChatBtn");
-      const navSettingsBtn = document.getElementById("navSettingsBtn");
-      const backToChatBtn = document.getElementById("backToChatBtn");
-      const viewChat = document.getElementById("viewChat");
-      const viewSettings = document.getElementById("viewSettings");
-      const saveKeyBtn = document.getElementById("saveKeyBtn");
-      const accountChip = document.getElementById("accountChip");
-      const historyList = document.getElementById("historyList");
-      const folderList = document.getElementById("folderList");
-      const chatSearch = document.getElementById("chatSearch");
-      const sidebarScroll = document.getElementById("sidebarScroll");
-      const jumpLatestBtn = document.getElementById("jumpLatestBtn");
-      const chatTitleEl = document.getElementById("chatTitle");
-      const debugBody = document.getElementById("debugBody");
-      const debugStatusBadge = document.getElementById("debugStatusBadge");
-      const itemMenu = document.getElementById("itemMenu");
-      const uiModal = document.getElementById("uiModal");
-      const modalTitle = document.getElementById("modalTitle");
-      const modalDesc = document.getElementById("modalDesc");
-      const modalInput = document.getElementById("modalInput");
-      const modalCancel = document.getElementById("modalCancel");
-      const modalConfirm = document.getElementById("modalConfirm");
+    const $ = (id) => document.getElementById(id);
+    const msg = $("msg");
+    const secretBox = $("secretBox");
+    const secretValue = $("secretValue");
+    const listBox = $("listBox");
+    const toastEl = $("toast");
+    let toastTimer = null;
 
-      const MORE_SVG = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="5" cy="12" r="1.75"/><circle cx="12" cy="12" r="1.75"/><circle cx="19" cy="12" r="1.75"/></svg>';
-      const FOLDER_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7z"/></svg>';
-      const CHEVRON_SVG = '<svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>';
-      const SEND_SVG = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 19V5M5 12l7-7 7 7"/></svg>';
-      const LS_THEME = "om_ai_theme";
-      const LS_EXPANDED = "om_ai_expanded_projects";
+    function setMsg(text, ok) {
+      msg.textContent = text || "";
+      msg.className = "msg" + (text ? (ok ? " ok" : " err") : "");
+    }
 
-      const chatMessages = [];
-      let chatBusy = false;
-      let chatModel = "om:free";
-      const modelBadge = document.getElementById("modelBadge");
+    function toast(text) {
+      toastEl.textContent = text || "";
+      toastEl.classList.add("show");
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => toastEl.classList.remove("show"), 1800);
+    }
 
-      function setModelBadge(info) {
-        if (!modelBadge) return;
-        if (!info) {
-          modelBadge.textContent = "Model —";
-          modelBadge.className = "model-badge";
-          return;
-        }
-        const backend = String(info.backend || "").toLowerCase();
-        const native = backend === "om_native" || backend === "om-native";
-        if (native) {
-          // Never show ollama/llama labels in native mode.
-          modelBadge.textContent = "Model OM-1.0";
-          modelBadge.className = "model-badge native";
-          chatModel = "OM-1.0";
-          return;
-        }
-        const name = info.name || info.model || chatModel || "—";
-        const provider = info.provider || "";
-        const be = info.backend_label || info.backend || "";
-        modelBadge.textContent = [name, provider, be].filter(Boolean).join(" · ");
-        modelBadge.className = "model-badge";
-        if (info.name || info.model) chatModel = info.name || info.model;
-      }
+    function escapeHtml(s) {
+      return String(s)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+    }
 
-      async function refreshModelBadge() {
-        try {
-          const key = currentApiKey();
-          if (!key) return;
-          const res = await fetch("/api/v1/model", {
-            headers: { "Authorization": "Bearer " + key },
-          });
-          if (!res.ok) return;
-          const data = await res.json();
-          setModelBadge(data);
-        } catch (_) {}
-      }
-      let typingEl = null;
-      let currentConversationId = null;
-      let currentFolderFilter = null;
-      let foldersCache = [];
-      let conversationsCache = [];
-      let chatSearchQuery = "";
-      let historyVisibleCount = 24;
-      const HISTORY_PAGE = 24;
-      let currentView = "chat";
-      let modalResolver = null;
-      let stickToBottom = true;
-      const expandedProjects = new Set();
+    async function copyText(text, okLabel) {
+      const value = String(text || "");
+      if (!value) { toast("Nothing to copy"); return false; }
       try {
-        JSON.parse(localStorage.getItem(LS_EXPANDED) || "[]").forEach(function (id) { expandedProjects.add(id); });
-      } catch (_) {}
-      const DEFAULT_HINT = "Ready";
-      const LS_THEME = "om_ai_theme";
-      const LS_EXPANDED = "om_ai_expanded_projects";
-      const CONNECT_HINT = "Sign in to see your chats";
-      let sessionAuthed = false;
-      let machineKeyOverride = "";
-      let lastConversationId = null;
-
-      function persistExpanded() {
-        try { localStorage.setItem(LS_EXPANDED, JSON.stringify(Array.from(expandedProjects))); } catch (_) {}
-      }
-
-      function themeMode() {
-        try { return localStorage.getItem(LS_THEME) || "system"; } catch (_) { return "system"; }
-      }
-
-      function applyTheme(mode) {
-        const next = mode || themeMode();
-        try { localStorage.setItem(LS_THEME, next); } catch (_) {}
-        const dark = next === "dark" || (next === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches);
-        document.documentElement.setAttribute("data-theme", dark ? "dark" : "light");
-        document.querySelectorAll("#themeSeg [data-theme]").forEach(function (btn) {
-          btn.classList.toggle("active", btn.getAttribute("data-theme") === next);
-        });
-      }
-      applyTheme();
-      try {
-        window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", function () {
-          if (themeMode() === "system") applyTheme("system");
-        });
-      } catch (_) {}
-
-      function buildDefaultSystem() {
-        const d = new Date();
-        const human = d.toLocaleDateString("en-US", {
-          weekday: "long",
-          year: "numeric",
-          month: "long",
-          day: "numeric",
-        });
-        const year = d.getFullYear();
-        return (
-          "You are OM AI. Today's date is " + human + ". " +
-          "Always treat the current year as " + year + ". " +
-          "Do not claim the year is 2023. " +
-          "If asked about events after your training data, say you may lack post-training details and answer carefully."
-        );
-      }
-
-      function ensureDefaultSystem() {
-        const idx = chatMessages.findIndex(function (m) { return m.role === "system"; });
-        const content = buildDefaultSystem();
-        if (idx === -1) {
-          chatMessages.unshift({ role: "system", content: content });
-        } else {
-          // Keep the leading system turn fresh with today's date on each send.
-          chatMessages[idx] = { role: "system", content: content };
-        }
-      }
-
-      function normalizeApiKey(raw) {
-        let key = String(raw || "").trim();
-        if (!key) return "";
-        key = key.replace(/^OM_AI_API_KEYS\s*=\s*/i, "");
-        key = key.replace(/^Bearer\s+/i, "");
-        if (key.includes(",")) key = key.split(",")[0].trim();
-        if (/:(admin|operator|agent|viewer)\s*$/i.test(key)) {
-          key = key.replace(/:(admin|operator|agent|viewer)\s*$/i, "").trim();
-        }
-        return key;
-      }
-
-      function currentApiKey() {
-        return normalizeApiKey(machineKeyOverride || (adminKeyEl && adminKeyEl.value) || "");
-      }
-
-      function hasAuth() {
-        return sessionAuthed || !!currentApiKey();
-      }
-
-      function updateAuthUi() {
-        if (hasAuth()) {
-          authBadge.className = "auth-badge ready";
-          authBadgeText.textContent = sessionAuthed ? "Signed in · cookie" : "Machine key";
-          const hint = document.getElementById("sidebarHint");
-          if (hint) hint.textContent = sessionAuthed ? "Signed in" : "Connected";
-        } else {
-          authBadge.className = "auth-badge missing";
-          authBadgeText.textContent = "Not signed in";
-          const hint = document.getElementById("sidebarHint");
-          if (hint) hint.textContent = "Sign in";
-        }
-        if (!chatBusy) chatSendBtn.disabled = false;
-      }
-
-      function requireLoginRedirect() {
-        location.replace("/login");
-      }
-
-      function adminHeaders() {
-        const headers = { "Content-Type": "application/json" };
-        const key = currentApiKey();
-        if (key) headers["Authorization"] = "Bearer " + key;
-        return headers;
-      }
-
-      function tokenHeaders() {
-        const key = tokenAdminKey();
-        if (!key && !sessionAuthed) {
-          throw new Error("Sign in as admin or paste an admin key.");
-        }
-        const headers = { "Content-Type": "application/json" };
-        if (key) headers["Authorization"] = "Bearer " + key;
-        return headers;
-      }
-
-      function setDebug(status, kind, lines) {
-        if (!debugStatusBadge || !debugBody) return;
-        debugStatusBadge.textContent = status;
-        debugStatusBadge.className = "debug-status" + (kind ? " " + kind : "");
-        debugBody.textContent = Array.isArray(lines) ? lines.join("\n") : String(lines || "");
-      }
-
-      function show(msg, ok) {
-        if (tokenErrEl) {
-          tokenErrEl.textContent = ok ? "" : String(msg || "");
-          tokenErrEl.classList.toggle("show", !ok && !!msg);
-        }
-        if (resultEl) {
-          resultEl.textContent = msg;
-          resultEl.className = "result " + (ok ? "ok" : "err");
-        }
-      }
-
-      function clearTokenOnce() {
-        if (tokenOnceEl) tokenOnceEl.classList.remove("show");
-        if (tokenOnceValue) tokenOnceValue.textContent = "";
-      }
-
-      function showCreatedToken(token) {
-        if (!tokenOnceEl || !tokenOnceValue) return;
-        tokenOnceValue.textContent = token;
-        tokenOnceEl.classList.add("show");
-        if (tokenErrEl) tokenErrEl.classList.remove("show");
-      }
-
-      function tokenAdminKey() {
-        if (!tokenAdminKeyEl) return "";
-        return normalizeApiKey(tokenAdminKeyEl.value);
-      }
-
-      function setChatStatus(msg, kind) {
-        if (!chatStatusText || !chatStatus) return;
-        chatStatusText.textContent = msg || DEFAULT_HINT;
-        chatStatus.className = "chat-status" + (kind ? " " + kind : "");
-      }
-
-      function detailText(data) {
-        if (!data) return "Request failed";
-        if (typeof data.detail === "string") return data.detail;
-        if (Array.isArray(data.detail)) {
-          return data.detail.map(d => (d && d.msg) || JSON.stringify(d)).join("; ");
-        }
-        if (data.error && data.error.message) return data.error.message;
-        return JSON.stringify(data);
-      }
-
-      function friendlyHttpError(status, data) {
-        const detail = detailText(data);
-        if (status === 401) {
-          return "401 — invalid API key. Open Settings and paste a valid key.";
-        }
-        if (status === 403) {
-          const reason = detail && detail !== "Request failed" ? detail : "forbidden";
-          if (/admin\.tokens/i.test(String(reason))) {
-            return "Paste the admin key in Token console (Admin key field), then try again.";
-          }
-          return "403 — " + reason;
-        }
-        if (status === 404) {
-          return "404 — chat not found (deleted, or saved under a different API key). Starting fresh is fine.";
-        }
-        if (status === 503 || /not loaded|autoload|checkpoint/i.test(String(detail)) || String(detail).includes("OM model not loaded")) {
-          return "503 — model not loaded. Check chat backend / autoload settings.";
-        }
-        return "HTTP " + status + " — " + (detail || "request failed");
-      }
-
-      function ensureEmptyState() {
-        if (chatLog.querySelector(".msg")) return;
-        if (document.getElementById("chatEmpty")) return;
-        const empty = document.createElement("div");
-        empty.className = "chat-empty";
-        empty.id = "chatEmpty";
-        empty.innerHTML =
-          '<div class="hero-orb" aria-hidden="true"></div>' +
-          "<strong>How can I help you?</strong>" +
-          "<span>Your local OM brain. Connect in Settings, then start chatting.</span>" +
-          '<div class="suggest-row">' +
-          '<button type="button" class="suggest" data-prompt="Say hello in one short sentence.">Say hello</button>' +
-          '<button type="button" class="suggest" data-prompt="What can you do as a local OM model?">What can you do?</button>' +
-          '<button type="button" class="suggest" data-prompt="Summarize yourself in one line.">One-line summary</button>' +
-          "</div>";
-        chatLog.appendChild(empty);
-        updateJumpLatest();
-      }
-
-      function removeEmptyState() {
-        const empty = document.getElementById("chatEmpty");
-        if (empty) empty.remove();
-      }
-
-      function nearBottom(el, pad) {
-        pad = pad == null ? 80 : pad;
-        return el.scrollHeight - el.scrollTop - el.clientHeight <= pad;
-      }
-
-      function scrollChatToLatest(force) {
-        if (!force && !stickToBottom) return;
-        chatLog.scrollTop = chatLog.scrollHeight;
-        stickToBottom = true;
-        updateJumpLatest();
-      }
-
-      function updateJumpLatest() {
-        if (!jumpLatestBtn) return;
-        const hasMsgs = !!chatLog.querySelector(".msg");
-        const show = hasMsgs && !nearBottom(chatLog, 100);
-        jumpLatestBtn.classList.toggle("show", show);
-      }
-
-      function matchesSearch(text) {
-        const q = (chatSearchQuery || "").trim().toLowerCase();
-        if (!q) return true;
-        return String(text || "").toLowerCase().indexOf(q) !== -1;
-      }
-
-      function appendBubble(role, content, whenIso) {
-        removeEmptyState();
-        const el = document.createElement("div");
-        el.className = "msg " + role;
-        const head = document.createElement("div");
-        head.className = "msg-head";
-        const who = document.createElement("span");
-        who.className = "who";
-        who.textContent = role === "user" ? "You" : role === "assistant" ? "OM AI" : "Error";
-        const time = document.createElement("span");
-        time.className = "when";
+        await navigator.clipboard.writeText(value);
+        toast(okLabel || "Copied");
+        return true;
+      } catch (_) {
         try {
-          const d = whenIso ? new Date(whenIso) : new Date();
-          time.textContent = d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-        } catch (_) { time.textContent = ""; }
-        head.appendChild(who);
-        head.appendChild(time);
-        const body = document.createElement("div");
-        body.className = "body";
-        body.textContent = content;
-        el.appendChild(head);
-        el.appendChild(body);
-        chatLog.appendChild(el);
-        scrollChatToLatest(false);
-        return el;
-      }
-
-      function showTyping() {
-        removeEmptyState();
-        removeTyping();
-        const el = document.createElement("div");
-        el.className = "msg assistant typing";
-        el.id = "typingBubble";
-        el.innerHTML =
-          '<div class="msg-head"><span class="who">OM AI</span><span class="when">thinking</span></div>' +
-          '<div class="body"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>';
-        chatLog.appendChild(el);
-        scrollChatToLatest(true);
-        typingEl = el;
-      }
-
-      function removeTyping() {
-        if (typingEl) { typingEl.remove(); typingEl = null; }
-        const leftover = document.getElementById("typingBubble");
-        if (leftover) leftover.remove();
-      }
-
-      function renderMessages(messages) {
-        chatMessages.length = 0;
-        chatLog.innerHTML = "";
-        typingEl = null;
-        stickToBottom = true;
-        if (!messages || !messages.length) {
-          ensureEmptyState();
-          return;
-        }
-        messages.forEach(function (m) {
-          if (m.role === "system") return;
-          chatMessages.push({ role: m.role, content: m.content });
-          appendBubble(m.role, m.content, m.created_at);
-        });
-        scrollChatToLatest(true);
-      }
-
-      function persistKey() {
-        machineKeyOverride = currentApiKey();
-      }
-
-      function persistConvId(id) {
-        lastConversationId = id || null;
-        if (!hasAuth()) return;
-        api("/v1/profile", {
-          method: "PUT",
-          body: JSON.stringify(
-            id
-              ? { last_conversation_id: id }
-              : { clear_last_conversation: true }
-          ),
-        }).catch(function () {});
-      }
-
-      async function api(path, opts) {
-        opts = opts || {};
-        if (!hasAuth()) {
-          throw new Error("Not signed in — open Sign in.");
-        }
-        const headers = Object.assign({}, adminHeaders(), opts.headers || {});
-        const res = await fetch(path, Object.assign({}, opts, {
-          headers: headers,
-          credentials: "include",
-        }));
-        let data = null;
-        try { data = await res.json(); } catch (_) { data = null; }
-        if (res.status === 401) {
-          sessionAuthed = false;
-          updateAuthUi();
-        }
-        return { res: res, data: data };
-      }
-
-      function pulseSend() {
-        chatSendBtn.classList.remove("pulse");
-        void chatSendBtn.offsetWidth;
-        chatSendBtn.classList.add("pulse");
-      }
-
-      function escapeHtml(s) {
-        return String(s || "")
-          .replace(/&/g, "&amp;")
-          .replace(/</g, "&lt;")
-          .replace(/>/g, "&gt;")
-          .replace(/"/g, "&quot;");
-      }
-
-      /** First character upper; rest unchanged (not String#toUpperCase of whole word via capitalize). */
-      function capitalizeTitle(s) {
-        const t = String(s || "").trim();
-        if (!t) return t;
-        return t.charAt(0).toUpperCase() + t.slice(1);
-      }
-
-      async function ensureConversation() {
-        if (currentConversationId) return currentConversationId;
-        const { res, data } = await api("/v1/conversations", {
-          method: "POST",
-          body: JSON.stringify({
-            title: "New chat",
-            folder_id: currentFolderFilter || null,
-          }),
-        });
-        if (!res.ok) throw new Error(friendlyHttpError(res.status, data));
-        currentConversationId = data.id;
-        persistConvId(currentConversationId);
-        chatTitleEl.textContent = capitalizeTitle(data.title || "New chat");
-        await refreshHistory();
-        return currentConversationId;
-      }
-
-      async function persistTurn(userText, assistantText) {
-        if (!currentConversationId) return;
-        const { res, data } = await api("/v1/conversations/" + currentConversationId + "/messages", {
-          method: "POST",
-          body: JSON.stringify({
-            messages: [
-              { role: "user", content: userText },
-              { role: "assistant", content: assistantText },
-            ],
-            auto_title: true,
-          }),
-        });
-        if (!res.ok) {
-          console.warn("persist failed", data);
-          return;
-        }
-        if (data.conversation && data.conversation.title) {
-          chatTitleEl.textContent = capitalizeTitle(data.conversation.title);
-        }
-        await refreshHistory();
-      }
-
-      function moreBtnHtml(kind, id) {
-        return (
-          '<button type="button" class="more-btn" title="More" aria-label="More" data-menu="' +
-          kind + '" data-id="' + escapeHtml(id) + '">' + MORE_SVG + "</button>"
-        );
-      }
-
-      function chatRowHtml(c) {
-        const active = c.id === currentConversationId ? " active" : "";
-        return (
-          '<div class="hist-item' + active + '" data-id="' + escapeHtml(c.id) + '">' +
-          '<button type="button" class="main" data-open="' + escapeHtml(c.id) + '">' +
-          '<span class="item-title">' + escapeHtml(capitalizeTitle(c.title || "New chat")) + "</span></button>" +
-          moreBtnHtml("chat", c.id) +
-          "</div>"
-        );
-      }
-
-      function renderProjects() {
-        const folders = foldersCache.filter(function (f) {
-          if (matchesSearch(f.name)) return true;
-          return conversationsCache.some(function (c) {
-            return c.folder_id === f.id && matchesSearch(c.title || "New chat");
-          });
-        });
-        if (!folders.length) {
-          folderList.innerHTML = chatSearchQuery
-            ? '<div class="empty-hint">No matching projects</div>'
-            : '<div class="empty-hint">No projects yet</div>';
-          return;
-        }
-        folderList.innerHTML = folders.map(function (f) {
-          const expanded = expandedProjects.has(f.id) || !!chatSearchQuery;
-          const nested = conversationsCache.filter(function (c) {
-            return c.folder_id === f.id && matchesSearch(c.title || "New chat");
-          });
-          const chatsHtml = nested.length
-            ? nested.map(chatRowHtml).join("")
-            : '<div class="empty-hint">No chats yet</div>';
-          return (
-            '<div class="project-item' + (expanded ? "" : " collapsed") + '" data-project-id="' + escapeHtml(f.id) + '">' +
-            '<div class="folder-item">' +
-            '<button type="button" class="main" data-folder-toggle="' + escapeHtml(f.id) + '">' +
-            CHEVRON_SVG + FOLDER_SVG +
-            '<span class="item-title">' + escapeHtml(capitalizeTitle(f.name)) + "</span></button>" +
-            moreBtnHtml("project", f.id) +
-            "</div>" +
-            '<div class="project-chats">' + chatsHtml + "</div></div>"
-          );
-        }).join("");
-      }
-
-      function renderChats() {
-        const unfiled = conversationsCache.filter(function (c) {
-          return !c.folder_id && matchesSearch(c.title || "New chat");
-        });
-        if (!unfiled.length) {
-          historyList.innerHTML = chatSearchQuery
-            ? '<div class="empty-hint">No matching chats</div>'
-            : '<div class="empty-hint">No chats yet</div>';
-          return;
-        }
-        const slice = unfiled.slice(0, historyVisibleCount);
-        let html = slice.map(chatRowHtml).join("");
-        if (unfiled.length > historyVisibleCount) {
-          html +=
-            '<button type="button" class="history-more" id="historyMoreBtn">' +
-            "Next · load " + Math.min(HISTORY_PAGE, unfiled.length - historyVisibleCount) + " more" +
-            "</button>";
-        }
-        historyList.innerHTML = html;
-      }
-
-      function closeItemMenu() {
-        if (!itemMenu) return;
-        itemMenu.classList.remove("open");
-        itemMenu.hidden = true;
-        itemMenu.innerHTML = "";
-        document.querySelectorAll(".more-btn.open").forEach(function (b) { b.classList.remove("open"); });
-      }
-
-      function openItemMenu(anchor, items) {
-        if (!itemMenu) return;
-        closeItemMenu();
-        itemMenu.innerHTML = items.map(function (it) {
-          if (it.sep) return '<div class="menu-sep"></div>';
-          if (it.labelOnly) return '<div class="menu-label">' + escapeHtml(it.label) + "</div>";
-          return (
-            '<button type="button" class="' + (it.danger ? "danger" : "") + '" data-act="' + escapeHtml(it.act) + '"' +
-            (it.value ? ' data-value="' + escapeHtml(it.value) + '"' : "") + ">" +
-            escapeHtml(it.label) + "</button>"
-          );
-        }).join("");
-        itemMenu.hidden = false;
-        itemMenu.classList.add("open");
-        anchor.classList.add("open");
-        itemMenu.dataset.kind = anchor.getAttribute("data-menu") || "";
-        itemMenu.dataset.id = anchor.getAttribute("data-id") || "";
-        const rect = anchor.getBoundingClientRect();
-        const mw = Math.max(196, itemMenu.offsetWidth || 196);
-        let left = rect.right + 8;
-        let top = rect.top;
-        if (left + mw > window.innerWidth - 8) left = Math.max(8, rect.left - mw - 8);
-        itemMenu.style.left = left + "px";
-        itemMenu.style.top = top + "px";
-        requestAnimationFrame(function () {
-          const h = itemMenu.offsetHeight;
-          if (top + h > window.innerHeight - 8) {
-            itemMenu.style.top = Math.max(8, window.innerHeight - h - 8) + "px";
-          }
-        });
-      }
-
-      function closeModal(result) {
-        if (uiModal) uiModal.classList.remove("open");
-        const resolve = modalResolver;
-        modalResolver = null;
-        if (resolve) resolve(result);
-      }
-
-      function openModal(opts) {
-        opts = opts || {};
-        modalTitle.textContent = opts.title || "";
-        modalDesc.textContent = opts.desc || "";
-        modalDesc.style.display = opts.desc ? "" : "none";
-        modalConfirm.textContent = opts.confirmText || "Save";
-        modalConfirm.className = opts.danger ? "danger" : "";
-        if (opts.input) {
-          modalInput.style.display = "";
-          modalInput.value = opts.value || "";
-          modalInput.placeholder = opts.placeholder || "";
-          setTimeout(function () { modalInput.focus(); modalInput.select(); }, 40);
-        } else {
-          modalInput.style.display = "none";
-          modalInput.value = "";
-        }
-        uiModal.classList.add("open");
-        return new Promise(function (resolve) { modalResolver = resolve; });
-      }
-
-      async function refreshHistory() {
-        await refreshSidebar();
-      }
-
-      async function refreshFolders() {
-        await refreshSidebar();
-      }
-
-      async function refreshSidebar() {
-        if (!hasAuth()) {
-          historyList.innerHTML = '<div class="empty-hint">' + CONNECT_HINT + "</div>";
-          folderList.innerHTML = '<div class="empty-hint">' + CONNECT_HINT + "</div>";
-          return;
-        }
-        try {
-          const foldersRes = await api("/v1/folders");
-          if (!foldersRes.res.ok) {
-            folderList.innerHTML = '<div class="empty-hint">' + escapeHtml(friendlyHttpError(foldersRes.res.status, foldersRes.data)) + "</div>";
-          } else {
-            foldersCache = foldersRes.data.folders || [];
-          }
-          const convRes = await api("/v1/conversations");
-          if (!convRes.res.ok) {
-            historyList.innerHTML = '<div class="empty-hint">' + escapeHtml(friendlyHttpError(convRes.res.status, convRes.data)) + "</div>";
-            return;
-          }
-          if (convRes.data.database) document.getElementById("dbPath").textContent = convRes.data.database;
-          conversationsCache = convRes.data.conversations || [];
-          if (currentConversationId) {
-            const cur = conversationsCache.find(function (c) { return c.id === currentConversationId; });
-            if (cur && cur.folder_id) expandedProjects.add(cur.folder_id);
-          }
-          renderProjects();
-          renderChats();
-        } catch (e) {
-          const msg = '<div class="empty-hint">' + escapeHtml(String(e.message || e)) + "</div>";
-          historyList.innerHTML = msg;
-          folderList.innerHTML = msg;
-        }
-      }
-
-      async function loadConversation(id) {
-        showView("chat");
-        const { res, data } = await api("/v1/conversations/" + id);
-        if (res.status === 404) {
-          // Stale localStorage / deleted chat / different API key actor — recover quietly.
-          persistConvId(null);
-          currentConversationId = null;
-          chatMessages.length = 0;
-          chatLog.innerHTML = "";
-          typingEl = null;
-          chatTitleEl.textContent = "New chat";
-          ensureEmptyState();
-          setChatStatus("That chat is gone — starting a new one.", "ok");
-          await refreshHistory();
-          chatInput.focus();
-          return;
-        }
-        if (!res.ok) throw new Error(friendlyHttpError(res.status, data));
-        currentConversationId = data.id;
-        persistConvId(id);
-        chatTitleEl.textContent = capitalizeTitle(data.title || "Chat");
-        renderMessages(data.messages || []);
-        setChatStatus("Loaded conversation", "ok");
-        setTimeout(function () { if (!chatBusy) setChatStatus(DEFAULT_HINT, ""); }, 1000);
-        await refreshHistory();
-        closeSidebar();
-        chatInput.focus();
-      }
-
-      async function startNewChat(folderId) {
-        showView("chat");
-        chatMessages.length = 0;
-        chatLog.innerHTML = "";
-        typingEl = null;
-        currentConversationId = null;
-        persistConvId(null);
-        currentFolderFilter = folderId || null;
-        chatTitleEl.textContent = "New chat";
-        ensureEmptyState();
-        setChatStatus(DEFAULT_HINT, "");
-        setDebug("idle", "", "No requests yet.");
-        try {
-          if (hasAuth()) {
-            await ensureConversation();
-            if (folderId) expandedProjects.add(folderId);
-            persistExpanded();
-            await refreshHistory();
-          }
-        } catch (e) {
-          setChatStatus(String(e.message || e), "error");
-        }
-        chatInput.focus();
-        closeSidebar();
-      }
-
-      function syncSidebarProfile(name, initial) {
-        const n = name || "Account";
-        const i = initial || (n[0] || "?").toUpperCase();
-        const av = document.getElementById("sidebarAvatar");
-        const nm = document.getElementById("sidebarName");
-        if (av) av.textContent = i;
-        if (nm) nm.textContent = n;
-      }
-
-      async function loadProfile() {
-        if (!hasAuth()) {
-          syncSidebarProfile("Account", "?");
-          setAccountSignedInUi(null);
-          return;
-        }
-        try {
-          const { res, data } = await api("/v1/profile");
-          if (!res.ok) return;
-          const name = data.display_name || "Local user";
-          const initial = data.avatar_initial || (name[0] || "?").toUpperCase();
-          document.getElementById("displayNameLabel").textContent = name;
-          document.getElementById("avatarInitial").textContent = initial;
-          document.getElementById("displayNameInput").value = data.display_name || "";
-          document.getElementById("avatarInitialInput").value = data.avatar_initial || "";
-          document.getElementById("accountRole").textContent = "Role: " + (data.role || "—");
-          if (authBadgeText && hasAuth()) {
-            authBadge.className = "auth-badge ready";
-            authBadgeText.textContent = sessionAuthed
-              ? ("Signed in · " + (data.role || "ready"))
-              : ("Connected · " + (data.role || "ready"));
-          }
-          syncSidebarProfile(name, initial);
-        } catch (_) {}
-        await refreshAccountSessionUi();
-      }
-
-      function setAccountAuthMsg(msg, kind) {
-        const el = document.getElementById("accountAuthMsg");
-        if (!el) return;
-        el.textContent = msg || "";
-        el.className = "account-auth-msg" + (kind ? " " + kind : "");
-      }
-
-      function setAccountSignedInUi(user) {
-        const inn = document.getElementById("accountSignedIn");
-        if (!inn) return;
-        if (user) {
-          inn.hidden = false;
-          const label = user.display_name || user.email || "Signed in";
-          const emailEl = document.getElementById("accountEmailLabel");
-          const roleEl = document.getElementById("accountSessionRole");
-          const av = document.getElementById("accountAvatar");
-          if (emailEl) emailEl.textContent = label;
-          if (roleEl) roleEl.textContent = (user.email ? user.email + " · " : "") + "Role: " + (user.role || "—");
-          if (av) av.textContent = (label[0] || "?").toUpperCase();
-        } else {
-          inn.hidden = true;
-        }
-      }
-
-      async function refreshAccountSessionUi() {
-        if (!hasAuth()) {
-          setAccountSignedInUi(null);
-          return;
-        }
-        try {
-          const { res, data } = await api("/v1/auth/me");
-          if (res.status === 404) {
-            setAccountSignedInUi(null);
-            return;
-          }
-          if (!res.ok || !data.account || !data.user) {
-            setAccountSignedInUi(null);
-            return;
-          }
-          setAccountSignedInUi(data.user);
-          const name = data.user.display_name || data.user.email;
-          syncSidebarProfile(name, (name[0] || "?").toUpperCase());
-        } catch (_) {
-          setAccountSignedInUi(null);
-        }
-      }
-
-      async function loadAuthStatus() {
-        try {
-          const res = await fetch("/v1/auth/status");
-          if (!res.ok) return;
-          const data = await res.json();
-          const regBtn = document.getElementById("registerBtn");
-          const regTab = document.querySelector('[data-account-tab="register"]');
-          if (data.register_enabled === false) {
-            if (regBtn) regBtn.disabled = true;
-            if (regTab) regTab.style.display = "none";
-          }
-        } catch (_) {}
-      }
-
-      async function applySessionAuth(user) {
-        sessionAuthed = true;
-        machineKeyOverride = "";
-        if (adminKeyEl) adminKeyEl.value = "";
-        updateAuthUi();
-        setAccountSignedInUi(user || null);
-        setChatStatus("Signed in", "ok");
-        await bootstrapHistory();
-        await refreshModelBadge();
-        setTimeout(function () { if (!chatBusy) setChatStatus(DEFAULT_HINT, ""); }, 1200);
-      }
-
-      async function logoutAccount() {
-        try {
-          await fetch("/v1/auth/logout", {
-            method: "POST",
-            credentials: "include",
-            headers: adminHeaders(),
-          }).catch(function () {});
-        } finally {
-          sessionAuthed = false;
-          machineKeyOverride = "";
-          if (adminKeyEl) adminKeyEl.value = "";
-          lastConversationId = null;
-          currentConversationId = null;
-          chatMessages.length = 0;
-          chatLog.innerHTML = "";
-          typingEl = null;
-          setAccountSignedInUi(null);
-          updateAuthUi();
-          location.replace("/login");
-        }
-      }
-
-      async function saveProfile() {
-        try {
-          const { res, data } = await api("/v1/profile", {
-            method: "PUT",
-            body: JSON.stringify({
-              display_name: document.getElementById("displayNameInput").value,
-              avatar_initial: document.getElementById("avatarInitialInput").value,
-            }),
-          });
-          if (!res.ok) throw new Error(friendlyHttpError(res.status, data));
-          await loadProfile();
-          setChatStatus("Profile saved", "ok");
-        } catch (e) {
-          setChatStatus(String(e.message || e), "error");
-        }
-      }
-
-      async function sendChat(presetText) {
-        if (chatBusy) return;
-        const text = String(presetText != null ? presetText : chatInput.value).trim();
-        if (!text) {
-          setChatStatus("Type a message before sending.", "error");
-          chatInput.focus();
-          return;
-        }
-
-        let headers;
-        try {
-          headers = adminHeaders();
-        } catch (e) {
-          setChatStatus(String(e.message || e), "error");
-          setDebug("401", "err", String(e.message || e));
-          updateAuthUi();
-          openSettings();
-          return;
-        }
-
-        chatBusy = true;
-        chatSendBtn.disabled = true;
-        pulseSend();
-        chatInput.value = "";
-        appendBubble("user", text);
-        ensureDefaultSystem();
-        chatMessages.push({ role: "user", content: text });
-        showTyping();
-        setChatStatus("Waiting for the model…", "busy");
-        setDebug("…", "busy", "POST /api/v1/chat/completions\nmodel: " + chatModel + "\nmessages: " + chatMessages.length);
-
-        const t0 = performance.now();
-        try {
-          await ensureConversation();
-
-          const res = await fetch("/api/v1/chat/completions", {
-            method: "POST",
-            headers,
-            body: JSON.stringify({
-              model: chatModel,
-              messages: chatMessages,
-              max_tokens: 256,
-              temperature: 0.8,
-              stream: false,
-            }),
-          });
-          let data = null;
-          try { data = await res.json(); } catch (_) { data = null; }
-          const ms = Math.round(performance.now() - t0);
-          removeTyping();
-
-          const debugLines = [
-            "POST /api/v1/chat/completions",
-            "status: " + res.status + " " + (res.statusText || ""),
-            "latency: " + ms + " ms",
-            "conversation: " + (currentConversationId || "—"),
-          ];
-
-          if (!res.ok) {
-            const err = friendlyHttpError(res.status, data);
-            debugLines.push("detail: " + detailText(data));
-            setDebug(String(res.status), "err", debugLines);
-            appendBubble("system", err);
-            setChatStatus(err, "error");
-            chatMessages.pop();
-            return;
-          }
-
-          const reply =
-            (data && data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content) ||
-            "";
-          const clean = String(reply || "").trim() || "(empty reply)";
-          if (data && data.model) chatModel = data.model;
-          if (data && (data.om_backend === "om_native" || data.model === "OM-1.0")) {
-            setModelBadge({
-              name: "OM-1.0",
-              provider: data.om_provider || "OM AI",
-              backend: "om_native",
-            });
-          } else if (data && data.om_backend) {
-            setModelBadge({
-              name: data.model || chatModel,
-              provider: data.om_provider || "",
-              backend: data.om_backend,
-            });
-          }
-          chatMessages.push({ role: "assistant", content: clean });
-          appendBubble("assistant", clean);
-          setDebug("200", "ok", debugLines.concat(["reply_chars: " + clean.length]));
-          setChatStatus("Reply received · saved", "ok");
-
-          try {
-            await persistTurn(text, clean);
-          } catch (pe) {
-            setChatStatus("Reply ok, but save failed: " + (pe.message || pe), "error");
-          }
-
-          setTimeout(function () {
-            if (!chatBusy) setChatStatus(DEFAULT_HINT, "");
-          }, 1400);
-        } catch (e) {
-          removeTyping();
-          const err = String(e.message || e);
-          setDebug("error", "err", err);
-          appendBubble("system", err);
-          setChatStatus(err, "error");
-          chatMessages.pop();
-        } finally {
-          chatBusy = false;
-          chatSendBtn.disabled = false;
-          chatSendBtn.innerHTML = SEND_SVG;
-          chatInput.focus();
-        }
-      }
-
-      async function createToken() {
-        try {
-          clearTokenOnce();
-          show("", true);
-          const name = document.getElementById("tokenName").value.trim();
-          const role = document.getElementById("tokenRole").value;
-          if (!name) throw new Error("Token name is required");
-          const res = await fetch("/v1/tokens", {
-            method: "POST",
-            headers: tokenHeaders(),
-            body: JSON.stringify({ name, role, tenant_id: "default" }),
-          });
-          const data = await res.json();
-          if (!res.ok) throw new Error(friendlyHttpError(res.status, data));
-          const secret = data.token || "";
-          if (!secret) throw new Error("Server did not return an API key.");
-          showCreatedToken(secret);
-          document.getElementById("tokenName").value = "";
-          await listTokens();
-        } catch (e) {
-          clearTokenOnce();
-          show(String(e.message || e), false);
-        }
-      }
-
-      async function listTokens() {
-        try {
-          show("", true);
-          const res = await fetch("/v1/tokens", { headers: tokenHeaders() });
-          const data = await res.json();
-          if (!res.ok) throw new Error(friendlyHttpError(res.status, data));
-          const tokens = data.tokens || [];
-          if (!tokens.length) {
-            listBox.innerHTML = '<div class="empty-hint" style="padding:12px">No tokens yet.</div>';
-            return;
-          }
-          const rows = tokens.map(t =>
-            `<tr>
-              <td>${escapeHtml(t.name)}</td>
-              <td>${escapeHtml(t.role)}</td>
-              <td>${escapeHtml(t.prefix)}…</td>
-              <td>${t.active ? "active" : "revoked"}</td>
-              <td><button class="secondary" data-id="${escapeHtml(t.id)}" type="button">Revoke</button></td>
-            </tr>`
-          ).join("");
-          listBox.innerHTML =
-            `<table>
-              <thead><tr><th>Name</th><th>Role</th><th>Prefix</th><th>Status</th><th></th></tr></thead>
-              <tbody>${rows}</tbody>
-            </table>`;
-          listBox.querySelectorAll("button[data-id]").forEach(btn => {
-            btn.addEventListener("click", () => revokeToken(btn.getAttribute("data-id")));
-          });
-        } catch (e) {
-          listBox.innerHTML = '<div class="empty-hint" style="padding:12px">' + escapeHtml(String(e.message || e)) + "</div>";
-        }
-      }
-
-      async function revokeToken(id) {
-        try {
-          const res = await fetch("/v1/tokens/" + id, {
-            method: "DELETE",
-            headers: tokenHeaders(),
-          });
-          const data = await res.json();
-          if (!res.ok) throw new Error(friendlyHttpError(res.status, data));
-          show("", true);
-          await listTokens();
-        } catch (e) {
-          show(String(e.message || e), false);
-        }
-      }
-
-      function closeSidebar() {
-        sidebar.classList.remove("open");
-        backdrop.classList.remove("show");
-      }
-      function openSidebar() {
-        sidebar.classList.add("open");
-        backdrop.classList.add("show");
-      }
-
-      function syncNavActive(view) {
-        if (navChatBtn) navChatBtn.classList.toggle("active", view === "chat");
-        if (navSettingsBtn) navSettingsBtn.classList.toggle("active", view === "settings");
-      }
-
-      /** Clean chat URL: `/` or `/ui/chat` (etc.) with no hash — never `#chat`. */
-      function chatUrl() {
-        return "/chat" + (location.search || "");
-      }
-
-      /** Settings: keep path, use `#settings` (or `/#settings` from `/ui/settings`). */
-      function settingsUrl() {
-        return "/chat" + (location.search || "") + "#settings";
-      }
-
-      function showView(view, opts) {
-        const next = view === "settings" ? "settings" : "chat";
-        currentView = next;
-        const syncUrl = !(opts && opts.skipHash);
-        viewChat.classList.toggle("active", next === "chat");
-        viewSettings.classList.toggle("active", next === "settings");
-        syncNavActive(next);
-        closeSidebar();
-        if (syncUrl) {
-          if (next === "settings") {
-            const target = settingsUrl();
-            if ((location.pathname + location.search + location.hash) !== target) {
-              try { history.replaceState(null, "", target); } catch (_) {
-                location.hash = "settings";
-              }
-            }
-          } else {
-            // Chat: bare path, clear any hash (including #chat).
-            const target = chatUrl();
-            if (location.hash || (location.pathname + location.search) !== target) {
-              try { history.replaceState(null, "", target); } catch (_) {}
-            }
-          }
-        } else if (next === "chat" && /^#chat$/i.test(location.hash || "")) {
-          // Always strip legacy #chat even when skipHash (boot / hashchange).
-          try { history.replaceState(null, "", chatUrl()); } catch (_) {}
-        }
-        document.title = next === "settings" ? "OM AI — Settings" : "OM AI — Chat";
-        if (next === "settings") {
-          if (hasAuth()) {
-            listTokens().catch(function () {});
-            loadProfile().catch(function () {});
-          }
-        } else {
-          setTimeout(function () { if (chatInput) chatInput.focus(); }, 40);
-        }
-      }
-
-      function openSettings() { showView("settings"); }
-      function closeSettings() { showView("chat"); }
-
-      async function saveAndConnect() {
-        const cleaned = currentApiKey();
-        if (adminKeyEl) adminKeyEl.value = cleaned;
-        machineKeyOverride = cleaned;
-        sessionAuthed = false;
-        updateAuthUi();
-        if (!cleaned) {
-          requireLoginRedirect();
-          return;
-        }
-        setChatStatus("Connecting…", "busy");
-        await bootstrapHistory();
-        await refreshModelBadge();
-        setChatStatus("Connected", "ok");
-        setTimeout(function () { if (!chatBusy) setChatStatus(DEFAULT_HINT, ""); }, 1200);
-        showView("chat");
-      }
-
-      async function bootstrapHistory() {
-        if (!hasAuth()) {
-          historyList.innerHTML = '<div class="empty-hint">' + CONNECT_HINT + "</div>";
-          folderList.innerHTML = '<div class="empty-hint">' + CONNECT_HINT + "</div>";
-          return;
-        }
-        await refreshSidebar();
-        await loadProfile();
-        const saved = lastConversationId;
-        if (saved) {
-          try {
-            await loadConversation(saved);
-            return;
-          } catch (_) {
-            persistConvId(null);
-          }
-        }
-      }
-
-      async function ensureSessionOrRedirect() {
-        try {
-          const res = await fetch("/v1/auth/me", { credentials: "include" });
-          if (res.ok) {
-            const data = await res.json();
-            sessionAuthed = true;
-            lastConversationId = data.last_conversation_id || null;
-            if (data.user) setAccountSignedInUi(data.user);
-            updateAuthUi();
-            return true;
-          }
-        } catch (_) {}
-        if (currentApiKey()) {
-          sessionAuthed = false;
-          updateAuthUi();
+          const ta = document.createElement("textarea");
+          ta.value = value;
+          ta.style.position = "fixed";
+          ta.style.left = "-9999px";
+          document.body.appendChild(ta);
+          ta.select();
+          document.execCommand("copy");
+          ta.remove();
+          toast(okLabel || "Copied");
           return true;
+        } catch (e2) {
+          toast("Copy failed — select and copy manually");
+          return false;
         }
-        requireLoginRedirect();
+      }
+    }
+
+    async function ensureSession() {
+      const res = await fetch("/v1/auth/me", { credentials: "include" });
+      if (res.status === 401) {
+        location.replace("/login?next=" + encodeURIComponent("/ui/tokens"));
         return false;
       }
+      return res.ok;
+    }
 
-      document.getElementById("createBtn").addEventListener("click", createToken);
-      document.getElementById("listBtn").addEventListener("click", listTokens);
-      const logoutBtn = document.getElementById("logoutBtn");
-      if (logoutBtn) logoutBtn.addEventListener("click", logoutAccount);
-      if (copyTokenBtn) {
-        copyTokenBtn.addEventListener("click", async function () {
-          const val = (tokenOnceValue && tokenOnceValue.textContent) || "";
-          if (!val) return;
-          try {
-            await navigator.clipboard.writeText(val);
-            copyTokenBtn.textContent = "Copied";
-            setTimeout(function () { copyTokenBtn.textContent = "Copy"; }, 1400);
-          } catch (_) {
-            copyTokenBtn.textContent = "Select & copy";
-          }
+    async function createToken() {
+      setMsg("", true);
+      secretBox.classList.remove("show");
+      const name = $("tokenName").value.trim();
+      const role = $("tokenRole").value;
+      if (!name) { setMsg("Token name is required", false); return; }
+      $("createBtn").disabled = true;
+      try {
+        const res = await fetch("/v1/tokens", {
+          method: "POST",
+          credentials: "include",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ name, role, tenant_id: "default" }),
         });
-      }
-      if (toggleTokenAdminBtn && tokenAdminKeyEl) {
-        toggleTokenAdminBtn.addEventListener("click", function () {
-          const showing = tokenAdminKeyEl.type === "text";
-          tokenAdminKeyEl.type = showing ? "password" : "text";
-          toggleTokenAdminBtn.textContent = showing ? "Show" : "Hide";
-        });
-      }
-      document.getElementById("newChatBtn").addEventListener("click", function (e) {
-        e.preventDefault();
-        startNewChat();
-      });
-      document.getElementById("saveProfileBtn").addEventListener("click", saveProfile);
-      document.getElementById("newFolderBtn").addEventListener("click", async function () {
-        if (!hasAuth()) { requireLoginRedirect(); return; }
-        try {
-          const name = await openModal({
-            title: "New project",
-            desc: "Chats you create in this project stay grouped together.",
-            input: true,
-            placeholder: "Project name",
-            confirmText: "Create",
-          });
-          if (!name || !String(name).trim()) return;
-          const { res, data } = await api("/v1/folders", {
-            method: "POST",
-            body: JSON.stringify({ name: capitalizeTitle(name) }),
-          });
-          if (!res.ok) throw new Error(friendlyHttpError(res.status, data));
-          if (data && data.id) {
-            expandedProjects.add(data.id);
-            persistExpanded();
-          }
-          await refreshSidebar();
-        } catch (e) {
-          setChatStatus(String(e.message || e), "error");
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) {
+          const detail = data.detail || data.error || ("HTTP " + res.status);
+          throw new Error(typeof detail === "string" ? detail : JSON.stringify(detail));
         }
-      });
+        const secret = data.token || "";
+        if (!secret) throw new Error("Server did not return an API key.");
+        secretValue.textContent = secret;
+        secretBox.classList.add("show");
+        $("tokenName").value = "";
+        setMsg("API key created — copy it now", true);
+        await copyText(secret, "Key copied");
+        await listTokens();
+      } catch (e) {
+        setMsg(String(e.message || e), false);
+      } finally {
+        $("createBtn").disabled = false;
+      }
+    }
 
-      document.getElementById("saveFeedbackBtn").addEventListener("click", async function () {
-        if (!currentConversationId) {
-          setChatStatus("Nothing to export yet.", "error");
+    function keyCard(t) {
+      const active = !!t.active;
+      const prefix = String(t.prefix || "");
+      const el = document.createElement("div");
+      el.className = "key-card";
+      el.innerHTML =
+        '<div class="key-main">' +
+          "<h3></h3>" +
+          '<div class="key-meta">' +
+            '<span class="badge blue"></span>' +
+            '<span class="badge ' + (active ? "ok" : "off") + '">' + (active ? "active" : "revoked") + "</span>" +
+            '<code class="prefix-code" style="flex:0 1 auto;padding:4px 8px;font-size:12px"></code>' +
+          "</div>" +
+        "</div>" +
+        '<div class="key-actions"></div>';
+      el.querySelector("h3").textContent = t.name || "Untitled key";
+      el.querySelector(".badge.blue").textContent = t.role || "agent";
+      el.querySelector(".prefix-code").textContent = prefix ? (prefix + "…") : "—";
+
+      const actions = el.querySelector(".key-actions");
+      const copyBtn = document.createElement("button");
+      copyBtn.type = "button";
+      copyBtn.className = "btn btn-sm";
+      copyBtn.textContent = "Copy prefix";
+      copyBtn.title = "Full secret is only shown once at create time";
+      copyBtn.addEventListener("click", () => copyText(prefix, "Prefix copied"));
+      actions.appendChild(copyBtn);
+
+      if (active) {
+        const revokeBtn = document.createElement("button");
+        revokeBtn.type = "button";
+        revokeBtn.className = "btn btn-sm btn-danger";
+        revokeBtn.textContent = "Revoke";
+        revokeBtn.addEventListener("click", () => revokeToken(t.id));
+        actions.appendChild(revokeBtn);
+      }
+      return el;
+    }
+
+    async function listTokens() {
+      try {
+        const res = await fetch("/v1/tokens", { credentials: "include" });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) {
+          const detail = data.detail || ("HTTP " + res.status);
+          throw new Error(typeof detail === "string" ? detail : JSON.stringify(detail));
+        }
+        const tokens = data.tokens || [];
+        listBox.innerHTML = "";
+        if (!tokens.length) {
+          listBox.innerHTML = '<div class="empty"><strong>No API keys yet</strong>Create one above to authenticate scripts and clients.</div>';
           return;
         }
-        try {
-          const { res, data } = await api(
-            "/v1/conversations/" + currentConversationId + "/feedback",
-            { method: "POST", body: JSON.stringify({ rating: 5 }) }
-          );
-          if (!res.ok) throw new Error(friendlyHttpError(res.status, data));
-          setChatStatus("Saved " + data.saved + " turn(s) to feedback.", "ok");
-          setDebug("feedback", "ok", [
-            "POST /v1/conversations/{id}/feedback",
-            "saved: " + data.saved,
-            "database: " + (data.database || "—"),
-            data.note || "",
-          ]);
-        } catch (e) {
-          setChatStatus(String(e.message || e), "error");
-        }
-      });
-
-      async function renameChat(id) {
-        const cur = conversationsCache.find(function (c) { return c.id === id; });
-        const title = await openModal({
-          title: "Rename chat",
-          input: true,
-          value: capitalizeTitle((cur && cur.title) || "New chat"),
-          confirmText: "Save",
-        });
-        if (!title || !String(title).trim()) return;
-        const normalized = capitalizeTitle(title);
-        const { res, data } = await api("/v1/conversations/" + id, {
-          method: "PATCH",
-          body: JSON.stringify({ title: normalized }),
-        });
-        if (!res.ok) throw new Error(friendlyHttpError(res.status, data));
-        if (id === currentConversationId) chatTitleEl.textContent = capitalizeTitle(data.title || normalized);
-        await refreshSidebar();
+        tokens.forEach(t => listBox.appendChild(keyCard(t)));
+      } catch (e) {
+        listBox.innerHTML = '<div class="empty"><strong>Could not load keys</strong>' + escapeHtml(String(e.message || e)) + "</div>";
       }
+    }
 
-      async function deleteChat(id) {
-        const ok = await openModal({
-          title: "Delete chat?",
-          desc: "This will permanently delete the chat.",
-          confirmText: "Delete",
-          danger: true,
+    async function revokeToken(id) {
+      if (!id || !confirm("Revoke this API key? Apps using it will stop working.")) return;
+      try {
+        const res = await fetch("/v1/tokens/" + encodeURIComponent(id), {
+          method: "DELETE",
+          credentials: "include",
         });
-        if (!ok) return;
-        const { res, data } = await api("/v1/conversations/" + id, { method: "DELETE" });
-        if (!res.ok) throw new Error(friendlyHttpError(res.status, data));
-        if (id === currentConversationId) await startNewChat();
-        else await refreshSidebar();
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) {
+          const detail = data.detail || ("HTTP " + res.status);
+          throw new Error(typeof detail === "string" ? detail : JSON.stringify(detail));
+        }
+        setMsg("Key revoked", true);
+        toast("Key revoked");
+        await listTokens();
+      } catch (e) {
+        setMsg(String(e.message || e), false);
       }
+    }
 
-      async function moveChat(id, folderId) {
-        const body = folderId ? { folder_id: folderId } : { clear_folder: true };
-        const { res, data } = await api("/v1/conversations/" + id, {
-          method: "PATCH",
-          body: JSON.stringify(body),
-        });
-        if (!res.ok) throw new Error(friendlyHttpError(res.status, data));
-        if (folderId) {
-          expandedProjects.add(folderId);
-          persistExpanded();
-        }
-        await refreshSidebar();
-      }
+    $("createBtn").addEventListener("click", createToken);
+    $("tokenName").addEventListener("keydown", e => {
+      if (e.key === "Enter") { e.preventDefault(); createToken(); }
+    });
+    $("copyBtn").addEventListener("click", () => copyText(secretValue.textContent || "", "Key copied"));
 
-      async function renameProject(id) {
-        const cur = foldersCache.find(function (f) { return f.id === id; });
-        const name = await openModal({
-          title: "Rename project",
-          input: true,
-          value: capitalizeTitle((cur && cur.name) || ""),
-          confirmText: "Save",
-        });
-        if (!name || !String(name).trim()) return;
-        const { res, data } = await api("/v1/folders/" + id, {
-          method: "PATCH",
-          body: JSON.stringify({ name: capitalizeTitle(name) }),
-        });
-        if (!res.ok) throw new Error(friendlyHttpError(res.status, data));
-        await refreshSidebar();
-      }
-
-      async function deleteProject(id) {
-        const ok = await openModal({
-          title: "Delete project?",
-          desc: "Chats in this project move back to Chats.",
-          confirmText: "Delete",
-          danger: true,
-        });
-        if (!ok) return;
-        const { res, data } = await api("/v1/folders/" + id, { method: "DELETE" });
-        if (!res.ok) throw new Error(friendlyHttpError(res.status, data));
-        expandedProjects.delete(id);
-        persistExpanded();
-        if (currentFolderFilter === id) currentFolderFilter = null;
-        await refreshSidebar();
-      }
-
-      function showChatMenu(anchor, id) {
-        openItemMenu(anchor, [
-          { act: "rename", label: "Rename" },
-          { act: "move", label: "Move to project" },
-          { sep: true },
-          { act: "delete", label: "Delete", danger: true },
-        ]);
-        itemMenu.dataset.kind = "chat";
-        itemMenu.dataset.id = id;
-      }
-
-      function showProjectMenu(anchor, id) {
-        openItemMenu(anchor, [
-          { act: "new-in-project", label: "New chat" },
-          { act: "rename", label: "Rename" },
-          { sep: true },
-          { act: "delete", label: "Delete", danger: true },
-        ]);
-        itemMenu.dataset.kind = "project";
-        itemMenu.dataset.id = id;
-      }
-
-      function showMoveMenu(anchor, chatId) {
-        const items = [{ labelOnly: true, label: "Move to project" }];
-        foldersCache.forEach(function (f) {
-          items.push({ act: "move-to", label: f.name, value: f.id });
-        });
-        if (!foldersCache.length) {
-          items.push({ labelOnly: true, label: "No projects yet" });
-        }
-        items.push({ sep: true });
-        items.push({ act: "move-to", label: "No project", value: "" });
-        openItemMenu(anchor, items);
-        itemMenu.dataset.kind = "chat";
-        itemMenu.dataset.id = chatId;
-      }
-
-      sidebar.addEventListener("click", async function (e) {
-        const more = e.target.closest("[data-menu]");
-        if (more) {
-          e.preventDefault();
-          e.stopPropagation();
-          if (more.classList.contains("open")) {
-            closeItemMenu();
-            return;
-          }
-          const kind = more.getAttribute("data-menu");
-          const id = more.getAttribute("data-id");
-          if (kind === "chat") showChatMenu(more, id);
-          else showProjectMenu(more, id);
-          return;
-        }
-        const toggle = e.target.closest("[data-folder-toggle]");
-        if (toggle) {
-          const id = toggle.getAttribute("data-folder-toggle");
-          if (expandedProjects.has(id)) expandedProjects.delete(id);
-          else expandedProjects.add(id);
-          persistExpanded();
-          renderProjects();
-          return;
-        }
-        const openId = e.target.closest("[data-open]");
-        if (openId) {
-          try {
-            await loadConversation(openId.getAttribute("data-open"));
-          } catch (err) {
-            setChatStatus(String(err.message || err), "error");
-          }
-        }
-      });
-
-      itemMenu.addEventListener("click", async function (e) {
-        const btn = e.target.closest("[data-act]");
-        if (!btn) return;
-        e.stopPropagation();
-        const act = btn.getAttribute("data-act");
-        const kind = itemMenu.dataset.kind;
-        const id = itemMenu.dataset.id;
-        const value = btn.getAttribute("data-value");
-        const anchor = document.querySelector('.more-btn.open');
-        try {
-          if (act === "move") {
-            showMoveMenu(anchor || btn, id);
-            return;
-          }
-          closeItemMenu();
-          if (kind === "chat") {
-            if (act === "rename") await renameChat(id);
-            else if (act === "delete") await deleteChat(id);
-            else if (act === "move-to") await moveChat(id, value || null);
-          } else if (kind === "project") {
-            if (act === "new-in-project") await startNewChat(id);
-            else if (act === "rename") await renameProject(id);
-            else if (act === "delete") await deleteProject(id);
-          }
-        } catch (err) {
-          setChatStatus(String(err.message || err), "error");
-        }
-      });
-
-      modalCancel.addEventListener("click", function () { closeModal(null); });
-      modalConfirm.addEventListener("click", function () {
-        const inputVisible = modalInput.style.display !== "none";
-        closeModal(inputVisible ? modalInput.value : true);
-      });
-      modalInput.addEventListener("keydown", function (e) {
-        if (e.key === "Enter") {
-          e.preventDefault();
-          closeModal(modalInput.value);
-        }
-      });
-      uiModal.addEventListener("click", function (e) {
-        if (e.target === uiModal) closeModal(null);
-      });
-
-      document.addEventListener("click", function (e) {
-        if (!e.target.closest("#itemMenu") && !e.target.closest(".more-btn")) closeItemMenu();
-      });
-
-      const themeSeg = document.getElementById("themeSeg");
-      if (themeSeg) {
-        themeSeg.addEventListener("click", function (e) {
-          const btn = e.target.closest("[data-theme]");
-          if (!btn) return;
-          applyTheme(btn.getAttribute("data-theme"));
-        });
-      }
-
-      chatSendBtn.addEventListener("click", function (e) {
-        e.preventDefault();
-        sendChat();
-      });
-      chatClearBtn.addEventListener("click", function (e) {
-        e.preventDefault();
-        startNewChat();
-      });
-      chatInput.addEventListener("keydown", function (e) {
-        if (e.key === "Enter" && !e.shiftKey) {
-          e.preventDefault();
-          sendChat();
-        }
-      });
-      chatInput.addEventListener("input", function () {
-        this.style.height = "auto";
-        this.style.height = Math.min(180, this.scrollHeight) + "px";
-      });
-
-      chatLog.addEventListener("click", function (e) {
-        const btn = e.target.closest(".suggest");
-        if (!btn) return;
-        const prompt = btn.getAttribute("data-prompt") || btn.textContent;
-        sendChat(prompt);
-      });
-      chatLog.addEventListener("scroll", function () {
-        stickToBottom = nearBottom(chatLog, 80);
-        updateJumpLatest();
-      }, { passive: true });
-      if (jumpLatestBtn) {
-        jumpLatestBtn.addEventListener("click", function () {
-          scrollChatToLatest(true);
-        });
-      }
-      if (chatSearch) {
-        chatSearch.addEventListener("input", function () {
-          chatSearchQuery = chatSearch.value || "";
-          historyVisibleCount = HISTORY_PAGE;
-          renderProjects();
-          renderChats();
-        });
-      }
-      if (historyList) {
-        historyList.addEventListener("click", function (e) {
-          const more = e.target.closest("#historyMoreBtn");
-          if (!more) return;
-          historyVisibleCount += HISTORY_PAGE;
-          renderChats();
-        });
-      }
-
-      menuBtn.addEventListener("click", openSidebar);
-      backdrop.addEventListener("click", closeSidebar);
-      settingsBtn.addEventListener("click", openSettings);
-      if (mobileSettingsBtn) mobileSettingsBtn.addEventListener("click", openSettings);
-      if (navChatBtn) navChatBtn.addEventListener("click", function () { showView("chat"); });
-      if (navSettingsBtn) navSettingsBtn.addEventListener("click", openSettings);
-      if (backToChatBtn) backToChatBtn.addEventListener("click", closeSettings);
-      accountChip.addEventListener("click", openSettings);
-      saveKeyBtn.addEventListener("click", saveAndConnect);
-
-      toggleKeyBtn.addEventListener("click", function () {
-        const showing = adminKeyEl.type === "text";
-        adminKeyEl.type = showing ? "password" : "text";
-        toggleKeyBtn.textContent = showing ? "Show" : "Hide";
-      });
-
-      adminKeyEl.addEventListener("keydown", function (e) {
-        if (e.key === "Enter") {
-          e.preventDefault();
-          saveAndConnect();
-        }
-      });
-      adminKeyEl.addEventListener("blur", function () {
-        const cleaned = normalizeApiKey(adminKeyEl.value);
-        if (cleaned && adminKeyEl.value.trim() !== cleaned) {
-          adminKeyEl.value = cleaned;
-        }
-      });
-
-      document.addEventListener("keydown", function (e) {
-        if (e.key !== "Escape") return;
-        if (itemMenu && itemMenu.classList.contains("open")) {
-          closeItemMenu();
-          return;
-        }
-        if (uiModal && uiModal.classList.contains("open")) {
-          closeModal(null);
-          return;
-        }
-        if (currentView === "settings") closeSettings();
-      });
-
-      window.addEventListener("hashchange", function () {
-        const h = (location.hash || "").replace(/^#/, "").toLowerCase();
-        if (h === "settings") {
-          showView("settings", { skipHash: true });
-        } else {
-          // empty, "/", "chat", or anything else → chat; clear #chat from the bar
-          showView("chat");
-        }
-      });
-
-      fetch("/v1/tokens/meta").then(r => r.json()).then(d => {
-        if (d.chat_database) document.getElementById("dbPath").textContent = d.chat_database;
-        else if (d.database) document.getElementById("dbPath").textContent = d.database;
-        if (d.model) chatModel = d.model;
-        if (d.backend === "om_native" || d.model === "OM-1.0") {
-          setModelBadge({ name: "OM-1.0", provider: "OM AI", backend: "om_native" });
-        }
-      }).catch(() => {});
-      refreshModelBadge();
-
-      (async function boot() {
-        updateAuthUi();
-        const ok = await ensureSessionOrRedirect();
-        if (!ok) return;
-        await bootstrapHistory();
-        const bootHash = (location.hash || "").replace(/^#/, "").toLowerCase();
-        if (bootHash === "settings" || /\/ui\/settings\/?$/.test(location.pathname)) {
-          showView("settings", { skipHash: bootHash === "settings" });
-          if (/\/ui\/settings\/?$/.test(location.pathname) && bootHash !== "settings") {
-            try { history.replaceState(null, "", "/#settings"); } catch (_) {}
-          }
-        } else {
-          showView("chat");
-        }
-        if (currentView === "chat") chatInput.focus();
-      })();
+    (async function boot() {
+      const ok = await ensureSession();
+      if (!ok) return;
+      await listTokens();
     })();
   </script>
 </body>

@@ -63,14 +63,20 @@ body.dark .collapse-btn:hover,body.dark .icon-btn:hover,body.dark .ghost-btn:hov
 body.dark .nav-btn:hover{background:rgba(255,255,255,.06);}
 .nav-btn.active{background:#E8EEF7;color:var(--accent);font-weight:650;}
 body.dark .nav-btn.active{background:rgba(59,130,246,.15);color:#93C5FD;}
+.nav-more-btn .nav-more-chev{margin-left:auto;opacity:.7;transition:transform .15s ease;}
+.nav-more-btn.open .nav-more-chev{transform:rotate(180deg);}
+body.collapsed .nav-more-chev{display:none;}
+.nav-more-list{display:none;flex-direction:column;gap:1px;padding:2px 0 4px;}
+.nav-more-list.open{display:flex;}
+body.collapsed .nav-more-list{padding-left:0;}
 
 .conv-panel-wrap{flex:1 1 0%;min-height:0;display:none;flex-direction:column;overflow:hidden;border-top:1px solid var(--border);}
 body.chat-mode .side-nav-wrap{flex:0 1 auto;max-height:42vh;}
 body.chat-mode .conv-panel-wrap{display:flex;flex:1 1 0%;}
 body:not(.chat-mode) .side-nav-wrap{flex:1 1 0%;max-height:none;}
-.conv-filter-bar{padding:6px 8px 2px;display:flex;gap:4px;flex-wrap:wrap;flex-shrink:0;}
-.conv-filter-btn{border:1px solid var(--border);background:transparent;border-radius:999px;padding:3px 10px;font-size:11px;font-weight:650;color:var(--muted);cursor:pointer;}
-.conv-filter-btn:hover{color:var(--text);}
+.conv-filter-bar{padding:8px 8px 6px;display:flex;gap:4px;flex-wrap:wrap;flex-shrink:0;}
+.conv-filter-btn{border:1px solid var(--border);background:transparent;border-radius:999px;padding:5px 12px;font-size:11px;font-weight:650;color:var(--muted);cursor:pointer;}
+.conv-filter-btn:hover{color:var(--text);border-color:#94A3B8;}
 .conv-filter-btn.active{background:#EFF6FF;border-color:#BFDBFE;color:var(--accent);}
 body.dark .conv-filter-btn.active{background:rgba(59,130,246,.15);border-color:rgba(59,130,246,.3);color:#93C5FD;}
 .conv-panel{overflow-y:auto;padding:4px 8px 12px;flex:1;min-height:0;}
@@ -85,6 +91,24 @@ body.dark .conv-item.active{background:rgba(59,130,246,.12);}
 .conv-more-btn{border:0;background:transparent;color:var(--muted);border-radius:6px;padding:3px 4px;line-height:0;display:none;flex-shrink:0;align-items:center;}
 .conv-item:hover .conv-more-btn,.conv-item.active .conv-more-btn{display:inline-flex;}
 .conv-more-btn:hover{background:var(--soft);color:var(--text);}
+.side-proj-section{margin:4px 0 10px;}
+.side-proj-block{margin:0 0 10px;padding:2px 0 4px;}
+.side-proj-head{width:100%;border:0;background:transparent;text-align:left;padding:8px 10px;border-radius:10px;font-size:13px;font-weight:650;display:flex;align-items:center;gap:8px;color:var(--text);cursor:pointer;min-height:38px;box-sizing:border-box;}
+.side-proj-head:hover{background:rgba(0,0,0,.05);}
+body.dark .side-proj-head:hover{background:rgba(255,255,255,.06);}
+.side-proj-head.active{background:transparent;color:var(--accent);box-shadow:inset 0 0 0 1px #BFDBFE;}
+body.dark .side-proj-head.active{background:transparent;color:#93C5FD;box-shadow:inset 0 0 0 1px rgba(59,130,246,.35);}
+.side-proj-head .sp-chev{flex-shrink:0;opacity:.55;transition:transform .15s ease;display:inline-flex;}
+.side-proj-head.open .sp-chev{transform:rotate(90deg);}
+.side-proj-head .sp-name{flex:1;min-width:0;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;}
+.side-proj-head .sp-count{font-size:11px;font-weight:600;color:var(--muted);flex-shrink:0;}
+.side-proj-head .sp-new{border:0;background:transparent;color:var(--muted);border-radius:6px;padding:2px 4px;line-height:0;display:none;flex-shrink:0;}
+.side-proj-head:hover .sp-new,.side-proj-head.active .sp-new{display:inline-flex;}
+.side-proj-head .sp-new:hover{background:var(--soft);color:var(--text);}
+.side-proj-chats{padding:4px 0 2px 8px;display:none;flex-direction:column;gap:4px;border-left:2px solid var(--border);margin:6px 4px 2px 16px;}
+.side-proj-chats.open{display:flex;}
+.side-proj-chats .conv-item{padding:8px 10px;margin:0;min-height:36px;box-sizing:border-box;}
+.side-proj-empty{padding:8px 10px;font-size:12px;color:var(--muted);}
 .conv-ctx{position:fixed;min-width:200px;background:var(--bg);border:1px solid var(--border);border-radius:12px;box-shadow:0 12px 32px rgba(17,24,39,.15);padding:6px;z-index:200;display:none;}
 .conv-ctx.open{display:block;}
 .conv-ctx button{width:100%;border:0;background:transparent;text-align:left;padding:9px 12px;border-radius:8px;font-size:13px;font-weight:550;display:flex;align-items:center;gap:8px;}
@@ -103,12 +127,17 @@ body.dark .conv-item.active{background:rgba(59,130,246,.12);}
 .menu button:hover,.menu a:hover{background:var(--soft);}
 .drop-menu{position:absolute;top:calc(100% + 8px);right:0;min-width:220px;max-height:340px;overflow-y:auto;background:var(--bg);border:1px solid var(--border);border-radius:12px;box-shadow:0 12px 32px rgba(17,24,39,.12);padding:6px;display:none;z-index:60;}
 .drop-menu.open{display:block;}
-.drop-menu button,.drop-menu .drop-item{width:100%;border:0;background:transparent;text-align:left;padding:10px 12px;border-radius:8px;font-size:13px;font-weight:550;display:flex;align-items:center;gap:8px;}
-.drop-menu button:hover,.drop-menu .drop-item:hover{background:#EFF6FF;color:var(--accent);}
-body.dark .drop-menu button:hover,body.dark .drop-menu .drop-item:hover{background:rgba(59,130,246,.12);color:#93C5FD;}
+.drop-menu button,.drop-menu a,.drop-menu .drop-item{width:100%;border:0;background:transparent;text-align:left;padding:10px 12px;border-radius:8px;font-size:13px;font-weight:550;display:flex;align-items:center;gap:8px;text-decoration:none;color:inherit;cursor:pointer;box-sizing:border-box;}
+.drop-menu button:hover,.drop-menu a:hover,.drop-menu .drop-item:hover{background:#EFF6FF;color:var(--accent);}
+body.dark .drop-menu button:hover,body.dark .drop-menu a:hover,body.dark .drop-menu .drop-item:hover{background:rgba(59,130,246,.12);color:#93C5FD;}
 .drop-menu button.active{background:#EFF6FF;color:var(--accent);}
 body.dark .drop-menu button.active{background:rgba(59,130,246,.15);color:#93C5FD;}
 .drop-menu .drop-sep{height:1px;background:var(--border);margin:4px 8px;}
+.drop-menu .menu-danger{color:var(--danger);}
+.drop-menu .menu-danger:hover{background:rgba(220,38,38,.08);color:var(--danger);}
+.menu .drop-sep{height:1px;background:var(--border);margin:4px 8px;}
+.menu .menu-danger{color:var(--danger);}
+.menu .menu-danger:hover{background:rgba(220,38,38,.08);color:var(--danger);}
 .notif-item{padding:10px 12px;border-radius:8px;font-size:13px;cursor:pointer;}
 .notif-item:hover{background:var(--soft);}
 .notif-item.unread{background:#EFF6FF;}
@@ -149,6 +178,16 @@ body.dark .model-btn:hover{background:rgba(59,130,246,.1);}
 .bubble{max-width:min(100%,640px);padding:12px 16px;border-radius:16px;font-size:14.5px;line-height:1.6;word-break:break-word;}
 .row.user .bubble{background:var(--primary);color:var(--bg);border-bottom-right-radius:6px;}
 .row.assistant .bubble{background:var(--side);border:1px solid var(--border);border-bottom-left-radius:6px;}
+.bubble[data-stream="1"].is-typing{padding:14px 18px;min-height:44px;display:inline-flex;align-items:center;}
+.typing-dots{display:inline-flex;align-items:center;gap:5px;height:14px;}
+.typing-dots span{width:7px;height:7px;border-radius:50%;background:var(--muted);opacity:.35;animation:typingDot 1.15s ease-in-out infinite;}
+.typing-dots span:nth-child(2){animation-delay:.18s;}
+.typing-dots span:nth-child(3){animation-delay:.36s;}
+body.dark .typing-dots span{background:#94A3B8;}
+@keyframes typingDot{
+  0%,80%,100%{transform:translateY(0);opacity:.3;}
+  40%{transform:translateY(-4px);opacity:1;}
+}
 .bubble pre{background:rgba(0,0,0,.07);border-radius:8px;padding:10px 14px;overflow-x:auto;margin:8px 0;font-size:13px;}
 body.dark .bubble pre{background:rgba(255,255,255,.07);}
 .bubble code{font-family:ui-monospace,"SF Mono",Consolas,monospace;font-size:13px;}
@@ -203,7 +242,56 @@ body.dark .tool-toggle.on{background:rgba(59,130,246,.15);border-color:rgba(59,1
 .entity h3{margin:0 0 4px;font-size:15px;}
 .entity p{margin:0;color:var(--muted);font-size:13px;line-height:1.45;white-space:pre-wrap;}
 .entity .grow{flex:1;min-width:0;}
-.entity-actions{display:flex;gap:6px;flex-wrap:wrap;flex-shrink:0;}
+.entity-actions{display:flex;gap:6px;flex-wrap:wrap;flex-shrink:0;align-items:center;}
+.tools-list{display:flex;flex-direction:column;gap:12px;}
+.tool-card{border:1px solid var(--border);border-radius:14px;padding:16px;background:var(--bg);display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px 16px;align-items:start;}
+.tool-card-top{display:flex;align-items:flex-start;gap:12px;min-width:0;}
+.tool-icon{width:40px;height:40px;border-radius:10px;background:var(--soft);display:grid;place-items:center;flex-shrink:0;color:var(--accent);}
+.tool-card h3{margin:0 0 4px;font-size:15px;font-weight:700;}
+.tool-card p{margin:0;color:var(--muted);font-size:13px;line-height:1.45;}
+.tool-card .grow{flex:1;min-width:0;}
+.tool-badges{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;}
+.tool-actions{display:flex;flex-direction:column;gap:8px;align-items:stretch;min-width:110px;}
+.tool-actions .btn-outline,.tool-actions .btn-primary{justify-content:center;width:100%;}
+@media(max-width:560px){
+  .tool-card{grid-template-columns:1fr;}
+  .tool-actions{flex-direction:row;flex-wrap:wrap;min-width:0;}
+  .tool-actions .btn-outline,.tool-actions .btn-primary{width:auto;}
+}
+.asst-list{display:flex;flex-direction:column;gap:12px;}
+.asst-card{border:1px solid var(--border);border-radius:14px;padding:16px;background:var(--bg);display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px 16px;align-items:start;position:relative;}
+.asst-card.active{box-shadow:inset 0 0 0 1px #BFDBFE;background:#F8FBFF;}
+body.dark .asst-card.active{background:rgba(59,130,246,.08);box-shadow:inset 0 0 0 1px rgba(59,130,246,.35);}
+.asst-card-top{display:flex;align-items:flex-start;gap:12px;min-width:0;}
+.asst-icon{width:40px;height:40px;border-radius:10px;background:var(--soft);display:grid;place-items:center;flex-shrink:0;color:var(--accent);}
+.asst-card h3{margin:0 0 4px;font-size:15px;font-weight:700;}
+.asst-card p{margin:0;color:var(--muted);font-size:13px;line-height:1.45;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.asst-card .grow{flex:1;min-width:0;}
+.asst-badges{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;}
+.asst-actions{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:flex-end;}
+.asst-more-wrap{position:relative;}
+.asst-more-wrap .drop-menu{right:0;left:auto;top:calc(100% + 6px);min-width:160px;}
+@media(max-width:560px){
+  .asst-card{grid-template-columns:1fr;}
+  .asst-actions{justify-content:flex-start;}
+}
+.ui-list{display:flex;flex-direction:column;gap:12px;}
+.ui-card{border:1px solid var(--border);border-radius:14px;padding:16px;background:var(--bg);display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px 16px;align-items:start;position:relative;}
+.ui-card-top{display:flex;align-items:flex-start;gap:12px;min-width:0;}
+.ui-icon{width:40px;height:40px;border-radius:10px;background:var(--soft);display:grid;place-items:center;flex-shrink:0;color:var(--accent);}
+.ui-card h3{margin:0 0 4px;font-size:15px;font-weight:700;}
+.ui-card p{margin:0;color:var(--muted);font-size:13px;line-height:1.45;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.ui-card .grow{flex:1;min-width:0;}
+.ui-badges{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;}
+.ui-actions{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:flex-end;}
+.ui-more-wrap{position:relative;}
+.ui-more-wrap .drop-menu{right:0;left:auto;top:calc(100% + 6px);min-width:170px;}
+.ui-form-card{border:1px solid var(--border);border-radius:14px;padding:16px;background:var(--side);margin-top:16px;}
+.ui-form-card h3{margin:0 0 12px;font-size:14px;font-weight:700;}
+@media(max-width:560px){
+  .ui-card{grid-template-columns:1fr;}
+  .ui-actions{justify-content:flex-start;}
+}
 
 /* ── TABS ── */
 .tabs{display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:20px;overflow-x:auto;}
@@ -228,7 +316,9 @@ body.dark .tool-toggle.on{background:rgba(59,130,246,.15);border-color:rgba(59,1
 .btn-outline:hover{color:var(--text);border-color:#94A3B8;}
 .btn-danger{border:0;background:rgba(220,38,38,.1);color:var(--danger);border-radius:10px;padding:8px 12px;font-weight:600;font-size:13px;display:inline-flex;align-items:center;gap:6px;}
 .btn-danger:hover{background:rgba(220,38,38,.18);}
-.toggle-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:6px 0;}
+.form-grid .sw-wrap,.settings-section .sw-wrap{display:block;width:40px;height:22px;position:relative;flex-shrink:0;}
+.form-grid .toggle-row,.settings-section .toggle-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 0;}
+.form-grid .toggle-row > div:first-child{flex:1;min-width:0;}
 .toggle-label{font-size:13px;font-weight:550;}
 .toggle-sub{font-size:12px;color:var(--muted);}
 .sw-wrap{position:relative;width:40px;height:22px;flex-shrink:0;}
@@ -248,6 +338,50 @@ body.dark .tool-toggle.on{background:rgba(59,130,246,.15);border-color:rgba(59,1
 .search-hit strong{display:block;font-size:14px;margin-bottom:2px;}
 .search-hit span{font-size:12px;color:var(--muted);}
 .tag{display:inline-block;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;padding:2px 6px;border-radius:4px;background:var(--soft);color:var(--muted);margin-right:6px;}
+
+/* ── EXPLORE ── */
+.explore-panel{padding:28px 28px 48px;}
+.explore-inner{max-width:980px;}
+.explore-hero{margin-bottom:22px;}
+.explore-hero h2{margin:0 0 6px;font-size:26px;letter-spacing:-.04em;font-weight:700;}
+.explore-hero .sub{margin:0;font-size:15px;line-height:1.5;color:var(--muted);max-width:42ch;}
+.explore-filters{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:28px;}
+.explore-chip{
+  border:1px solid var(--border);background:var(--bg);color:var(--muted);
+  border-radius:999px;padding:7px 14px;font-size:13px;font-weight:600;cursor:pointer;
+}
+.explore-chip:hover{color:var(--text);border-color:#94A3B8;}
+.explore-chip.active{background:var(--primary);color:var(--bg);border-color:var(--primary);}
+.explore-section{margin-bottom:32px;}
+.explore-section-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:14px;}
+.explore-section-head h3{margin:0;font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);}
+.explore-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;}
+.explore-card{
+  border:1px solid var(--border);border-radius:16px;background:var(--bg);
+  padding:20px 18px 16px;display:flex;flex-direction:column;gap:12px;min-height:168px;
+  transition:border-color .15s ease, box-shadow .15s ease;
+}
+.explore-card:hover{border-color:#94A3B8;box-shadow:0 8px 24px rgba(17,24,39,.06);}
+.explore-card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;}
+.explore-icon{
+  width:40px;height:40px;border-radius:12px;display:grid;place-items:center;flex-shrink:0;
+  background:var(--soft);color:var(--text);
+}
+.explore-card.featured .explore-icon{background:#EFF6FF;color:var(--accent);}
+.explore-card h4{margin:0;font-size:16px;font-weight:650;letter-spacing:-.02em;line-height:1.3;}
+.explore-card p{margin:0;font-size:13.5px;line-height:1.55;color:var(--muted);flex:1;}
+.explore-card-foot{display:flex;align-items:center;justify-content:space-between;gap:10px;padding-top:4px;}
+.explore-card .badge{font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:4px 8px;}
+.explore-card .btn-use{
+  border:0;background:var(--primary);color:var(--bg);border-radius:10px;
+  padding:8px 14px;font-size:13px;font-weight:650;cursor:pointer;
+}
+.explore-card .btn-use:hover{opacity:.92;}
+@media (max-width:640px){
+  .explore-panel{padding:20px 16px 36px;}
+  .explore-hero h2{font-size:22px;}
+  .explore-grid{grid-template-columns:1fr;gap:12px;}
+}
 
 /* ── STATUS BADGES ── */
 .badge{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:999px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;}
@@ -276,14 +410,31 @@ body.dark .skeleton{background:linear-gradient(90deg,rgba(255,255,255,.04) 25%,r
 .profile-card .avatar{width:56px;height:56px;font-size:20px;}
 .profile-card h3{margin:0 0 4px;font-size:18px;}
 .profile-card p{margin:0;color:var(--muted);font-size:13px;}
+.profile-card .grow{flex:1;min-width:0;}
 .stat-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:20px;}
-.stat{border:1px solid var(--border);border-radius:12px;padding:14px;background:var(--bg);}
-.stat strong{display:block;font-size:20px;margin-bottom:2px;}
-.stat span{font-size:12px;color:var(--muted);}
+.stat{border:1px solid var(--border);border-radius:12px;padding:14px;background:var(--bg);text-align:center;}
+.stat strong{display:block;font-size:20px;font-weight:750;letter-spacing:-.02em;margin-bottom:2px;}
+.stat span{font-size:12px;color:var(--muted);font-weight:600;}
 .detail-header{border:1px solid var(--border);border-radius:14px;padding:20px;background:var(--side);margin-bottom:16px;}
 .detail-header h2{margin:0 0 6px;font-size:20px;font-weight:700;}
 .detail-header .sub{color:var(--muted);font-size:14px;margin:0;}
 .detail-meta{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;align-items:center;}
+.project-toolbar{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px;align-items:center;}
+.project-toolbar input,.project-toolbar select{border:1px solid var(--border);border-radius:10px;padding:8px 12px;background:var(--bg);outline:none;font-size:13px;}
+.project-toolbar input{flex:1;min-width:160px;}
+.project-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;}
+.project-card{border:1px solid var(--border);border-radius:14px;padding:16px;background:var(--bg);display:flex;flex-direction:column;gap:10px;position:relative;}
+.project-card:hover{border-color:#94A3B8;}
+.project-card h3{margin:0;font-size:15px;display:flex;align-items:center;gap:8px;}
+.project-card .desc{margin:0;color:var(--muted);font-size:13px;line-height:1.45;min-height:36px;}
+.project-card .meta{font-size:12px;color:var(--muted);}
+.project-card .actions{display:flex;gap:8px;align-items:center;margin-top:auto;}
+.project-card .more-wrap{position:relative;margin-left:auto;}
+.project-menu{position:absolute;right:0;bottom:calc(100% + 6px);min-width:160px;background:var(--bg);border:1px solid var(--border);border-radius:10px;box-shadow:0 10px 28px rgba(17,24,39,.14);padding:6px;display:none;z-index:20;}
+.project-menu.open{display:block;}
+.project-menu button{width:100%;border:0;background:transparent;text-align:left;padding:8px 10px;border-radius:8px;font-size:13px;}
+.project-menu button:hover{background:var(--soft);}
+.project-menu button.danger{color:var(--danger);}
 .member-row{display:flex;align-items:center;gap:10px;padding:10px 14px;border:1px solid var(--border);border-radius:10px;background:var(--bg);margin-bottom:8px;}
 .member-row .avatar{width:30px;height:30px;font-size:11px;}
 .member-row .grow{flex:1;}
@@ -387,7 +538,7 @@ body.dark .chip.on{background:rgba(59,130,246,.15);border-color:rgba(59,130,246,
         <button type="button" class="icon-btn" id="headerProfileBtn" aria-label="Profile">
           <div class="avatar" id="headerAvatar" style="width:30px;height:30px;font-size:12px">O</div>
         </button>
-        <div class="drop-menu" id="headerMenu" style="width:200px"></div>
+        <div class="drop-menu" id="headerMenu" style="min-width:220px;width:220px"></div>
       </div>
     </div>
   </header>
@@ -443,7 +594,7 @@ body.dark .chip.on{background:rgba(59,130,246,.15);border-color:rgba(59,130,246,
   <section class="view" id="view-assistants"><div class="panel"><div class="panel-inner" id="assistantsPanel"></div></div></section>
 
   <!-- EXPLORE -->
-  <section class="view" id="view-explore"><div class="panel"><div class="panel-inner" id="explorePanel"></div></div></section>
+  <section class="view" id="view-explore"><div class="panel explore-panel"><div class="panel-inner explore-inner" id="explorePanel"></div></div></section>
 
   <!-- FILES -->
   <section class="view" id="view-files"><div class="panel"><div class="panel-inner" id="filesPanel"></div></div></section>
@@ -551,10 +702,10 @@ const ICONS = {
 /* ─── NAV ORDER ─── */
 const NAV = [
   ["chat","Chat","message"],
+  ["projects","Projects","folder"],
   ["library","Library","book"],
   ["scheduled","Scheduled","calendar"],
   ["tools","Tools","wrench"],
-  ["projects","Projects","folder"],
   ["assistants","Assistants","bot"],
   ["explore","Explore","compass"],
   ["files","Files","file"],
@@ -565,6 +716,7 @@ const NAV = [
   ["settings","Settings","settings"],
   ["profile","Profile","user"],
 ];
+const NAV_PRIMARY = 2;
 
 const SUGGESTIONS = [
   { cat:"Write",   text:"Draft a concise product update email", prompt:"Help me draft a concise product update email for our team." },
@@ -579,10 +731,11 @@ const state = {
   user:null, profile:null, settings:null, workspaces:[], workspaceId:null,
   conversations:[], currentId:null, messages:[], busy:false,
   model:"OM-1.0", models:[], catalog:[],
-  view:"chat", projects:[], assistants:[],
+  view:"chat", projects:[], assistants:[], activeProjectId:null, projectFilter:"all", projectSort:"updated", projectQuery:"",
   selectedAssistantId:null, notifications:[], unreadNotifs:0,
   tools:{web:false,code:false}, abort:null, searchQuery:"",
   convFilter:"all", recognition:null, ttsActive:false,
+  navMoreOpen:false, expandedProjects:{},
 };
 
 /* ─── DOM SHORTCUTS ─── */
@@ -743,17 +896,69 @@ function updateTopTitle() {
 }
 
 /* ─── NAV ─── */
+function makeNavButton(id, label, iconName) {
+  const b = document.createElement("button");
+  b.type = "button";
+  b.className = "nav-btn"+(state.view === id ? " active":"");
+  b.dataset.view = id;
+  b.innerHTML = svg(iconName)+'<span class="nav-label">'+escapeHtml(label)+"</span>";
+  b.addEventListener("click", () => setView(id));
+  return b;
+}
+
+function isPrimaryNav(viewId) {
+  return NAV.slice(0, NAV_PRIMARY).some(([id]) => id === viewId);
+}
+
+function syncNavMoreOpen() {
+  const moreBtn = $("navMoreBtn");
+  const moreList = $("navMoreList");
+  if (!moreBtn || !moreList) return;
+  const open = !!state.navMoreOpen;
+  moreBtn.classList.toggle("open", open);
+  moreList.classList.toggle("open", open);
+  const label = moreBtn.querySelector(".nav-label");
+  if (label) label.textContent = open ? "Less" : "More";
+}
+
 function buildNav() {
   els.navTabs.innerHTML = "";
-  NAV.forEach(([id, label, iconName]) => {
-    const b = document.createElement("button");
-    b.type = "button";
-    b.className = "nav-btn"+(state.view === id ? " active":"");
-    b.dataset.view = id;
-    b.innerHTML = svg(iconName)+'<span class="nav-label">'+escapeHtml(label)+"</span>";
-    b.addEventListener("click", () => setView(id));
-    els.navTabs.appendChild(b);
+  const primary = NAV.slice(0, NAV_PRIMARY);
+  const secondary = NAV.slice(NAV_PRIMARY);
+
+  primary.forEach(([id, label, iconName]) => {
+    els.navTabs.appendChild(makeNavButton(id, label, iconName));
   });
+
+  if (secondary.length) {
+    const moreBtn = document.createElement("button");
+    moreBtn.type = "button";
+    moreBtn.id = "navMoreBtn";
+    moreBtn.className = "nav-btn nav-more-btn";
+    moreBtn.innerHTML =
+      svg("more")+
+      '<span class="nav-label">More</span>'+
+      '<span class="nav-more-chev">'+svg("chevD",14)+"</span>";
+    moreBtn.addEventListener("click", e => {
+      e.stopPropagation();
+      state.navMoreOpen = !state.navMoreOpen;
+      syncNavMoreOpen();
+    });
+    els.navTabs.appendChild(moreBtn);
+
+    const moreList = document.createElement("div");
+    moreList.id = "navMoreList";
+    moreList.className = "nav-more-list";
+    secondary.forEach(([id, label, iconName]) => {
+      moreList.appendChild(makeNavButton(id, label, iconName));
+    });
+    els.navTabs.appendChild(moreList);
+
+    // Keep More open if current view is in the overflow list
+    if (!isPrimaryNav(state.view)) state.navMoreOpen = true;
+    syncNavMoreOpen();
+  }
+
   setIcon($("newChatBtn"), "plus", 16);
   $("newChatBtn").appendChild(Object.assign(document.createElement("span"),{className:"side-label",textContent:"New chat"}));
   setIcon($("collapseBtn"), "chevL", 18);
@@ -763,19 +968,27 @@ function buildNav() {
   setIcon($("helpBtn"), "help", 18);
   setIcon($("searchTopBtn"), "search", 18);
   $("sideMenu").innerHTML =
-    '<button type="button" data-goto="profile">'+svg("user",16)+' Profile</button>'+
-    '<button type="button" data-goto="settings">'+svg("settings",16)+' Settings</button>'+
-    '<a href="/ui/tokens">'+svg("key",16)+' API Keys</a>'+
-    '<button type="button" id="sideLogout">'+svg("logOut",16)+' Sign out</button>';
+    '<button type="button" data-goto="profile">'+svg("user",16)+'<span>Profile</span></button>'+
+    '<button type="button" data-goto="settings">'+svg("settings",16)+'<span>Settings</span></button>'+
+    '<a href="/ui/tokens">'+svg("key",16)+'<span>API Keys</span></a>'+
+    '<div class="drop-sep"></div>'+
+    '<button type="button" class="menu-danger" id="sideLogout">'+svg("logOut",16)+'<span>Sign out</span></button>';
   $("headerMenu").innerHTML =
-    '<button type="button" data-goto="profile">'+svg("user",16)+' Profile</button>'+
-    '<button type="button" data-goto="settings">'+svg("settings",16)+' Settings</button>'+
-    '<a href="/ui/tokens">'+svg("key",16)+' API Keys</a>'+
-    '<button type="button" id="headerLogout">'+svg("logOut",16)+' Sign out</button>';
+    '<button type="button" data-goto="profile">'+svg("user",16)+'<span>Profile</span></button>'+
+    '<button type="button" data-goto="settings">'+svg("settings",16)+'<span>Settings</span></button>'+
+    '<a href="/ui/tokens">'+svg("key",16)+'<span>API Keys</span></a>'+
+    '<div class="drop-sep"></div>'+
+    '<button type="button" class="menu-danger" id="headerLogout">'+svg("logOut",16)+'<span>Sign out</span></button>';
   $("sideLogout").addEventListener("click", logout);
   $("headerLogout").addEventListener("click", logout);
-  document.querySelectorAll("[data-goto]").forEach(el => {
-    el.addEventListener("click", () => setView(el.getAttribute("data-goto")));
+  document.querySelectorAll("#sideMenu [data-goto], #headerMenu [data-goto]").forEach(el => {
+    el.addEventListener("click", () => {
+      closeMenus();
+      setView(el.getAttribute("data-goto"));
+    });
+  });
+  document.querySelectorAll("#sideMenu a, #headerMenu a").forEach(el => {
+    el.addEventListener("click", () => closeMenus());
   });
   // Attach menu
   $("attachUploadFile").innerHTML = svg("file",14)+" Upload file to OM";
@@ -837,43 +1050,145 @@ function renderConvList() {
   $("newChatBtn").style.display = "";
   if (!showWrap) return;
 
-  let items = state.conversations.slice();
-  if (state.convFilter === "pinned")   items = items.filter(c => c.pinned);
-  if (state.convFilter === "archived") items = items.filter(c => c.archived);
-  else if (state.convFilter === "all") items = items.filter(c => !c.archived);
+  const filter = state.convFilter || "all";
+  let items = (state.conversations || []).slice();
+  if (filter === "pinned") {
+    items = items.filter(c => !!c.pinned && !c.archived);
+  } else if (filter === "archived") {
+    items = items.filter(c => !!c.archived);
+  } else {
+    items = items.filter(c => !c.archived);
+  }
 
-  if (!items.length) {
-    const empty = document.createElement("div");
-    empty.style.cssText = "padding:16px 12px;color:var(--muted);font-size:13px;";
-    empty.textContent = state.convFilter === "archived" ? "No archived chats" : "No chats yet";
-    els.convList.appendChild(empty);
+  const projectChats = {};
+  const freeChats = [];
+  // Flat list for Pinned / Archived so project chats still appear
+  const flatList = filter === "archived" || filter === "pinned";
+  items.forEach(c => {
+    if (!flatList && c.project_id) {
+      if (!projectChats[c.project_id]) projectChats[c.project_id] = [];
+      projectChats[c.project_id].push(c);
+    } else {
+      freeChats.push(c);
+    }
+  });
+
+  if (state.activeProjectId) state.expandedProjects[state.activeProjectId] = true;
+
+  const sideProjects = (state.projects||[]).filter(p => !p.archived);
+  if (sideProjects.length && !flatList) {
+    const sec = document.createElement("div");
+    sec.className = "side-proj-section";
+    const label = document.createElement("div");
+    label.className = "group-label";
+    label.textContent = "Projects";
+    sec.appendChild(label);
+
+    sideProjects.forEach(p => {
+      const chats = projectChats[p.id] || [];
+      const open = !!state.expandedProjects[p.id];
+      const wrap = document.createElement("div");
+      wrap.className = "side-proj-block";
+
+      const head = document.createElement("button");
+      head.type = "button";
+      head.className = "side-proj-head"+(open?" open":"")+(state.activeProjectId===p.id?" active":"");
+      head.innerHTML =
+        '<span class="sp-chev">'+svg("chevR",12)+"</span>"+
+        svg("folder",14)+
+        '<span class="sp-name"></span>'+
+        (chats.length ? '<span class="sp-count">'+chats.length+"</span>" : "")+
+        '<button type="button" class="sp-new" title="New chat in project">'+svg("plus",14)+"</button>";
+      head.querySelector(".sp-name").textContent = p.name || "Project";
+
+      head.querySelector(".sp-new").addEventListener("click", async e => {
+        e.stopPropagation();
+        try {
+          state.activeProjectId = p.id;
+          state.expandedProjects[p.id] = true;
+          await createChat("New chat", p.id);
+          closeSidebar();
+          els.input.focus();
+        } catch (_) {}
+      });
+
+      head.addEventListener("click", e => {
+        if (e.target.closest(".sp-new")) return;
+        state.expandedProjects[p.id] = !state.expandedProjects[p.id];
+        if (state.expandedProjects[p.id]) state.activeProjectId = p.id;
+        renderConvList();
+      });
+      head.addEventListener("dblclick", e => {
+        if (e.target.closest(".sp-new")) return;
+        loadProjectDetail(p);
+      });
+      wrap.appendChild(head);
+
+      const list = document.createElement("div");
+      list.className = "side-proj-chats"+(open?" open":"");
+      if (!chats.length) {
+        const empty = document.createElement("div");
+        empty.className = "side-proj-empty";
+        empty.textContent = "No chats yet";
+        list.appendChild(empty);
+      } else {
+        chats.forEach(c => list.appendChild(makeConvItem(c)));
+      }
+      wrap.appendChild(list);
+      sec.appendChild(wrap);
+    });
+    els.convList.appendChild(sec);
+  }
+
+  if (!freeChats.length) {
+    const hasVisibleProjects = !flatList && sideProjects.length > 0;
+    if (!hasVisibleProjects) {
+      const empty = document.createElement("div");
+      empty.style.cssText = "padding:16px 12px;color:var(--muted);font-size:13px;";
+      empty.textContent =
+        filter === "archived" ? "No archived chats" :
+        filter === "pinned" ? "No pinned chats" :
+        "No chats yet";
+      els.convList.appendChild(empty);
+    }
     return;
   }
+
   const groups = {Today:[],Yesterday:[],Previous:[]};
-  items.forEach(c => groups[dayBucket(c.updated_at)].push(c));
+  freeChats.forEach(c => groups[dayBucket(c.updated_at)].push(c));
+  const chatsLabel = document.createElement("div");
+  chatsLabel.className = "group-label";
+  chatsLabel.textContent =
+    filter === "archived" ? "Archived" :
+    filter === "pinned" ? "Pinned" :
+    "Chats";
+  els.convList.appendChild(chatsLabel);
   ["Today","Yesterday","Previous"].forEach(label => {
     const list = groups[label];
     if (!list.length) return;
     const h = document.createElement("div");
     h.className = "group-label"; h.textContent = label;
+    h.style.paddingTop = "6px";
     els.convList.appendChild(h);
-    list.forEach(c => {
-      const btn = document.createElement("button");
-      btn.type = "button";
-      btn.className = "conv-item"+(c.id === state.currentId ? " active":"");
-      btn.innerHTML =
-        (c.pinned ? '<span class="conv-pin-icon">'+svg("pin",10)+"</span>" : "")+
-        '<span class="ci-title"></span>'+
-        '<button type="button" class="conv-more-btn" title="More options">'+svg("moreV",14)+"</button>";
-      btn.querySelector(".ci-title").textContent = c.title||"New chat";
-      btn.querySelector(".conv-more-btn").addEventListener("click", e => showConvCtxMenu(e, c));
-      btn.addEventListener("click", e => {
-        if (e.target.closest(".conv-more-btn")) return;
-        loadConversation(c.id); closeSidebar();
-      });
-      els.convList.appendChild(btn);
-    });
+    list.forEach(c => els.convList.appendChild(makeConvItem(c)));
   });
+}
+
+function makeConvItem(c) {
+  const btn = document.createElement("button");
+  btn.type = "button";
+  btn.className = "conv-item"+(c.id === state.currentId ? " active":"");
+  btn.innerHTML =
+    (c.pinned ? '<span class="conv-pin-icon">'+svg("pin",10)+"</span>" : "")+
+    '<span class="ci-title"></span>'+
+    '<button type="button" class="conv-more-btn" title="More options">'+svg("moreV",14)+"</button>";
+  btn.querySelector(".ci-title").textContent = c.title||"New chat";
+  btn.querySelector(".conv-more-btn").addEventListener("click", e => showConvCtxMenu(e, c));
+  btn.addEventListener("click", e => {
+    if (e.target.closest(".conv-more-btn")) return;
+    loadConversation(c.id); closeSidebar();
+  });
+  return btn;
 }
 
 /* ─── CONVERSATION ACTIONS ─── */
@@ -891,19 +1206,21 @@ async function renameConv(c) {
 async function pinConv(c, pinned) {
   const { res } = await api("/v1/conversations/"+encodeURIComponent(c.id),
     {method:"PATCH",body:JSON.stringify({pinned})},{success: pinned?"Pinned":"Unpinned"});
-  if (res.ok) await refreshConversations();
+  if (!res.ok) return;
+  if (pinned) await setConvFilter("pinned");
+  else await setConvFilter(state.convFilter === "pinned" ? "all" : state.convFilter);
 }
 
 async function archiveConv(c, archived) {
   const { res } = await api("/v1/conversations/"+encodeURIComponent(c.id),
     {method:"PATCH",body:JSON.stringify({archived})},{success: archived?"Archived":"Restored"});
-  if (res.ok) {
-    if (archived && state.currentId === c.id) {
-      state.currentId = null; state.messages = [];
-      updateTopTitle(); renderMessages();
-    }
-    await refreshConversations();
+  if (!res.ok) return;
+  if (archived && state.currentId === c.id) {
+    state.currentId = null; state.messages = [];
+    updateTopTitle(); renderMessages();
   }
+  if (archived) await setConvFilter("archived");
+  else await setConvFilter("all");
 }
 
 async function moveToProject(c) {
@@ -916,6 +1233,7 @@ async function moveToProject(c) {
   if (Number.isNaN(idx)||!projects[idx]) return;
   await api("/v1/conversations/"+encodeURIComponent(c.id),
     {method:"PATCH",body:JSON.stringify({project_id:projects[idx].id})},{success:"Moved to "+projects[idx].name});
+  state.expandedProjects[projects[idx].id] = true;
   await refreshConversations();
 }
 
@@ -979,6 +1297,10 @@ async function deleteConv(c) {
 }
 
 /* ─── MESSAGES ─── */
+function typingIndicatorHtml() {
+  return '<div class="typing-dots" aria-label="OM is typing" role="status"><span></span><span></span><span></span></div>';
+}
+
 function renderMessages() {
   els.messages.innerHTML = "";
   if (!state.messages.length) {
@@ -1010,8 +1332,12 @@ function renderMessages() {
     }
     const bubble = document.createElement("div");
     bubble.className = "bubble";
+    const waiting = !!(m._streaming && !String(m.content||"").trim());
     if (m._streaming) bubble.dataset.stream = "1";
-    bubble.innerHTML = m._streaming ? "…" : (m.role === "assistant" ? renderMarkdown(m.content||"") : escapeHtml(m.content||"").replace(/\n/g,"<br>"));
+    if (waiting) bubble.classList.add("is-typing");
+    if (waiting) bubble.innerHTML = typingIndicatorHtml();
+    else if (m.role === "assistant") bubble.innerHTML = renderMarkdown(m.content||"");
+    else bubble.innerHTML = escapeHtml(m.content||"").replace(/\n/g,"<br>");
     col.appendChild(bubble);
     if (m.role === "assistant" && !m._streaming) {
       col.appendChild(buildMsgActions(m, idx));
@@ -1024,8 +1350,16 @@ function renderMessages() {
 
 function updateStreamBubble(text) {
   const bubble = els.messages.querySelector('.bubble[data-stream="1"]');
-  if (bubble) { bubble.innerHTML = renderMarkdown(text||"…"); els.messages.scrollTop = els.messages.scrollHeight; }
-  else renderMessages();
+  if (!bubble) { renderMessages(); return; }
+  const body = String(text||"");
+  if (!body.trim()) {
+    bubble.classList.add("is-typing");
+    bubble.innerHTML = typingIndicatorHtml();
+  } else {
+    bubble.classList.remove("is-typing");
+    bubble.innerHTML = renderMarkdown(body);
+  }
+  els.messages.scrollTop = els.messages.scrollHeight;
 }
 
 function buildMsgActions(m, idx) {
@@ -1140,6 +1474,8 @@ async function streamCompletion(messages) {
     body:JSON.stringify({
       model:state.model||"OM-1.0", messages,
       max_tokens:1024, temperature:state.settings?state.settings.temperature:0.8, stream:true,
+      project_id:state.activeProjectId||undefined,
+      conversation_id:state.currentId||undefined,
     }),
   });
   if (res.status === 401) { location.replace("/login"); throw new Error("unauthorized"); }
@@ -1241,31 +1577,70 @@ function autosize() {
 }
 
 /* ─── CONVERSATION API ─── */
+async function refreshProjects() {
+  const { res, data } = await api("/v1/projects",{},{error:false});
+  if (res.ok) state.projects = (data && data.projects)||[];
+}
+
+function setConvFilter(filter, { refresh = true } = {}) {
+  const next = filter === "pinned" || filter === "archived" ? filter : "all";
+  state.convFilter = next;
+  document.querySelectorAll(".conv-filter-btn").forEach(b => {
+    b.classList.toggle("active", b.dataset.filter === next);
+  });
+  if (refresh) return refreshConversations();
+}
+
 async function refreshConversations() {
-  const filter = state.convFilter === "archived" ? "?archived_only=1" : "";
-  const { res, data } = await api("/v1/conversations"+filter,{},{error:false});
+  const qs = new URLSearchParams();
+  if (state.convFilter === "archived") qs.set("archived_only", "true");
+  else if (state.convFilter === "pinned") qs.set("pinned_only", "true");
+  const suffix = qs.toString() ? ("?" + qs.toString()) : "";
+  const [{ res, data }] = await Promise.all([
+    api("/v1/conversations"+suffix,{},{error:false}),
+    refreshProjects(),
+  ]);
   if (!res.ok) return;
-  state.conversations = (data && data.conversations)||[];
+  state.conversations = ((data && data.conversations)||[]).map(c => ({
+    ...c,
+    pinned: !!(c.pinned === true || c.pinned === 1 || c.pinned === "1"),
+    archived: !!(c.archived === true || c.archived === 1 || c.archived === "1"),
+  }));
   renderConvList();
 }
 
-async function createChat(title) {
-  const { res, data } = await api("/v1/conversations",{method:"POST",body:JSON.stringify({title:title||"New chat"})},{success:"New chat created"});
+async function createChat(title, projectId) {
+  const pid = projectId || state.activeProjectId || null;
+  const body = {title:title||"New chat"};
+  if (pid) body.project_id = pid;
+  const { res, data } = await api("/v1/conversations",{method:"POST",body:JSON.stringify(body)},{success:"New chat created"});
   if (!res.ok) throw new Error((data && data.detail)||"Create failed");
   state.currentId = data.id; state.messages = [];
+  if (pid) state.activeProjectId = pid;
   updateTopTitle(); await refreshConversations();
   await persistLast(data.id); renderMessages();
+  if (pid) setProjectHash(pid, data.id);
   return data;
 }
 
-async function loadConversation(id) {
+async function loadConversation(id, opts) {
+  opts = opts || {};
   const { res, data } = await api("/v1/conversations/"+encodeURIComponent(id),{},{error:false});
   if (!res.ok) { toast("Could not load chat","error"); return; }
   state.currentId = data.id;
   state.messages = (data.messages||[]).map(m => ({role:m.role,content:m.content}));
+  if (data.project_id) state.activeProjectId = data.project_id;
+  else if (!opts.keepProject) state.activeProjectId = null;
+  if (data.project_id) state.expandedProjects[data.project_id] = true;
+  if (data.project_id && data.model) { /* noop */ }
+  if (data.project_id) {
+    const proj = state.projects.find(p => p.id === data.project_id);
+    if (proj && proj.model) state.model = proj.model;
+  }
   updateTopTitle(); setView("chat",true);
   renderConvList(); renderMessages();
   await persistLast(id);
+  if (data.project_id) setProjectHash(data.project_id, id);
 }
 
 async function appendTurn(userText, assistantText) {
@@ -1403,6 +1778,78 @@ function emptyPanel(title, desc, actionLabel, actionFn) {
   return d;
 }
 
+function mkBadge(text, cls) {
+  const s = document.createElement("span");
+  s.className = "badge "+(cls||"gray");
+  s.textContent = text;
+  return s;
+}
+
+function uiMoreMenu(items) {
+  const wrap = document.createElement("div");
+  wrap.className = "ui-more-wrap";
+  const btn = document.createElement("button");
+  btn.type = "button";
+  btn.className = "icon-btn";
+  btn.title = "More";
+  btn.innerHTML = svg("more",16);
+  const drop = document.createElement("div");
+  drop.className = "drop-menu";
+  btn.addEventListener("click", e => {
+    e.stopPropagation();
+    const wasOpen = drop.classList.contains("open");
+    closeMenus();
+    if (wasOpen) return;
+    drop.innerHTML = "";
+    (items||[]).forEach(it => {
+      const b = document.createElement("button");
+      b.type = "button";
+      if (it.danger) b.style.color = "var(--danger)";
+      b.innerHTML = (it.icon ? svg(it.icon,14) : "") + escapeHtml(it.label||"");
+      b.onclick = async ev => {
+        ev.stopPropagation();
+        drop.classList.remove("open");
+        if (it.onClick) await it.onClick();
+      };
+      drop.appendChild(b);
+    });
+    drop.classList.add("open");
+  });
+  wrap.append(btn, drop);
+  return wrap;
+}
+
+function uiCard({ icon, title, desc, badges, actions, more }) {
+  const card = document.createElement("div");
+  card.className = "ui-card";
+  const left = document.createElement("div");
+  left.className = "ui-card-top";
+  left.innerHTML =
+    '<div class="ui-icon">'+(icon ? svg(icon,18) : svg("file",18))+"</div>"+
+    '<div class="grow"><h3></h3><p></p><div class="ui-badges"></div></div>';
+  left.querySelector("h3").textContent = title || "Untitled";
+  left.querySelector("p").textContent = desc || "";
+  const badgeRow = left.querySelector(".ui-badges");
+  (badges||[]).forEach(b => {
+    if (!b) return;
+    if (b instanceof Node) badgeRow.appendChild(b);
+    else badgeRow.appendChild(mkBadge(b.text, b.cls));
+  });
+  const act = document.createElement("div");
+  act.className = "ui-actions";
+  (actions||[]).forEach(a => { if (a) act.appendChild(a); });
+  if (more && more.length) act.appendChild(uiMoreMenu(more));
+  card.append(left, act);
+  return card;
+}
+
+function blurb(text, max) {
+  const s = String(text||"").trim().replace(/\s+/g," ");
+  if (!s) return "";
+  const n = max || 160;
+  return s.length > n ? s.slice(0, n) + "…" : s;
+}
+
 function buildTabs(container, tabs, onChange, defaultTab) {
   const bar = document.createElement("div"); bar.className = "tabs";
   const activeId = defaultTab||tabs[0][0];
@@ -1471,61 +1918,86 @@ async function loadSearchView() {
 /* ─── VIEW: LIBRARY (tabbed) ─── */
 async function loadLibraryView() {
   const panel = $("libraryPanel");
-  panel.innerHTML = '<div class="panel-head"><div><h2>Library</h2><p class="sub">Saved snippets, files, and generated content.</p></div>'+
+  panel.innerHTML =
+    '<div class="panel-head"><div><h2>Library</h2><p class="sub">Saved snippets, files, and generated content.</p></div>'+
     '<button type="button" class="btn-primary" id="libAddBtn">'+svg("plus",14)+" Add item</button></div>"+
-    '<div id="libTabs"></div><div id="libContent">'+skeletons(3)+"</div>"+
-    '<div id="libAddForm" class="hidden"><form class="form-grid" id="libForm">'+
+    '<div id="libTabs"></div><div class="ui-list" id="libContent">'+skeletons(3)+"</div>";
+
+  $("libAddBtn").onclick = () => openLibraryCreateModal();
+  const tabs = [["all","All"],["generated","Generated"],["saved","Saved"],["documents","Documents"],["images","Images"],["favorites","Favorites"]];
+  buildTabs($("libTabs"), tabs, id => { activeLibTab = id; loadLibTab(id); }, activeLibTab||"all");
+  loadLibTab(activeLibTab||"all");
+}
+
+function openLibraryCreateModal() {
+  showModal("Add to Library",
+    '<form class="form-grid" id="libCreateModalForm">'+
     '<label>Title<input name="title" required maxlength="200" placeholder="Title…"/></label>'+
     '<label>Content<textarea name="content" rows="6" maxlength="500000" placeholder="Paste content…"></textarea></label>'+
-    '<label>Kind<select name="kind"><option value="document">Document</option><option value="snippet">Snippet</option><option value="note">Note</option></select></label>'+
-    '<div style="display:flex;gap:8px"><button type="submit" class="btn-primary">'+svg("plus",14)+" Save</button>"+
-    '<button type="button" class="btn-outline" id="libCancelBtn">Cancel</button></div></form></div>';
-
-  $("libAddBtn").addEventListener("click", () => { $("libAddForm").classList.remove("hidden"); $("libAddBtn").classList.add("hidden"); });
-  $("libCancelBtn").addEventListener("click", () => { $("libAddForm").classList.add("hidden"); $("libAddBtn").classList.remove("hidden"); });
-  $("libForm").addEventListener("submit", async e => {
-    e.preventDefault();
-    const fd = new FormData(e.target);
-    await api("/v1/library",{method:"POST",body:JSON.stringify({title:String(fd.get("title")||"").trim(),content:String(fd.get("content")||""),kind:String(fd.get("kind"))})},{success:"Added to library"});
-    e.target.reset(); $("libAddForm").classList.add("hidden"); $("libAddBtn").classList.remove("hidden");
-    loadLibTab(activeLibTab);
-  });
-
-  let activeLibTab = "all";
-  const tabs = [["all","All"],["generated","Generated"],["saved","Saved"],["documents","Documents"],["images","Images"],["favorites","Favorites"]];
-  buildTabs($("libTabs"), tabs, id => { activeLibTab = id; loadLibTab(id); }, "all");
-  loadLibTab("all");
+    '<label>Kind<select name="kind"><option value="document">Document</option><option value="snippet">Snippet</option><option value="note">Note</option></select></label></form>',
+    async () => {
+      const form = $("libCreateModalForm"); if (!form) return;
+      const fd = new FormData(form);
+      const title = String(fd.get("title")||"").trim();
+      if (!title) { toast("Title required","error"); return; }
+      await api("/v1/library",{method:"POST",body:JSON.stringify({title,content:String(fd.get("content")||""),kind:String(fd.get("kind"))})},{success:"Added to library"});
+      loadLibTab(activeLibTab);
+    }
+  );
 }
 
 async function loadLibTab(tabId) {
-  const box = $("libContent");
+  activeLibTab = tabId || "all";
+  const box = $("libContent"); if (!box) return;
   box.innerHTML = skeletons(3);
   const params = [];
-  if (tabId !== "all" && tabId !== "favorites") params.push("kind="+encodeURIComponent(tabId));
-  if (tabId === "favorites") params.push("favorite=1");
-  const url = "/v1/library"+(params.length?"?"+params.join("&"):"");
-  const { res, data } = await api(url,{},{error:false});
+  if (activeLibTab !== "all" && activeLibTab !== "favorites") params.push("kind="+encodeURIComponent(activeLibTab));
+  if (activeLibTab === "favorites") params.push("favorite=1");
+  const { res, data } = await api("/v1/library"+(params.length?"?"+params.join("&"):""),{},{error:false});
   box.innerHTML = "";
   const items = (res.ok && data && data.items)||[];
-  if (!items.length) { box.appendChild(emptyPanel("Nothing here","Add items to your library.")); return; }
+  if (!items.length) {
+    box.appendChild(emptyPanel("Nothing here","Add items to your library.","Add item", () => openLibraryCreateModal()));
+    return;
+  }
   items.forEach(item => {
-    box.appendChild(entityCard(
-      item.title,
-      (item.content||"").slice(0,200),
-      (item.kind||"")+" · "+(item.favorite?"★ Favorite · ":"")+fmtDate(item.created_at),
-      [
-        btnOutline("Use","",() => { els.input.value = item.content||""; autosize(); setView("chat"); toast("Loaded into composer","success"); }),
-        btnOutline(item.favorite?"Unfav":"Fav","star", async () => {
-          await api("/v1/library/"+encodeURIComponent(item.id),{method:"PATCH",body:JSON.stringify({favorite:!item.favorite})},{success:item.favorite?"Removed from favorites":"Added to favorites"});
-          loadLibTab(activeLibTab);
+    box.appendChild(uiCard({
+      icon: item.kind === "image" ? "image" : (item.kind === "snippet" ? "code" : "book"),
+      title: item.title || "Untitled",
+      desc: blurb(item.content, 160),
+      badges: [
+        {text: item.kind || "item", cls:"gray"},
+        item.favorite ? {text:"Favorite", cls:"yellow"} : null,
+        {text: fmtDate(item.created_at), cls:"gray"},
+      ].filter(Boolean),
+      actions: [
+        btnPrimary("Use", "zap", () => {
+          els.input.value = item.content||"";
+          autosize(); setView("chat");
+          toast("Loaded into composer","success");
         }),
-        btnOutline("Delete","trash", async () => {
-          if (!confirm("Delete item?")) return;
-          await api("/v1/library/"+encodeURIComponent(item.id),{method:"DELETE"},{success:"Deleted"});
-          loadLibTab(activeLibTab);
-        }),
-      ]
-    ));
+      ],
+      more: [
+        {
+          label: item.favorite ? "Unfavorite" : "Favorite",
+          icon: "star",
+          onClick: async () => {
+            await api("/v1/library/"+encodeURIComponent(item.id),{method:"PATCH",body:JSON.stringify({favorite:!item.favorite})},{success:item.favorite?"Removed from favorites":"Favorited"});
+            loadLibTab(activeLibTab);
+          },
+        },
+        {
+          label: "Delete",
+          icon: "trash",
+          danger: true,
+          onClick: async () => {
+            if (!confirm("Delete item?")) return;
+            await api("/v1/library/"+encodeURIComponent(item.id),{method:"DELETE"},{success:"Deleted"});
+            loadLibTab(activeLibTab);
+          },
+        },
+      ],
+    }));
   });
 }
 let activeLibTab = "all";
@@ -1533,35 +2005,33 @@ let activeLibTab = "all";
 /* ─── VIEW: SCHEDULED ─── */
 async function loadScheduledView() {
   const panel = $("scheduledPanel");
-  panel.innerHTML = '<div class="panel-head"><div><h2>Scheduled</h2><p class="sub">Recurring tasks and automations.</p></div>'+
+  panel.innerHTML =
+    '<div class="panel-head"><div><h2>Scheduled</h2><p class="sub">Recurring tasks and automations.</p></div>'+
     '<button type="button" class="btn-primary" id="schedAddBtn">'+svg("plus",14)+" New task</button></div>"+
-    '<div id="schedList">'+skeletons(3)+"</div>"+
-    '<form class="form-grid hidden" id="schedForm">'+
+    '<div class="ui-list" id="schedList">'+skeletons(3)+"</div>";
+  $("schedAddBtn").onclick = () => openScheduledCreateModal();
+  loadScheduledList();
+}
+
+function openScheduledCreateModal() {
+  showModal("New scheduled task",
+    '<form class="form-grid" id="schedCreateModalForm">'+
     '<label>Title<input name="title" required maxlength="200" placeholder="Daily summary…"/></label>'+
     '<label>Cron or interval<input name="schedule" placeholder="0 9 * * * or every 1h" maxlength="100"/></label>'+
-    '<label>Prompt / Payload<textarea name="payload" rows="4" maxlength="4000" placeholder="System prompt or task payload…"></textarea></label>'+
-    '<div style="display:flex;gap:8px">'+
-    '<button type="submit" class="btn-primary">'+svg("plus",14)+" Create</button>"+
-    '<button type="button" class="btn-outline" id="schedCancelBtn">Cancel</button></div></form>';
-
-  $("schedAddBtn").addEventListener("click", () => {
-    $("schedForm").classList.remove("hidden"); $("schedAddBtn").classList.add("hidden");
-  });
-  $("schedCancelBtn").addEventListener("click", () => {
-    $("schedForm").classList.add("hidden"); $("schedAddBtn").classList.remove("hidden");
-  });
-  $("schedForm").addEventListener("submit", async e => {
-    e.preventDefault();
-    const fd = new FormData(e.target);
-    await api("/v1/scheduled-tasks",{method:"POST",body:JSON.stringify({
-      title:String(fd.get("title")||"").trim(),
-      schedule:String(fd.get("schedule")||"").trim(),
-      payload:{prompt:String(fd.get("payload")||"").trim()},
-    })},{success:"Scheduled task created"});
-    e.target.reset(); $("schedForm").classList.add("hidden"); $("schedAddBtn").classList.remove("hidden");
-    loadScheduledList();
-  });
-  loadScheduledList();
+    '<label>Prompt / Payload<textarea name="payload" rows="4" maxlength="4000" placeholder="What should OM do?"></textarea></label></form>',
+    async () => {
+      const form = $("schedCreateModalForm"); if (!form) return;
+      const fd = new FormData(form);
+      const title = String(fd.get("title")||"").trim();
+      if (!title) { toast("Title required","error"); return; }
+      await api("/v1/scheduled-tasks",{method:"POST",body:JSON.stringify({
+        title,
+        schedule:String(fd.get("schedule")||"").trim(),
+        payload:{prompt:String(fd.get("payload")||"").trim()},
+      })},{success:"Scheduled task created"});
+      loadScheduledList();
+    }
+  );
 }
 
 async function loadScheduledList() {
@@ -1570,111 +2040,341 @@ async function loadScheduledList() {
   const { res, data } = await api("/v1/scheduled-tasks",{},{error:false});
   box.innerHTML = "";
   const items = (res.ok && data && (data.tasks||data.scheduled_tasks||data.items))||[];
-  if (!items.length) { box.appendChild(emptyPanel("No scheduled tasks","Create recurring automations.")); return; }
+  if (!items.length) {
+    box.appendChild(emptyPanel("No scheduled tasks","Create recurring automations.","New task", () => openScheduledCreateModal()));
+    return;
+  }
   items.forEach(t => {
     const isPaused = t.status === "paused" || t.paused;
-    const badgeClass = isPaused?"yellow":t.status==="error"?"red":"green";
-    box.appendChild(entityCard(
-      t.title||t.name||"Untitled",
-      (t.schedule||"")+(t.payload&&t.payload.prompt?" · "+String(t.payload.prompt).slice(0,80):""),
-      fmtDate(t.updated_at||t.created_at),
-      [
-        Object.assign(document.createElement("span"),{
-          innerHTML:'<span class="badge '+badgeClass+'">'+escapeHtml(t.status||"active")+"</span>",
-        }),
+    const status = String(t.status||"active");
+    const badgeCls = isPaused ? "yellow" : (status === "error" ? "red" : "green");
+    const prompt = t.payload && t.payload.prompt ? String(t.payload.prompt) : "";
+    box.appendChild(uiCard({
+      icon: "calendar",
+      title: t.title||t.name||"Untitled",
+      desc: blurb((t.schedule ? t.schedule+" · " : "") + prompt, 160),
+      badges: [
+        {text: status, cls: badgeCls},
+        {text: fmtDate(t.updated_at||t.created_at), cls:"gray"},
+      ],
+      actions: [
         btnOutline(isPaused?"Resume":"Pause", isPaused?"play":"pause", async () => {
           await api("/v1/tasks/"+encodeURIComponent(t.id),{method:"PATCH",body:JSON.stringify({status:isPaused?"active":"paused"})},{success:isPaused?"Resumed":"Paused"});
           loadScheduledList();
         }),
-        btnOutline("Delete","trash", async () => {
-          if (!confirm("Delete task?")) return;
-          await api("/v1/tasks/"+encodeURIComponent(t.id),{method:"DELETE"},{success:"Task deleted"});
-          loadScheduledList();
-        }),
-      ]
-    ));
+      ],
+      more: [
+        {
+          label: "Delete",
+          icon: "trash",
+          danger: true,
+          onClick: async () => {
+            if (!confirm("Delete task?")) return;
+            await api("/v1/tasks/"+encodeURIComponent(t.id),{method:"DELETE"},{success:"Task deleted"});
+            loadScheduledList();
+          },
+        },
+      ],
+    }));
   });
 }
 
 /* ─── VIEW: TOOLS ─── */
+function toolIconName(id) {
+  const map = {
+    shell:"wrench", knowledge_search:"brain", openapi:"link",
+    web_search:"globe", calculator:"cpu", code_interpreter:"code", file_analyzer:"file",
+  };
+  return map[id] || "wrench";
+}
+
+function syncComposerToolsFromCatalog(tools) {
+  const byId = {};
+  (tools||[]).forEach(t => { byId[t.id] = t; });
+  const web = byId.web_search;
+  const code = byId.code_interpreter;
+  if (web) {
+    state.tools.web = !!(web.installed && web.enabled);
+    $("toolWeb") && $("toolWeb").classList.toggle("on", state.tools.web);
+  }
+  if (code) {
+    state.tools.code = !!(code.installed && code.enabled);
+    $("toolCode") && $("toolCode").classList.toggle("on", state.tools.code);
+  }
+}
+
+async function patchTool(toolId, body, successMsg) {
+  const { res, data } = await api(
+    "/v1/tools/"+encodeURIComponent(toolId),
+    {method:"PATCH", body:JSON.stringify(body)},
+    {success: successMsg, error:true}
+  );
+  return { res, data };
+}
+
 async function loadToolsView() {
   const panel = $("toolsPanel");
-  panel.innerHTML = '<div class="panel-head"><div><h2>Tools</h2><p class="sub">Enable or configure available tools.</p></div></div>'+
-    '<div id="toolsList">'+skeletons(4)+"</div>";
+  panel.innerHTML =
+    '<div class="panel-head"><div><h2>Tools</h2><p class="sub">Install and enable tools for chat and agents.</p></div></div>'+
+    '<div class="tools-list" id="toolsList">'+skeletons(4)+"</div>";
+
   const { res, data } = await api("/v1/tools",{},{error:false});
-  const box = $("toolsList"); box.innerHTML = "";
+  const box = $("toolsList");
+  box.innerHTML = "";
   const items = (res.ok && data && (data.tools||data.items))||[];
-  if (!items.length) { box.appendChild(emptyPanel("No tools available","Tools registered in your workspace will appear here.")); return; }
+  if (!items.length) {
+    box.appendChild(emptyPanel("No tools available","Tools registered in your workspace will appear here."));
+    return;
+  }
+  syncComposerToolsFromCatalog(items);
+
   items.forEach(t => {
-    const enabled = t.enabled !== false;
-    const card = entityCard(
-      t.name||t.id,
-      t.description||"",
-      (t.category||"")+(t.version?" v"+t.version:""),
-      [
-        btnOutline(enabled?"Disable":"Enable", enabled?"x":"check", async () => {
-          await api("/v1/tools/"+encodeURIComponent(t.id),{method:"PATCH",body:JSON.stringify({enabled:!enabled})},{success:enabled?"Tool disabled":"Tool enabled"});
-          loadToolsView();
-        }),
-        ...(t.installable && !t.installed ? [btnOutline("Install","download", async () => {
-          await api("/v1/tools/"+encodeURIComponent(t.id),{method:"PATCH",body:JSON.stringify({install:true})},{success:"Installing…"});
-          setTimeout(loadToolsView,1500);
-        })] : []),
-      ]
-    );
-    // add enabled chip
-    const chipEl = document.createElement("span");
-    chipEl.innerHTML = '<span class="badge '+(enabled?"green":"gray")+'">'+(enabled?"Enabled":"Disabled")+"</span>";
-    card.querySelector(".entity-actions").prepend(chipEl);
+    const installed = !!(t.installed || t.category === "installed");
+    const enabled = installed && !!t.enabled;
+    const card = document.createElement("div");
+    card.className = "tool-card";
+
+    const left = document.createElement("div");
+    left.className = "tool-card-top";
+    left.innerHTML =
+      '<div class="tool-icon">'+svg(toolIconName(t.id),18)+"</div>"+
+      '<div class="grow"><h3></h3><p></p><div class="tool-badges"></div></div>';
+    left.querySelector("h3").textContent = t.name || t.id;
+    left.querySelector("p").textContent = t.description || "";
+    const badges = left.querySelector(".tool-badges");
+    const mkBadge = (text, cls) => {
+      const s = document.createElement("span");
+      s.className = "badge "+cls;
+      s.textContent = text;
+      return s;
+    };
+    badges.appendChild(mkBadge(installed ? "Installed" : "Available", installed ? "blue" : "gray"));
+    badges.appendChild(mkBadge(enabled ? "Enabled" : "Disabled", enabled ? "green" : "gray"));
+
+    const actions = document.createElement("div");
+    actions.className = "tool-actions";
+
+    if (!installed) {
+      actions.appendChild(btnPrimary("Install", "download", async () => {
+        await patchTool(t.id, {install:true, enabled:true}, "Tool installed & enabled");
+        loadToolsView();
+      }));
+    } else if (enabled) {
+      actions.appendChild(btnOutline("Disable", "x", async () => {
+        await patchTool(t.id, {enabled:false}, "Tool disabled");
+        loadToolsView();
+      }));
+    } else {
+      actions.appendChild(btnPrimary("Enable", "check", async () => {
+        await patchTool(t.id, {enabled:true, install:true}, "Tool enabled");
+        loadToolsView();
+      }));
+    }
+
+    card.appendChild(left);
+    card.appendChild(actions);
     box.appendChild(card);
   });
 }
 
 /* ─── VIEW: PROJECTS ─── */
-async function loadProjectsView() {
-  const panel = $("projectsPanel");
-  panel.innerHTML = '<div class="panel-head"><div><h2>Projects</h2><p class="sub">Organize work and context.</p></div>'+
-    '<button type="button" class="btn-primary" id="projCreateBtn">'+svg("plus",14)+" New project</button></div>"+
-    '<div id="projectsList">'+skeletons(3)+"</div>"+
-    '<form class="form-grid hidden" id="projectForm">'+
-    '<label>Name<input id="projName" name="name" required maxlength="120" placeholder="Project name"/></label>'+
-    '<label>Description<textarea name="description" rows="2" maxlength="2000" placeholder="Optional description"></textarea></label>'+
-    '<div style="display:flex;gap:8px"><button type="submit" class="btn-primary">'+svg("plus",14)+" Create</button>"+
-    '<button type="button" class="btn-outline" id="projCancelBtn">Cancel</button></div></form>';
-
-  $("projCreateBtn").addEventListener("click", () => {
-    $("projectForm").classList.remove("hidden"); $("projCreateBtn").classList.add("hidden");
-    $("projName").focus();
-  });
-  $("projCancelBtn").addEventListener("click", () => {
-    $("projectForm").classList.add("hidden"); $("projCreateBtn").classList.remove("hidden");
-  });
-  $("projectForm").addEventListener("submit", async e => {
-    e.preventDefault();
-    const fd = new FormData(e.target);
-    await api("/v1/projects",{method:"POST",body:JSON.stringify({name:String(fd.get("name")||"").trim(),description:String(fd.get("description")||"").trim()})},{success:"Project created"});
-    e.target.reset(); $("projectForm").classList.add("hidden"); $("projCreateBtn").classList.remove("hidden");
-    loadProjectsView();
-  });
-
-  const { res, data } = await api("/v1/projects",{},{error:false});
-  const list = $("projectsList"); list.innerHTML = "";
-  state.projects = (res.ok && data && data.projects)||[];
-  if (!state.projects.length) { list.appendChild(emptyPanel("No projects","Create your first project.","New project", () => { $("projCreateBtn").click(); })); return; }
-  state.projects.forEach(p => {
-    list.appendChild(entityCard(p.name, p.description, fmtDate(p.updated_at||p.created_at), [
-      btnOutline("Open","folder", () => loadProjectDetail(p)),
-      btnOutline("Delete","trash", async () => {
-        if (!confirm("Delete project?")) return;
-        await api("/v1/projects/"+encodeURIComponent(p.id),{method:"DELETE"},{success:"Project deleted"});
-        loadProjectsView();
-      }),
-    ]));
-  });
+function setProjectHash(projectId, chatId) {
+  if (!projectId) { if (location.hash.indexOf("/projects") === 1) history.replaceState(null,"",location.pathname+location.search); return; }
+  const h = chatId ? "#/projects/"+projectId+"/chat/"+chatId : "#/projects/"+projectId;
+  if (location.hash !== h) history.replaceState(null,"",h);
 }
 
-/* ─── PROJECT DETAIL ─── */
-async function loadProjectDetail(p) {
+function parseProjectHash() {
+  const m = String(location.hash||"").match(/^#\/projects(?:\/([a-f0-9]+)(?:\/chat\/([a-f0-9]+))?)?/i);
+  if (!m) return null;
+  return { projectId: m[1]||null, chatId: m[2]||null };
+}
+
+function relativeUpdated(iso) {
+  if (!iso) return "";
+  const d = new Date(iso); const now = Date.now();
+  if (Number.isNaN(d.getTime())) return iso;
+  const diff = now - d.getTime();
+  if (diff < 86400000 && new Date(now).toDateString() === d.toDateString()) return "Today";
+  if (diff < 172800000) return "Yesterday";
+  return fmtDate(iso);
+}
+
+async function openProjectCreateModal() {
+  const models = (state.models||[]).length ? state.models : [{id:"OM-1.0"}];
+  const opts = models.map(m => '<option value="'+escapeHtml(m.id||m)+'"'+( (m.id||m)==="OM-1.0"?' selected':'')+">"+escapeHtml(m.id||m)+"</option>").join("");
+  showModal("New Project",
+    '<form class="form-grid" id="projCreateModalForm">'+
+    '<label>Project Name<input name="name" required maxlength="120" placeholder="Hindu Rishte AI"/></label>'+
+    '<label>Description<textarea name="description" rows="2" maxlength="2000" placeholder="What is this project about?"></textarea></label>'+
+    '<label>Project Instructions<textarea name="instructions" rows="5" maxlength="8000" placeholder="You are a relationship assistant."></textarea></label>'+
+    '<label>Default AI Model<select name="model">'+opts+"</select></label>"+
+    '<label>Seed file (optional)<input name="seed" type="file"/></label>'+
+    '<p style="margin:0;font-size:12px;color:var(--muted)">After create you will open the project workspace.</p></form>',
+    async () => {
+      const form = $("projCreateModalForm");
+      if (!form) return;
+      const fd = new FormData(form);
+      const name = String(fd.get("name")||"").trim();
+      if (!name) { toast("Project name required","error"); return; }
+      const payload = {
+        name,
+        description: String(fd.get("description")||"").trim(),
+        instructions: String(fd.get("instructions")||"").trim(),
+        model: String(fd.get("model")||"OM-1.0"),
+      };
+      const { res, data } = await api("/v1/projects",{method:"POST",body:JSON.stringify(payload)},{success:"Project created"});
+      if (!res.ok || !data) return;
+      const fileInput = form.querySelector('input[name="seed"]');
+      if (fileInput && fileInput.files && fileInput.files[0]) {
+        const f = fileInput.files[0];
+        const text = await f.text().catch(() => "");
+        await api("/v1/projects/"+encodeURIComponent(data.id)+"/files",{
+          method:"POST",
+          body:JSON.stringify({name:f.name, content:text.slice(0,500000), mime:f.type||"text/plain"})
+        },{error:false});
+      }
+      state.projects = [data].concat(state.projects.filter(p => p.id !== data.id));
+      state.expandedProjects[data.id] = true;
+      state.activeProjectId = data.id;
+      renderConvList();
+      await loadProjectDetail(data);
+    }
+  );
+  // Make modal OK submit the form
+  setTimeout(() => {
+    const form = $("projCreateModalForm");
+    if (form) form.addEventListener("submit", e => { e.preventDefault(); els.modalOk.click(); });
+  }, 0);
+}
+
+async function loadProjectsView() {
+  state.activeProjectId = null;
+  setProjectHash(null);
+  const panel = $("projectsPanel");
+  panel.innerHTML =
+    '<div class="panel-head"><div><h2>Projects</h2><p class="sub">Organize chats, files, knowledge, and memory.</p></div>'+
+    '<button type="button" class="btn-primary" id="projCreateBtn">'+svg("plus",14)+" New Project</button></div>"+
+    '<div class="toolbar-row" style="display:flex;flex-wrap:wrap;gap:8px;margin:0 0 14px;align-items:center">'+
+    '<input id="projSearch" type="search" placeholder="Search projects…" style="flex:1;min-width:160px;padding:8px 12px;border:1px solid var(--border);border-radius:10px;background:var(--bg)"/>'+
+    '<select id="projSort" style="padding:8px 10px;border:1px solid var(--border);border-radius:10px;background:var(--bg)">'+
+    '<option value="updated">Sort: Recent</option><option value="name">Sort: Name</option><option value="created">Sort: Created</option><option value="favorite">Sort: Favorites</option></select>'+
+    '<select id="projFilter" style="padding:8px 10px;border:1px solid var(--border);border-radius:10px;background:var(--bg)">'+
+    '<option value="all">All</option><option value="recent">Recent</option><option value="favorites">Favorites</option><option value="archived">Archived</option></select>'+
+    '</div><div id="projectsList">'+skeletons(3)+"</div>";
+
+  $("projCreateBtn").onclick = () => openProjectCreateModal();
+  $("projSearch").value = state.projectQuery||"";
+  $("projSort").value = state.projectSort||"updated";
+  $("projFilter").value = state.projectFilter||"all";
+  const reload = () => {
+    state.projectQuery = $("projSearch").value.trim();
+    state.projectSort = $("projSort").value;
+    state.projectFilter = $("projFilter").value;
+    renderProjectsList();
+  };
+  $("projSearch").addEventListener("input", () => { clearTimeout(window._projSearchT); window._projSearchT = setTimeout(reload, 200); });
+  $("projSort").onchange = reload;
+  $("projFilter").onchange = reload;
+  await renderProjectsList();
+}
+
+async function renderProjectsList() {
+  const list = $("projectsList");
+  if (!list) return;
+  list.innerHTML = skeletons(3);
+  const qs = new URLSearchParams();
+  if (state.projectQuery) qs.set("q", state.projectQuery);
+  if (state.projectSort) qs.set("sort", state.projectSort);
+  if (state.projectFilter) qs.set("filter", state.projectFilter);
+  const { res, data } = await api("/v1/projects?"+qs.toString(),{},{error:false});
+  list.innerHTML = "";
+  state.projects = (res.ok && data && data.projects)||[];
+  if (!state.projects.length) {
+    list.appendChild(emptyPanel("No projects","Create a project to keep chats, files, and memory together.","New Project", () => openProjectCreateModal()));
+    return;
+  }
+  state.projects.forEach(p => list.appendChild(projectCard(p)));
+}
+
+function projectCard(p) {
+  const card = document.createElement("div");
+  card.className = "entity-card";
+  card.style.cssText = "padding:16px;border:1px solid var(--border);border-radius:14px;background:var(--bg);margin-bottom:10px;position:relative;";
+  card.innerHTML =
+    '<div style="display:flex;gap:12px;align-items:flex-start">'+
+    '<div style="width:40px;height:40px;border-radius:10px;background:var(--soft);display:grid;place-items:center;flex-shrink:0">'+svg("folder",18)+"</div>"+
+    '<div style="flex:1;min-width:0">'+
+    '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><strong style="font-size:15px">'+escapeHtml(p.name||"Untitled")+"</strong>"+
+    (p.favorite ? '<span class="badge blue">Favorite</span>' : "")+
+    (p.archived ? '<span class="badge gray">Archived</span>' : "")+
+    "</div>"+
+    '<p style="margin:6px 0;color:var(--muted);font-size:13px;line-height:1.45">'+escapeHtml(p.description||"No description")+"</p>"+
+    '<div style="display:flex;flex-wrap:wrap;gap:10px;font-size:12px;color:var(--muted)">'+
+    "<span>Last updated: "+escapeHtml(relativeUpdated(p.updated_at||p.created_at))+"</span>"+
+    "<span>Chats: "+(p.chat_count||0)+"</span>"+
+    "<span>Files: "+(p.file_count||0)+"</span>"+
+    "</div>"+
+    '<div style="display:flex;gap:8px;margin-top:12px;align-items:center">'+
+    '<button type="button" class="btn-primary" data-open>Open Project</button>'+
+    '<button type="button" class="icon-btn" data-menu title="More">'+svg("more",16)+"</button>"+
+    "</div></div></div>"+
+    '<div class="drop-menu" data-drop style="right:12px;top:auto;bottom:12px;left:auto;min-width:180px"></div>';
+
+  card.querySelector("[data-open]").onclick = () => loadProjectDetail(p);
+  const menuBtn = card.querySelector("[data-menu]");
+  const drop = card.querySelector("[data-drop]");
+  menuBtn.onclick = (e) => {
+    e.stopPropagation();
+    closeMenus();
+    drop.innerHTML =
+      '<button type="button" data-act="rename">'+svg("edit",14)+" Rename</button>"+
+      '<button type="button" data-act="duplicate">'+svg("copy",14)+" Duplicate</button>"+
+      '<button type="button" data-act="favorite">'+svg("star",14)+" "+(p.favorite?"Unfavorite":"Favorite")+"</button>"+
+      '<button type="button" data-act="archive">'+svg("archive",14)+" "+(p.archived?"Unarchive":"Archive")+"</button>"+
+      '<button type="button" data-act="share">'+svg("share",14)+" Share</button>"+
+      '<div class="drop-sep"></div>'+
+      '<button type="button" data-act="delete" style="color:var(--danger)">'+svg("trash",14)+" Delete</button>";
+    drop.classList.add("open");
+    drop.querySelectorAll("[data-act]").forEach(btn => {
+      btn.onclick = async (ev) => {
+        ev.stopPropagation();
+        drop.classList.remove("open");
+        const act = btn.getAttribute("data-act");
+        if (act === "rename") {
+          const name = prompt("Rename project", p.name||"");
+          if (!name || !name.trim()) return;
+          await api("/v1/projects/"+encodeURIComponent(p.id),{method:"PATCH",body:JSON.stringify({name:name.trim()})},{success:"Renamed"});
+          renderProjectsList();
+        } else if (act === "duplicate") {
+          const { res, data } = await api("/v1/projects/"+encodeURIComponent(p.id)+"/duplicate",{method:"POST"},{success:"Duplicated"});
+          if (res.ok && data) loadProjectDetail(data);
+          else renderProjectsList();
+        } else if (act === "favorite") {
+          await api("/v1/projects/"+encodeURIComponent(p.id),{method:"PATCH",body:JSON.stringify({favorite:!p.favorite})},{success:p.favorite?"Removed favorite":"Favorited"});
+          renderProjectsList();
+        } else if (act === "archive") {
+          await api("/v1/projects/"+encodeURIComponent(p.id),{method:"PATCH",body:JSON.stringify({archived:!p.archived})},{success:p.archived?"Restored":"Archived"});
+          renderProjectsList();
+        } else if (act === "share") {
+          const url = location.origin+"/chat#/projects/"+p.id;
+          try { await navigator.clipboard.writeText(url); toast("Project link copied","success"); }
+          catch (_) { prompt("Copy project link", url); }
+        } else if (act === "delete") {
+          if (!confirm("Delete project permanently?")) return;
+          await api("/v1/projects/"+encodeURIComponent(p.id),{method:"DELETE"},{success:"Project deleted"});
+          renderProjectsList();
+        }
+      };
+    });
+  };
+  return card;
+}
+
+async function loadProjectDetail(p, tab) {
+  state.activeProjectId = p.id;
+  setProjectHash(p.id);
+  if (p.model) state.model = p.model;
   const panel = $("projectsPanel");
   panel.innerHTML =
     '<button type="button" class="back-btn" id="projBackBtn">'+svg("chevL",14)+" Projects</button>"+
@@ -1683,235 +2383,450 @@ async function loadProjectDetail(p) {
     '<p class="sub" id="projDetailDesc"></p>'+
     '<div class="detail-meta">'+
     '<span class="badge blue">'+svg("folder",12)+" Project</span>"+
-    '<span style="font-size:12px;color:var(--muted)">'+fmtDate(p.updated_at||p.created_at)+'</span>'+
+    '<span style="font-size:12px;color:var(--muted)">Model: '+escapeHtml(p.model||"OM-1.0")+"</span>"+
+    '<span style="font-size:12px;color:var(--muted)">'+fmtDate(p.updated_at||p.created_at)+"</span>"+
     '</div></div>'+
     '<div id="projDetailTabs"></div><div id="projDetailContent">'+skeletons(2)+"</div>";
 
   $("projDetailTitle").textContent = p.name;
-  $("projDetailDesc").textContent  = p.description||"";
+  $("projDetailDesc").textContent = p.description||"";
   $("projBackBtn").addEventListener("click", loadProjectsView);
 
-  const tabs = [["overview","Overview"],["chats","Chats"],["files","Files"],["instructions","Instructions"],["knowledge","Knowledge"],["members","Members"],["activity","Activity"],["settings","Settings"]];
-  let activeTab = "overview";
-  buildTabs($("projDetailTabs"), tabs, id => { activeTab = id; loadProjectTab(p, id); }, "overview");
-  loadProjectTab(p, "overview");
+  const tabs = [
+    ["overview","Overview"],["chats","Chats"],["files","Files"],
+    ["knowledge","Knowledge"],["instructions","Instructions"],
+    ["memory","Memory"],["settings","Settings"]
+  ];
+  const startTab = tab || "overview";
+  buildTabs($("projDetailTabs"), tabs, id => loadProjectTab(p, id), startTab);
+  loadProjectTab(p, startTab);
+  setView("projects", true);
+}
+
+async function openProjectChat(project, chatId) {
+  state.activeProjectId = project.id;
+  if (project.model) state.model = project.model;
+  await loadConversation(chatId, {keepProject:true});
+  setProjectHash(project.id, chatId);
 }
 
 async function loadProjectTab(p, tab) {
-  const box = $("projDetailContent"); box.innerHTML = skeletons(2);
+  const box = $("projDetailContent");
+  if (!box) return;
+  box.innerHTML = skeletons(2);
+
   if (tab === "overview") {
     const { res, data } = await api("/v1/projects/"+encodeURIComponent(p.id),{},{error:false});
     const proj = (res.ok && data) || p;
+    Object.assign(p, proj);
     box.innerHTML = "";
     const info = document.createElement("div");
     info.className = "settings-section";
     info.innerHTML = "<h3>Overview</h3>"+
       "<p style='margin:0;font-size:14px;line-height:1.6'>"+escapeHtml(proj.description||"No description.")+"</p>"+
+      (proj.instructions ? "<pre style='white-space:pre-wrap;background:var(--soft);padding:12px;border-radius:10px;font-size:13px;margin-top:12px'>"+escapeHtml(proj.instructions.slice(0,800))+"</pre>" : "")+
       "<div class='stat-row' style='margin-top:12px'>"+
       "<div class='stat'><strong>"+(proj.chat_count||0)+"</strong><span>Chats</span></div>"+
       "<div class='stat'><strong>"+(proj.file_count||0)+"</strong><span>Files</span></div>"+
-      "<div class='stat'><strong>"+(proj.member_count||0)+"</strong><span>Members</span></div>"+
+      "<div class='stat'><strong>"+(proj.memory_count||0)+"</strong><span>Memories</span></div>"+
+      "<div class='stat'><strong>"+(proj.knowledge_count||0)+"</strong><span>Knowledge</span></div>"+
       "</div>";
     box.appendChild(info);
-    // recent chats
-    const { res: r2, data: d2 } = await api("/v1/conversations?project_id="+encodeURIComponent(p.id),{},{error:false});
-    const chats = (r2.ok && d2 && d2.conversations)||[];
+    const { res: r2, data: d2 } = await api("/v1/projects/"+encodeURIComponent(p.id)+"/chats",{},{error:false});
+    const chats = (r2.ok && ((d2 && d2.chats) || (d2 && d2.conversations))) || [];
     if (chats.length) {
-      const h4 = document.createElement("h4"); h4.textContent = "Recent chats"; h4.style.cssText = "margin:16px 0 8px;font-size:14px;";
+      const h4 = document.createElement("h4"); h4.textContent = "Recent project chats"; h4.style.cssText = "margin:16px 0 8px;font-size:14px;";
       box.appendChild(h4);
       chats.slice(0,5).forEach(c => {
         const row = document.createElement("div");
         row.style.cssText = "display:flex;align-items:center;gap:8px;padding:8px 12px;border:1px solid var(--border);border-radius:10px;margin-bottom:6px;background:var(--bg);cursor:pointer;";
-        row.innerHTML = svg("message",14)+"<span style='flex:1'>"+escapeHtml(c.title||"Chat")+"</span><small style='color:var(--muted)'>"+fmtDate(c.updated_at)+"</small>";
-        row.addEventListener("click", () => loadConversation(c.id));
+        row.innerHTML = svg("message",14)+'<span style="flex:1">'+escapeHtml(c.title||"Chat")+'</span><small style="color:var(--muted)">'+fmtDate(c.updated_at)+"</small>";
+        row.addEventListener("click", () => openProjectChat(p, c.id));
         box.appendChild(row);
       });
     }
-  } else if (tab === "chats") {
-    const { res, data } = await api("/v1/conversations?project_id="+encodeURIComponent(p.id),{},{error:false});
-    box.innerHTML = "";
-    const chats = (res.ok && data && data.conversations)||[];
-    const btnNew = document.createElement("button"); btnNew.type = "button"; btnNew.className = "btn-primary";
-    btnNew.innerHTML = svg("plus",14)+" New chat in project";
-    btnNew.style.marginBottom = "12px";
-    btnNew.addEventListener("click", async () => {
-      const { res: r2, data: d2 } = await api("/v1/conversations",{method:"POST",body:JSON.stringify({title:"New chat",project_id:p.id})},{success:"Chat created"});
-      if (r2.ok) { loadConversation(d2.id); }
-    });
-    box.appendChild(btnNew);
-    if (!chats.length) { box.appendChild(emptyPanel("No chats","Start a new chat in this project.")); return; }
+    return;
+  }
+
+  if (tab === "chats") {
+    box.innerHTML =
+      '<div class="panel-head" style="padding:0;margin-bottom:12px"><div><h3 style="margin:0">Project Chats</h3><p class="sub">All chats stay inside this project and use its context.</p></div>'+
+      '<button type="button" class="btn-primary" id="projNewChatBtn">'+svg("plus",14)+" New Chat</button></div>"+
+      '<div id="projChatsList">'+skeletons(3)+"</div>";
+    $("projNewChatBtn").onclick = async () => {
+      const chat = await createChat("New chat", p.id);
+      await openProjectChat(p, chat.id);
+    };
+    const { res, data } = await api("/v1/projects/"+encodeURIComponent(p.id)+"/chats",{},{error:false});
+    const list = $("projChatsList"); list.innerHTML = "";
+    const chats = (res.ok && ((data && data.chats) || (data && data.conversations))) || [];
+    if (!chats.length) { list.appendChild(emptyPanel("No project chats yet","Start a chat that uses this project's instructions, files, and memory.","New Chat", () => $("projNewChatBtn").click())); return; }
     chats.forEach(c => {
-      box.appendChild(entityCard(c.title||"Chat","",fmtDate(c.updated_at),[
-        btnOutline("Open","message", () => loadConversation(c.id)),
-      ]));
+      const row = document.createElement("div");
+      row.style.cssText = "display:flex;align-items:center;gap:10px;padding:12px 14px;border:1px solid var(--border);border-radius:12px;margin-bottom:8px;background:var(--bg);cursor:pointer;";
+      row.innerHTML = svg("message",16)+'<div style="flex:1;min-width:0"><strong style="display:block;font-size:14px">'+escapeHtml(c.title||"Chat")+'</strong><small style="color:var(--muted)">'+fmtDate(c.updated_at)+"</small></div>";
+      row.onclick = () => openProjectChat(p, c.id);
+      list.appendChild(row);
     });
-  } else if (tab === "files") {
-    const { res, data } = await api("/v1/files?project_id="+encodeURIComponent(p.id),{},{error:false});
-    box.innerHTML = "";
+    return;
+  }
+
+  if (tab === "files") {
+    box.innerHTML =
+      '<div class="panel-head" style="padding:0;margin-bottom:12px"><div><h3 style="margin:0">Files</h3><p class="sub">PDF, DOCX, TXT, CSV, images, and code for project RAG.</p></div>'+
+      '<label class="btn-outline" style="display:inline-flex;align-items:center;gap:6px;cursor:pointer">'+svg("paperclip",14)+' Upload<input id="projFileInput" type="file" multiple hidden/></label></div>'+
+      '<div id="projFilesList">'+skeletons(3)+"</div>";
+    $("projFileInput").onchange = async (e) => {
+      const files = Array.from(e.target.files||[]);
+      for (const f of files) {
+        const text = await f.text().catch(() => "");
+        await api("/v1/projects/"+encodeURIComponent(p.id)+"/files",{
+          method:"POST", body:JSON.stringify({name:f.name, content:String(text||"").slice(0,500000), mime:f.type||"text/plain"})
+        },{success:f.name+" uploaded"});
+      }
+      loadProjectTab(p, "files");
+    };
+    const { res, data } = await api("/v1/projects/"+encodeURIComponent(p.id)+"/files",{},{error:false});
+    const list = $("projFilesList"); list.innerHTML = "";
     const files = (res.ok && data && data.files)||[];
-    if (!files.length) { box.appendChild(emptyPanel("No files","Upload files to this project.")); return; }
+    if (!files.length) { list.appendChild(emptyPanel("No files","Upload documents to ground project chats.")); return; }
     files.forEach(f => {
-      box.appendChild(entityCard(f.name,f.mime+" · "+(f.size||0)+" bytes",fmtDate(f.created_at),[
-        btnOutline("Delete","trash", async () => {
-          if (!confirm("Delete file?")) return;
-          await api("/v1/files/"+encodeURIComponent(f.id),{method:"DELETE"},{success:"Deleted"});
-          loadProjectTab(p,"files");
+      list.appendChild(entityCard(f.name, (f.mime||"file")+" · Ready ✓", fmtDate(f.updated_at||f.created_at), [
+        btnOutline("Open","externalLink", async () => {
+          const { res:r2, data:d2 } = await api("/v1/files/"+encodeURIComponent(f.id),{},{error:false});
+          if (r2.ok && d2) showModal(f.name, "<pre style='white-space:pre-wrap;font-size:13px;max-height:50vh;overflow:auto'>"+escapeHtml((d2.content_text||d2.preview||"").slice(0,8000))+"</pre>");
+        }),
+        btnOutline("Rename","edit", async () => {
+          const name = prompt("Rename file", f.name||"");
+          if (!name || !name.trim()) return;
+          await api("/v1/files/"+encodeURIComponent(f.id),{method:"PATCH",body:JSON.stringify({name:name.trim()})},{success:"Renamed"});
+          loadProjectTab(p, "files");
+        }),
+        btnOutline("Remove","trash", async () => {
+          if (!confirm("Remove file from project?")) return;
+          await api("/v1/projects/"+encodeURIComponent(p.id)+"/files/"+encodeURIComponent(f.id),{method:"DELETE"},{success:"Removed"});
+          loadProjectTab(p, "files");
         }),
       ]));
     });
-  } else if (tab === "instructions") {
-    box.innerHTML = "";
-    const { res, data } = await api("/v1/instructions/versions?owner_type=project&owner_id="+encodeURIComponent(p.id),{},{error:false});
-    const versions = (res.ok && data && (data.versions||data.items))||[];
-    const form = document.createElement("form"); form.className = "form-grid";
-    const latestContent = versions.length ? (versions[0].content||"") : "";
-    form.innerHTML = "<label>Instructions<textarea name='content' rows='10' maxlength='16000' placeholder='Project-level instructions for OM…'>"+escapeHtml(latestContent)+"</textarea></label>"+
-      '<button type="submit" class="btn-primary">'+svg("check",14)+" Save version</button>";
-    form.addEventListener("submit", async e => {
+    return;
+  }
+
+  if (tab === "knowledge") {
+    box.innerHTML =
+      '<div class="panel-head" style="padding:0;margin-bottom:12px"><div><h3 style="margin:0">Knowledge</h3><p class="sub">Files, documents, URLs, and data sources for project search.</p></div></div>'+
+      '<form class="form-grid" id="projKnForm">'+
+      '<label>Name<input name="name" required maxlength="200" placeholder="Source name"/></label>'+
+      '<label>Type<select name="source_type"><option value="document">Document</option><option value="url">URL</option><option value="file">File</option><option value="data">Data source</option></select></label>'+
+      '<label>URI / URL<input name="uri" maxlength="1000" placeholder="https://…"/></label>'+
+      '<label>Content<textarea name="content" rows="4" maxlength="2000000" placeholder="Paste text to embed…"></textarea></label>'+
+      '<button type="submit" class="btn-primary">'+svg("plus",14)+" Add source</button></form>"+
+      '<div id="projKnList" style="margin-top:14px">'+skeletons(2)+"</div>";
+    $("projKnForm").onsubmit = async (e) => {
       e.preventDefault();
       const fd = new FormData(e.target);
-      await api("/v1/instructions/versions",{method:"POST",body:JSON.stringify({owner_type:"project",owner_id:p.id,content:String(fd.get("content"))})},{success:"Instructions saved"});
-      loadProjectTab(p,"instructions");
+      await api("/v1/knowledge/sources",{method:"POST",body:JSON.stringify({
+        name:String(fd.get("name")||"").trim(),
+        source_type:String(fd.get("source_type")||"document"),
+        uri:String(fd.get("uri")||"").trim(),
+        content:String(fd.get("content")||""),
+        project_id:p.id
+      })},{success:"Knowledge source added"});
+      e.target.reset(); loadProjectTab(p, "knowledge");
+    };
+    const { res, data } = await api("/v1/projects/"+encodeURIComponent(p.id)+"/knowledge",{},{error:false});
+    const list = $("projKnList"); list.innerHTML = "";
+    const items = (res.ok && data && data.sources)||[];
+    if (!items.length) { list.appendChild(emptyPanel("No knowledge sources","Add documents or URLs for project RAG.")); return; }
+    items.forEach(s => {
+      list.appendChild(entityCard(s.name, (s.source_type||"")+" · "+(s.status||"ready"), fmtDate(s.created_at), [
+        btnOutline("Delete","trash", async () => {
+          if (!confirm("Delete source?")) return;
+          await api("/v1/knowledge/sources/"+encodeURIComponent(s.id),{method:"DELETE"},{success:"Deleted"});
+          loadProjectTab(p, "knowledge");
+        })
+      ]));
     });
-    box.appendChild(form);
-    if (versions.length) {
-      const h4 = document.createElement("h4"); h4.textContent = "Version history"; h4.style.cssText = "margin:16px 0 8px;font-size:14px;";
-      box.appendChild(h4);
-      const verBox = document.createElement("div");
-      versions.slice(0,10).forEach((v,i) => {
-        const row = document.createElement("div"); row.className = "version-row";
-        row.innerHTML = '<span class="ver-n">v'+(versions.length-i)+'</span>'+
-          '<span class="ver-d">'+fmtDate(v.created_at)+"</span>"+
-          '<span class="ver-c">'+escapeHtml((v.content||"").slice(0,80))+"…</span>";
-        verBox.appendChild(row);
-      });
-      box.appendChild(verBox);
-    }
-  } else if (tab === "knowledge") {
-    const { res, data } = await api("/v1/knowledge/sources?project_id="+encodeURIComponent(p.id),{},{error:false});
-    box.innerHTML = "";
-    const sources = (res.ok && data && data.sources)||[];
-    if (!sources.length) { box.appendChild(emptyPanel("No knowledge sources","Link knowledge to this project.")); return; }
-    sources.forEach(s => {
-      box.appendChild(entityCard(s.name,s.source_type+" · "+(s.status||""),fmtDate(s.created_at),[]));
-    });
-  } else if (tab === "members") {
-    const { res, data } = await api("/v1/projects/"+encodeURIComponent(p.id)+"/members",{},{error:false});
-    box.innerHTML = "";
-    const members = (res.ok && data && (data.members||data.users))||[];
-    const invForm = document.createElement("form");
-    invForm.style.cssText = "display:flex;gap:8px;margin-bottom:16px;";
-    invForm.innerHTML = '<input name="email" type="email" placeholder="user@example.com" style="flex:1;border:1px solid var(--border);border-radius:10px;padding:8px 12px;background:var(--bg);outline:none;"/>'+
-      '<button type="submit" class="btn-primary">'+svg("users",14)+" Invite</button>";
-    invForm.addEventListener("submit", async e => {
+    return;
+  }
+
+  if (tab === "instructions") {
+    const { res, data } = await api("/v1/projects/"+encodeURIComponent(p.id),{},{error:false});
+    const proj = (res.ok && data) || p;
+    box.innerHTML =
+      '<form class="form-grid" id="projInstrForm">'+
+      '<label>Project Instructions<textarea name="instructions" rows="12" maxlength="8000" placeholder="You are a coding assistant. Always provide production code.">'+escapeHtml(proj.instructions||"")+"</textarea></label>"+
+      '<div style="display:flex;gap:8px"><button type="submit" class="btn-primary">'+svg("check",14)+" Save</button></div></form>"+
+      '<h4 style="margin:18px 0 8px;font-size:14px">Version History</h4><div id="projInstrVers">'+skeletons(2)+"</div>";
+    $("projInstrForm").onsubmit = async (e) => {
       e.preventDefault();
       const fd = new FormData(e.target);
-      await api("/v1/projects/"+encodeURIComponent(p.id)+"/members",{method:"POST",body:JSON.stringify({email:String(fd.get("email")).trim()})},{success:"Member invited"});
-      e.target.reset(); loadProjectTab(p,"members");
+      const instructions = String(fd.get("instructions")||"");
+      const { res:r2, data:d2 } = await api("/v1/projects/"+encodeURIComponent(p.id),{method:"PATCH",body:JSON.stringify({instructions})},{success:"Instructions saved"});
+      if (r2.ok && d2) Object.assign(p, d2);
+      loadProjectTab(p, "instructions");
+    };
+    const { res: rv, data: dv } = await api("/v1/instructions/versions?owner_type=project&owner_id="+encodeURIComponent(p.id),{},{error:false});
+    const vers = $("projInstrVers"); vers.innerHTML = "";
+    const versions = (rv.ok && dv && dv.versions)||[];
+    if (!versions.length) { vers.innerHTML = '<p style="color:var(--muted);font-size:13px">No versions yet.</p>'; return; }
+    versions.forEach(v => {
+      const row = document.createElement("div");
+      row.style.cssText = "padding:10px 12px;border:1px solid var(--border);border-radius:10px;margin-bottom:6px;font-size:13px;";
+      row.innerHTML = '<strong>v'+escapeHtml(String(v.version||""))+'</strong> <span style="color:var(--muted)">'+fmtDate(v.created_at)+'</span>'+
+        '<pre style="white-space:pre-wrap;margin:8px 0 0;font-size:12px;color:var(--muted)">'+escapeHtml(String(v.content||"").slice(0,280))+"</pre>";
+      vers.appendChild(row);
     });
-    box.appendChild(invForm);
-    if (!members.length) { box.appendChild(emptyPanel("No members","Invite team members.")); return; }
-    members.forEach(m => {
-      const row = document.createElement("div"); row.className = "member-row";
-      row.innerHTML = '<div class="avatar">'+escapeHtml((m.name||m.email||"?").charAt(0).toUpperCase())+"</div>"+
-        '<div class="grow"><strong style="display:block;font-size:13px">'+escapeHtml(m.name||m.email||m.id)+"</strong>"+
-        '<span class="member-role">'+escapeHtml(m.role||"member")+"</span></div>";
-      const del = document.createElement("button"); del.type = "button"; del.className = "btn-outline";
-      del.innerHTML = svg("x",14)+" Remove";
-      del.addEventListener("click", async () => {
-        if (!confirm("Remove member?")) return;
-        await api("/v1/projects/"+encodeURIComponent(p.id)+"/members/"+encodeURIComponent(m.id||m.user_id),{method:"DELETE"},{success:"Member removed"});
-        loadProjectTab(p,"members");
-      });
-      row.appendChild(del); box.appendChild(row);
+    return;
+  }
+
+  if (tab === "memory") {
+    box.innerHTML =
+      '<div class="panel-head" style="padding:0;margin-bottom:12px"><div><h3 style="margin:0">Project Memory</h3><p class="sub">Facts remembered only inside this project.</p></div></div>'+
+      '<form class="form-grid" id="projMemForm">'+
+      '<label>Memory<input name="content" required maxlength="4000" placeholder="Uses React / Node.js API / PostgreSQL"/></label>'+
+      '<button type="submit" class="btn-primary">'+svg("plus",14)+" Add memory</button></form>"+
+      '<div id="projMemList" style="margin-top:14px">'+skeletons(2)+"</div>";
+    $("projMemForm").onsubmit = async (e) => {
+      e.preventDefault();
+      const fd = new FormData(e.target);
+      await api("/v1/projects/"+encodeURIComponent(p.id)+"/memory",{method:"POST",body:JSON.stringify({content:String(fd.get("content")||"").trim(),importance:0.7})},{success:"Memory saved"});
+      e.target.reset(); loadProjectTab(p, "memory");
+    };
+    const { res, data } = await api("/v1/projects/"+encodeURIComponent(p.id)+"/memory",{},{error:false});
+    const list = $("projMemList"); list.innerHTML = "";
+    const items = (res.ok && data && data.memories)||[];
+    if (!items.length) { list.appendChild(emptyPanel("No project memories","OM will also extract memories from project chats.")); return; }
+    items.forEach(m => {
+      list.appendChild(entityCard(m.content, "importance "+(m.importance||0.5), fmtDate(m.created_at), [
+        btnOutline("Delete","trash", async () => {
+          await api("/v1/projects/"+encodeURIComponent(p.id)+"/memory/"+encodeURIComponent(m.id),{method:"DELETE"},{success:"Deleted"});
+          loadProjectTab(p, "memory");
+        })
+      ]));
     });
-  } else if (tab === "activity") {
-    const { res, data } = await api("/v1/history?project_id="+encodeURIComponent(p.id),{},{error:false});
-    box.innerHTML = "";
-    const events = (res.ok && data && data.events)||[];
-    if (!events.length) { box.appendChild(emptyPanel("No activity","Actions in this project will appear here.")); return; }
-    events.forEach(ev => {
-      const d = document.createElement("div"); d.className = "history-item";
-      d.innerHTML = "<strong></strong><span></span>";
-      d.querySelector("strong").textContent = ev.title||ev.kind||"Event";
-      d.querySelector("span").textContent   = (ev.body||"")+" · "+fmtDate(ev.created_at);
-      box.appendChild(d);
-    });
-  } else if (tab === "settings") {
-    box.innerHTML = "";
-    const form = document.createElement("form"); form.className = "form-grid";
-    form.innerHTML = "<label>Project name<input name='name' value='"+escapeHtml(p.name||"")+"' required maxlength='120'/></label>"+
-      "<label>Description<textarea name='description' rows='3' maxlength='2000'>"+escapeHtml(p.description||"")+"</textarea></label>"+
-      "<label>Visibility<select name='visibility'><option value='private'>Private</option><option value='team'>Team</option><option value='public'>Public</option></select></label>"+
-      '<div style="display:flex;gap:8px">'+
+    return;
+  }
+
+  if (tab === "settings") {
+    const { res, data } = await api("/v1/projects/"+encodeURIComponent(p.id),{},{error:false});
+    const proj = (res.ok && data) || p;
+    const models = (state.models||[]).length ? state.models : [{id:"OM-1.0"}];
+    const opts = models.map(m => '<option value="'+escapeHtml(m.id||m)+'"'+((m.id||m)===(proj.model||"OM-1.0")?' selected':'')+">"+escapeHtml(m.id||m)+"</option>").join("");
+    box.innerHTML =
+      '<form class="form-grid" id="projSettingsForm">'+
+      "<h3>General</h3>"+
+      '<label>Project name<input name="name" value="'+escapeHtml(proj.name||"")+'" required maxlength="120"/></label>'+
+      '<label>Description<textarea name="description" rows="3" maxlength="2000">'+escapeHtml(proj.description||"")+"</textarea></label>"+
+      "<h3>AI Model</h3>"+
+      '<label>Default model<select name="model">'+opts+"</select></label>"+
+      '<div style="display:flex;gap:8px;flex-wrap:wrap">'+
       '<button type="submit" class="btn-primary">'+svg("check",14)+" Save</button>"+
-      '<button type="button" class="btn-danger" id="projDeleteBtn">'+svg("trash",14)+" Delete project</button></div>";
-    form.addEventListener("submit", async e => {
+      '<button type="button" class="btn-outline" id="projFavBtn">'+svg("star",14)+" "+(proj.favorite?"Unfavorite":"Favorite")+"</button>"+
+      '<button type="button" class="btn-danger" id="projDeleteBtn">'+svg("trash",14)+" Delete Project</button></div></form>"+
+      '<div class="settings-section" style="margin-top:18px"><h3>Members & Permissions</h3>'+
+      '<div id="projMembersBox">'+skeletons(2)+"</div>"+
+      '<form class="form-grid" id="projMemberForm" style="margin-top:10px">'+
+      '<label>Invite email<input name="member_email" type="email" required placeholder="teammate@example.com"/></label>'+
+      '<button type="submit" class="btn-outline">'+svg("plus",14)+" Invite</button></form></div>";
+
+    $("projSettingsForm").onsubmit = async (e) => {
       e.preventDefault();
       const fd = new FormData(e.target);
-      await api("/v1/projects/"+encodeURIComponent(p.id),{method:"PATCH",body:JSON.stringify({name:String(fd.get("name")||"").trim(),description:String(fd.get("description")||"").trim()})},{success:"Project updated"});
-    });
-    box.appendChild(form);
-    $("projDeleteBtn").addEventListener("click", async () => {
+      const { res:r2, data:d2 } = await api("/v1/projects/"+encodeURIComponent(p.id),{method:"PUT",body:JSON.stringify({
+        name:String(fd.get("name")||"").trim(),
+        description:String(fd.get("description")||"").trim(),
+        model:String(fd.get("model")||"OM-1.0")
+      })},{success:"Project updated"});
+      if (r2.ok && d2) { Object.assign(p, d2); if (d2.model) state.model = d2.model; loadProjectDetail(p, "settings"); }
+    };
+    $("projFavBtn").onclick = async () => {
+      await api("/v1/projects/"+encodeURIComponent(p.id),{method:"PATCH",body:JSON.stringify({favorite:!proj.favorite})},{success:"Updated"});
+      loadProjectDetail(p, "settings");
+    };
+    $("projDeleteBtn").onclick = async () => {
       if (!confirm("Delete project permanently?")) return;
       await api("/v1/projects/"+encodeURIComponent(p.id),{method:"DELETE"},{success:"Project deleted"});
       loadProjectsView();
+    };
+    $("projMemberForm").onsubmit = async (e) => {
+      e.preventDefault();
+      const fd = new FormData(e.target);
+      await api("/v1/projects/"+encodeURIComponent(p.id)+"/members",{method:"POST",body:JSON.stringify({member_email:String(fd.get("member_email")||"").trim(), role:"viewer"})},{success:"Invited"});
+      e.target.reset(); loadProjectTab(p, "settings");
+    };
+    const { res: rm, data: dm } = await api("/v1/projects/"+encodeURIComponent(p.id)+"/members",{},{error:false});
+    const mb = $("projMembersBox"); mb.innerHTML = "";
+    const members = (rm.ok && dm && dm.members)||[];
+    if (!members.length) mb.innerHTML = '<p style="color:var(--muted);font-size:13px">Only you have access.</p>';
+    members.forEach(m => {
+      mb.appendChild(entityCard(m.member_email||m.email||m.id, m.role||"viewer", fmtDate(m.created_at), [
+        btnOutline("Remove","trash", async () => {
+          await api("/v1/projects/"+encodeURIComponent(p.id)+"/members/"+encodeURIComponent(m.id),{method:"DELETE"},{success:"Removed"});
+          loadProjectTab(p, "settings");
+        })
+      ]));
     });
   }
 }
 
+async function restoreProjectRoute() {
+  const route = parseProjectHash();
+  if (!route || !route.projectId) return false;
+  const { res, data } = await api("/v1/projects/"+encodeURIComponent(route.projectId),{},{error:false});
+  if (!res.ok || !data) return false;
+  if (route.chatId) {
+    await loadProjectDetail(data, "chats");
+    await openProjectChat(data, route.chatId);
+  } else {
+    await loadProjectDetail(data);
+  }
+  return true;
+}
+
 /* ─── VIEW: ASSISTANTS ─── */
+function assistantBlurb(a) {
+  const desc = String(a.description || "").trim();
+  if (desc) return desc;
+  const sp = String(a.system_prompt || "").trim().replace(/\s+/g, " ");
+  if (!sp) return "No description yet.";
+  return sp.length > 140 ? sp.slice(0, 140) + "…" : sp;
+}
+
+async function openAssistantCreateModal() {
+  const models = (state.models||[]).length ? state.models : [{id:state.model||"OM-1.0"}];
+  const opts = models.map(m => {
+    const id = m.id||m;
+    return '<option value="'+escapeHtml(id)+'"'+(id===(state.model||"OM-1.0")?' selected':'')+">"+escapeHtml(id)+"</option>";
+  }).join("");
+  showModal("New Assistant",
+    '<form class="form-grid" id="asstCreateModalForm">'+
+    '<label>Name<input name="name" required maxlength="120" placeholder="Coding Assistant"/></label>'+
+    '<label>Description<textarea name="description" rows="2" maxlength="2000" placeholder="What this assistant is for"></textarea></label>'+
+    '<label>System prompt<textarea name="system_prompt" rows="6" maxlength="8000" placeholder="You are a helpful coding assistant…"></textarea></label>'+
+    '<label>Model<select name="model">'+opts+"</select></label></form>",
+    async () => {
+      const form = $("asstCreateModalForm");
+      if (!form) return;
+      const fd = new FormData(form);
+      const name = String(fd.get("name")||"").trim();
+      if (!name) { toast("Name required","error"); return; }
+      const { res, data } = await api("/v1/assistants",{method:"POST",body:JSON.stringify({
+        name,
+        description: String(fd.get("description")||"").trim(),
+        system_prompt: String(fd.get("system_prompt")||"").trim(),
+        model: String(fd.get("model")||state.model||"OM-1.0"),
+      })},{success:"Assistant created"});
+      if (!res.ok || !data) return;
+      state.assistants = [data].concat(state.assistants.filter(x => x.id !== data.id));
+      await loadAssistantsView();
+      loadAssistantDetail(data);
+    }
+  );
+  setTimeout(() => {
+    const form = $("asstCreateModalForm");
+    if (form) form.addEventListener("submit", e => { e.preventDefault(); els.modalOk.click(); });
+  }, 0);
+}
+
 async function loadAssistantsView() {
   const panel = $("assistantsPanel");
-  panel.innerHTML = '<div class="panel-head"><div><h2>Assistants</h2><p class="sub">Custom system prompts for specialized chats.</p></div>'+
+  panel.innerHTML =
+    '<div class="panel-head"><div><h2>Assistants</h2><p class="sub">Custom system prompts for specialized chats.</p></div>'+
     '<button type="button" class="btn-primary" id="asstCreateBtn">'+svg("plus",14)+" New assistant</button></div>"+
-    '<div id="assistantsList">'+skeletons(3)+"</div>"+
-    '<form class="form-grid hidden" id="asstForm">'+
-    '<label>Name<input id="asstName" name="name" required maxlength="120"/></label>'+
-    '<label>Description<textarea name="description" rows="2" maxlength="2000"></textarea></label>'+
-    '<label>System prompt<textarea name="system_prompt" rows="5" maxlength="8000"></textarea></label>'+
-    '<div style="display:flex;gap:8px"><button type="submit" class="btn-primary">'+svg("plus",14)+" Create</button>"+
-    '<button type="button" class="btn-outline" id="asstCancelBtn">Cancel</button></div></form>';
+    '<div class="asst-list" id="assistantsList">'+skeletons(3)+"</div>";
 
-  $("asstCreateBtn").addEventListener("click", () => {
-    $("asstForm").classList.remove("hidden"); $("asstCreateBtn").classList.add("hidden");
-    $("asstName").focus();
-  });
-  $("asstCancelBtn").addEventListener("click", () => {
-    $("asstForm").classList.add("hidden"); $("asstCreateBtn").classList.remove("hidden");
-  });
-  $("asstForm").addEventListener("submit", async e => {
-    e.preventDefault();
-    const fd = new FormData(e.target);
-    await api("/v1/assistants",{method:"POST",body:JSON.stringify({name:String(fd.get("name")||"").trim(),description:String(fd.get("description")||"").trim(),system_prompt:String(fd.get("system_prompt")||"").trim(),model:state.model})},{success:"Assistant created"});
-    e.target.reset(); $("asstForm").classList.add("hidden"); $("asstCreateBtn").classList.remove("hidden");
-    loadAssistantsView();
-  });
+  $("asstCreateBtn").onclick = () => openAssistantCreateModal();
 
   const { res, data } = await api("/v1/assistants",{},{error:false});
-  const list = $("assistantsList"); list.innerHTML = "";
+  const list = $("assistantsList");
+  list.innerHTML = "";
   state.assistants = (res.ok && data && data.assistants)||[];
-  if (!state.assistants.length) { list.appendChild(emptyPanel("No assistants","Create a custom assistant.")); return; }
+  if (!state.assistants.length) {
+    list.appendChild(emptyPanel("No assistants","Create a custom assistant for specialized chats.","New assistant", () => openAssistantCreateModal()));
+    return;
+  }
+
   state.assistants.forEach(a => {
     const isActive = state.selectedAssistantId === a.id;
-    list.appendChild(entityCard(a.name, a.description||a.system_prompt, "Model: "+(a.model||"OM-1.0"), [
-      btnOutline(isActive?"Active":"Use","",() => {
-        state.selectedAssistantId = isActive ? null : a.id;
-        toast(state.selectedAssistantId?"Assistant active":"Assistant cleared","success");
-        loadAssistantsView();
-      }),
-      btnOutline("Open","bot", () => loadAssistantDetail(a)),
-      btnOutline("Duplicate","copy", async () => {
-        await api("/v1/assistants/"+encodeURIComponent(a.id)+"/duplicate",{method:"POST",body:"{}"},{success:"Duplicated"});
-        loadAssistantsView();
-      }),
-      btnOutline("Delete","trash", async () => {
-        if (!confirm("Delete assistant?")) return;
-        if (state.selectedAssistantId === a.id) state.selectedAssistantId = null;
-        await api("/v1/assistants/"+encodeURIComponent(a.id),{method:"DELETE"},{success:"Deleted"});
-        loadAssistantsView();
-      }),
-    ]));
+    const card = document.createElement("div");
+    card.className = "asst-card"+(isActive?" active":"");
+
+    const left = document.createElement("div");
+    left.className = "asst-card-top";
+    left.innerHTML =
+      '<div class="asst-icon">'+svg("bot",18)+"</div>"+
+      '<div class="grow"><h3></h3><p></p><div class="asst-badges"></div></div>';
+    left.querySelector("h3").textContent = a.name || "Untitled";
+    left.querySelector("p").textContent = assistantBlurb(a);
+    const badges = left.querySelector(".asst-badges");
+    const mkBadge = (text, cls) => {
+      const s = document.createElement("span");
+      s.className = "badge "+cls;
+      s.textContent = text;
+      return s;
+    };
+    badges.appendChild(mkBadge(a.model || "OM-1.0", "blue"));
+    if (isActive) badges.appendChild(mkBadge("Active", "green"));
+
+    const actions = document.createElement("div");
+    actions.className = "asst-actions";
+
+    const useBtn = isActive
+      ? btnOutline("Active", "check", () => {
+          state.selectedAssistantId = null;
+          toast("Assistant cleared","success");
+          loadAssistantsView();
+        })
+      : btnPrimary("Use", "zap", () => {
+          state.selectedAssistantId = a.id;
+          toast("Using "+(a.name||"assistant"),"success");
+          setView("chat");
+        });
+    if (isActive) useBtn.classList.add("active");
+
+    const openBtn = btnOutline("Open", "bot", () => loadAssistantDetail(a));
+
+    const moreWrap = document.createElement("div");
+    moreWrap.className = "asst-more-wrap";
+    const moreBtn = document.createElement("button");
+    moreBtn.type = "button";
+    moreBtn.className = "icon-btn";
+    moreBtn.title = "More";
+    moreBtn.innerHTML = svg("more",16);
+    const drop = document.createElement("div");
+    drop.className = "drop-menu";
+    moreBtn.addEventListener("click", e => {
+      e.stopPropagation();
+      const wasOpen = drop.classList.contains("open");
+      closeMenus();
+      if (wasOpen) return;
+      drop.innerHTML =
+        '<button type="button" data-act="duplicate">'+svg("copy",14)+" Duplicate</button>"+
+        '<button type="button" data-act="delete" style="color:var(--danger)">'+svg("trash",14)+" Delete</button>";
+      drop.classList.add("open");
+      drop.querySelectorAll("[data-act]").forEach(btn => {
+        btn.onclick = async ev => {
+          ev.stopPropagation();
+          drop.classList.remove("open");
+          const act = btn.getAttribute("data-act");
+          if (act === "duplicate") {
+            await api("/v1/assistants/"+encodeURIComponent(a.id)+"/duplicate",{method:"POST",body:"{}"},{success:"Duplicated"});
+            loadAssistantsView();
+          } else if (act === "delete") {
+            if (!confirm("Delete assistant \""+(a.name||"")+"\"?")) return;
+            if (state.selectedAssistantId === a.id) state.selectedAssistantId = null;
+            await api("/v1/assistants/"+encodeURIComponent(a.id),{method:"DELETE"},{success:"Deleted"});
+            loadAssistantsView();
+          }
+        };
+      });
+    });
+    moreWrap.append(moreBtn, drop);
+
+    actions.append(useBtn, openBtn, moreWrap);
+    card.append(left, actions);
+    list.appendChild(card);
   });
 }
 
@@ -1985,19 +2900,51 @@ async function loadAssistantTab(a, tab) {
   } else if (tab === "tools") {
     const { res, data } = await api("/v1/tools",{},{error:false});
     box.innerHTML = "";
+    const intro = document.createElement("div");
+    intro.className = "settings-section";
+    intro.innerHTML = "<h3>Assistant tools</h3><p style='margin:0;font-size:13px;color:var(--muted)'>Add tools this assistant can use during chats.</p>";
+    box.appendChild(intro);
+    const list = document.createElement("div");
+    list.className = "ui-list";
+    box.appendChild(list);
     const tools = (res.ok && data && (data.tools||data.items))||[];
     const asstTools = new Set(a.tools||[]);
-    if (!tools.length) { box.appendChild(emptyPanel("No tools","No tools available in this workspace.")); return; }
+    if (!tools.length) {
+      list.appendChild(emptyPanel("No tools","Install tools from the Tools page first."));
+      return;
+    }
     tools.forEach(t => {
-      const enabled = asstTools.has(t.id);
-      box.appendChild(entityCard(t.name, t.description||"", t.category||"", [
-        btnOutline(enabled?"Remove":"Add", enabled?"x":"plus", async () => {
-          const next = new Set(asstTools);
-          if (enabled) next.delete(t.id); else next.add(t.id);
-          await api("/v1/assistants/"+encodeURIComponent(a.id),{method:"PATCH",body:JSON.stringify({tools:[...next]})},{success:enabled?"Tool removed":"Tool added"});
-          a.tools = [...next]; loadAssistantTab(a,"tools");
-        }),
-      ]));
+      const attached = asstTools.has(t.id);
+      const installed = !!(t.installed || t.status === "installed");
+      list.appendChild(uiCard({
+        icon: toolIconName(t.id),
+        title: t.name || t.id,
+        desc: t.description || "",
+        badges: [
+          {text: installed ? "Installed" : "Available", cls: installed ? "blue" : "gray"},
+          {text: attached ? "Added" : "Not added", cls: attached ? "green" : "gray"},
+        ],
+        actions: [
+          attached
+            ? btnOutline("Remove", "x", async () => {
+                const next = new Set(asstTools);
+                next.delete(t.id);
+                await api("/v1/assistants/"+encodeURIComponent(a.id),{method:"PATCH",body:JSON.stringify({tools:[...next]})},{success:"Tool removed"});
+                a.tools = [...next];
+                loadAssistantTab(a, "tools");
+              })
+            : btnPrimary("Add", "plus", async () => {
+                const next = new Set(asstTools);
+                next.add(t.id);
+                if (!installed) {
+                  await patchTool(t.id, {install:true, enabled:true}, null).catch(() => {});
+                }
+                await api("/v1/assistants/"+encodeURIComponent(a.id),{method:"PATCH",body:JSON.stringify({tools:[...next]})},{success:"Tool added"});
+                a.tools = [...next];
+                loadAssistantTab(a, "tools");
+              }),
+        ],
+      }));
     });
   } else if (tab === "settings") {
     box.innerHTML = "";
@@ -2024,47 +2971,135 @@ async function loadAssistantTab(a, tab) {
 }
 
 /* ─── VIEW: EXPLORE ─── */
+function exploreIcon(category) {
+  const map = { featured:"zap", template:"scroll", workflow:"activity", community:"users" };
+  return svg(map[category] || "compass", 18);
+}
+
+function exploreBadgeClass(category) {
+  if (category === "featured") return "blue";
+  if (category === "workflow") return "green";
+  if (category === "community") return "yellow";
+  return "gray";
+}
+
 async function loadExploreView() {
   const panel = $("explorePanel");
-  panel.innerHTML = '<div class="panel-head"><div><h2>Explore</h2><p class="sub">Templates and community starters.</p></div></div><div id="exploreList">'+skeletons(4)+"</div>";
+  panel.innerHTML =
+    '<div class="explore-hero"><h2>Explore</h2><p class="sub">Templates and community starters for OM.</p></div>'+
+    '<div class="explore-filters" id="exploreFilters"></div>'+
+    '<div id="exploreBody">'+skeletons(4)+"</div>";
+
   const { res, data } = await api("/v1/explore",{},{error:false});
-  const list = $("exploreList"); list.innerHTML = "";
-  const items = (res.ok && data && data.items)||[];
-  if (!items.length) { list.appendChild(emptyPanel("Nothing to explore","Templates and starters appear here.")); return; }
-  items.forEach(item => {
-    list.appendChild(entityCard(item.title, item.description, item.category, [
-      btnOutline("Use","compass", async () => {
-        const { res: r2, data: d2 } = await api("/v1/explore/"+encodeURIComponent(item.id)+"/use",{method:"POST",body:"{}"},{success:"Added to workspace"});
-        if (r2.ok && d2 && d2.assistant) { setView("assistants"); loadAssistantsView(); }
-        else if (r2.ok && d2 && d2.prompt) { setView("prompts"); loadPromptsView(); }
-      }),
-    ]));
+  const items = (res.ok && data && data.items) || [];
+  state._exploreItems = items;
+
+  const filters = [
+    ["all","All"],
+    ["featured","Featured"],
+    ["template","Templates"],
+    ["workflow","Workflows"],
+    ["community","Community"],
+  ];
+  const filterBar = $("exploreFilters");
+  filters.forEach(([id, label], i) => {
+    const chip = document.createElement("button");
+    chip.type = "button";
+    chip.className = "explore-chip"+(i === 0 ? " active" : "");
+    chip.textContent = label;
+    chip.dataset.filter = id;
+    chip.addEventListener("click", () => {
+      filterBar.querySelectorAll(".explore-chip").forEach(c => c.classList.toggle("active", c === chip));
+      renderExploreGrid(id);
+    });
+    filterBar.appendChild(chip);
   });
+  renderExploreGrid("all");
+}
+
+function renderExploreGrid(filterId) {
+  const body = $("exploreBody");
+  if (!body) return;
+  const items = state._exploreItems || [];
+  const filtered = filterId === "all"
+    ? items.slice()
+    : items.filter(it => String(it.category||"").toLowerCase() === filterId || (filterId === "featured" && it.featured));
+
+  body.innerHTML = "";
+  if (!filtered.length) {
+    body.appendChild(emptyPanel("Nothing here","Try another filter or check back later."));
+    return;
+  }
+
+  const order = ["featured","template","workflow","community"];
+  const groups = {};
+  filtered.forEach(it => {
+    const cat = String(it.category || "template").toLowerCase();
+    (groups[cat] = groups[cat] || []).push(it);
+  });
+
+  const cats = filterId === "all"
+    ? order.filter(c => groups[c] && groups[c].length)
+    : Object.keys(groups);
+
+  cats.forEach(cat => {
+    const section = document.createElement("section");
+    section.className = "explore-section";
+    const label = cat.charAt(0).toUpperCase() + cat.slice(1);
+    section.innerHTML =
+      '<div class="explore-section-head"><h3>'+escapeHtml(label)+'</h3></div>'+
+      '<div class="explore-grid"></div>';
+    const grid = section.querySelector(".explore-grid");
+    (groups[cat] || []).forEach(item => grid.appendChild(buildExploreCard(item)));
+    body.appendChild(section);
+  });
+}
+
+function buildExploreCard(item) {
+  const cat = String(item.category || "template").toLowerCase();
+  const card = document.createElement("article");
+  card.className = "explore-card"+(item.featured ? " featured" : "");
+  card.innerHTML =
+    '<div class="explore-card-top">'+
+    '<div class="explore-icon">'+exploreIcon(cat)+"</div>"+
+    '<span class="badge '+exploreBadgeClass(cat)+'">'+escapeHtml(cat)+"</span>"+
+    "</div>"+
+    "<h4></h4><p></p>"+
+    '<div class="explore-card-foot"><button type="button" class="btn-use">Use</button></div>';
+  card.querySelector("h4").textContent = item.title || "Untitled";
+  card.querySelector("p").textContent = item.description || "";
+  card.querySelector(".btn-use").addEventListener("click", async () => {
+    const { res: r2, data: d2 } = await api(
+      "/v1/explore/"+encodeURIComponent(item.id)+"/use",
+      { method:"POST", body:"{}" },
+      { success:"Added to workspace" }
+    );
+    if (r2.ok && d2 && d2.assistant) { setView("assistants"); loadAssistantsView(); }
+    else if (r2.ok && d2 && d2.prompt) { setView("prompts"); loadPromptsView(); }
+    else if (r2.ok && d2 && d2.prompt_text) {
+      els.input.value = d2.prompt_text;
+      autosize();
+      setView("chat");
+      toast("Prompt loaded","success");
+    }
+  });
+  return card;
 }
 
 /* ─── VIEW: FILES (tabbed) ─── */
 async function loadFilesView() {
   const panel = $("filesPanel");
-  panel.innerHTML = '<div class="panel-head"><div><h2>Files</h2><p class="sub">Upload and manage files.</p></div>'+
+  panel.innerHTML =
+    '<div class="panel-head"><div><h2>Files</h2><p class="sub">Upload and manage files.</p></div>'+
     '<div style="display:flex;gap:6px">'+
     '<button type="button" class="btn-outline" id="filesUploadBtn">'+svg("paperclip",14)+" Upload</button>"+
     '<button type="button" class="btn-primary" id="filesCreateBtn">'+svg("plus",14)+" Create</button></div></div>"+
     '<input type="file" id="filesUpload" class="hidden" accept="*/*"/>'+
-    '<div id="filesTabs"></div><div id="filesContent">'+skeletons(3)+"</div>"+
-    '<form class="form-grid hidden" id="filesCreateForm">'+
-    '<label>File name<input name="name" required maxlength="240" placeholder="notes.txt"/></label>'+
-    '<label>Content<textarea name="content" rows="8" maxlength="2000000" placeholder="Paste text content…"></textarea></label>'+
-    '<div style="display:flex;gap:8px"><button type="submit" class="btn-primary">'+svg("plus",14)+" Create file</button>"+
-    '<button type="button" class="btn-outline" id="filesCancelBtn">Cancel</button></div></form>';
+    '<div id="filesTabs"></div><div class="ui-list" id="filesContent">'+skeletons(3)+"</div>";
 
-  $("filesUploadBtn").addEventListener("click", () => $("filesUpload").click());
-  $("filesCreateBtn").addEventListener("click", () => {
-    $("filesCreateForm").classList.remove("hidden"); $("filesCreateBtn").classList.add("hidden");
-  });
-  $("filesCancelBtn").addEventListener("click", () => {
-    $("filesCreateForm").classList.add("hidden"); $("filesCreateBtn").classList.remove("hidden");
-  });
-  $("filesUpload").addEventListener("change", async e => {
+  $("filesUploadBtn").onclick = () => $("filesUpload").click();
+  $("filesCreateBtn").onclick = () => openFileCreateModal();
+  $("filesUpload").onchange = async e => {
     const file = e.target.files && e.target.files[0]; e.target.value = "";
     if (!file) return;
     const isText = !file.type||file.type.startsWith("text/")||/\.(txt|md|json|csv)$/i.test(file.name);
@@ -2077,54 +3112,97 @@ async function loadFilesView() {
       await api("/v1/files",{method:"POST",body:JSON.stringify({name:file.name,content_base64:b64,mime:file.type||"application/octet-stream"})},{success:"File uploaded"});
     }
     loadFilesTab(activeFilesTab);
-  });
-  $("filesCreateForm").addEventListener("submit", async e => {
-    e.preventDefault();
-    const fd = new FormData(e.target);
-    await api("/v1/files",{method:"POST",body:JSON.stringify({name:String(fd.get("name")||"").trim(),content:String(fd.get("content")||""),mime:"text/plain"})},{success:"File created"});
-    e.target.reset(); $("filesCreateForm").classList.add("hidden"); $("filesCreateBtn").classList.remove("hidden");
-    loadFilesTab(activeFilesTab);
-  });
+  };
 
   const fileTabs = [["all","All"],["documents","Documents"],["images","Images"],["code","Code"],["recent","Recent"]];
-  buildTabs($("filesTabs"), fileTabs, id => { activeFilesTab = id; loadFilesTab(id); }, "all");
-  loadFilesTab("all");
+  buildTabs($("filesTabs"), fileTabs, id => { activeFilesTab = id; loadFilesTab(id); }, activeFilesTab||"all");
+  loadFilesTab(activeFilesTab||"all");
 }
 let activeFilesTab = "all";
 
+function openFileCreateModal() {
+  showModal("Create file",
+    '<form class="form-grid" id="filesCreateModalForm">'+
+    '<label>File name<input name="name" required maxlength="240" placeholder="notes.txt"/></label>'+
+    '<label>Content<textarea name="content" rows="8" maxlength="2000000" placeholder="Paste text content…"></textarea></label></form>',
+    async () => {
+      const form = $("filesCreateModalForm"); if (!form) return;
+      const fd = new FormData(form);
+      const name = String(fd.get("name")||"").trim();
+      if (!name) { toast("File name required","error"); return; }
+      await api("/v1/files",{method:"POST",body:JSON.stringify({name,content:String(fd.get("content")||""),mime:"text/plain"})},{success:"File created"});
+      loadFilesTab(activeFilesTab);
+    }
+  );
+}
+
+function fileIconFor(f) {
+  const mime = String(f.mime||"");
+  const name = String(f.name||"");
+  if (mime.startsWith("image/") || /\.(png|jpe?g|gif|webp)$/i.test(name)) return "image";
+  if (mime.includes("json") || /\.(js|ts|py|go|rs|java|c|cpp|html|css)$/i.test(name)) return "code";
+  return "file";
+}
+
+function formatBytes(n) {
+  const v = Number(n)||0;
+  if (v < 1024) return v+" B";
+  if (v < 1048576) return (v/1024).toFixed(1)+" KB";
+  return (v/1048576).toFixed(1)+" MB";
+}
+
 async function loadFilesTab(tabId) {
+  activeFilesTab = tabId || "all";
   const box = $("filesContent"); if (!box) return;
   box.innerHTML = skeletons(3);
   const params = [];
-  if (tabId === "documents") params.push("kind=document");
-  if (tabId === "images")    params.push("kind=image");
-  if (tabId === "code")      params.push("kind=code");
-  if (tabId === "recent")    params.push("sort=recent&limit=20");
-  const url = "/v1/files"+(params.length?"?"+params.join("&"):"");
-  const { res, data } = await api(url,{},{error:false});
+  if (activeFilesTab === "documents") params.push("kind=document");
+  if (activeFilesTab === "images")    params.push("kind=image");
+  if (activeFilesTab === "code")      params.push("kind=code");
+  if (activeFilesTab === "recent")    params.push("sort=recent&limit=20");
+  const { res, data } = await api("/v1/files"+(params.length?"?"+params.join("&"):""),{},{error:false});
   box.innerHTML = "";
   const items = (res.ok && data && data.files)||[];
-  if (!items.length) { box.appendChild(emptyPanel("No files","Upload or create files.")); return; }
+  if (!items.length) {
+    box.appendChild(emptyPanel("No files","Upload or create files.","Create", () => openFileCreateModal()));
+    return;
+  }
   items.forEach(f => {
-    box.appendChild(entityCard(f.name, f.mime+" · "+(f.size||0)+" bytes", fmtDate(f.updated_at||f.created_at), [
-      btnOutline("View","file", async () => {
-        const { res: r2, data: d2 } = await api("/v1/files/"+encodeURIComponent(f.id),{},{error:false});
-        if (r2.ok) {
+    box.appendChild(uiCard({
+      icon: fileIconFor(f),
+      title: f.name || "Untitled",
+      desc: (f.mime||"file")+" · "+formatBytes(f.size),
+      badges: [{text: fmtDate(f.updated_at||f.created_at), cls:"gray"}],
+      actions: [
+        btnOutline("View", "file", async () => {
+          const { res: r2, data: d2 } = await api("/v1/files/"+encodeURIComponent(f.id),{},{error:false});
+          if (!r2.ok) return;
           const content = d2.content||d2.text||JSON.stringify(d2);
-          showModal("File: "+f.name, '<textarea style="width:100%;height:280px;border:1px solid var(--border);border-radius:8px;padding:10px;font-family:monospace;font-size:12px;background:var(--side)">'+escapeHtml(content.slice(0,4000))+"</textarea>", null);
-        }
-      }),
-      btnOutline("Rename","edit", async () => {
-        const name = prompt("File name",f.name); if (!name) return;
-        await api("/v1/files/"+encodeURIComponent(f.id),{method:"PATCH",body:JSON.stringify({name})},{success:"Renamed"});
-        loadFilesTab(tabId);
-      }),
-      btnOutline("Delete","trash", async () => {
-        if (!confirm("Delete file?")) return;
-        await api("/v1/files/"+encodeURIComponent(f.id),{method:"DELETE"},{success:"Deleted"});
-        loadFilesTab(tabId);
-      }),
-    ]));
+          showModal("File: "+f.name, '<textarea style="width:100%;height:280px;border:1px solid var(--border);border-radius:8px;padding:10px;font-family:monospace;font-size:12px;background:var(--side)">'+escapeHtml(String(content).slice(0,4000))+"</textarea>", null);
+        }),
+      ],
+      more: [
+        {
+          label: "Rename",
+          icon: "edit",
+          onClick: async () => {
+            const name = prompt("File name", f.name); if (!name) return;
+            await api("/v1/files/"+encodeURIComponent(f.id),{method:"PATCH",body:JSON.stringify({name})},{success:"Renamed"});
+            loadFilesTab(activeFilesTab);
+          },
+        },
+        {
+          label: "Delete",
+          icon: "trash",
+          danger: true,
+          onClick: async () => {
+            if (!confirm("Delete file?")) return;
+            await api("/v1/files/"+encodeURIComponent(f.id),{method:"DELETE"},{success:"Deleted"});
+            loadFilesTab(activeFilesTab);
+          },
+        },
+      ],
+    }));
   });
 }
 
@@ -2132,170 +3210,320 @@ function showModal(title, bodyHtml, onOk) {
   els.modalTitle.textContent = title;
   els.modalBody.innerHTML = bodyHtml;
   els.modal.classList.add("open");
+  els.modalOk.style.display = onOk ? "" : "none";
   els.modalOk.onclick = () => { els.modal.classList.remove("open"); if (onOk) onOk(); };
+  els.modalCancel.onclick = () => { els.modal.classList.remove("open"); els.modalOk.style.display = ""; };
 }
 
 /* ─── VIEW: KNOWLEDGE ─── */
 async function loadKnowledgeView() {
   const panel = $("knowledgePanel");
-  panel.innerHTML = '<div class="panel-head"><div><h2>Knowledge</h2><p class="sub">Sources indexed for retrieval.</p></div></div><div id="knowledgeList">'+skeletons(3)+"</div>"+
-    '<form class="form-grid" id="knForm">'+
-    '<label>Name<input id="knName" name="name" required maxlength="200"/></label>'+
-    '<label>Source type<select name="source_type"><option value="document">Document</option><option value="url">URL</option><option value="file">File</option></select></label>'+
-    '<label>URI<input name="uri" maxlength="1000" placeholder="https://…"/></label>'+
-    '<label>Content<textarea name="content" rows="6" maxlength="2000000" placeholder="Paste document text…"></textarea></label>'+
-    '<button type="submit" class="btn-primary">'+svg("plus",14)+" Add source</button></form>";
-
-  $("knForm").addEventListener("submit", async e => {
-    e.preventDefault();
-    const fd = new FormData(e.target);
-    await api("/v1/knowledge/sources",{method:"POST",body:JSON.stringify({name:String(fd.get("name")||"").trim(),source_type:String(fd.get("source_type")||"document"),uri:String(fd.get("uri")||"").trim(),content:String(fd.get("content")||"")})},{success:"Source added"});
-    e.target.reset(); loadKnowledgeView();
-  });
+  panel.innerHTML =
+    '<div class="panel-head"><div><h2>Knowledge</h2><p class="sub">Sources indexed for retrieval.</p></div>'+
+    '<button type="button" class="btn-primary" id="knAddBtn">'+svg("plus",14)+" Add source</button></div>"+
+    '<div class="ui-list" id="knowledgeList">'+skeletons(3)+"</div>";
+  $("knAddBtn").onclick = () => openKnowledgeCreateModal();
 
   const { res, data } = await api("/v1/knowledge/sources",{},{error:false});
   const list = $("knowledgeList"); list.innerHTML = "";
   const items = (res.ok && data && data.sources)||[];
-  if (!items.length) { list.appendChild(emptyPanel("No sources","Add a document or URL source.")); return; }
+  if (!items.length) {
+    list.appendChild(emptyPanel("No sources","Add a document or URL source.","Add source", () => openKnowledgeCreateModal()));
+    return;
+  }
   items.forEach(s => {
-    list.appendChild(entityCard(s.name, s.source_type+" · "+(s.status||""), (s.doc_count||0)+" docs · "+fmtDate(s.created_at), [
-      btnOutline("Delete","trash", async () => {
-        if (!confirm("Delete source?")) return;
-        await api("/v1/knowledge/sources/"+encodeURIComponent(s.id),{method:"DELETE"},{success:"Deleted"});
-        loadKnowledgeView();
-      }),
-    ]));
+    const status = String(s.status||"ready");
+    const statusCls = status === "ready" || status === "indexed" ? "green" : (status === "error" ? "red" : "yellow");
+    list.appendChild(uiCard({
+      icon: "brain",
+      title: s.name || "Untitled source",
+      desc: blurb((s.source_type||"document")+(s.uri ? " · "+s.uri : ""), 160),
+      badges: [
+        {text: s.source_type || "document", cls:"blue"},
+        {text: status, cls: statusCls},
+        {text: (s.doc_count||0)+" docs", cls:"gray"},
+      ],
+      actions: [],
+      more: [
+        {
+          label: "Delete",
+          icon: "trash",
+          danger: true,
+          onClick: async () => {
+            if (!confirm("Delete source?")) return;
+            await api("/v1/knowledge/sources/"+encodeURIComponent(s.id),{method:"DELETE"},{success:"Deleted"});
+            loadKnowledgeView();
+          },
+        },
+      ],
+    }));
   });
+}
+
+function openKnowledgeCreateModal() {
+  showModal("Add knowledge source",
+    '<form class="form-grid" id="knCreateModalForm">'+
+    '<label>Name<input name="name" required maxlength="200" placeholder="Product handbook"/></label>'+
+    '<label>Source type<select name="source_type"><option value="document">Document</option><option value="url">URL</option><option value="file">File</option></select></label>'+
+    '<label>URI<input name="uri" maxlength="1000" placeholder="https://…"/></label>'+
+    '<label>Content<textarea name="content" rows="6" maxlength="2000000" placeholder="Paste document text…"></textarea></label></form>',
+    async () => {
+      const form = $("knCreateModalForm"); if (!form) return;
+      const fd = new FormData(form);
+      const name = String(fd.get("name")||"").trim();
+      if (!name) { toast("Name required","error"); return; }
+      await api("/v1/knowledge/sources",{method:"POST",body:JSON.stringify({
+        name,
+        source_type:String(fd.get("source_type")||"document"),
+        uri:String(fd.get("uri")||"").trim(),
+        content:String(fd.get("content")||""),
+      })},{success:"Source added"});
+      loadKnowledgeView();
+    }
+  );
 }
 
 /* ─── VIEW: PROMPTS (tabbed) ─── */
 async function loadPromptsView() {
   const panel = $("promptsPanel");
-  panel.innerHTML = '<div class="panel-head"><div><h2>Prompts</h2><p class="sub">Reusable prompt templates.</p></div>'+
+  panel.innerHTML =
+    '<div class="panel-head"><div><h2>Prompts</h2><p class="sub">Reusable prompt templates.</p></div>'+
     '<button type="button" class="btn-primary" id="prCreateBtn">'+svg("plus",14)+" New prompt</button></div>"+
-    '<div id="promptsTabs"></div><div id="promptsContent">'+skeletons(3)+"</div>"+
-    '<form class="form-grid hidden" id="prForm">'+
-    '<label>Name<input id="prName" name="name" required maxlength="120"/></label>'+
-    '<label>Content<textarea name="content" rows="6" required maxlength="16000"></textarea></label>'+
-    '<label>Kind<select name="kind"><option value="user">My prompt</option><option value="template">Template</option></select></label>'+
-    '<div style="display:flex;gap:8px"><button type="submit" class="btn-primary">'+svg("plus",14)+" Create</button>"+
-    '<button type="button" class="btn-outline" id="prCancelBtn">Cancel</button></div></form>';
-
-  $("prCreateBtn").addEventListener("click", () => {
-    $("prForm").classList.remove("hidden"); $("prCreateBtn").classList.add("hidden"); $("prName").focus();
-  });
-  $("prCancelBtn").addEventListener("click", () => {
-    $("prForm").classList.add("hidden"); $("prCreateBtn").classList.remove("hidden");
-  });
-  $("prForm").addEventListener("submit", async e => {
-    e.preventDefault();
-    const fd = new FormData(e.target);
-    await api("/v1/prompts",{method:"POST",body:JSON.stringify({name:String(fd.get("name")||"").trim(),content:String(fd.get("content")||"").trim(),kind:String(fd.get("kind"))})},{success:"Prompt created"});
-    e.target.reset(); $("prForm").classList.add("hidden"); $("prCreateBtn").classList.remove("hidden");
-    loadPromptsTab(activePromptsTab);
-  });
-
+    '<div id="promptsTabs"></div><div class="ui-list" id="promptsContent">'+skeletons(3)+"</div>";
+  $("prCreateBtn").onclick = () => openPromptCreateModal();
   const ptabs = [["my","My"],["templates","Templates"],["favorites","Favorites"]];
-  buildTabs($("promptsTabs"), ptabs, id => { activePromptsTab = id; loadPromptsTab(id); }, "my");
-  loadPromptsTab("my");
+  buildTabs($("promptsTabs"), ptabs, id => { activePromptsTab = id; loadPromptsTab(id); }, activePromptsTab||"my");
+  loadPromptsTab(activePromptsTab||"my");
 }
 let activePromptsTab = "my";
 
+function openPromptCreateModal() {
+  showModal("New prompt",
+    '<form class="form-grid" id="prCreateModalForm">'+
+    '<label>Name<input name="name" required maxlength="120" placeholder="Meeting notes"/></label>'+
+    '<label>Content<textarea name="content" rows="6" required maxlength="16000" placeholder="Write your reusable prompt…"></textarea></label>'+
+    '<label>Kind<select name="kind"><option value="user">My prompt</option><option value="template">Template</option></select></label></form>',
+    async () => {
+      const form = $("prCreateModalForm"); if (!form) return;
+      const fd = new FormData(form);
+      const name = String(fd.get("name")||"").trim();
+      const content = String(fd.get("content")||"").trim();
+      if (!name || !content) { toast("Name and content required","error"); return; }
+      await api("/v1/prompts",{method:"POST",body:JSON.stringify({name,content,kind:String(fd.get("kind"))})},{success:"Prompt created"});
+      loadPromptsTab(activePromptsTab);
+    }
+  );
+}
+
 async function loadPromptsTab(tabId) {
+  activePromptsTab = tabId || "my";
   const box = $("promptsContent"); if (!box) return;
   box.innerHTML = skeletons(3);
   const params = [];
-  if (tabId === "my")        params.push("kind=user");
-  if (tabId === "templates") params.push("kind=template");
-  if (tabId === "favorites") params.push("favorite=1");
-  const url = "/v1/prompts"+(params.length?"?"+params.join("&"):"");
-  const { res, data } = await api(url,{},{error:false});
+  if (activePromptsTab === "my")        params.push("kind=user");
+  if (activePromptsTab === "templates") params.push("kind=template");
+  if (activePromptsTab === "favorites") params.push("favorite=1");
+  const { res, data } = await api("/v1/prompts"+(params.length?"?"+params.join("&"):""),{},{error:false});
   box.innerHTML = "";
   const items = (res.ok && data && data.prompts)||[];
-  if (!items.length) { box.appendChild(emptyPanel("No prompts","Create prompt templates.")); return; }
+  if (!items.length) {
+    box.appendChild(emptyPanel("No prompts","Create prompt templates.","New prompt", () => openPromptCreateModal()));
+    return;
+  }
   items.forEach(p => {
-    box.appendChild(entityCard(p.name, (p.content||"").slice(0,180), (p.kind||"")+" · "+fmtDate(p.updated_at||p.created_at), [
-      btnOutline("Use","",() => { els.input.value = p.content||""; autosize(); setView("chat"); toast("Prompt loaded","success"); }),
-      btnOutline(p.favorite?"Unfav":"Fav","star", async () => {
-        await api("/v1/prompts/"+encodeURIComponent(p.id),{method:"PATCH",body:JSON.stringify({favorite:!p.favorite})},{success:p.favorite?"Removed":"Added to favorites"});
-        loadPromptsTab(tabId);
-      }),
-      btnOutline("Edit","edit", async () => {
-        const name = prompt("Name",p.name); if (!name) return;
-        const content = prompt("Content",p.content||""); if (content == null) return;
-        await api("/v1/prompts/"+encodeURIComponent(p.id),{method:"PATCH",body:JSON.stringify({name,content})},{success:"Updated"});
-        loadPromptsTab(tabId);
-      }),
-      btnOutline("Delete","trash", async () => {
-        if (!confirm("Delete prompt?")) return;
-        await api("/v1/prompts/"+encodeURIComponent(p.id),{method:"DELETE"},{success:"Deleted"});
-        loadPromptsTab(tabId);
-      }),
-    ]));
+    box.appendChild(uiCard({
+      icon: "scroll",
+      title: p.name || "Untitled",
+      desc: blurb(p.content, 160),
+      badges: [
+        {text: p.kind || "prompt", cls:"blue"},
+        p.favorite ? {text:"Favorite", cls:"yellow"} : null,
+        {text: fmtDate(p.updated_at||p.created_at), cls:"gray"},
+      ].filter(Boolean),
+      actions: [
+        btnPrimary("Use", "zap", () => {
+          els.input.value = p.content||"";
+          autosize(); setView("chat");
+          toast("Prompt loaded","success");
+        }),
+      ],
+      more: [
+        {
+          label: p.favorite ? "Unfavorite" : "Favorite",
+          icon: "star",
+          onClick: async () => {
+            await api("/v1/prompts/"+encodeURIComponent(p.id),{method:"PATCH",body:JSON.stringify({favorite:!p.favorite})},{success:p.favorite?"Removed":"Favorited"});
+            loadPromptsTab(activePromptsTab);
+          },
+        },
+        {
+          label: "Edit",
+          icon: "edit",
+          onClick: async () => {
+            showModal("Edit prompt",
+              '<form class="form-grid" id="prEditModalForm">'+
+              '<label>Name<input name="name" required maxlength="120" value="'+escapeHtml(p.name||"")+'"/></label>'+
+              '<label>Content<textarea name="content" rows="8" required maxlength="16000">'+escapeHtml(p.content||"")+"</textarea></label></form>",
+              async () => {
+                const form = $("prEditModalForm"); if (!form) return;
+                const fd = new FormData(form);
+                await api("/v1/prompts/"+encodeURIComponent(p.id),{method:"PATCH",body:JSON.stringify({
+                  name:String(fd.get("name")||"").trim(),
+                  content:String(fd.get("content")||""),
+                })},{success:"Updated"});
+                loadPromptsTab(activePromptsTab);
+              }
+            );
+          },
+        },
+        {
+          label: "Delete",
+          icon: "trash",
+          danger: true,
+          onClick: async () => {
+            if (!confirm("Delete prompt?")) return;
+            await api("/v1/prompts/"+encodeURIComponent(p.id),{method:"DELETE"},{success:"Deleted"});
+            loadPromptsTab(activePromptsTab);
+          },
+        },
+      ],
+    }));
   });
 }
 
 /* ─── VIEW: MODELS ─── */
 async function loadModelsView() {
   const panel = $("modelsPanel");
-  panel.innerHTML = '<div class="panel-head"><div><h2>Models</h2><p class="sub">Available models and defaults.</p></div></div><div id="modelsList">'+skeletons(3)+"</div>";
+  panel.innerHTML =
+    '<div class="panel-head"><div><h2>Models</h2><p class="sub">Available models and defaults.</p></div></div>'+
+    '<div class="ui-list" id="modelsList">'+skeletons(3)+"</div>";
   const { res, data } = await api("/v1/models/catalog",{},{error:false});
   const list = $("modelsList"); list.innerHTML = "";
   const models = (res.ok && data && data.models)||[];
   const def = (data && data.default_model)||state.model;
-  if (!models.length) { list.appendChild(emptyPanel("No models","Models available in your deployment appear here.")); return; }
+  if (!models.length) {
+    list.appendChild(emptyPanel("No models","Models available in your deployment appear here."));
+    return;
+  }
   models.forEach(m => {
     const isDefault = m.id === def;
-    list.appendChild(entityCard(m.name, m.description||"", "Context: "+(m.context_length||"—")+"k · Temp "+(m.temperature||"—"), [
-      ...(isDefault ? [Object.assign(document.createElement("span"),{innerHTML:'<span class="badge green">Default</span>'})] : []),
-      ...(!isDefault ? [btnOutline("Set default","cpu", async () => {
-        state.model = m.id;
-        await api("/v1/settings",{method:"PATCH",body:JSON.stringify({default_model:m.id})},{success:m.name+" set as default"});
-        renderModels(); loadModelsView();
-      })] : []),
-    ]));
+    const isActive = m.id === state.model;
+    list.appendChild(uiCard({
+      icon: "cpu",
+      title: m.name || m.id,
+      desc: blurb(m.description || ("Model id: "+(m.id||"")), 160),
+      badges: [
+        isDefault ? {text:"Default", cls:"green"} : null,
+        isActive ? {text:"In use", cls:"blue"} : null,
+        {text: "Context "+(m.context_length||"—")+"k", cls:"gray"},
+      ].filter(Boolean),
+      actions: isDefault ? [] : [
+        btnPrimary("Set default", "check", async () => {
+          state.model = m.id;
+          await api("/v1/settings",{method:"PATCH",body:JSON.stringify({default_model:m.id})},{success:(m.name||m.id)+" set as default"});
+          renderModels(); loadModelsView();
+        }),
+      ],
+      more: !isActive ? [{
+        label: "Use now",
+        icon: "zap",
+        onClick: () => {
+          state.model = m.id;
+          renderModels();
+          updateComposerChip && updateComposerChip();
+          toast((m.name||m.id)+" selected","success");
+          loadModelsView();
+        },
+      }] : [],
+    }));
   });
 }
 
 /* ─── VIEW: MEMORY ─── */
 async function loadMemoryView() {
   const panel = $("memoryPanel");
-  panel.innerHTML = '<div class="panel-head"><div><h2>Memory</h2><p class="sub">Persistent facts OM remembers.</p></div></div><div id="memoryList">'+skeletons(3)+"</div>"+
-    '<form class="form-grid" id="memForm">'+
-    '<label>Content<input id="memContent" name="content" required maxlength="4000" placeholder="Remember that I prefer concise answers…"/></label>'+
-    '<label>Importance (0–1)<input name="importance" type="number" min="0" max="1" step="0.1" value="0.5"/></label>'+
-    '<button type="submit" class="btn-primary">'+svg("plus",14)+" Add memory</button></form>";
-
-  $("memForm").addEventListener("submit", async e => {
-    e.preventDefault();
-    const fd = new FormData(e.target);
-    await api("/v1/memories",{method:"POST",body:JSON.stringify({content:String(fd.get("content")||"").trim(),importance:parseFloat(fd.get("importance"))||0.5,kind:"semantic"})},{success:"Memory added"});
-    e.target.reset(); loadMemoryView();
-  });
+  panel.innerHTML =
+    '<div class="panel-head"><div><h2>Memory</h2><p class="sub">Persistent facts OM remembers.</p></div>'+
+    '<button type="button" class="btn-primary" id="memAddBtn">'+svg("plus",14)+" Add memory</button></div>"+
+    '<div class="ui-list" id="memoryList">'+skeletons(3)+"</div>";
+  $("memAddBtn").onclick = () => openMemoryCreateModal();
 
   const { res, data } = await api("/v1/memories",{},{error:false});
   const list = $("memoryList"); list.innerHTML = "";
   const items = (res.ok && data && data.memories)||[];
-  if (!items.length) { list.appendChild(emptyPanel("No memories","Add facts OM should remember.")); return; }
+  if (!items.length) {
+    list.appendChild(emptyPanel("No memories","Add facts OM should remember.","Add memory", () => openMemoryCreateModal()));
+    return;
+  }
   items.forEach(m => {
     const enabled = !(m.enabled===false||m.enabled===0||m.enabled==="0");
-    list.appendChild(entityCard((m.content||"").slice(0,120),"Importance: "+(m.importance??0.5)+" · "+m.kind,(!enabled?"Disabled · ":"")+fmtDate(m.updated_at||m.created_at),[
-      btnOutline(enabled?"Disable":"Enable","", async () => {
-        await api("/v1/memories/"+encodeURIComponent(m.id),{method:"PATCH",body:JSON.stringify({enabled:!enabled})},{success:"Updated"});
-        loadMemoryView();
-      }),
-      btnOutline("Edit","edit", async () => {
-        const content = prompt("Memory content",m.content||""); if (!content) return;
-        await api("/v1/memories/"+encodeURIComponent(m.id),{method:"PATCH",body:JSON.stringify({content})},{success:"Updated"});
-        loadMemoryView();
-      }),
-      btnOutline("Delete","trash", async () => {
-        if (!confirm("Delete memory?")) return;
-        await api("/v1/memories/"+encodeURIComponent(m.id),{method:"DELETE"},{success:"Deleted"});
-        loadMemoryView();
-      }),
-    ]));
+    list.appendChild(uiCard({
+      icon: "database",
+      title: blurb(m.content, 80) || "Memory",
+      desc: blurb(m.content, 180),
+      badges: [
+        {text: enabled ? "Enabled" : "Disabled", cls: enabled ? "green" : "gray"},
+        {text: "Importance "+(m.importance??0.5), cls:"blue"},
+        {text: m.kind || "semantic", cls:"gray"},
+      ],
+      actions: [
+        btnOutline(enabled?"Disable":"Enable", enabled?"x":"check", async () => {
+          await api("/v1/memories/"+encodeURIComponent(m.id),{method:"PATCH",body:JSON.stringify({enabled:!enabled})},{success:"Updated"});
+          loadMemoryView();
+        }),
+      ],
+      more: [
+        {
+          label: "Edit",
+          icon: "edit",
+          onClick: async () => {
+            showModal("Edit memory",
+              '<form class="form-grid" id="memEditModalForm">'+
+              '<label>Content<textarea name="content" rows="5" required maxlength="4000">'+escapeHtml(m.content||"")+"</textarea></label></form>",
+              async () => {
+                const form = $("memEditModalForm"); if (!form) return;
+                const fd = new FormData(form);
+                const content = String(fd.get("content")||"").trim();
+                if (!content) return;
+                await api("/v1/memories/"+encodeURIComponent(m.id),{method:"PATCH",body:JSON.stringify({content})},{success:"Updated"});
+                loadMemoryView();
+              }
+            );
+          },
+        },
+        {
+          label: "Delete",
+          icon: "trash",
+          danger: true,
+          onClick: async () => {
+            if (!confirm("Delete memory?")) return;
+            await api("/v1/memories/"+encodeURIComponent(m.id),{method:"DELETE"},{success:"Deleted"});
+            loadMemoryView();
+          },
+        },
+      ],
+    }));
   });
+}
+
+function openMemoryCreateModal() {
+  showModal("Add memory",
+    '<form class="form-grid" id="memCreateModalForm">'+
+    '<label>Content<textarea name="content" rows="4" required maxlength="4000" placeholder="Remember that I prefer concise answers…"></textarea></label>'+
+    '<label>Importance (0–1)<input name="importance" type="number" min="0" max="1" step="0.1" value="0.5"/></label></form>',
+    async () => {
+      const form = $("memCreateModalForm"); if (!form) return;
+      const fd = new FormData(form);
+      const content = String(fd.get("content")||"").trim();
+      if (!content) { toast("Content required","error"); return; }
+      await api("/v1/memories",{method:"POST",body:JSON.stringify({
+        content,
+        importance:parseFloat(fd.get("importance"))||0.5,
+        kind:"semantic",
+      })},{success:"Memory added"});
+      loadMemoryView();
+    }
+  );
 }
 
 /* ─── VIEW: SETTINGS (full) ─── */
@@ -2391,17 +3619,27 @@ async function loadSettingsTab(tab) {
     });
     box.appendChild(form);
   } else if (tab === "privacy") {
-    const form = document.createElement("form"); form.className = "form-grid";
+    const form = document.createElement("form");
+    form.className = "form-grid";
+    form.id = "privacySettingsForm";
     form.innerHTML =
+      '<h3 style="margin:0;font-size:14px;font-weight:700;color:var(--text)">Privacy</h3>'+
       '<div class="toggle-row"><div><div class="toggle-label">Save chat history</div><div class="toggle-sub">Store conversations on OM servers</div></div>'+
-      '<label class="sw-wrap"><input type="checkbox" name="privacy_history"'+(s.privacy_history!==false?" checked":"")+'><div class="sw-track"></div><div class="sw-thumb"></div></label></div>'+
+      '<label class="sw-wrap"><input type="checkbox" id="privacyHistory" name="privacy_history"'+(s.privacy_history!==false?" checked":"")+'/><span class="sw-track"></span><span class="sw-thumb"></span></label></div>'+
       '<div class="toggle-row"><div><div class="toggle-label">Data collection</div><div class="toggle-sub">Help improve OM AI with usage data</div></div>'+
-      '<label class="sw-wrap"><input type="checkbox" name="data_collection"'+(s.data_collection?" checked":"")+'><div class="sw-track"></div><div class="sw-thumb"></div></label></div>'+
-      '<button type="submit" class="btn-primary">'+svg("check",14)+" Save</button>";
+      '<label class="sw-wrap"><input type="checkbox" id="dataCollection" name="data_collection"'+(s.data_collection?" checked":"")+'/><span class="sw-track"></span><span class="sw-thumb"></span></label></div>'+
+      '<button type="submit" class="btn-primary" id="privacySaveBtn">'+svg("check",14)+" Save</button>";
     form.addEventListener("submit", async e => {
       e.preventDefault();
-      const fd = new FormData(e.target);
-      await api("/v1/settings",{method:"PATCH",body:JSON.stringify({privacy_history:!!fd.get("privacy_history"),data_collection:!!fd.get("data_collection")})},{success:"Privacy settings saved"});
+      e.stopPropagation();
+      const payload = {
+        privacy_history: !!$("privacyHistory").checked,
+        data_collection: !!$("dataCollection").checked,
+      };
+      const { res, data } = await api("/v1/settings",{method:"PATCH",body:JSON.stringify(payload)},{success:"Privacy settings saved"});
+      if (res.ok && data && data.settings) {
+        state.settings = data.settings;
+      }
     });
     box.appendChild(form);
   } else if (tab === "security") {
@@ -2415,19 +3653,28 @@ async function loadSettingsTab(tab) {
       "<p style='margin:0;font-size:13px'>"+svg("shield",14)+" <strong>Security note:</strong> Never share your API keys. Rotate them regularly. All connections use TLS.</p></div>";
     box.appendChild(sec);
   } else if (tab === "notifications") {
-    const form = document.createElement("form"); form.className = "form-grid";
+    const form = document.createElement("form");
+    form.className = "form-grid";
+    form.id = "notifSettingsForm";
     form.innerHTML =
+      '<h3 style="margin:0;font-size:14px;font-weight:700;color:var(--text)">Notifications</h3>'+
       '<div class="toggle-row"><div><div class="toggle-label">Email notifications</div></div>'+
-      '<label class="sw-wrap"><input type="checkbox" name="notifications_email"'+(s.notifications_email?" checked":"")+'><div class="sw-track"></div><div class="sw-thumb"></div></label></div>'+
+      '<label class="sw-wrap"><input type="checkbox" id="notifEmail" name="notifications_email"'+(s.notifications_email?" checked":"")+'/><span class="sw-track"></span><span class="sw-thumb"></span></label></div>'+
       '<div class="toggle-row"><div><div class="toggle-label">Push notifications</div></div>'+
-      '<label class="sw-wrap"><input type="checkbox" name="notifications_push"'+(s.notifications_push!==false?" checked":"")+'><div class="sw-track"></div><div class="sw-thumb"></div></label></div>'+
+      '<label class="sw-wrap"><input type="checkbox" id="notifPush" name="notifications_push"'+(s.notifications_push!==false?" checked":"")+'/><span class="sw-track"></span><span class="sw-thumb"></span></label></div>'+
       '<div class="toggle-row"><div><div class="toggle-label">Task notifications</div></div>'+
-      '<label class="sw-wrap"><input type="checkbox" name="notifications_tasks"'+(s.notifications_tasks!==false?" checked":"")+'><div class="sw-track"></div><div class="sw-thumb"></div></label></div>'+
+      '<label class="sw-wrap"><input type="checkbox" id="notifTasks" name="notifications_tasks"'+(s.notifications_tasks!==false?" checked":"")+'/><span class="sw-track"></span><span class="sw-thumb"></span></label></div>'+
       '<button type="submit" class="btn-primary">'+svg("check",14)+" Save</button>";
     form.addEventListener("submit", async e => {
       e.preventDefault();
-      const fd = new FormData(e.target);
-      await api("/v1/settings",{method:"PATCH",body:JSON.stringify({notifications_email:!!fd.get("notifications_email"),notifications_push:!!fd.get("notifications_push"),notifications_tasks:!!fd.get("notifications_tasks")})},{success:"Notifications saved"});
+      e.stopPropagation();
+      const payload = {
+        notifications_email: !!$("notifEmail").checked,
+        notifications_push: !!$("notifPush").checked,
+        notifications_tasks: !!$("notifTasks").checked,
+      };
+      const { res, data } = await api("/v1/settings",{method:"PATCH",body:JSON.stringify(payload)},{success:"Notifications saved"});
+      if (res.ok && data && data.settings) state.settings = data.settings;
     });
     box.appendChild(form);
   } else if (tab === "billing") {
@@ -2456,7 +3703,9 @@ async function loadSettingsTab(tab) {
 /* ─── VIEW: PROFILE ─── */
 async function loadProfileView() {
   const panel = $("profilePanel");
-  panel.innerHTML = '<div class="panel-head"><div><h2>Profile</h2><p class="sub">Your account and workspace identity.</p></div></div><div id="profileBody">'+skeletons(2)+"</div>";
+  panel.innerHTML =
+    '<div class="panel-head"><div><h2>Profile</h2><p class="sub">Your account and workspace identity.</p></div></div>'+
+    '<div id="profileBody">'+skeletons(2)+"</div>";
   const [me, settings, prof] = await Promise.all([
     api("/v1/auth/me",{},{error:false}),
     api("/v1/settings",{},{error:false}),
@@ -2467,31 +3716,58 @@ async function loadProfileView() {
   const u = (me.res.ok && me.data)||{};
   const sett = (settings.res.ok && settings.data && settings.data.settings)||{};
   const body = $("profileBody");
-  body.innerHTML =
-    '<div class="profile-card"><div class="avatar" style="width:56px;height:56px;font-size:20px">'+escapeHtml(avatarInitial())+"</div>"+
-    "<div><h3>"+escapeHtml(displayName())+"</h3>"+
+  body.innerHTML = "";
+
+  const card = document.createElement("div");
+  card.className = "profile-card";
+  card.innerHTML =
+    '<div class="avatar" style="width:56px;height:56px;font-size:20px">'+escapeHtml(avatarInitial())+"</div>"+
+    "<div class='grow'><h3>"+escapeHtml(displayName())+"</h3>"+
     "<p>"+escapeHtml(u.user&&u.user.email ? u.user.email : (u.actor||""))+"</p>"+
-    "<p style='margin-top:4px'>Role: "+escapeHtml(u.role||"user")+"</p></div></div>"+
-    '<div class="stat-row">'+
+    '<div class="ui-badges" style="margin-top:8px">'+
+    '<span class="badge blue">'+escapeHtml(u.role||"user")+"</span>"+
+    '<span class="badge gray">'+escapeHtml(sett.default_model||"OM-1.0")+"</span>"+
+    '<span class="badge '+(sett.memory_enabled!==false?"green":"gray")+'">Memory '+(sett.memory_enabled!==false?"On":"Off")+"</span>"+
+    "</div></div>";
+  body.appendChild(card);
+
+  const stats = document.createElement("div");
+  stats.className = "stat-row";
+  stats.innerHTML =
     '<div class="stat"><strong>'+state.conversations.length+"</strong><span>Conversations</span></div>"+
     '<div class="stat"><strong>'+state.projects.length+"</strong><span>Projects</span></div>"+
-    '<div class="stat"><strong>'+state.assistants.length+"</strong><span>Assistants</span></div></div>"+
-    '<form class="form-grid" id="profileForm">'+
+    '<div class="stat"><strong>'+state.assistants.length+"</strong><span>Assistants</span></div>";
+  body.appendChild(stats);
+
+  const form = document.createElement("form");
+  form.className = "form-grid";
+  form.id = "profileForm";
+  form.innerHTML =
+    "<h3 style='margin:0;font-size:14px;font-weight:700;color:var(--text)'>Edit profile</h3>"+
     '<label>Display name<input name="display_name" maxlength="80" value="'+escapeHtml((state.profile&&state.profile.display_name)||"")+'"/></label>'+
     '<label>Avatar initial<input name="avatar_initial" maxlength="2" value="'+escapeHtml((state.profile&&state.profile.avatar_initial)||"")+'"/></label>'+
-    '<button type="submit" class="btn-primary">'+svg("check",14)+" Save profile</button></form>"+
-    '<div class="settings-section" style="margin-top:16px"><h3>Preferences</h3>'+
-    "<p style='margin:0;font-size:13px;color:var(--muted)'>Model: "+escapeHtml(sett.default_model||"OM-1.0")+" · Memory: "+(sett.memory_enabled!==false?"On":"Off")+"</p></div>"+
-    '<div style="margin-top:16px;display:flex;gap:8px;flex-wrap:wrap">'+
-    '<button type="button" class="btn-outline" data-goto="settings">'+svg("settings",14)+" Settings</button>"+
-    '<a class="btn-outline" href="/ui/tokens">'+svg("key",14)+" API Keys</a>"+
-    '<button type="button" class="btn-outline" id="profileLogout">'+svg("logOut",14)+" Sign out</button></div>";
-  body.querySelector("#profileForm").addEventListener("submit", async e => {
+    '<button type="submit" class="btn-primary">'+svg("check",14)+" Save profile</button>";
+  form.addEventListener("submit", async e => {
     e.preventDefault();
     const fd = new FormData(e.target);
-    const { res, data } = await api("/v1/profile",{method:"PUT",body:JSON.stringify({display_name:String(fd.get("display_name")||"").trim(),avatar_initial:String(fd.get("avatar_initial")||"").trim()})},{success:"Profile saved"});
-    if (res.ok) { state.profile = data; applyUserChrome(); }
+    const { res, data } = await api("/v1/profile",{method:"PUT",body:JSON.stringify({
+      display_name:String(fd.get("display_name")||"").trim(),
+      avatar_initial:String(fd.get("avatar_initial")||"").trim(),
+    })},{success:"Profile saved"});
+    if (res.ok) { state.profile = data; applyUserChrome(); loadProfileView(); }
   });
+  body.appendChild(form);
+
+  const actions = document.createElement("div");
+  actions.className = "settings-section";
+  actions.style.marginTop = "16px";
+  actions.innerHTML =
+    "<h3>Quick links</h3>"+
+    '<div style="display:flex;gap:8px;flex-wrap:wrap">'+
+    '<button type="button" class="btn-outline" data-goto="settings">'+svg("settings",14)+" Settings</button>"+
+    '<a class="btn-outline" href="/ui/tokens">'+svg("key",14)+" API Keys</a>"+
+    '<button type="button" class="btn-danger" id="profileLogout">'+svg("logOut",14)+" Sign out</button></div>";
+  body.appendChild(actions);
   body.querySelector("#profileLogout").addEventListener("click", logout);
   body.querySelectorAll("[data-goto]").forEach(el => el.addEventListener("click", () => setView(el.getAttribute("data-goto"))));
 }
@@ -2508,6 +3784,10 @@ const VIEW_LOADERS = {
 /* ─── SET VIEW ─── */
 function setView(view, silent) {
   state.view = view;
+  if (!isPrimaryNav(view)) {
+    state.navMoreOpen = true;
+    syncNavMoreOpen();
+  }
   document.body.classList.toggle("chat-mode", view === "chat");
   document.querySelectorAll(".nav-btn").forEach(b => b.classList.toggle("active", b.dataset.view === view));
   document.querySelectorAll(".view").forEach(v => v.classList.toggle("active", v.id === "view-"+view));
@@ -2569,16 +3849,22 @@ async function init() {
     if (asst.res.ok) state.assistants = (asst.data && asst.data.assistants)||[];
     const proj = await api("/v1/projects",{},{error:false});
     if (proj.res.ok) state.projects = (proj.data && proj.data.projects)||[];
+    const tools = await api("/v1/tools",{},{error:false});
+    if (tools.res.ok) syncComposerToolsFromCatalog((tools.data && tools.data.tools)||[]);
   } catch (_) {}
   await refreshConversations();
-  const params = new URLSearchParams(location.search);
-  const deepLink = params.get("c");
-  if (deepLink) await loadConversation(deepLink);
-  else {
-    const last = (me.data && me.data.last_conversation_id)||(state.profile && state.profile.last_conversation_id);
-    if (last && state.conversations.some(c => c.id === last)) await loadConversation(last);
-    else renderMessages();
+  const routed = await restoreProjectRoute();
+  if (!routed) {
+    const params = new URLSearchParams(location.search);
+    const deepLink = params.get("c");
+    if (deepLink) await loadConversation(deepLink);
+    else {
+      const last = (me.data && me.data.last_conversation_id)||(state.profile && state.profile.last_conversation_id);
+      if (last && state.conversations.some(c => c.id === last)) await loadConversation(last);
+      else renderMessages();
+    }
   }
+  window.addEventListener("hashchange", () => { restoreProjectRoute().catch(() => {}); });
   updateTopTitle();
   initMic();
   // composer model chip
@@ -2648,13 +3934,20 @@ $("fileUploadInput").addEventListener("change", async e => {
   } catch (_) { toast("Upload failed","error"); }
 });
 
-// Tool toggles
+// Tool toggles (sync with Tools catalog)
 ["toolWeb","toolCode"].forEach(id => {
-  $(id).addEventListener("click", () => {
+  $(id).addEventListener("click", async () => {
     const key = id === "toolWeb" ? "web":"code";
-    state.tools[key] = !state.tools[key];
-    $(id).classList.toggle("on", state.tools[key]);
-    toast((key==="web"?"Web":"Code")+" "+(state.tools[key]?"enabled":"disabled"),"success");
+    const toolId = key === "web" ? "web_search" : "code_interpreter";
+    const next = !state.tools[key];
+    state.tools[key] = next;
+    $(id).classList.toggle("on", next);
+    try {
+      await patchTool(toolId, {install:true, enabled:next}, (key==="web"?"Web":"Code")+" "+(next?"enabled":"disabled"));
+    } catch (_) {
+      state.tools[key] = !next;
+      $(id).classList.toggle("on", !next);
+    }
   });
 });
 
@@ -2716,11 +4009,9 @@ $("wsSwitchBtn").addEventListener("click", async () => {
 
 // Conv filter buttons
 document.querySelectorAll(".conv-filter-btn").forEach(btn => {
-  btn.addEventListener("click", () => {
-    document.querySelectorAll(".conv-filter-btn").forEach(b => b.classList.remove("active"));
-    btn.classList.add("active");
-    state.convFilter = btn.dataset.filter;
-    refreshConversations();
+  btn.addEventListener("click", e => {
+    e.stopPropagation();
+    setConvFilter(btn.dataset.filter || "all");
   });
 });
 

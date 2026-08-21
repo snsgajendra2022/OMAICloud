@@ -281,6 +281,7 @@ def chat_reply(
     actor: str = "",
     assistant_instructions: str = "",
     project_instructions: str = "",
+    project_id: str | None = None,
 ) -> tuple[str, ChatBackendInfo]:
     """Generate a chat reply and return ``(text, backend_info)``."""
     from om_ai.runtime.chat_orchestrator import (
@@ -323,6 +324,7 @@ def chat_reply(
         actor=actor or "",
         assistant_instructions=assistant_instructions or "",
         project_instructions=project_instructions or "",
+        project_id=project_id,
         compact=True,
     )
 

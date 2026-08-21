@@ -96,6 +96,7 @@ CREATE TABLE IF NOT EXISTS knowledge_sources (
     uri TEXT NOT NULL DEFAULT '',
     status TEXT NOT NULL DEFAULT 'ready',
     doc_count INTEGER NOT NULL DEFAULT 0,
+    project_id TEXT,
     created_at TEXT NOT NULL,
     updated_at TEXT NOT NULL
 );
@@ -116,6 +117,16 @@ CREATE TABLE IF NOT EXISTS memories_ui (
     importance REAL NOT NULL DEFAULT 0.5,
     kind TEXT NOT NULL DEFAULT 'semantic',
     enabled INTEGER NOT NULL DEFAULT 1,
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL
+);
+CREATE TABLE IF NOT EXISTS project_memory (
+    id TEXT PRIMARY KEY,
+    project_id TEXT NOT NULL,
+    tenant_id TEXT NOT NULL,
+    actor TEXT NOT NULL,
+    content TEXT NOT NULL,
+    importance REAL NOT NULL DEFAULT 0.5,
     created_at TEXT NOT NULL,
     updated_at TEXT NOT NULL
 );
@@ -165,6 +176,7 @@ CREATE INDEX IF NOT EXISTS idx_tasks_actor ON tasks(tenant_id, actor, updated_at
 CREATE INDEX IF NOT EXISTS idx_notif_actor ON notifications(tenant_id, actor, created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_ks_actor ON knowledge_sources(tenant_id, actor, updated_at DESC);
 CREATE INDEX IF NOT EXISTS idx_mem_ui ON memories_ui(tenant_id, actor, updated_at DESC);
+CREATE INDEX IF NOT EXISTS idx_proj_mem ON project_memory(project_id, tenant_id, actor, updated_at DESC);
 CREATE INDEX IF NOT EXISTS idx_proj_members ON project_members(project_id, tenant_id, actor);
 """
 
@@ -209,6 +221,31 @@ class PlatformStore:
             self._conn.execute(
                 "ALTER TABLE platform_files ADD COLUMN category TEXT NOT NULL DEFAULT 'document'"
             )
+        ks_cols = {
+            r[1] for r in self._conn.execute("PRAGMA table_info(knowledge_sources)").fetchall()
+        }
+        if "project_id" not in ks_cols:
+            self._conn.execute("ALTER TABLE knowledge_sources ADD COLUMN project_id TEXT")
+        self._conn.execute(
+            """
+            CREATE TABLE IF NOT EXISTS project_memory (
+                id TEXT PRIMARY KEY,
+                project_id TEXT NOT NULL,
+                tenant_id TEXT NOT NULL,
+                actor TEXT NOT NULL,
+                content TEXT NOT NULL,
+                importance REAL NOT NULL DEFAULT 0.5,
+                created_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL
+            )
+            """
+        )
+        self._conn.execute(
+            """
+            CREATE INDEX IF NOT EXISTS idx_proj_mem
+            ON project_memory(project_id, tenant_id, actor, updated_at DESC)
+            """
+        )
         self._conn.commit()
 
     def _seed_tools(self) -> None:
@@ -305,31 +342,29 @@ class PlatformStore:
         return dict(row)
 
     # --- files ---
-    def list_files(self, tenant_id: str, actor: str, *, q: str = "") -> list[dict[str, Any]]:
+    def list_files(
+        self, tenant_id: str, actor: str, *, q: str = "", project_id: str | None = None
+    ) -> list[dict[str, Any]]:
         with self._lock:
+            params: list[Any] = [tenant_id, actor]
+            where = "WHERE tenant_id=? AND actor=?"
+            if project_id:
+                where += " AND project_id=?"
+                params.append(project_id)
             if q.strip():
                 like = f"%{q.strip()}%"
-                rows = self._conn.execute(
-                    """
-                    SELECT id, tenant_id, actor, workspace_id, project_id, name, mime, size,
-                           substr(content_text, 1, 400) AS preview, storage_path, created_at, updated_at
-                    FROM platform_files
-                    WHERE tenant_id=? AND actor=? AND (name LIKE ? OR content_text LIKE ?)
-                    ORDER BY updated_at DESC
-                    """,
-                    (tenant_id, actor, like, like),
-                ).fetchall()
-            else:
-                rows = self._conn.execute(
-                    """
-                    SELECT id, tenant_id, actor, workspace_id, project_id, name, mime, size,
-                           substr(content_text, 1, 400) AS preview, storage_path, created_at, updated_at
-                    FROM platform_files
-                    WHERE tenant_id=? AND actor=?
-                    ORDER BY updated_at DESC
-                    """,
-                    (tenant_id, actor),
-                ).fetchall()
+                where += " AND (name LIKE ? OR content_text LIKE ?)"
+                params.extend([like, like])
+            rows = self._conn.execute(
+                f"""
+                SELECT id, tenant_id, actor, workspace_id, project_id, name, mime, size,
+                       substr(content_text, 1, 400) AS preview, storage_path, created_at, updated_at
+                FROM platform_files
+                {where}
+                ORDER BY updated_at DESC
+                """,
+                params,
+            ).fetchall()
         return [dict(r) for r in rows]
 
     def get_file(self, file_id: str, tenant_id: str, actor: str) -> dict[str, Any]:
@@ -733,6 +768,8 @@ class PlatformStore:
             "notifications_push": True,
             "notifications_tasks": True,
             "privacy_history": True,
+            "data_collection": False,
+            "max_tokens": 1024,
         }
         with self._lock:
             row = self._conn.execute(
@@ -764,16 +801,28 @@ class PlatformStore:
         return merged
 
     # --- knowledge sources ---
-    def list_knowledge_sources(self, tenant_id: str, actor: str) -> list[dict[str, Any]]:
+    def list_knowledge_sources(
+        self, tenant_id: str, actor: str, *, project_id: str | None = None
+    ) -> list[dict[str, Any]]:
         with self._lock:
-            rows = self._conn.execute(
-                """
-                SELECT * FROM knowledge_sources
-                WHERE tenant_id=? AND actor=?
-                ORDER BY updated_at DESC
-                """,
-                (tenant_id, actor),
-            ).fetchall()
+            if project_id:
+                rows = self._conn.execute(
+                    """
+                    SELECT * FROM knowledge_sources
+                    WHERE tenant_id=? AND actor=? AND project_id=?
+                    ORDER BY updated_at DESC
+                    """,
+                    (tenant_id, actor, project_id),
+                ).fetchall()
+            else:
+                rows = self._conn.execute(
+                    """
+                    SELECT * FROM knowledge_sources
+                    WHERE tenant_id=? AND actor=?
+                    ORDER BY updated_at DESC
+                    """,
+                    (tenant_id, actor),
+                ).fetchall()
         return [dict(r) for r in rows]
 
     def create_knowledge_source(
@@ -786,6 +835,7 @@ class PlatformStore:
         uri: str = "",
         doc_count: int = 0,
         status: str = "ready",
+        project_id: str | None = None,
     ) -> dict[str, Any]:
         kid = uuid.uuid4().hex
         now = _utc()
@@ -793,8 +843,8 @@ class PlatformStore:
             self._conn.execute(
                 """
                 INSERT INTO knowledge_sources
-                (id, tenant_id, actor, name, source_type, uri, status, doc_count, created_at, updated_at)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                (id, tenant_id, actor, name, source_type, uri, status, doc_count, created_at, updated_at, project_id)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                 (
                     kid,
@@ -807,6 +857,7 @@ class PlatformStore:
                     int(doc_count),
                     now,
                     now,
+                    project_id,
                 ),
             )
             self._conn.commit()
@@ -935,6 +986,91 @@ class PlatformStore:
             if cur.rowcount == 0:
                 raise KeyError("memory not found")
 
+    # --- project memory ---
+    def list_project_memories(
+        self, project_id: str, tenant_id: str, actor: str
+    ) -> list[dict[str, Any]]:
+        with self._lock:
+            rows = self._conn.execute(
+                """
+                SELECT * FROM project_memory
+                WHERE project_id=? AND tenant_id=? AND actor=?
+                ORDER BY importance DESC, updated_at DESC
+                """,
+                (project_id, tenant_id, actor),
+            ).fetchall()
+        return [dict(r) for r in rows]
+
+    def create_project_memory(
+        self,
+        project_id: str,
+        tenant_id: str,
+        actor: str,
+        *,
+        content: str,
+        importance: float = 0.5,
+    ) -> dict[str, Any]:
+        mid = uuid.uuid4().hex
+        now = _utc()
+        with self._lock:
+            self._conn.execute(
+                """
+                INSERT INTO project_memory
+                (id, project_id, tenant_id, actor, content, importance, created_at, updated_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                """,
+                (
+                    mid,
+                    project_id,
+                    tenant_id,
+                    actor,
+                    (content or "").strip()[:4000],
+                    float(importance),
+                    now,
+                    now,
+                ),
+            )
+            self._conn.commit()
+            row = self._conn.execute(
+                "SELECT * FROM project_memory WHERE id=?", (mid,)
+            ).fetchone()
+        return dict(row)
+
+    def delete_project_memory(
+        self, memory_id: str, project_id: str, tenant_id: str, actor: str
+    ) -> None:
+        with self._lock:
+            cur = self._conn.execute(
+                """
+                DELETE FROM project_memory
+                WHERE id=? AND project_id=? AND tenant_id=? AND actor=?
+                """,
+                (memory_id, project_id, tenant_id, actor),
+            )
+            self._conn.commit()
+            if cur.rowcount == 0:
+                raise KeyError("project memory not found")
+
+    def clear_file_project(
+        self, file_id: str, tenant_id: str, actor: str
+    ) -> dict[str, Any]:
+        with self._lock:
+            row = self._conn.execute(
+                "SELECT * FROM platform_files WHERE id=? AND tenant_id=? AND actor=?",
+                (file_id, tenant_id, actor),
+            ).fetchone()
+            if not row:
+                raise KeyError("file not found")
+            self._conn.execute(
+                "UPDATE platform_files SET project_id=NULL, updated_at=? WHERE id=?",
+                (_utc(), file_id),
+            )
+            self._conn.commit()
+            out = self._conn.execute(
+                "SELECT * FROM platform_files WHERE id=?", (file_id,)
+            ).fetchone()
+        return dict(out)
+
     # --- tools ---
     def list_tools(self, tenant_id: str, actor: str) -> list[dict[str, Any]]:
         with self._lock:
@@ -952,14 +1088,22 @@ class PlatformStore:
         for t in catalog:
             item = dict(t)
             b = binds.get(t["id"])
+            catalog_installed = bool(int(item.get("installed") or 0))
             if b:
-                item["enabled"] = int(b["enabled"])
-                item["installed"] = 1
+                item["enabled"] = bool(int(b["enabled"]))
+                item["installed"] = True
                 item["user_config"] = b.get("config") or "{}"
             else:
+                item["enabled"] = bool(int(item.get("enabled") or 0)) and catalog_installed
+                item["installed"] = catalog_installed
                 item["user_config"] = "{}"
-            item["enabled"] = bool(item.get("enabled"))
-            item["installed"] = bool(item.get("installed"))
+            # Normalize status for UI (category historically held installed/available)
+            item["status"] = "installed" if item["installed"] else "available"
+            item["installable"] = not item["installed"]
+            item["category"] = item.get("category") if item.get("category") not in {
+                "installed",
+                "available",
+            } else "tool"
             out.append(item)
         return out
 
@@ -984,8 +1128,11 @@ class PlatformStore:
                 (tenant_id, actor, tool_id),
             ).fetchone()
             now = _utc()
-            cur_enabled = int(row["enabled"]) if row else int(tool["enabled"])
+            cur_enabled = int(row["enabled"]) if row else int(tool["enabled"] or 0)
             cur_config = row["config"] if row else "{}"
+            # Installing implies a binding; default to enabled unless explicitly disabled
+            if installed is True and enabled is None and not row:
+                enabled = True
             if enabled is not None:
                 cur_enabled = int(bool(enabled))
             if config is not None:
@@ -1005,6 +1152,12 @@ class PlatformStore:
                     """,
                     (tenant_id, actor, tool_id, cur_enabled, cur_config, now),
                 )
+                # Keep catalog installed flag in sync for seeded "available" tools
+                if installed is True or enabled is True:
+                    self._conn.execute(
+                        "UPDATE platform_tools SET installed=1 WHERE id=?",
+                        (tool_id,),
+                    )
             self._conn.commit()
         return next(t for t in self.list_tools(tenant_id, actor) if t["id"] == tool_id)
 
