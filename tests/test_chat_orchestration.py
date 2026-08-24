@@ -23,11 +23,11 @@ def test_build_chat_messages_includes_system_and_user():
 
 def test_generation_config_defaults():
     cfg = generation_config()
-    assert cfg["temperature"] == 0.7
-    assert cfg["top_p"] == 0.9
-    assert cfg["top_k"] == 50
-    assert cfg["repetition_penalty"] == 1.15
-    assert cfg["max_new_tokens"] == 256
+    assert cfg["temperature"] == 0.2
+    assert cfg["top_p"] == 0.85
+    assert cfg["top_k"] == 20
+    assert cfg["repetition_penalty"] == 1.1
+    assert cfg["max_new_tokens"] == 64
 
 
 def test_generation_config_overrides():
@@ -42,10 +42,14 @@ def test_quality_gate_flags_spam_and_loops():
     assert is_low_quality_reply("Hi! How can I help you today?") == ""
 
 
-def test_policy_recovery_greeting():
+def test_policy_recovery_greeting_on_spam():
     reply = policy_recovery_reply("hii", reason="spam")
     assert reply is not None
-    assert "help" in reply.lower() or "OM AI" in reply
+    assert "OM AI" in reply or "help" in reply.lower()
+    assert policy_recovery_reply("hii", reason="") is None
+    clarify = policy_recovery_reply("explain quantum physics", reason="spam")
+    assert clarify is not None
+    assert "rephrase" in clarify.lower() or "sentence" in clarify.lower()
 
 
 def test_assistant_chitchat_requires_markers():

@@ -28,9 +28,7 @@ DEFAULT_PROMPT_CONTENT = (
 )
 
 DEFAULT_PROMPT_COMPACT = (
-    "You are OM AI. Follow instructions. Be helpful and concise. "
-    "Match the user's language. Use memory/knowledge when given. "
-    "Greet briefly when greeted. No spam or word loops."
+    "You are OM AI, a helpful assistant powered by OM-1.0 running locally."
 )
 
 
@@ -192,13 +190,13 @@ def get_system_prompt_store() -> SystemPromptStore:
 
 def active_system_prompt(*, compact: bool = False) -> str:
     """Return active system prompt text (or built-in default)."""
+    if compact:
+        # Tiny OM-1.0 windows (max_seq_len=128) need the short SFT-aligned prompt.
+        return DEFAULT_PROMPT_COMPACT
     try:
         active = get_system_prompt_store().get_active()
         if active and (active.get("content") or "").strip():
-            text = str(active["content"]).strip()
-            if compact and len(text) > 180:
-                return DEFAULT_PROMPT_COMPACT
-            return text
+            return str(active["content"]).strip()
     except Exception as exc:
         logger.debug("system prompt load failed: %s", exc)
-    return DEFAULT_PROMPT_COMPACT if compact else DEFAULT_PROMPT_CONTENT
+    return DEFAULT_PROMPT_CONTENT

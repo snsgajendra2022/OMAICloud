@@ -34,12 +34,12 @@ def _env_int(name: str, default: int) -> int:
 def generation_config(**overrides: Any) -> dict[str, Any]:
     """ChatGPT-style sampling defaults for OM-1.0 chat (env-overridable)."""
     cfg = {
-        "temperature": _env_float("OM_CHAT_TEMPERATURE", 0.7),
-        "top_p": _env_float("OM_CHAT_TOP_P", 0.9),
-        "top_k": _env_int("OM_CHAT_TOP_K", 50),
-        "repetition_penalty": _env_float("OM_CHAT_REPETITION_PENALTY", 1.15),
-        "max_new_tokens": _env_int("OM_CHAT_MAX_NEW_TOKENS", 256),
-        "min_new_tokens": _env_int("OM_CHAT_MIN_NEW_TOKENS", 4),
+        "temperature": _env_float("OM_CHAT_TEMPERATURE", 0.2),
+        "top_p": _env_float("OM_CHAT_TOP_P", 0.85),
+        "top_k": _env_int("OM_CHAT_TOP_K", 20),
+        "repetition_penalty": _env_float("OM_CHAT_REPETITION_PENALTY", 1.1),
+        "max_new_tokens": _env_int("OM_CHAT_MAX_NEW_TOKENS", 64),
+        "min_new_tokens": _env_int("OM_CHAT_MIN_NEW_TOKENS", 1),
     }
     for k, v in overrides.items():
         if v is not None:
@@ -83,13 +83,10 @@ def build_chat_messages(
     return [{"role": "system", "content": system}] + non_system
 
 
-_GREETING_REPLY = (
-    "Hi! I'm OM AI. How can I help you today?"
-)
+_GREETING_REPLY = "Hi! I'm OM AI. How can I help you today?"
 _OM_SELF_REPLY = (
     "I'm OM AI, powered by the OM-1.0 native model running locally on your machine. "
-    "I can chat, remember our conversation history in this workspace, and help with "
-    "writing, explaining, and brainstorming. What would you like to do?"
+    "How can I help?"
 )
 _CLARIFY_REPLY = (
     "I didn't catch a clear answer there. Could you rephrase that in one short sentence?"
@@ -99,11 +96,13 @@ _CLARIFY_REPLY = (
 def policy_recovery_reply(
     user_text: str, *, reason: str = "", language: str = "en"
 ) -> str | None:
-    """Safe assistant reply when the base model fails quality gates.
+    """Last-resort reply when generation is empty/spam after retries.
 
-    This is an orchestration safety net for undertrained local checkpoints —
-    not a replacement for SFT. Only used after degenerate / spam generations.
+    Prefer OM-1.0 output; use short safe replies only if the base model
+    still dumps corpus junk (common before chat SFT finishes).
     """
+    if reason not in {"degenerate", "spam", "empty"}:
+        return None
     from om_ai.live_knowledge.freshness import is_greeting_like, is_om_self_query
 
     if is_greeting_like(user_text):
@@ -112,17 +111,11 @@ def policy_recovery_reply(
         return _GREETING_REPLY
     if is_om_self_query(user_text):
         if language in {"hi", "hi-Latn"}:
-            return (
-                "Main OM AI hoon — aapke machine par chalne wala OM-1.0 native model. "
-                "Main chat, memory, aur writing/brainstorming mein madad karta hoon. "
-                "Aap kya karna chahenge?"
-            )
+            return "Main OM AI hoon — OM-1.0 local model. Aap kya karna chahenge?"
         return _OM_SELF_REPLY
-    if reason in {"degenerate", "spam", "empty"}:
-        if language in {"hi", "hi-Latn"}:
-            return "Mujhe clear jawab nahi mila. Kya aap ek short sentence mein dobara bata sakte hain?"
-        return _CLARIFY_REPLY
-    return None
+    if language in {"hi", "hi-Latn"}:
+        return "Mujhe clear jawab nahi mila. Kya aap ek short sentence mein dobara bata sakte hain?"
+    return _CLARIFY_REPLY
 
 
 def looks_like_assistant_chitchat(text: str | None) -> bool:

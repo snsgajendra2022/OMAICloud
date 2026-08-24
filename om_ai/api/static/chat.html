@@ -1473,7 +1473,7 @@ async function streamCompletion(messages) {
     headers:{"Content-Type":"application/json"},
     body:JSON.stringify({
       model:state.model||"OM-1.0", messages,
-      max_tokens:1024, temperature:state.settings?state.settings.temperature:0.8, stream:true,
+      max_tokens:64, temperature:state.settings?Math.min(Number(state.settings.temperature??0.2),0.3):0.2, stream:true,
       project_id:state.activeProjectId||undefined,
       conversation_id:state.currentId||undefined,
     }),
@@ -1559,13 +1559,8 @@ function buildRequestMessages() {
     const a = state.assistants.find(x => x.id === state.selectedAssistantId);
     if (a && a.system_prompt) return [{role:"system",content:a.system_prompt},...history];
   }
-  const extras = [];
-  if (state.tools.web)  extras.push("[web search enabled]");
-  if (state.tools.code) extras.push("[code interpreter enabled]");
-  if (extras.length && history.length) {
-    const last = history[history.length-1];
-    if (last.role === "user") last.content = extras.join(" ")+" "+last.content;
-  }
+  // Do not rewrite user text with "[web search enabled]" tags — that breaks
+  // tiny OM-1.0 chat-SFT greets. Tool mode is tracked client-side only.
   return history;
 }
 
@@ -3606,7 +3601,7 @@ async function loadSettingsTab(tab) {
   } else if (tab === "ai") {
     const form = document.createElement("form"); form.className = "form-grid";
     form.innerHTML = "<label>Default model<input name='default_model' value='"+escapeHtml(s.default_model||"OM-1.0")+"'/></label>"+
-      "<label>Temperature<input name='temperature' type='number' min='0' max='2' step='0.1' value='"+(s.temperature??0.7)+"'/></label>"+
+      "<label>Temperature<input name='temperature' type='number' min='0' max='1' step='0.05' value='"+(s.temperature??0.2)+"'/></label>"+
       "<label>Max tokens<input name='max_tokens' type='number' min='64' max='8192' value='"+(s.max_tokens||1024)+"'/></label>"+
       '<div class="toggle-row"><div><div class="toggle-label">Memory</div><div class="toggle-sub">Remember facts across conversations</div></div>'+
       '<label class="sw-wrap"><input type="checkbox" name="memory_enabled"'+(s.memory_enabled!==false?" checked":"")+'><div class="sw-track"></div><div class="sw-thumb"></div></label></div>'+

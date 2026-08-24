@@ -1,0 +1,13 @@
+{
+  "status": "completed",
+  "device": "cpu",
+  "finished_at": "2026-08-21T15:00:41Z",
+  "steps": 4000,
+  "last_loss": 0.00018,
+  "data": "data/om-chat-sft.jsonl",
+  "rows": 170,
+  "checkpoint": "artifacts/checkpoints/om-1.0-chat-sft/latest.pt",
+  "serve_checkpoint_updated": true,
+  "note": "Chat SFT complete for tiny OM-1.0. Better greetings/short answers expected; not ChatGPT-class.",
+  "production_ready": false
+}

@@ -60,6 +60,8 @@ def _client_ip(request: Request) -> str:
 
 
 def _check_auth_rate(request: Request) -> None:
+    if _AUTH_MAX_HITS <= 0:
+        return
     ip = _client_ip(request)
     now = time.monotonic()
     with _auth_lock:

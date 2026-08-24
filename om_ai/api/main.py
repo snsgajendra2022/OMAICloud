@@ -98,8 +98,9 @@ app.include_router(conversations_router)
 app.include_router(auth_router)
 app.include_router(workspace_router)
 app.include_router(platform_router)
+_RATE_LIMIT_MAX = int(os.getenv("OM_AI_RATE_LIMIT", "120"))
 rate_limiter = RateLimiter(
-    max_requests=int(os.getenv("OM_AI_RATE_LIMIT", "120")),
+    max_requests=max(1, _RATE_LIMIT_MAX),
     window_seconds=60,
 )
 ssrf_guard = SSRFGuard()
@@ -270,6 +271,9 @@ def _audit(
 
 @app.middleware("http")
 async def _rate_limit_middleware(request: Request, call_next):
+    # OM_AI_RATE_LIMIT=0 disables global rate limiting (local dev default).
+    if _RATE_LIMIT_MAX <= 0:
+        return await call_next(request)
     client = request.client.host if request.client else "unknown"
     try:
         rate_limiter.check(client)

@@ -41,7 +41,11 @@ OM_SYSTEM_IDENTITY_COMPACT = "You are OM AI (OM-1.0 native language model)."
 def _latest_user_text(messages: list[dict]) -> str:
     for m in reversed(messages or []):
         if str(m.get("role") or "") == "user":
-            return str(m.get("content") or "").strip()
+            text = str(m.get("content") or "").strip()
+            # Strip legacy UI tool tags that poison tiny chat-SFT greets.
+            for tag in ("[web search enabled]", "[code interpreter enabled]"):
+                text = text.replace(tag, "").strip()
+            return text
     return ""
 
 
@@ -64,8 +68,27 @@ def looks_like_web_spam(text: str) -> bool:
         "en.wikipedia.org",
         "upgrade upgrade",
         "membership of",
+        "harry potter",
+        "knockoff",
+        "overpriced",
+        "documentary presence",
+        "released label",
+        "on dvd",
+        "sale by",
+        "http://",
+        "https://",
+        "www.",
+        "email@",
+        "href=",
     )
-    return any(b in low for b in spam_bits)
+    if any(b in low for b in spam_bits):
+        return True
+    # Long multi-topic dumps with no clear assistant voice.
+    if len(s) > 180 and s.count(".") >= 4 and (" and " in low) and ("the " in low):
+        markers = ("hi!", "hello", "i'm om", "i am om", "how can i help")
+        if not any(m in low for m in markers):
+            return True
+    return False
 
 
 @dataclass(frozen=True)
@@ -79,6 +102,26 @@ class ChatBackendInfo:
 
 def _env(name: str, default: str = "") -> str:
     return (os.getenv(name) or default).strip()
+
+
+def _env_float(name: str, default: float) -> float:
+    raw = _env(name)
+    if not raw:
+        return default
+    try:
+        return float(raw)
+    except ValueError:
+        return default
+
+
+def _env_int(name: str, default: int) -> int:
+    raw = _env(name)
+    if not raw:
+        return default
+    try:
+        return int(raw)
+    except ValueError:
+        return default
 
 
 def openai_base_url() -> str:
@@ -198,12 +241,7 @@ def runtime_date_system_text(*, today: date | None = None) -> str:
 def runtime_date_system_text_compact(*, today: date | None = None) -> str:
     """Ultra-short system line for tiny context windows (e.g. max_seq_len=128)."""
     d = today or date.today()
-    human = d.strftime(f"%A, %B {d.day}, %Y")
-    return (
-        f"{OM_SYSTEM_IDENTITY_COMPACT} "
-        f"Today's date is {human}. "
-        f"Always treat the current year as {d.year}."
-    )
+    return f"You are OM AI. Today is {d.isoformat()} ({d.year})."
 
 
 def with_runtime_date_context(
@@ -284,6 +322,17 @@ def chat_reply(
     project_id: str | None = None,
 ) -> tuple[str, ChatBackendInfo]:
     """Generate a chat reply and return ``(text, backend_info)``."""
+    # Sanitize legacy UI tool tags from user turns.
+    cleaned_messages = []
+    for m in messages or []:
+        role = str(m.get("role") or "user")
+        content = str(m.get("content") or "")
+        if role == "user":
+            for tag in ("[web search enabled]", "[code interpreter enabled]"):
+                content = content.replace(tag, "")
+            content = content.strip()
+        cleaned_messages.append({"role": role, "content": content})
+    messages = cleaned_messages
     from om_ai.runtime.chat_orchestrator import (
         build_chat_messages,
         generation_config,
@@ -294,6 +343,15 @@ def chat_reply(
     from om_ai.runtime.intelligence import enrich_for_chat
 
     info = resolve_backend(local_loaded=local_loaded, native_ready=native_ready)
+    # Tiny OM-1.0 chat-SFT collapses with UI defaults (temp 0.7–0.8, 1024 tokens).
+    # Prefer env/sampling defaults unless the client asks for a low temperature.
+    if info.backend == "om_native":
+        env_temp = _env_float("OM_CHAT_TEMPERATURE", 0.2)
+        env_max = _env_int("OM_CHAT_MAX_NEW_TOKENS", 64)
+        if temperature is None or float(temperature) > 0.35:
+            temperature = env_temp
+        if max_new_tokens is None or int(max_new_tokens) > env_max:
+            max_new_tokens = env_max
     gen = generation_config(
         max_new_tokens=max_new_tokens,
         temperature=temperature,
@@ -337,6 +395,15 @@ def chat_reply(
         user_text = _latest_user_text(messages)
         from om_ai.live_knowledge.freshness import is_greeting_like, is_om_self_query
 
+        # Tiny local windows: keep sampling close to greedy so SFT chat sticks.
+        if is_greeting_like(user_text) or is_om_self_query(user_text):
+            kwargs["temperature"] = min(float(kwargs["temperature"]), 0.15)
+            kwargs["top_k"] = min(int(kwargs["top_k"]), 20)
+            kwargs["top_p"] = min(float(kwargs["top_p"]), 0.85)
+            kwargs["max_new_tokens"] = min(int(kwargs["max_new_tokens"]), 48)
+            kwargs["min_new_tokens"] = 1
+            kwargs["repetition_penalty"] = max(float(kwargs["repetition_penalty"]), 1.05)
+
         info_base = ChatBackendInfo(
             backend=info.backend,
             model=info.model,
@@ -347,9 +414,17 @@ def chat_reply(
         if intel.direct_reply:
             return intel.direct_reply, info_base
 
-        extra = runtime_date_system_text_compact()
-        if intel.extra_system:
-            extra = f"{extra}\n\n{intel.extra_system}"
+        # Prefer a single short system for tiny OM-1.0 windows.
+        # Do NOT stack extra system lines — that breaks chat-SFT greets.
+        if is_greeting_like(user_text) or is_om_self_query(user_text):
+            extra = None
+        else:
+            extra = runtime_date_system_text_compact()
+            if intel.extra_system:
+                hint = intel.extra_system.strip()
+                if len(hint) > 120:
+                    hint = hint[:117] + "..."
+                extra = f"{extra}\n{hint}" if extra else hint
 
         # Chat template: system + turns. Compact for tiny local windows.
         messages = build_chat_messages(
@@ -406,13 +481,11 @@ def chat_reply(
 
         fail = is_low_quality_reply(text)
         if not fail and is_greeting_like(user_text) and not looks_like_assistant_chitchat(text):
-            fail = "degenerate"
+            fail = "spam"
         if not fail and is_om_self_query(user_text):
             low = (text or "").lower()
-            if "om" not in low and is_low_quality_reply(text) == "":
-                # Self-intro expected; reject unrelated corpus dumps.
-                if not looks_like_assistant_chitchat(text) or "buy" in low:
-                    fail = "degenerate"
+            if "om" not in low:
+                fail = "spam"
         if not fail:
             cleaned = usable_generation_text(text) or ""
             cleaned = cleaned.lstrip(" ,.;:\"'`-—–")
@@ -428,7 +501,7 @@ def chat_reply(
             retry_kwargs.update(
                 {
                     "max_new_tokens": max(int(kwargs["max_new_tokens"]), 96),
-                    "temperature": 0.4,
+                    "temperature": 0.55,
                     "top_p": 0.9,
                     "top_k": 40,
                     "repetition_penalty": max(float(kwargs["repetition_penalty"]), 1.2),
@@ -437,12 +510,6 @@ def chat_reply(
             )
             retry = native_chat(messages, **retry_kwargs)
             retry_fail = is_low_quality_reply(retry)
-            if (
-                not retry_fail
-                and is_greeting_like(user_text)
-                and not looks_like_assistant_chitchat(retry)
-            ):
-                retry_fail = "degenerate"
             if not retry_fail:
                 retry = (usable_generation_text(retry) or "").lstrip(" ,.;:\"'`-—–")
                 if retry:
@@ -452,8 +519,7 @@ def chat_reply(
         except Exception as exc:
             logger.debug("native retry skipped: %s", exc)
 
-        # Orchestration safety net (greetings / identity / clarify) when base
-        # model still dumps web-corpus junk. Real ChatGPT quality still needs SFT.
+        # Only a minimal clarify fallback when generation is still unusable.
         recovered = policy_recovery_reply(
             user_text, reason=fail or "empty", language=intel.language
         )

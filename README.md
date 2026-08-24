@@ -159,3 +159,9 @@ om-ai train-om1 \
   --precision auto \
   --resume artifacts/checkpoints/om-1.0-base/latest.pt \
   --output artifacts/checkpoints/om-1.0-base
+
+
+  if any chnages chat thi sfind the issue if this is worng ans show then fixed this and but complte pelasedo not stap if this is not complted eplase anny thing need chat here pelase and complte this and chat you can only chat and undestend what missing and complted  this  please do not need anyhting static and local need to all prodection complted pelase 
+
+
+  
