@@ -1,0 +1,34 @@
+{
+  "name": "om-knowledge-brain-v1",
+  "coverage": "1600\u20132026",
+  "domains": [
+    "history",
+    "mathematics",
+    "physics",
+    "chemistry",
+    "biology",
+    "medicine",
+    "engineering",
+    "electronics",
+    "robotics",
+    "programming",
+    "computer_science",
+    "artificial_intelligence",
+    "business",
+    "psychology",
+    "philosophy",
+    "future_technology"
+  ],
+  "eras": [
+    "era1_scientific_revolution",
+    "era2_enlightenment",
+    "era3_industrial",
+    "era4_modern_science",
+    "era5_computer_revolution",
+    "era6_internet_ai",
+    "era7_generative_ai"
+  ],
+  "directive": "OM-1.0 Genesis Universal Intelligence Master Directive",
+  "note": "Scaffold for Universal Knowledge Engine. Add licensed books/docs/papers into knowledge/<domain>/raw/ then run RAG ingest + SFT generate.",
+  "paths_created": 64
+}

@@ -1,0 +1,305 @@
+{
+  "name": "om-system-build-v1",
+  "mode": "PRODUCTION_FOUNDATION_COMPLETE",
+  "om_version": "1.0",
+  "root": "/Users/gajendrarawat/Downloads/om-ai-operating-brain 3",
+  "elapsed_sec": 6.89,
+  "verified": true,
+  "verification": {
+    "passed": 35,
+    "total": 35,
+    "accuracy": 1.0,
+    "all_passed": true,
+    "checks": [
+      {
+        "name": "import:om_ai.core.reasoning",
+        "ok": true,
+        "detail": "imported",
+        "status": "PASS"
+      },
+      {
+        "name": "import:om_ai.knowledge.ingestion",
+        "ok": true,
+        "detail": "imported",
+        "status": "PASS"
+      },
+      {
+        "name": "import:om_ai.knowledge.retrieval",
+        "ok": true,
+        "detail": "imported",
+        "status": "PASS"
+      },
+      {
+        "name": "import:om_ai.knowledge.graph",
+        "ok": true,
+        "detail": "imported",
+        "status": "PASS"
+      },
+      {
+        "name": "import:om_ai.cognition",
+        "ok": true,
+        "detail": "imported",
+        "status": "PASS"
+      },
+      {
+        "name": "import:om_ai.evaluation",
+        "ok": true,
+        "detail": "imported",
+        "status": "PASS"
+      },
+      {
+        "name": "import:om_ai.learning",
+        "ok": true,
+        "detail": "imported",
+        "status": "PASS"
+      },
+      {
+        "name": "import:om_ai.agent.coding_agent",
+        "ok": true,
+        "detail": "imported",
+        "status": "PASS"
+      },
+      {
+        "name": "import:om_ai.reasoning.engine",
+        "ok": true,
+        "detail": "imported",
+        "status": "PASS"
+      },
+      {
+        "name": "import:om_ai.memory.sqlite_memory",
+        "ok": true,
+        "detail": "imported",
+        "status": "PASS"
+      },
+      {
+        "name": "import:om_ai.continuous.feedback",
+        "ok": true,
+        "detail": "imported",
+        "status": "PASS"
+      },
+      {
+        "name": "import:om_ai.api.foundation_routes",
+        "ok": true,
+        "detail": "imported",
+        "status": "PASS"
+      },
+      {
+        "name": "dir:data/om-foundation-corpus/raw",
+        "ok": true,
+        "detail": "/Users/gajendrarawat/Downloads/om-ai-operating-brain 3/data/om-foundation-corpus/raw",
+        "status": "PASS"
+      },
+      {
+        "name": "dir:data/om-foundation-corpus/processed",
+        "ok": true,
+        "detail": "/Users/gajendrarawat/Downloads/om-ai-operating-brain 3/data/om-foundation-corpus/processed",
+        "status": "PASS"
+      },
+      {
+        "name": "dir:data/om-foundation-corpus/chunks",
+        "ok": true,
+        "detail": "/Users/gajendrarawat/Downloads/om-ai-operating-brain 3/data/om-foundation-corpus/chunks",
+        "status": "PASS"
+      },
+      {
+        "name": "dir:data/om-foundation-corpus/embeddings",
+        "ok": true,
+        "detail": "/Users/gajendrarawat/Downloads/om-ai-operating-brain 3/data/om-foundation-corpus/embeddings",
+        "status": "PASS"
+      },
+      {
+        "name": "dir:data/om-foundation-corpus/metadata",
+        "ok": true,
+        "detail": "/Users/gajendrarawat/Downloads/om-ai-operating-brain 3/data/om-foundation-corpus/metadata",
+        "status": "PASS"
+      },
+      {
+        "name": "dir:data/om-knowledge-universe-v1/knowledge",
+        "ok": true,
+        "detail": "/Users/gajendrarawat/Downloads/om-ai-operating-brain 3/data/om-knowledge-universe-v1/knowledge",
+        "status": "PASS"
+      },
+      {
+        "name": "dir:training/datasets",
+        "ok": true,
+        "detail": "/Users/gajendrarawat/Downloads/om-ai-operating-brain 3/training/datasets",
+        "status": "PASS"
+      },
+      {
+        "name": "dir:training/configs",
+        "ok": true,
+        "detail": "/Users/gajendrarawat/Downloads/om-ai-operating-brain 3/training/configs",
+        "status": "PASS"
+      },
+      {
+        "name": "dir:training/checkpoints",
+        "ok": true,
+        "detail": "/Users/gajendrarawat/Downloads/om-ai-operating-brain 3/training/checkpoints",
+        "status": "PASS"
+      },
+      {
+        "name": "dir:training/scripts",
+        "ok": true,
+        "detail": "/Users/gajendrarawat/Downloads/om-ai-operating-brain 3/training/scripts",
+        "status": "PASS"
+      },
+      {
+        "name": "dir:training/evaluation",
+        "ok": true,
+        "detail": "/Users/gajendrarawat/Downloads/om-ai-operating-brain 3/training/evaluation",
+        "status": "PASS"
+      },
+      {
+        "name": "dir:artifacts/eval",
+        "ok": true,
+        "detail": "/Users/gajendrarawat/Downloads/om-ai-operating-brain 3/artifacts/eval",
+        "status": "PASS"
+      },
+      {
+        "name": "dir:artifacts/system",
+        "ok": true,
+        "detail": "/Users/gajendrarawat/Downloads/om-ai-operating-brain 3/artifacts/system",
+        "status": "PASS"
+      },
+      {
+        "name": "reasoning:pipeline",
+        "ok": true,
+        "detail": "score=0.85",
+        "status": "PASS"
+      },
+      {
+        "name": "knowledge:ingest+search",
+        "ok": true,
+        "detail": "doc_id=ef8e250c-5021-4e90-9a58-0fe0e83c02c8 hits=3",
+        "status": "PASS"
+      },
+      {
+        "name": "knowledge:graph",
+        "ok": true,
+        "detail": "nodes=13",
+        "status": "PASS"
+      },
+      {
+        "name": "evaluation:suite",
+        "ok": true,
+        "detail": "{\"coding\": 100.0, \"architecture\": 100.0, \"security\": 100.0, \"completeness\": 100.0, \"math\": 100.0, \"knowledge\": 100.0}",
+        "status": "PASS"
+      },
+      {
+        "name": "learning:feedback+export",
+        "ok": true,
+        "detail": "feedback=acf5c851-1156-4a11-835e-36bf7d47980e exported={'sft_rows': 29, 'preference_rows': 4}",
+        "status": "PASS"
+      },
+      {
+        "name": "coding:agent",
+        "ok": true,
+        "detail": "steps=6",
+        "status": "PASS"
+      },
+      {
+        "name": "config:omai-20m.json",
+        "ok": true,
+        "detail": "/Users/gajendrarawat/Downloads/om-ai-operating-brain 3/configs/omai-20m.json",
+        "status": "PASS"
+      },
+      {
+        "name": "config:om-1b.json",
+        "ok": true,
+        "detail": "/Users/gajendrarawat/Downloads/om-ai-operating-brain 3/configs/om-1b.json",
+        "status": "PASS"
+      },
+      {
+        "name": "config:om-7b.json",
+        "ok": true,
+        "detail": "/Users/gajendrarawat/Downloads/om-ai-operating-brain 3/configs/om-7b.json",
+        "status": "PASS"
+      },
+      {
+        "name": "config:om-70b.json",
+        "ok": true,
+        "detail": "/Users/gajendrarawat/Downloads/om-ai-operating-brain 3/configs/om-70b.json",
+        "status": "PASS"
+      }
+    ]
+  },
+  "steps": {
+    "1_check_installation": {
+      "root": "/Users/gajendrarawat/Downloads/om-ai-operating-brain 3",
+      "has_om_ai": true,
+      "has_pyproject": true
+    },
+    "2_9_foundation_upgrade": {
+      "report": "/Users/gajendrarawat/Downloads/om-ai-operating-brain 3/artifacts/FOUNDATION_UPGRADE_REPORT.json",
+      "checklist": {
+        "Knowledge Corpus Layout": true,
+        "Document Ingestion": true,
+        "Retrieval Layer": true,
+        "Reasoning Engine": true,
+        "Planning Engine": true,
+        "Verification Engine": true,
+        "Evaluation Framework": true,
+        "Feedback Learning": true,
+        "Training Preparation": true,
+        "OM-1B/7B/70B Path": "ready (configs; weights external)"
+      }
+    },
+    "10_knowledge_graph": {
+      "nodes": 13,
+      "edges": 10
+    },
+    "11_cognition_runtime": {
+      "intent": "coding",
+      "agents": [
+        "master",
+        "coding",
+        "testing",
+        "security"
+      ],
+      "has_solution": true
+    },
+    "12_monitoring": {
+      "path": "/Users/gajendrarawat/Downloads/om-ai-operating-brain 3/artifacts/system/monitoring.json"
+    },
+    "13_self_check": {
+      "passed": 35,
+      "total": 35,
+      "all_passed": true
+    }
+  },
+  "completion": {
+    "Knowledge Corpus Engine": true,
+    "Document Ingestion": true,
+    "Vector Knowledge System": true,
+    "Knowledge Graph": true,
+    "Reasoning Engine": true,
+    "Planning Engine": true,
+    "Verification Engine": true,
+    "Reflection Engine": true,
+    "Evaluation Framework": true,
+    "Continuous Learning Pipeline": true,
+    "Feedback System": true,
+    "Dataset Generator": true,
+    "Training Pipeline": true,
+    "Agent Framework": true,
+    "Memory System": true,
+    "API Layer": true,
+    "Monitoring": true,
+    "Security Layer": true,
+    "Deployment Structure": true,
+    "OM-1B/7B/70B Path": "READY (configs+scripts; weights need GPU/data)"
+  },
+  "external_only": [
+    "OM-1B/7B/70B trained weight files",
+    "large licensed corpus volume",
+    "GPU / distributed wall-clock"
+  ],
+  "commands": {
+    "rebuild": "om-ai system build",
+    "knowledge_status": "om-ai knowledge status",
+    "knowledge_ingest": "om-ai knowledge ingest <file>",
+    "reason": "om-ai reason \"Design a school management system\"",
+    "evaluate": "om-ai evaluate run",
+    "serve": "om-ai serve --host 127.0.0.1 --port 8080"
+  }
+}

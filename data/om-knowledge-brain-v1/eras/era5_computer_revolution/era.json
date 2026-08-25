@@ -1,0 +1,18 @@
+{
+  "id": "era5_computer_revolution",
+  "name": "Computer Revolution",
+  "years": "1950\u20132000",
+  "themes": [
+    "hardware",
+    "software",
+    "networks",
+    "AI history"
+  ],
+  "key_ideas": [
+    "Transistor \u2192 IC \u2192 microprocessor",
+    "Operating systems & networks",
+    "Fortran/COBOL/C/C++/Java/Python/JS lineage",
+    "Turing Test (1950), Dartmouth (1956)",
+    "Expert systems \u2192 early ML"
+  ]
+}

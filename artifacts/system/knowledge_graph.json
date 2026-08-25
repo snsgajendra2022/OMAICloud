@@ -1,0 +1,69 @@
+{
+  "nodes": [
+    "Agents",
+    "KnowledgeCorpus",
+    "Learning",
+    "Memory",
+    "OM-1.0",
+    "OM-1B",
+    "OM-70B",
+    "OM-7B",
+    "Reasoning",
+    "Retrieval",
+    "Training",
+    "knowledge",
+    "reasoning"
+  ],
+  "edges": [
+    {
+      "s": "KnowledgeCorpus",
+      "r": "feeds",
+      "o": "Retrieval"
+    },
+    {
+      "s": "Retrieval",
+      "r": "feeds",
+      "o": "Reasoning"
+    },
+    {
+      "s": "Reasoning",
+      "r": "uses",
+      "o": "Agents"
+    },
+    {
+      "s": "Agents",
+      "r": "writes",
+      "o": "Memory"
+    },
+    {
+      "s": "Learning",
+      "r": "improves",
+      "o": "Training"
+    },
+    {
+      "s": "Training",
+      "r": "produces",
+      "o": "OM-1B"
+    },
+    {
+      "s": "OM-1B",
+      "r": "scales_to",
+      "o": "OM-7B"
+    },
+    {
+      "s": "OM-7B",
+      "r": "scales_to",
+      "o": "OM-70B"
+    },
+    {
+      "s": "OM-1.0",
+      "r": "has_layer",
+      "o": "reasoning"
+    },
+    {
+      "s": "OM-1.0",
+      "r": "has_layer",
+      "o": "knowledge"
+    }
+  ]
+}

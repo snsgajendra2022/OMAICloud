@@ -1,0 +1,35 @@
+{
+  "name": "om-knowledge-universe-v1",
+  "priority": "highest",
+  "buckets": [
+    "books",
+    "scientific_papers",
+    "programming",
+    "mathematics",
+    "engineering",
+    "medicine",
+    "history",
+    "business",
+    "patents",
+    "documentation",
+    "research",
+    "code_repositories"
+  ],
+  "pipeline": [
+    "raw",
+    "cleaned",
+    "deduplicated",
+    "filtered",
+    "metadata",
+    "chunked",
+    "embeddings"
+  ],
+  "paths_created": 84,
+  "next": [
+    "Add licensed docs under knowledge/<bucket>/raw/",
+    "om-ai data-pipeline run (or universe process)",
+    "Ingest chunks into PersistentKnowledgeBase RAG",
+    "Generate SFT from high-quality excerpts"
+  ],
+  "honesty": "Layout + pipeline hooks \u2260 filled corpus. Volume and licenses must be supplied by operators."
+}

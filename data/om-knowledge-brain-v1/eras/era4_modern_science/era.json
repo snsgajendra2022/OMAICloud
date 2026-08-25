@@ -1,0 +1,18 @@
+{
+  "id": "era4_modern_science",
+  "name": "Modern Science Foundation",
+  "years": "1900\u20131950",
+  "themes": [
+    "quantum",
+    "relativity",
+    "computing foundations",
+    "electronics"
+  ],
+  "key_ideas": [
+    "Relativity & quantum mechanics",
+    "Einstein / Bohr / Heisenberg / Schr\u00f6dinger",
+    "Boolean logic & Turing machine",
+    "Information theory",
+    "Vacuum tubes & early computers"
+  ]
+}

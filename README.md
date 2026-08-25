@@ -11,7 +11,7 @@ This repository is **working software** (architecture, trainers, agents, API). I
 - Local OM-1.0 smoke/long checkpoints prove the native pipeline; they are **not** frontier capability
 - No fabricated benchmark leaderboard scores are claimed
 
-See `docs/IMPLEMENTATION_STATUS.md`, `docs/EXTERNAL_ASSETS_REQUIRED.md`, **`docs/PROJECT_GENESIS_JARVIS.md`**, **`docs/OM10_GENESIS_CORPUS_SPEC.md`** (19-layer training corpus), **`docs/OM10_GENESIS_TRAINING.md`**, **`docs/OWN_MODEL_MILESTONE1.md`**, **`docs/OWN_INTELLIGENCE_ROADMAP.md`**, **`docs/RESPONSE_EXPERIENCE.md`**, and **`docs/JARVIS_OPERATING_INTELLIGENCE.md`**.
+See `docs/IMPLEMENTATION_STATUS.md`, `docs/EXTERNAL_ASSETS_REQUIRED.md`, **`docs/OM_FOUNDATION_UPGRADE_V1.md`**, **`docs/OM_COMPLETION_ROADMAP.md`**, **`docs/OM_AI_GENESIS_PLATFORM_V1.md`**, **`docs/OM_KNOWLEDGE_BRAIN_1600_2026.md`**, **`docs/PROJECT_GENESIS_JARVIS.md`**, **`docs/OM10_GENESIS_CORPUS_SPEC.md`**, **`docs/OM10_GENESIS_TRAINING.md`**, **`docs/OWN_MODEL_MILESTONE1.md`**, **`docs/OWN_INTELLIGENCE_ROADMAP.md`**, **`docs/RESPONSE_EXPERIENCE.md`**, and **`docs/JARVIS_OPERATING_INTELLIGENCE.md`**.
 
 ## Quick start (OM-1.0 native)
 

@@ -1,0 +1,23 @@
+{
+  "cycle": [
+    "User interaction",
+    "Feedback capture",
+    "Export SFT + preference JSONL",
+    "om-ai sft / om-ai dpo",
+    "Eval suite",
+    "Promote checkpoint if scores rise"
+  ],
+  "commands": {
+    "sft": "om-ai sft --config configs/omai-20m.json --tokenizer artifacts/tokenizer-production-65536.json --checkpoint <base.pt> --data artifacts/continuous_test/sft_replay.jsonl --output artifacts/checkpoints/om-continuous-sft --steps 500 --device mps",
+    "dpo": "om-ai dpo --config configs/omai-20m.json --tokenizer artifacts/tokenizer-production-65536.json --checkpoint <sft.pt> --data artifacts/continuous_test/preference_replay.jsonl --output artifacts/checkpoints/om-continuous-dpo --steps 300 --device mps",
+    "eval": "om-ai eval suite --out artifacts/eval/post-continuous.json"
+  },
+  "exported": {
+    "sft_rows": 29,
+    "preference_rows": 3
+  },
+  "paths": {
+    "sft": "artifacts/continuous_test/sft_replay.jsonl",
+    "preference": "artifacts/continuous_test/preference_replay.jsonl"
+  }
+}

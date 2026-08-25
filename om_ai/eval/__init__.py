@@ -1,3 +1,5 @@
 from .benchmarks import EvaluationHarness
 from .runner import BenchmarkRunner
-__all__=["EvaluationHarness","BenchmarkRunner"]
+from .platform import run_suite
+
+__all__ = ["EvaluationHarness", "BenchmarkRunner", "run_suite"]

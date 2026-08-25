@@ -449,6 +449,135 @@ def genesis_cmd(args):
         print(json.dumps(layers_catalog(), indent=2))
 
 
+def knowledge_brain_cmd(args):
+    if args.sub == "catalog":
+        from om_ai.knowledge_brain import knowledge_catalog
+
+        print(json.dumps(knowledge_catalog(), indent=2))
+    elif args.sub == "init":
+        from om_ai.knowledge_brain import init_corpus
+
+        print(json.dumps(init_corpus(args.root), indent=2))
+    elif args.sub == "generate":
+        from om_ai.knowledge_brain import write_instruct_dataset
+
+        man = write_instruct_dataset(
+            args.out,
+            count=args.count,
+            also_init_corpus=not args.no_init,
+            root=args.root,
+        )
+        print(json.dumps(man, indent=2))
+    elif args.sub == "directive":
+        from om_ai.knowledge_brain.directive import KNOWLEDGE_DIRECTIVE, KNOWLEDGE_SYSTEM
+
+        print(KNOWLEDGE_DIRECTIVE)
+        print("\n--- system one-liner ---\n")
+        print(KNOWLEDGE_SYSTEM)
+
+
+def knowledge_universe_cmd(args):
+    from om_ai.knowledge_universe import init_universe, process_stub, universe_status
+
+    if args.sub == "init":
+        print(json.dumps(init_universe(args.root), indent=2))
+    elif args.sub == "status":
+        print(json.dumps(universe_status(args.root), indent=2))
+    elif args.sub == "process":
+        print(json.dumps(process_stub(args.root), indent=2))
+
+
+def reason_cmd(args):
+    from om_ai.reasoning import reason
+
+    trace = reason(args.question)
+    if args.json:
+        print(json.dumps(trace.to_dict(), indent=2))
+    else:
+        print(trace.as_markdown())
+
+
+def eval_suite_cmd(args):
+    from om_ai.eval import run_suite
+
+    complete_fn = None
+    if args.config and args.tokenizer and args.checkpoint:
+        _, tok, model, dev = load_model(args.config, args.tokenizer, args.checkpoint, args.device)
+        harness = EvaluationHarness(model, tok, dev)
+
+        def complete_fn(prompt: str, max_new: int) -> str:  # noqa: F811
+            return harness.complete(prompt, max_new_tokens=max_new)
+
+    result = run_suite(
+        args.suite,
+        complete_fn=complete_fn,
+        max_new_tokens=args.max_new_tokens,
+        report_path=args.out,
+    )
+    print(json.dumps({k: v for k, v in result.items() if k != "cases"}, indent=2))
+
+
+def coding_cmd(args):
+    from om_ai.agent.coding_agent import plan_coding_task
+
+    print(json.dumps(plan_coding_task(args.task, root=args.root, dry_run=not args.apply), indent=2))
+
+
+def continuous_cmd(args):
+    from om_ai.continuous import export_learning_bundle
+
+    if args.sub == "export":
+        print(json.dumps(export_learning_bundle(args.out, db_path=args.db), indent=2))
+
+
+def upgrade_cmd(args):
+    if args.target == "foundation":
+        from om_ai.foundation import upgrade_foundation
+
+        print(json.dumps(upgrade_foundation(args.root or None), indent=2))
+    else:
+        raise SystemExit(f"Unknown upgrade target: {args.target}")
+
+
+def system_cmd(args):
+    if args.sub == "build":
+        from om_ai.system import system_build
+
+        print(json.dumps(system_build(args.root or None), indent=2))
+    elif args.sub == "check":
+        from om_ai.system import self_check
+        from pathlib import Path
+
+        print(json.dumps(self_check(Path(args.root or Path.cwd()).resolve()), indent=2))
+
+
+def knowledge_cmd(args):
+    from om_ai.knowledge.engine import knowledge_ingest, knowledge_status, ensure_knowledge_layout
+
+    if args.sub == "status":
+        print(json.dumps(knowledge_status(args.root or None), indent=2))
+    elif args.sub == "init":
+        print(json.dumps(ensure_knowledge_layout(args.root or None), indent=2))
+    elif args.sub == "ingest":
+        print(json.dumps(knowledge_ingest(args.path, domain=args.domain or ""), indent=2))
+
+
+def evaluate_run_cmd(args):
+    from om_ai.evaluation import run_evaluation
+
+    report = run_evaluation(out=args.out)
+    scores = report.get("scores") or {}
+    # Human-readable + JSON
+    print("OM Evaluation Report")
+    print(f"Reasoning Score: {scores.get('architecture', 0)}%")
+    print(f"Coding Score: {scores.get('coding', 0)}%")
+    print(f"Knowledge Score: {scores.get('knowledge', 0)}%")
+    print(f"Security Score: {scores.get('security', 0)}%")
+    print(f"Completeness: {scores.get('completeness', 0)}%")
+    print(f"Report Generated: {args.out}")
+    print(json.dumps(report, indent=2))
+
+
 def registry_list(args):
     reg = ModelRegistry(args.root)
     print(json.dumps(reg.list_versions(), indent=2, default=str))
@@ -718,13 +847,6 @@ def main():
     ch.add_argument("--device")
     ch.set_defaults(func=chat)
 
-    e = sp.add_parser("evaluate")
-    e.add_argument("--config", required=True)
-    e.add_argument("--tokenizer", required=True)
-    e.add_argument("--checkpoint", required=True)
-    e.add_argument("--device")
-    e.set_defaults(func=evaluate)
-
     b = sp.add_parser("benchmark")
     b.add_argument("--config", required=True)
     b.add_argument("--tokenizer", required=True)
@@ -824,6 +946,115 @@ def main():
     geg.set_defaults(func=genesis_cmd)
     ged = ges.add_parser("domains", help="List Genesis training domains")
     ged.set_defaults(func=genesis_cmd)
+
+    kb = sp.add_parser(
+        "knowledge-brain",
+        help="OM Universal Knowledge Brain (1600–2026 eras + domains)",
+    )
+    kbs = kb.add_subparsers(dest="sub", required=True)
+    kbc = kbs.add_parser("catalog", help="Print eras + domains catalog JSON")
+    kbc.set_defaults(func=knowledge_brain_cmd)
+    kbi = kbs.add_parser("init", help="Create knowledge folder tree under data/")
+    kbi.add_argument("--root", default="data/om-knowledge-brain-v1")
+    kbi.set_defaults(func=knowledge_brain_cmd)
+    kbg = kbs.add_parser("generate", help="Generate knowledge instruct SFT JSONL")
+    kbg.add_argument("--root", default="data/om-knowledge-brain-v1")
+    kbg.add_argument(
+        "--out",
+        default="data/om-knowledge-brain-v1/train/om_knowledge_instruct_v1.jsonl",
+    )
+    kbg.add_argument("--count", type=int, default=2000)
+    kbg.add_argument("--no-init", action="store_true", help="Skip corpus folder init")
+    kbg.set_defaults(func=knowledge_brain_cmd)
+    kbd = kbs.add_parser("directive", help="Print master knowledge directive")
+    kbd.set_defaults(func=knowledge_brain_cmd)
+
+    ku = sp.add_parser(
+        "knowledge-universe",
+        help="Massive Knowledge Universe corpus layout (books/papers/code/…)",
+    )
+    kus = ku.add_subparsers(dest="sub", required=True)
+    kui = kus.add_parser("init", help="Create knowledge/ bucket tree")
+    kui.add_argument("--root", default="data/om-knowledge-universe-v1")
+    kui.set_defaults(func=knowledge_universe_cmd)
+    kus2 = kus.add_parser("status", help="Count raw files per bucket")
+    kus2.add_argument("--root", default="data/om-knowledge-universe-v1")
+    kus2.set_defaults(func=knowledge_universe_cmd)
+    kup = kus.add_parser("process", help="Write clean/dedupe/embed process plan")
+    kup.add_argument("--root", default="data/om-knowledge-universe-v1")
+    kup.set_defaults(func=knowledge_universe_cmd)
+
+    rs = sp.add_parser("reason", help="OM reasoning engine (decompose→plan→verify→critique)")
+    rs.add_argument("question")
+    rs.add_argument("--json", action="store_true")
+    rs.set_defaults(func=reason_cmd)
+
+    evs = sp.add_parser("eval", help="OM Evaluation Platform")
+    evss = evs.add_subparsers(dest="sub", required=True)
+    evsuite = evss.add_parser("suite", help="Run om_eval_suite_v1 (heuristic or model)")
+    evsuite.add_argument("--suite", default="benchmarks/om_eval_suite_v1.jsonl")
+    evsuite.add_argument("--out", default="artifacts/eval/latest.json")
+    evsuite.add_argument("--config", default="")
+    evsuite.add_argument("--tokenizer", default="")
+    evsuite.add_argument("--checkpoint", default="")
+    evsuite.add_argument("--max-new-tokens", type=int, default=64)
+    evsuite.add_argument("--device")
+    evsuite.set_defaults(func=eval_suite_cmd)
+
+    cd = sp.add_parser("coding", help="OM Coding Agent")
+    cds = cd.add_subparsers(dest="sub", required=True)
+    cdp = cds.add_parser("plan", help="Plan a coding task against a repo (dry-run)")
+    cdp.add_argument("--task", required=True)
+    cdp.add_argument("--root", default=".")
+    cdp.add_argument("--apply", action="store_true", help="Request apply mode (still gated)")
+    cdp.set_defaults(func=coding_cmd)
+
+    cont = sp.add_parser("continuous", help="Continuous learning cycle")
+    conts = cont.add_subparsers(dest="sub", required=True)
+    conte = conts.add_parser("export", help="Export feedback → SFT/DPO recipe bundle")
+    conte.add_argument("--out", default="data/continuous")
+    conte.add_argument("--db", default="artifacts/feedback.sqlite3")
+    conte.set_defaults(func=continuous_cmd)
+
+    up = sp.add_parser("upgrade", help="Run OM foundation / platform upgrades")
+    up.add_argument("target", choices=["foundation"], help="Upgrade target")
+    up.add_argument("--root", default="", help="Repo root (default: cwd)")
+    up.set_defaults(func=upgrade_cmd)
+
+    sysp = sp.add_parser("system", help="OM production system build / self-check")
+    syss = sysp.add_subparsers(dest="sub", required=True)
+    sysb = syss.add_parser("build", help="Build production foundation + verify")
+    sysb.add_argument("--root", default="")
+    sysb.set_defaults(func=system_cmd)
+    sysc = syss.add_parser("check", help="Run self-check only")
+    sysc.add_argument("--root", default="")
+    sysc.set_defaults(func=system_cmd)
+
+    kn = sp.add_parser("knowledge", help="Knowledge Corpus Engine")
+    kns = kn.add_subparsers(dest="sub", required=True)
+    knst = kns.add_parser("status", help="Knowledge Engine READY status")
+    knst.add_argument("--root", default="")
+    knst.set_defaults(func=knowledge_cmd)
+    kni = kns.add_parser("init", help="Ensure corpus directories")
+    kni.add_argument("--root", default="")
+    kni.set_defaults(func=knowledge_cmd)
+    knin = kns.add_parser("ingest", help="Ingest a document into RAG")
+    knin.add_argument("path")
+    knin.add_argument("--domain", default="")
+    knin.set_defaults(func=knowledge_cmd)
+
+    # Alias: om-ai evaluate run  (legacy model smoke: om-ai evaluate model)
+    evrun = sp.add_parser("evaluate")
+    evrs = evrun.add_subparsers(dest="sub", required=True)
+    evrr = evrs.add_parser("run", help="Run evaluation suite + scores report")
+    evrr.add_argument("--out", default="artifacts/eval/foundation_report.json")
+    evrr.set_defaults(func=evaluate_run_cmd)
+    evrl = evrs.add_parser("model", help="Legacy model smoke/perplexity eval")
+    evrl.add_argument("--config", required=True)
+    evrl.add_argument("--tokenizer", required=True)
+    evrl.add_argument("--checkpoint", required=True)
+    evrl.add_argument("--device")
+    evrl.set_defaults(func=evaluate)
 
     rg = sp.add_parser("registry")
     rgs = rg.add_subparsers(dest="sub", required=True)

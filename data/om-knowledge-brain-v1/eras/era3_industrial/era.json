@@ -1,0 +1,18 @@
+{
+  "id": "era3_industrial",
+  "name": "Industrial Revolution",
+  "years": "1800\u20131900",
+  "themes": [
+    "engineering",
+    "thermodynamics",
+    "electromagnetism",
+    "biology"
+  ],
+  "key_ideas": [
+    "Steam engines & manufacturing",
+    "Electricity & thermodynamics",
+    "Maxwell electromagnetism",
+    "Evolution & microbiology foundations",
+    "Telegraph & telephone"
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "id": "era1_scientific_revolution",
+  "name": "Scientific Revolution",
+  "years": "1600\u20131700",
+  "themes": [
+    "physics",
+    "astronomy",
+    "mathematics",
+    "scientific method"
+  ],
+  "key_ideas": [
+    "Galileo observation + experiment",
+    "Kepler planetary laws",
+    "Newton classical mechanics & gravity",
+    "Early calculus & probability",
+    "Telescope astronomy"
+  ]
+}

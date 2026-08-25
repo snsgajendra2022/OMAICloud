@@ -1,0 +1,62 @@
+{
+  "name": "om-foundation-upgrade-v1",
+  "root": "/Users/gajendrarawat/Downloads/om-ai-operating-brain 3",
+  "steps": {
+    "1_check_folders": "ok",
+    "2_create_modules": "om_ai.core / knowledge.ingestion / retrieval / evaluation / learning",
+    "3_initialize_databases": "feedback.sqlite3 + RAG via PersistentKnowledgeBase",
+    "4_setup_configuration": [
+      "/Users/gajendrarawat/Downloads/om-ai-operating-brain 3/training/README.md"
+    ],
+    "5_run_tests": {
+      "ran": true,
+      "exit_code": 0,
+      "stdout_tail": ".......                                                                  [100%]\n7 passed in 3.10s\n",
+      "stderr_tail": ""
+    },
+    "6_generate_report": "/Users/gajendrarawat/Downloads/om-ai-operating-brain 3/artifacts/eval/foundation_report.json"
+  },
+  "dirs_ensured": 14,
+  "knowledge_universe": {
+    "root": "/Users/gajendrarawat/Downloads/om-ai-operating-brain 3/data/om-knowledge-universe-v1",
+    "buckets": [
+      "books",
+      "scientific_papers",
+      "programming",
+      "mathematics",
+      "engineering",
+      "medicine",
+      "history",
+      "business",
+      "patents",
+      "documentation",
+      "research",
+      "code_repositories"
+    ]
+  },
+  "evaluation_scores": {
+    "coding": 100.0,
+    "architecture": 100.0,
+    "security": 100.0,
+    "completeness": 100.0,
+    "math": 100.0,
+    "knowledge": 100.0
+  },
+  "checklist": {
+    "Knowledge Corpus Layout": true,
+    "Document Ingestion": true,
+    "Retrieval Layer": true,
+    "Reasoning Engine": true,
+    "Planning Engine": true,
+    "Verification Engine": true,
+    "Evaluation Framework": true,
+    "Feedback Learning": true,
+    "Training Preparation": true,
+    "OM-1B/7B/70B Path": "ready (configs; weights external)"
+  },
+  "external_remaining": [
+    "OM-1B / OM-7B / OM-70B actual weights",
+    "large licensed training data",
+    "GPU / distributed training"
+  ]
+}

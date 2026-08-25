@@ -1,0 +1,3 @@
+{"prompt": "API mistake", "chosen": "correct response body", "rejected": "wrong", "source": "feedback", "rating": 2}
+{"prompt": "API mistake", "chosen": "correct response body", "rejected": "wrong", "source": "feedback", "rating": 2}
+{"prompt": "Design SMS", "chosen": "Correct answer is this...", "rejected": "This answer is wrong", "source": "feedback", "rating": 2}

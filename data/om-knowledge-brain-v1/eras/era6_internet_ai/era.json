@@ -1,0 +1,18 @@
+{
+  "id": "era6_internet_ai",
+  "name": "Internet + AI Era",
+  "years": "2000\u20132020",
+  "themes": [
+    "web",
+    "cloud",
+    "big data",
+    "deep learning"
+  ],
+  "key_ideas": [
+    "HTML/CSS/JS/APIs/cloud",
+    "Distributed systems, Hadoop, Spark",
+    "Deep learning & GPU computing",
+    "Mobile platforms",
+    "Neural network renaissance"
+  ]
+}

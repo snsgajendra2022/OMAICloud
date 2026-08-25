@@ -1,0 +1,19 @@
+{
+  "id": "era7_generative_ai",
+  "name": "Generative AI Era",
+  "years": "2020\u20132026",
+  "themes": [
+    "transformers",
+    "LLMs",
+    "agents",
+    "RAG",
+    "multimodal"
+  ],
+  "key_ideas": [
+    "Tokenizer \u2192 embedding \u2192 attention \u2192 layers \u2192 output",
+    "Pretrain / SFT / RLHF / DPO",
+    "RAG + tools + agents",
+    "Multimodal systems",
+    "OM-style cognitive OS around the LLM"
+  ]
+}

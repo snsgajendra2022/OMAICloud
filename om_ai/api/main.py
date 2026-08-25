@@ -44,6 +44,7 @@ from om_ai.api.auth_routes import router as auth_router
 from om_ai.api.workspace_routes import router as workspace_router
 from om_ai.api.oi_routes import router as oi_router
 from om_ai.api.platform_routes import router as platform_router
+from om_ai.api.foundation_routes import router as foundation_router
 from om_ai.continuous.feedback import FeedbackStore
 
 logger = logging.getLogger(__name__)
@@ -100,6 +101,7 @@ app.include_router(auth_router)
 app.include_router(workspace_router)
 app.include_router(oi_router)
 app.include_router(platform_router)
+app.include_router(foundation_router)
 _RATE_LIMIT_MAX = int(os.getenv("OM_AI_RATE_LIMIT", "120"))
 rate_limiter = RateLimiter(
     max_requests=max(1, _RATE_LIMIT_MAX),
@@ -375,7 +377,13 @@ class MultimodalRequest(BaseModel):
 @app.get("/health", tags=["System"])
 def health():
     """Liveness probe — always 200 if the process is alive."""
-    return {"ok": True, "version": _API_VERSION}
+    return {
+        "ok": True,
+        "status": "healthy",
+        "om_version": "1.0",
+        "version": _API_VERSION,
+        "foundation": "complete",
+    }
 
 
 @app.get("/ready", tags=["System"])

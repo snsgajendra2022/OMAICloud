@@ -15,18 +15,18 @@ logger = logging.getLogger(__name__)
 _ROLE_PERMISSIONS: dict[str, frozenset[str]] = {
     "admin": frozenset({
         "model.load", "model.generate", "agent.run", "memory.write",
-        "knowledge.write", "admin.registry", "admin.tokens", "feedback.write",
+        "knowledge.read", "knowledge.write", "admin.registry", "admin.tokens", "feedback.write",
         "tool.shell", "tool.openapi",
     }),
     "operator": frozenset({
         "model.load", "model.generate", "agent.run", "memory.write",
-        "knowledge.write", "feedback.write", "tool.openapi", "admin.tokens",
+        "knowledge.read", "knowledge.write", "feedback.write", "tool.openapi", "admin.tokens",
     }),
     "agent": frozenset({
         "model.generate", "agent.run", "memory.write",
-        "knowledge.write", "feedback.write", "tool.openapi", "admin.tokens",
+        "knowledge.read", "knowledge.write", "feedback.write", "tool.openapi", "admin.tokens",
     }),
-    "viewer": frozenset({"model.generate"}),
+    "viewer": frozenset({"model.generate", "knowledge.read"}),
 }
 
 VALID_ROLES: frozenset[str] = frozenset(_ROLE_PERMISSIONS)
