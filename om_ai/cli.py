@@ -365,7 +365,7 @@ def feedback_export(args):
 
 
 def corpus_cmd(args):
-    svc = CorpusService(output_dir=args.workdir)
+    svc = CorpusService(output_dir=getattr(args, "workdir", "artifacts/corpus"))
     if args.sub == "import":
         print(json.dumps(svc.import_path(args.input, license=args.license, owner=args.owner, source_id=args.source_id), indent=2, default=str))
     elif args.sub == "validate":
@@ -378,6 +378,75 @@ def corpus_cmd(args):
         print(json.dumps(svc.shard(args.input, args.output, args.shard_size), indent=2))
     elif args.sub == "stats":
         print(json.dumps(svc.file_stats(args.input), indent=2))
+    elif args.sub == "catalog":
+        from om_ai.corpus import catalog_as_dicts
+
+        print(json.dumps({"sources": catalog_as_dicts(training_only=args.training_only)}, indent=2))
+    elif args.sub == "fetch":
+        from om_ai.corpus import fetch_sources
+
+        ids = [x.strip() for x in (args.sources or "").split(",") if x.strip()] or None
+        results = fetch_sources(Path(args.root), ids, max_docs=args.max_docs)
+        print(
+            json.dumps(
+                [
+                    {
+                        "source_id": r.source_id,
+                        "path": r.path,
+                        "docs": r.docs,
+                        "bytes": r.bytes,
+                        "ok": r.ok,
+                        "detail": r.detail,
+                    }
+                    for r in results
+                ],
+                indent=2,
+            )
+        )
+    elif args.sub == "build-v1":
+        from om_ai.data_pipeline import run_omai_corpus_v1
+
+        ids = [x.strip() for x in (args.sources or "").split(",") if x.strip()] or None
+        report = run_omai_corpus_v1(
+            args.root,
+            fetch=not args.no_fetch,
+            source_ids=ids,
+            max_docs=args.max_docs,
+        )
+        print(json.dumps(report, indent=2, default=str))
+
+
+def data_pipeline_cmd(args):
+    from om_ai.data_pipeline import run_omai_corpus_v1
+    from om_ai.data_pipeline.validator import validate_corpus
+    from om_ai.tokenizer.omai_v1 import tokenizer_v1_status
+
+    if args.sub == "run":
+        ids = [x.strip() for x in (args.sources or "").split(",") if x.strip()] or None
+        report = run_omai_corpus_v1(
+            args.root,
+            fetch=not args.no_fetch,
+            source_ids=ids,
+            max_docs=args.max_docs,
+            tokenize=not args.no_tokenize,
+        )
+        print(json.dumps(report, indent=2, default=str))
+    elif args.sub == "validate":
+        print(json.dumps(validate_corpus(args.root), indent=2))
+    elif args.sub == "tokenizer-status":
+        print(json.dumps(tokenizer_v1_status(args.tokenizer), indent=2))
+
+
+def genesis_cmd(args):
+    if args.sub == "generate":
+        from om_ai.genesis import write_dataset
+
+        man = write_dataset(args.out, count=args.count)
+        print(json.dumps(man, indent=2))
+    elif args.sub == "domains":
+        from om_ai.genesis.domains import layers_catalog
+
+        print(json.dumps(layers_catalog(), indent=2))
 
 
 def registry_list(args):
@@ -710,6 +779,51 @@ def main():
             if sub == "shard":
                 cp.add_argument("--shard-size", type=int, default=1000)
         cp.set_defaults(func=corpus_cmd)
+
+    cc = csp.add_parser("catalog", help="List approved open training-data sources")
+    cc.add_argument("--training-only", action="store_true")
+    cc.set_defaults(func=corpus_cmd, workdir="artifacts/corpus")
+
+    cf = csp.add_parser("fetch", help="Fetch licensed sample sources into OMAI-Corpus-v1/raw")
+    cf.add_argument("--root", default="data/omai-corpus-v1")
+    cf.add_argument("--sources", default="", help="Comma list: wikipedia-en,gutenberg,fineweb,open-assistant,om-owned")
+    cf.add_argument("--max-docs", type=int, default=40)
+    cf.set_defaults(func=corpus_cmd, workdir="artifacts/corpus")
+
+    cb = csp.add_parser("build-v1", help="Build OMAI-Corpus-v1 (fetch→clean→dedupe→train/val)")
+    cb.add_argument("--root", default="data/omai-corpus-v1")
+    cb.add_argument("--sources", default="")
+    cb.add_argument("--max-docs", type=int, default=40)
+    cb.add_argument("--no-fetch", action="store_true", help="Only rebuild from existing raw/")
+    cb.set_defaults(func=corpus_cmd, workdir="artifacts/corpus")
+
+    dp = sp.add_parser("data-pipeline", help="OMAI-Corpus-v1 factory (Own Model Roadmap Phase 1–2)")
+    dps = dp.add_subparsers(dest="sub", required=True)
+    dpr = dps.add_parser("run", help="Raw→clean→filter→dedupe→tokenize→train/val")
+    dpr.add_argument("--root", default="data/omai-corpus-v1")
+    dpr.add_argument("--sources", default="")
+    dpr.add_argument("--max-docs", type=int, default=40)
+    dpr.add_argument("--no-fetch", action="store_true")
+    dpr.add_argument("--no-tokenize", action="store_true")
+    dpr.set_defaults(func=data_pipeline_cmd)
+    dpv = dps.add_parser("validate", help="Validate corpus folder layout")
+    dpv.add_argument("--root", default="data/omai-corpus-v1")
+    dpv.set_defaults(func=data_pipeline_cmd)
+    dpt = dps.add_parser("tokenizer-status", help="OMAI-Tokenizer-v1 special-token status")
+    dpt.add_argument("--tokenizer", default="artifacts/tokenizer-production-65536.json")
+    dpt.set_defaults(func=data_pipeline_cmd)
+
+    ge = sp.add_parser("genesis", help="OM-1.0 Genesis-JARVIS intelligence dataset")
+    ges = ge.add_subparsers(dest="sub", required=True)
+    geg = ges.add_parser("generate", help="Generate instruction SFT JSONL")
+    geg.add_argument(
+        "--out",
+        default="data/omai-genesis-v1/train/omai_genesis_instruct_v1.jsonl",
+    )
+    geg.add_argument("--count", type=int, default=1000)
+    geg.set_defaults(func=genesis_cmd)
+    ged = ges.add_parser("domains", help="List Genesis training domains")
+    ged.set_defaults(func=genesis_cmd)
 
     rg = sp.add_parser("registry")
     rgs = rg.add_subparsers(dest="sub", required=True)

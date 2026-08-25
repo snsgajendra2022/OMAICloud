@@ -1,0 +1,47 @@
+{
+  "built_at": "2026-08-25T09:52:19+00:00",
+  "root": "data/omai-corpus-v1",
+  "fetch": [
+    {
+      "source_id": "om-owned",
+      "path": "data/omai-corpus-v1/raw/om-owned.jsonl",
+      "docs": 1,
+      "bytes": 10727,
+      "ok": true,
+      "detail": "local"
+    },
+    {
+      "source_id": "wikipedia-en",
+      "path": "data/omai-corpus-v1/raw/wikipedia-en.jsonl",
+      "docs": 8,
+      "bytes": 18504,
+      "ok": true,
+      "detail": "wikipedia_api"
+    },
+    {
+      "source_id": "gutenberg",
+      "path": "data/omai-corpus-v1/raw/gutenberg.jsonl",
+      "docs": 8,
+      "bytes": 3255406,
+      "ok": true,
+      "detail": "gutenberg_http"
+    }
+  ],
+  "merged_docs": 17,
+  "rejected": {
+    "license": 0,
+    "quality": 0,
+    "empty": 0
+  },
+  "dedupe": {
+    "input": "data/omai-corpus-v1/clean/all.jsonl",
+    "output": "data/omai-corpus-v1/filtered/deduped.jsonl",
+    "records": 17
+  },
+  "train_docs": 16,
+  "validation_docs": 1,
+  "train_jsonl": "data/omai-corpus-v1/train/shard-00001.jsonl",
+  "train_txt": "data/omai-corpus-v1/train/corpus.txt",
+  "validation_jsonl": "data/omai-corpus-v1/validation/shard-00001.jsonl",
+  "note": "This is a license-gated SAMPLE corpus for pipeline correctness. 1B\u201370B training still needs scaled downloads + GPU cluster."
+}

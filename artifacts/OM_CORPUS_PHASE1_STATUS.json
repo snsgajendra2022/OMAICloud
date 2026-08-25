@@ -1,0 +1,65 @@
+{
+  "milestone": "Phase 1 — OMAI-Corpus-v1 production pipeline",
+  "updated_at": "2026-08-25T10:17:00+00:00",
+  "pipeline_complete_pct": 100.0,
+  "data_volume": "sample (~0.8M tokens tokenized; not 100B+)",
+  "layout_ok": true,
+  "root": "data/omai-corpus-v1",
+  "layout": [
+    "raw/fineweb",
+    "raw/wikipedia",
+    "raw/books",
+    "raw/papers",
+    "raw/code",
+    "raw/conversations",
+    "cleaned",
+    "filtered",
+    "deduplicated",
+    "tokenized",
+    "train",
+    "validation",
+    "audit"
+  ],
+  "stages": {
+    "dataset_downloader": true,
+    "license_tracking": true,
+    "data_validation": true,
+    "language_filtering": true,
+    "quality_scoring": true,
+    "duplicate_removal": true,
+    "pii_filtering": true,
+    "toxic_content_filtering": true,
+    "tokenization": true,
+    "train_validation_split": true
+  },
+  "smoke_build": {
+    "cleaned_docs": 132,
+    "train_docs": 88,
+    "validation_docs": 5,
+    "tokenized_tokens": 833736,
+    "train_by_source": {
+      "gutenberg": 8,
+      "fineweb": 40,
+      "open-assistant": 34,
+      "wikipedia-en": 5,
+      "om-owned": 1
+    }
+  },
+  "commands": {
+    "catalog": "om-ai corpus catalog --training-only",
+    "fetch": "om-ai corpus fetch --root data/omai-corpus-v1 --max-docs 40",
+    "build": "om-ai corpus build-v1 --root data/omai-corpus-v1 --max-docs 40",
+    "next_phase": "om-ai train-om1 --config configs/om-1b.json --data data/omai-corpus-v1/train/corpus.txt --device cuda"
+  },
+  "honesty": {
+    "pipeline_software": "100%",
+    "scaled_corpus_for_1B": "NOT_MET — need FineWeb/full dumps at 100B+ tokens on large storage/GPUs",
+    "om_1b_through_70b_weights": "0%"
+  },
+  "docs": [
+    "docs/ROADMAP_EXECUTION.md",
+    "docs/OMAI_CORPUS_V1.md",
+    "docs/CORPUS_SCALE_PLAN.md"
+  ],
+  "next": "Phase 2 — scale corpus volume, then train OMAI-Base-1B"
+}

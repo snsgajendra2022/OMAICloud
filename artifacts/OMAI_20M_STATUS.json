@@ -1,0 +1,16 @@
+{
+  "milestone": "OMAI-20M prove-the-brain",
+  "checkpoint": "artifacts/checkpoints/omai-20m-base/latest.pt",
+  "exists": true,
+  "bytes": 259239509,
+  "config": "configs/omai-20m.json",
+  "tokenizer": "artifacts/tokenizer-production-65536.json",
+  "data": "data/omai-corpus-v1/train/corpus.txt",
+  "device": "mps",
+  "steps": 200,
+  "last_loss": 6.45638,
+  "parameters": 21597440,
+  "owned": true,
+  "script_note": "Train succeeded; status rewrite after fixing --max-tokens line-break bug in prove script.",
+  "note": "Prototype brain only \u2014 scale 100M\u21921B\u21927B\u219270B with more data/compute."
+}

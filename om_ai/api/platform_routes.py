@@ -87,7 +87,14 @@ class SettingsPatch(BaseModel):
     language: str | None = None
     temperature: float | None = None
     max_tokens: int | None = None
+    llm_enabled: bool | None = None
+    llm_only: bool | None = None
     memory_enabled: bool | None = None
+    rag_enabled: bool | None = None
+    live_knowledge_enabled: bool | None = None
+    agent_brain_enabled: bool | None = None
+    llm_providers: dict[str, bool] | None = None
+    llm_api_keys: dict[str, str] | None = None
     notifications_email: bool | None = None
     notifications_push: bool | None = None
     notifications_tasks: bool | None = None
@@ -403,7 +410,7 @@ def read_notification(
 # ---------- Settings ----------
 @router.get("/v1/settings")
 def get_settings(ctx: TenantContext = Depends(require_auth)) -> dict[str, Any]:
-    return {"settings": get_platform_store().get_settings(ctx.tenant_id, ctx.actor)}
+    return {"settings": get_platform_store().get_settings_public(ctx.tenant_id, ctx.actor)}
 
 
 @router.patch("/v1/settings")
@@ -623,6 +630,31 @@ def models_catalog(ctx: TenantContext = Depends(require_auth)) -> dict[str, Any]
             "max_tokens": 256,
         },
     ]
+    # Enabled external connectors (Settings → AI)
+    from om_ai.runtime.external_llms import LLM_CATALOG, resolve_api_key
+
+    providers = settings.get("llm_providers") or {}
+    keys = settings.get("llm_api_keys") or {}
+    for pid, meta in LLM_CATALOG.items():
+        if meta.get("owned"):
+            continue
+        if not providers.get(pid):
+            continue
+        ready = bool(resolve_api_key(pid, keys))
+        models.append(
+            {
+                "id": pid,
+                "name": meta["name"],
+                "kind": "external",
+                "description": f"{meta['vendor']} — {'ready' if ready else 'needs API key in Settings → AI'}",
+                "vendor": meta["vendor"],
+                "external": True,
+                "has_api_key": ready,
+                "temperature": settings.get("temperature", 0.7),
+                "context_length": "—",
+                "max_tokens": settings.get("max_tokens", 1024),
+            }
+        )
     return {"models": models, "default_model": settings.get("default_model", "OM-1.0")}
 
 

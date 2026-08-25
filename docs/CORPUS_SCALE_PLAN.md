@@ -19,6 +19,14 @@ Goal: grow from example files to a license-governed training corpus without cont
 - `data/example_corpus.txt`, tiny JSONL samples
 - Purpose: unit tests + pipeline smoke only
 
+### Phase 0.5 — OMAI-Corpus-v1 sample (implemented)
+
+- Catalog: FineWeb, Wikipedia, Gutenberg, OpenAssistant, OM-owned (+ gated Common Crawl / Stack / arXiv)
+- CLI: `om-ai corpus catalog|fetch|build-v1`
+- Layout: `data/omai-corpus-v1/{raw/{fineweb,wikipedia,books,...},cleaned,filtered,deduplicated,tokenized,train,validation,audit}`
+- Docs: `docs/OMAI_CORPUS_V1.md`, `docs/ROADMAP_EXECUTION.md`
+- **Pipeline stages: 100%.** Sample inventory only — not trillion-token volume yet
+
 ### Phase 1 — Internal / owned
 
 1. Declare every source in a manifest (`license`, `owner`, `allowed_for_training`)

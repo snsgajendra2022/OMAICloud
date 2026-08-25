@@ -13,10 +13,9 @@ from om_ai.understanding import UnderstandingResult, understand_message
 
 
 def _env_flag(name: str, default: bool = True) -> bool:
-    raw = (os.getenv(name) or "").strip().lower()
-    if not raw:
-        return default
-    return raw not in {"0", "false", "no", "off"}
+    from om_ai.runtime.session_flags import env_flag
+
+    return env_flag(name, default)
 
 
 def _map_understanding_intent(u: UnderstandingResult) -> ChatIntent:

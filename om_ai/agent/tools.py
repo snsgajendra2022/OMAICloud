@@ -9,10 +9,9 @@ logger = logging.getLogger(__name__)
 
 
 def _env_flag(name: str, default: bool = True) -> bool:
-    raw = (os.getenv(name) or "").strip().lower()
-    if not raw:
-        return default
-    return raw not in {"0", "false", "no", "off"}
+    from om_ai.runtime.session_flags import env_flag
+
+    return env_flag(name, default)
 
 
 def search_knowledge(

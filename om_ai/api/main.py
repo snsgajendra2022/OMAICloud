@@ -42,6 +42,7 @@ from om_ai.tenancy import TenantDirectory
 from om_ai.api.conversations import router as conversations_router, bind_conversation_store
 from om_ai.api.auth_routes import router as auth_router
 from om_ai.api.workspace_routes import router as workspace_router
+from om_ai.api.oi_routes import router as oi_router
 from om_ai.api.platform_routes import router as platform_router
 from om_ai.continuous.feedback import FeedbackStore
 
@@ -97,6 +98,7 @@ bind_conversation_store(conversations)
 app.include_router(conversations_router)
 app.include_router(auth_router)
 app.include_router(workspace_router)
+app.include_router(oi_router)
 app.include_router(platform_router)
 _RATE_LIMIT_MAX = int(os.getenv("OM_AI_RATE_LIMIT", "120"))
 rate_limiter = RateLimiter(

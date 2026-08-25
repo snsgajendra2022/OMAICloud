@@ -218,31 +218,85 @@ def _run_chat(
     actor: str = "",
     project_id: str | None = None,
     project_instructions: str = "",
+    model: str | None = None,
 ) -> tuple[str, str, str, str]:
     """Return (text, response_model_id, backend_name, provider)."""
     info = resolve_backend(local_loaded=_local_loaded(), native_ready=_native_ready())
+    settings: dict = {}
     try:
-        text, used = chat_reply(
-            messages,
-            local_chat=_engine.chat if _engine is not None else None,
-            local_loaded=_local_loaded(),
-            native_chat=_native_backend.chat if _native_backend is not None else None,
-            native_ready=_native_ready(),
-            max_new_tokens=max_new,
-            temperature=temperature,
-            top_p=top_p,
-            top_k=top_k,
-            repetition_penalty=repetition_penalty,
-            tenant_id=tenant_id,
-            actor=actor,
-            project_id=project_id,
-            project_instructions=project_instructions,
+        from om_ai.api.platform_store import get_platform_store
+        from om_ai.runtime.session_flags import apply_session_flags, flags_from_settings
+
+        settings = get_platform_store().get_settings(tenant_id, actor or "")
+        if settings.get("llm_enabled") is False:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="LLM is disabled in Settings → AI. Turn on Enable LLM to chat.",
+            )
+        flag_ctx = apply_session_flags(flags_from_settings(settings))
+    except HTTPException:
+        raise
+    except Exception:
+        from contextlib import nullcontext
+
+        flag_ctx = nullcontext()
+        settings = {}
+
+    # External LLM path (user-enabled connectors)
+    try:
+        from om_ai.runtime.external_llms import (
+            chat_external,
+            normalize_provider_id,
+            provider_ready,
         )
+
+        pid = normalize_provider_id(model)
+        if pid and pid != "om":
+            enabled = settings.get("llm_providers") or {}
+            stored_keys = settings.get("llm_api_keys") or {}
+            ok, reason = provider_ready(pid, enabled=enabled, stored_keys=stored_keys)
+            if not ok:
+                raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=reason)
+            with flag_ctx:
+                text, display, vendor = chat_external(
+                    pid,
+                    messages,
+                    stored_keys=stored_keys,
+                    max_tokens=int(max_new or 1024),
+                    temperature=float(temperature if temperature is not None else 0.7),
+                    top_p=float(top_p if top_p is not None else 1.0),
+                )
+            return text, display, "external", vendor
+    except HTTPException:
+        raise
+    except Exception as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    try:
+        with flag_ctx:
+            text, used = chat_reply(
+                messages,
+                local_chat=_engine.chat if _engine is not None else None,
+                local_loaded=_local_loaded(),
+                native_chat=_native_backend.chat if _native_backend is not None else None,
+                native_ready=_native_ready(),
+                max_new_tokens=max_new,
+                temperature=temperature,
+                top_p=top_p,
+                top_k=top_k,
+                repetition_penalty=repetition_penalty,
+                tenant_id=tenant_id,
+                actor=actor,
+                project_id=project_id,
+                project_instructions=project_instructions,
+            )
     except NativeCheckpointError as exc:
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             detail=str(exc) or "OM-1.0 checkpoint unavailable.",
         ) from exc
+    except HTTPException:
+        raise
     except Exception as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
     model_name = used.model or info.model or _default_model_id
@@ -342,12 +396,35 @@ async def chat_completions(
         conversation_id=req.conversation_id,
     )
 
-    # When native is forced and checkpoint missing, fail fast with 503 (no third-party LLM).
-    if configured_backend() == "om_native" and not _native_ready():
+    from om_ai.runtime.external_llms import normalize_provider_id
+
+    ext_pid = normalize_provider_id(req.model)
+    use_external = bool(ext_pid and ext_pid != "om")
+
+    # When native is forced and checkpoint missing, fail fast with 503 —
+    # unless the request targets an enabled external LLM.
+    if (
+        not use_external
+        and configured_backend() == "om_native"
+        and not _native_ready()
+    ):
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             detail="OM-1.0 checkpoint unavailable.",
         )
+
+    chat_kwargs = dict(
+        max_new=max_new,
+        temperature=temperature,
+        top_p=top_p,
+        top_k=top_k,
+        repetition_penalty=repetition_penalty,
+        tenant_id=ctx.tenant_id,
+        actor=ctx.actor,
+        project_id=project_id,
+        project_instructions=project_instructions,
+        model=req.model,
+    )
 
     if req.stream:
         async def event_stream() -> AsyncGenerator[str, None]:
@@ -357,7 +434,7 @@ async def chat_completions(
                     "id": chunk_id,
                     "object": "chat.completion.chunk",
                     "created": int(time.time()),
-                    "model": "OM-1.0" if configured_backend() == "om_native" else (req.model or _default_model_id),
+                    "model": req.model or ("OM-1.0" if configured_backend() == "om_native" else _default_model_id),
                     "choices": [
                         {
                             "index": 0,
@@ -368,18 +445,7 @@ async def chat_completions(
                 }
             )
             try:
-                text, model_name, backend, provider = _run_chat(
-                    messages,
-                    max_new=max_new,
-                    temperature=temperature,
-                    top_p=top_p,
-                    top_k=top_k,
-                    repetition_penalty=repetition_penalty,
-                    tenant_id=ctx.tenant_id,
-                    actor=ctx.actor,
-                    project_id=project_id,
-                    project_instructions=project_instructions,
-                )
+                text, model_name, backend, provider = _run_chat(messages, **chat_kwargs)
             except HTTPException as exc:
                 yield _sse({"error": {"message": str(exc.detail), "type": "server_error"}})
                 yield "data: [DONE]\n\n"
@@ -398,8 +464,6 @@ async def chat_completions(
                         "object": "chat.completion.chunk",
                         "created": int(time.time()),
                         "model": model_name,
-                        "om_backend": backend,
-                        "om_provider": provider,
                         "choices": [
                             {
                                 "index": 0,
@@ -407,6 +471,8 @@ async def chat_completions(
                                 "finish_reason": None,
                             }
                         ],
+                        "om_backend": backend,
+                        "om_provider": provider,
                     }
                 )
             yield _sse(
@@ -415,27 +481,23 @@ async def chat_completions(
                     "object": "chat.completion.chunk",
                     "created": int(time.time()),
                     "model": model_name,
+                    "choices": [
+                        {"index": 0, "delta": {}, "finish_reason": "stop"}
+                    ],
                     "om_backend": backend,
                     "om_provider": provider,
-                    "choices": [{"index": 0, "delta": {}, "finish_reason": "stop"}],
                 }
             )
             yield "data: [DONE]\n\n"
 
         return StreamingResponse(event_stream(), media_type="text/event-stream")
 
-    text, model_name, backend, provider = _run_chat(
-        messages,
-        max_new=max_new,
-        temperature=temperature,
-        top_p=top_p,
-        top_k=top_k,
-        repetition_penalty=repetition_penalty,
-        tenant_id=ctx.tenant_id,
-        actor=ctx.actor,
-        project_id=project_id,
-        project_instructions=project_instructions,
-    )
+    if configured_backend() == "om_native" and not use_external and not _native_ready():
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="OM-1.0 checkpoint unavailable.",
+        )
+    text, model_name, backend, provider = _run_chat(messages, **chat_kwargs)
     return _chat_response(model_name, text, backend=backend, provider=provider)
 
 

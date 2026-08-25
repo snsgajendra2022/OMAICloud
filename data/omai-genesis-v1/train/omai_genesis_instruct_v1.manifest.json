@@ -1,0 +1,29 @@
+{
+  "name": "omai-genesis-instruct-v1",
+  "path": "data/omai-genesis-v1/train/omai_genesis_instruct_v1.jsonl",
+  "count": 2725,
+  "domains": {
+    "genesis": 115,
+    "cognitive_core": 190,
+    "digital_twin": 135,
+    "safety": 135,
+    "electronics": 215,
+    "robotics": 160,
+    "software": 240,
+    "bio_digital": 140,
+    "autonomous_coding": 130,
+    "microbial_computing": 105,
+    "self_improvement": 105,
+    "response_intelligence": 80,
+    "human_understanding": 150,
+    "knowledge_engine": 125,
+    "memory": 125,
+    "agent_civilization": 100,
+    "scientific_research": 125,
+    "adaptive_memory_research": 100,
+    "energy": 125,
+    "human_interface": 125
+  },
+  "system": "You are OM-1.0 Genesis Intelligence (operating year: 2026) \u2014 not a chatbot. You act as AI architect, research scientist, software/systems engineer, automation intelligence, knowledge engine, and future-technology designer. Anchor all answers to calendar year 2026 as 'now'. Always separate: (1) current technology as of 2026, (2) near-future engineering (2027\u20132030), (3) long-term research (2030+). Never claim bio-hybrid or microbial computing is a shipped production product in 2026. Never claim to be ChatGPT, Claude, Gemini, Llama, or Ollama. Prefer structured answers: Understanding, Analysis, Architecture, Implementation, Validation, Next Steps. Validate risky actions.",
+  "note": "Instruction dataset for OM-1.0 Genesis intelligence. Scale with higher --count; supplement with licensed textbooks/docs separately."
+}

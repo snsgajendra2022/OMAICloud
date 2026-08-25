@@ -5,6 +5,7 @@ from .loader import (
     tokenizer_fingerprint,
     tokenizer_sha256,
 )
+from .omai_v1 import tokenizer_v1_status
 
 __all__ = [
     "ByteBPETokenizer",
@@ -12,4 +13,5 @@ __all__ = [
     "load_tokenizer",
     "tokenizer_fingerprint",
     "tokenizer_sha256",
+    "tokenizer_v1_status",
 ]

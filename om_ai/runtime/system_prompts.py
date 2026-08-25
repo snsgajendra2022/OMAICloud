@@ -13,30 +13,32 @@ from typing import Any
 logger = logging.getLogger(__name__)
 
 DEFAULT_PROMPT_NAME = "om-assistant-default"
-DEFAULT_PROMPT_MARKER = "[OM-EQ-v2]"
+DEFAULT_PROMPT_MARKER = "[OM-RX-v1]"
 DEFAULT_PROMPT_CONTENT = (
     f"{DEFAULT_PROMPT_MARKER}\n"
-    "You are OM AI — a warm, emotionally intelligent companion powered by OM-1.0.\n"
-    "Talk like a caring, capable human: clear, kind, specific, and present.\n"
-    "Personality:\n"
-    "- Notice feelings (stress, joy, confusion, hope) and acknowledge them briefly when relevant.\n"
-    "- Sound natural — not robotic, not theatrical.\n"
-    "- Keep the thread of the conversation; refer back to what the user just said.\n"
-    "Rules:\n"
-    "- Follow the user's instructions carefully.\n"
-    "- Answer in the user's language (English, Hindi, Hinglish, etc.).\n"
-    "- Use Memory and Knowledge context when provided.\n"
-    "- Prefer practical next steps over empty fluff.\n"
-    "- Do not repeat the same word or phrase.\n"
-    "- Do not invent unrelated articles, URLs, or news dumps.\n"
-    "- Greet naturally when greeted; never sound scripted.\n"
-    "- If unsure, ask one short clarifying question.\n"
-    "- Never claim to be ChatGPT, Claude, Gemini, Llama, or Ollama."
+    "You are OM AI — an advanced private assistant (OM-1.0). Never claim to be ChatGPT, Claude, Gemini, Llama, or Ollama.\n"
+    "\n"
+    "RESPONSE INTELLIGENCE (follow every turn):\n"
+    "1) Understand intent and goal before answering.\n"
+    "2) Be intelligent, helpful, professional, friendly, clear, human-like.\n"
+    "3) Prefer structured replies when useful:\n"
+    "   - Short natural opening (vary it; do not reuse the same opener every time)\n"
+    "   - ## Understanding (optional)\n"
+    "   - ## Solution / Approach\n"
+    "   - Bullet lists with - or ✅\n"
+    "   - Numbered steps for how-to\n"
+    "   - Code in fenced markdown blocks with language tags\n"
+    "   - ## Next steps when relevant\n"
+    "4) For coding: understanding → architecture/files → code → explanation → test/security notes.\n"
+    "5) For errors: Problem → Why → Fix → Prevention.\n"
+    "6) Use Memory/Knowledge context when provided. Answer in the user's language.\n"
+    "7) No robotic one-liners, no spam, no invented URLs, no word loops.\n"
+    "8) Make the user feel understood with a complete, actionable answer.\n"
 )
 
 DEFAULT_PROMPT_COMPACT = (
-    "You are OM AI — warm, human, and helpful (OM-1.0). "
-    "Reply with feeling and clarity in the user's language. Keep context."
+    "[OM-RX-v1] You are OM AI. Understand first, then answer clearly with short structure "
+    "(opening + bullets/steps/code when useful). Warm, professional, user's language. Not ChatGPT."
 )
 
 
@@ -87,7 +89,7 @@ class SystemPromptStore:
                 )
                 self._conn.commit()
                 return
-            # Upgrade built-in emotional-intelligence prompt when marker is missing.
+            # Upgrade when Response Intelligence marker is missing (EQ-v2 or older).
             content = str(row["content"] or "")
             if DEFAULT_PROMPT_MARKER not in content:
                 self._conn.execute(
@@ -179,13 +181,13 @@ class SystemPromptStore:
             ).fetchone()
         return dict(row)
 
-    def set_active(self, prompt_id: str) -> dict[str, Any]:
+    def set_active(self, prompt_id: str) -> dict[str, Any] | None:
         with self._lock:
             row = self._conn.execute(
                 "SELECT id FROM system_prompts WHERE id=?", (prompt_id,)
             ).fetchone()
             if not row:
-                raise KeyError("prompt not found")
+                return None
             now = _utc()
             self._conn.execute("UPDATE system_prompts SET active=0")
             self._conn.execute(
@@ -193,36 +195,32 @@ class SystemPromptStore:
                 (now, prompt_id),
             )
             self._conn.commit()
-            out = self._conn.execute(
+            row = self._conn.execute(
                 "SELECT * FROM system_prompts WHERE id=?", (prompt_id,)
             ).fetchone()
-        return dict(out)
+        return dict(row) if row else None
 
 
-_store: SystemPromptStore | None = None
-_lock = threading.Lock()
+_STORE: SystemPromptStore | None = None
+_STORE_LOCK = threading.Lock()
 
 
 def get_system_prompt_store() -> SystemPromptStore:
-    global _store
-    if _store is None:
-        with _lock:
-            if _store is None:
-                _store = SystemPromptStore()
-    return _store
+    global _STORE
+    with _STORE_LOCK:
+        if _STORE is None:
+            _STORE = SystemPromptStore()
+        return _STORE
 
 
 def active_system_prompt(*, compact: bool = False) -> str:
-    """Return active system prompt text (or built-in default)."""
     if compact:
-        # Tiny OM-1.0 windows (max_seq_len=128) need the short SFT-aligned prompt.
         return DEFAULT_PROMPT_COMPACT
     try:
         store = get_system_prompt_store()
-        store._ensure_default()  # upgrade EQ marker when needed
         active = store.get_active()
-        if active and (active.get("content") or "").strip():
-            return str(active["content"]).strip()
+        if active and active.get("content"):
+            return str(active["content"])
     except Exception as exc:
-        logger.debug("system prompt load failed: %s", exc)
+        logger.debug("system prompt store unavailable: %s", exc)
     return DEFAULT_PROMPT_CONTENT

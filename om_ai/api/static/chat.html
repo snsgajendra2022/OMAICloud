@@ -204,7 +204,21 @@ body.dark .typing-dots span{background:#94A3B8;}
   0%,80%,100%{transform:translateY(0);opacity:.3;}
   40%{transform:translateY(-4px);opacity:1;}
 }
+.bubble h1,.bubble h2,.bubble h3{margin:12px 0 6px;font-weight:700;letter-spacing:-.02em;line-height:1.3;}
+.bubble h1{font-size:1.25em;}
+.bubble h2{font-size:1.12em;}
+.bubble h3{font-size:1.05em;}
+.bubble ul,.bubble ol{margin:8px 0 8px 1.1em;padding:0;}
+.bubble li{margin:4px 0;line-height:1.5;}
+.bubble .md-p{margin:0 0 10px;}
+.bubble .md-p:last-child{margin-bottom:0;}
+.bubble .rx-phase{font-size:12px;color:var(--muted);font-weight:600;margin-bottom:8px;display:flex;align-items:center;gap:8px;}
+.bubble .rx-phase .spin{width:10px;height:10px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:rxSpin .7s linear infinite;}
+@keyframes rxSpin{to{transform:rotate(360deg)}}
+.bubble .rx-block{opacity:0;transform:translateY(6px);animation:rxIn .35s ease forwards;}
+@keyframes rxIn{to{opacity:1;transform:none}}
 .bubble pre{background:rgba(0,0,0,.07);border-radius:8px;padding:10px 14px;overflow-x:auto;margin:8px 0;font-size:13px;}
+
 body.dark .bubble pre{background:rgba(255,255,255,.07);}
 .bubble code{font-family:ui-monospace,"SF Mono",Consolas,monospace;font-size:13px;}
 .bubble pre code{background:none;padding:0;}
@@ -215,6 +229,10 @@ body.dark .bubble :not(pre) > code{background:rgba(255,255,255,.1);}
 .msg-actions button:hover{background:var(--soft);color:var(--text);}
 .msg-actions button.active{color:var(--accent);}
 .tts-btn.speaking{color:var(--danger);}
+.msg-more-menu{min-width:200px;padding:6px;box-shadow:0 8px 28px rgba(0,0,0,.14);}
+.msg-more-menu button{display:flex;align-items:center;gap:10px;width:100%;text-align:left;padding:10px 12px;border:0;background:transparent;border-radius:8px;font-size:13px;font-weight:600;color:var(--text);cursor:pointer;}
+.msg-more-menu button:hover{background:var(--soft);}
+.msg-more-menu button svg{flex-shrink:0;opacity:.75;}
 
 /* ── COMPOSER ── */
 .composer-wrap{padding:10px 16px 18px;flex-shrink:0;}
@@ -343,6 +361,25 @@ body.dark .asst-card.active{background:rgba(59,130,246,.08);box-shadow:inset 0 0
 .sw-wrap input:checked + .sw-track{background:var(--accent);}
 .sw-thumb{position:absolute;top:3px;left:3px;width:16px;height:16px;background:#fff;border-radius:50%;pointer-events:none;transition:left .2s;}
 .sw-wrap input:checked + .sw-track + .sw-thumb{left:21px;}
+.llm-provider-box{margin:10px 0 4px;padding:12px 14px;border:1px solid var(--border);border-radius:12px;background:var(--soft);}
+.llm-provider-box h4{margin:0 0 4px;font-size:13px;font-weight:700;color:var(--text);}
+.llm-provider-box .llm-hint{margin:0 0 10px;font-size:12px;color:var(--muted);line-height:1.4;}
+.llm-provider-row{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:10px 0;border-top:1px solid var(--border);flex-wrap:wrap;}
+.llm-provider-row:first-of-type{border-top:0;padding-top:2px;}
+.llm-provider-meta{min-width:0;flex:1;}
+.llm-provider-name{font-size:13px;font-weight:600;color:var(--text);}
+.llm-provider-vendor{font-size:11px;color:var(--muted);margin-top:1px;}
+.llm-provider-badge{display:inline-block;margin-left:6px;font-size:10px;font-weight:700;padding:1px 6px;border-radius:999px;vertical-align:middle;}
+.llm-provider-badge.on{background:rgba(22,163,74,.12);color:#15803d;}
+.llm-provider-badge.owned{background:rgba(37,99,235,.12);color:#1d4ed8;}
+.llm-provider-badge.warn{background:rgba(217,119,6,.12);color:#b45309;}
+.llm-provider-actions{display:flex;align-items:center;gap:8px;flex-shrink:0;}
+.llm-key-row{width:100%;margin-top:6px;display:none;}
+.llm-key-row.show{display:block;}
+.llm-key-row input{width:100%;border:1px solid var(--border);border-radius:8px;padding:8px 10px;font-size:12px;background:var(--bg);}
+.llm-use-btn{border:1px solid var(--border);background:var(--bg);border-radius:8px;padding:5px 10px;font-size:11px;font-weight:600;color:var(--muted);cursor:pointer;}
+.llm-use-btn:hover{color:var(--text);border-color:#94A3B8;}
+.llm-use-btn.active{background:rgba(37,99,235,.1);color:#1d4ed8;border-color:rgba(37,99,235,.35);}
 
 /* ── SEARCH ── */
 .search-bar{width:100%;border:1px solid var(--border);background:var(--bg);border-radius:12px;padding:12px 14px;font-size:14px;outline:none;margin-bottom:16px;}
@@ -792,13 +829,44 @@ function renderMarkdown(raw) {
     inlines.push('<code>'+c+'</code>');
     return "\x00IC"+i+"\x00";
   });
+  s = s.replace(/^### (.+)$/gm, "<h3>$1</h3>");
+  s = s.replace(/^## (.+)$/gm, "<h2>$1</h2>");
+  s = s.replace(/^# (.+)$/gm, "<h1>$1</h1>");
   s = s.replace(/\*\*\*([^*]+)\*\*\*/g,"<strong><em>$1</em></strong>");
   s = s.replace(/\*\*([^*]+)\*\*/g,"<strong>$1</strong>");
   s = s.replace(/\*([^*\n]+)\*/g,"<em>$1</em>");
-  s = s.replace(/\n/g,"<br>");
+  // bullet / check lists
+  s = s.replace(/^(?:[-*]|\u2705|\u2713)\s+(.+)$/gm, "<li>$1</li>");
+  s = s.replace(/^(?:\d+[.)])\s+(.+)$/gm, "<li data-ol=\"1\">$1</li>");
+  s = s.replace(/(?:<li(?![^>]*data-ol).*?<\/li>\n?)+/g, (m) => "<ul>"+m.replace(/\n/g,"")+"</ul>");
+  s = s.replace(/(?:<li data-ol=\"1\">.*?<\/li>\n?)+/g, (m) => "<ol>"+m.replace(/\n/g,"").replace(/ data-ol=\"1\"/g,"")+"</ol>");
+  // paragraphs
+  s = s.split(/\n{2,}/).map(p => {
+    if (/^<(h[1-3]|ul|ol|pre)/.test(p.trim())) return p;
+    return '<div class="md-p">'+p.replace(/\n/g,"<br>")+"</div>";
+  }).join("");
   codeBlocks.forEach((b,i) => { s = s.split("\x00CB"+i+"\x00").join(b); });
   inlines.forEach((c,i) => { s = s.split("\x00IC"+i+"\x00").join(c); });
   return s;
+}
+
+function renderExperienceMarkdown(raw, animate) {
+  const html = renderMarkdown(raw);
+  if (!animate) return html;
+  // Wrap top-level chunks for staggered reveal
+  const wrap = document.createElement("div");
+  wrap.innerHTML = html;
+  let delay = 0;
+  Array.from(wrap.children).forEach((el) => {
+    el.classList.add("rx-block");
+    el.style.animationDelay = (delay * 0.12) + "s";
+    delay += 1;
+  });
+  return wrap.innerHTML;
+}
+
+function experiencePhaseHtml(label) {
+  return '<div class="rx-phase" role="status"><span class="spin" aria-hidden="true"></span>'+escapeHtml(label)+"</div>";
 }
 
 function fmtDate(iso) {
@@ -1484,11 +1552,12 @@ function renderMessages() {
     const waiting = !!(m._streaming && !String(m.content||"").trim());
     if (m._streaming) bubble.dataset.stream = "1";
     if (waiting) bubble.classList.add("is-typing");
-    if (waiting) bubble.innerHTML = typingIndicatorHtml();
-    else if (m.role === "assistant") bubble.innerHTML = renderMarkdown(m.content||"");
+    if (waiting) bubble.innerHTML = experiencePhaseHtml("Understanding request…")+typingIndicatorHtml();
+    else if (m.role === "assistant") bubble.innerHTML = renderExperienceMarkdown(m.content||"", !!m._reveal);
     else bubble.innerHTML = escapeHtml(m.content||"").replace(/\n/g,"<br>");
     col.appendChild(bubble);
     if (m.role === "assistant" && !m._streaming) {
+      if (m._reveal) delete m._reveal;
       col.appendChild(buildMsgActions(m, idx));
     }
     row.appendChild(col);
@@ -1503,7 +1572,8 @@ function updateStreamBubble(text) {
   const body = String(text||"");
   if (!body.trim()) {
     bubble.classList.add("is-typing");
-    bubble.innerHTML = typingIndicatorHtml();
+    const phase = state._rxPhase || "Understanding request…";
+    bubble.innerHTML = experiencePhaseHtml(phase)+typingIndicatorHtml();
   } else {
     bubble.classList.remove("is-typing");
     bubble.removeAttribute("aria-busy");
@@ -1543,7 +1613,7 @@ function buildMsgActions(m, idx) {
     mk("Regenerate","refresh", () => regenerate(idx)),
     ttsBtn,
     mk("Share","share", () => shareMessage(m.content)),
-    mk("More","more", e => showMsgMore(e, m, idx))
+    mk("More","more", e => { e.stopPropagation(); showMsgMore(e, m, idx); })
   );
   return actions;
 }
@@ -1551,21 +1621,44 @@ function buildMsgActions(m, idx) {
 function showMsgMore(e, m, idx) {
   closeMenus();
   const menu = document.createElement("div");
-  menu.className = "drop-menu open";
-  Object.assign(menu.style, {position:"fixed",left:Math.min(e.clientX,window.innerWidth-240)+"px",top:e.clientY+"px",zIndex:"250"});
-  [
-    ["Save to library", () => saveToLibrary(m.content)],
-    ["Add to project",  () => addToProject(m.content)],
-    ["Export",          () => exportMessage(m.content)],
-    ["Report",          () => toast("Report submitted — thank you","success")],
-  ].forEach(([label, fn]) => {
-    const b = document.createElement("button"); b.type = "button"; b.textContent = label;
-    b.addEventListener("click", () => { menu.remove(); fn(); });
+  menu.className = "drop-menu open msg-more-menu";
+  Object.assign(menu.style, {
+    position:"fixed",
+    left:Math.min((e.clientX||0), window.innerWidth-260)+"px",
+    top:Math.min((e.clientY||0), window.innerHeight-320)+"px",
+    zIndex:"250",
+  });
+  const items = [
+    { label: "Regenerate", icon: "refresh", onClick: () => regenerate(idx) },
+    { label: "Share", icon: "share", onClick: () => shareMessage(m.content) },
+    { label: "Copy", icon: "copy", onClick: async () => {
+      try { await navigator.clipboard.writeText(m.content||""); toast("Copied","success"); }
+      catch (_) { toast("Copy failed","error"); }
+    }},
+    { label: "Save to library", icon: "book", onClick: () => saveToLibrary(m.content) },
+    { label: "Add to project", icon: "folder", onClick: () => addToProject(m.content) },
+    { label: "Export", icon: "download", onClick: () => exportMessage(m.content) },
+    { label: "Report", icon: "shield", onClick: () => toast("Report submitted — thank you","success") },
+  ];
+  items.forEach(it => {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.innerHTML = (it.icon && typeof svg === "function" ? svg(it.icon,14) : "") + escapeHtml(it.label);
+    b.addEventListener("click", ev => {
+      ev.stopPropagation();
+      menu.remove();
+      it.onClick();
+    });
     menu.appendChild(b);
   });
   document.body.appendChild(menu);
-  const close = ev => { if (!menu.contains(ev.target)) { menu.remove(); document.removeEventListener("click",close); } };
-  setTimeout(() => document.addEventListener("click",close), 0);
+  const close = ev => {
+    if (!menu.contains(ev.target)) {
+      menu.remove();
+      document.removeEventListener("click", close);
+    }
+  };
+  setTimeout(() => document.addEventListener("click", close), 0);
 }
 
 async function saveToLibrary(content) {
@@ -1618,12 +1711,14 @@ async function regenerate(assistantIdx) {
 async function streamCompletion(messages) {
   const controller = new AbortController();
   state.abort = controller;
+  const maxTok = Math.max(64, Math.min(2048, Number((state.settings&&state.settings.max_tokens)||256)||256));
+  const temp = state.settings ? Number(state.settings.temperature??0.55) : 0.55;
   const res = await fetch("/api/v1/chat/completions", {
     method:"POST", credentials:"include", signal:controller.signal,
     headers:{"Content-Type":"application/json"},
     body:JSON.stringify({
       model:state.model||"OM-1.0", messages,
-      max_tokens:64, temperature:state.settings?Math.min(Number(state.settings.temperature??0.2),0.3):0.2, stream:true,
+      max_tokens:maxTok, temperature:temp, stream:true,
       project_id:state.activeProjectId||undefined,
       conversation_id:state.currentId||undefined,
     }),
@@ -1636,6 +1731,17 @@ async function streamCompletion(messages) {
   }
   const reader = res.body.getReader(), decoder = new TextDecoder();
   let buffer = "", full = "";
+  const phases = ["Understanding request…","Checking context…","Preparing answer…"];
+  let phaseIdx = 0;
+  state._rxPhase = phases[0];
+  if (state._rxPhaseTimer) clearInterval(state._rxPhaseTimer);
+  state._rxPhaseTimer = setInterval(() => {
+    phaseIdx = Math.min(phaseIdx + 1, phases.length - 1);
+    state._rxPhase = phases[phaseIdx];
+    const last = state.messages[state.messages.length-1];
+    if (last && last._streaming && !String(last.content||"").trim()) updateStreamBubble("");
+  }, 900);
+  try {
   while (true) {
     const { done, value } = await reader.read();
     if (done) break;
@@ -1659,6 +1765,9 @@ async function streamCompletion(messages) {
       } catch (_) {}
     }
   }
+  } finally {
+    if (state._rxPhaseTimer) { clearInterval(state._rxPhaseTimer); state._rxPhaseTimer = null; }
+  }
   return full;
 }
 
@@ -1679,7 +1788,11 @@ async function sendPrompt(text) {
     const reply = await streamCompletion(reqMsgs);
     const clean = String(reply||"").trim()||"(empty reply)";
     const last = state.messages[state.messages.length-1];
-    if (last && last.role === "assistant") { last.content = clean; delete last._streaming; }
+    if (last && last.role === "assistant") {
+      last.content = clean;
+      last._reveal = true;
+      delete last._streaming;
+    }
     clearTypingAnimation();
     renderMessages();
     try { await appendTurn(prompt, clean); } catch (_) { toast("Reply ok, save failed","error"); }
@@ -3546,7 +3659,12 @@ async function loadModelsView() {
   panel.innerHTML =
     '<div class="panel-head"><div><h2>Models</h2><p class="sub">Available models and defaults.</p></div></div>'+
     '<div class="ui-list" id="modelsList">'+skeletons(3)+"</div>";
-  const { res, data } = await api("/v1/models/catalog",{},{error:false});
+  const [cat, sett] = await Promise.all([
+    api("/v1/models/catalog",{},{error:false}),
+    api("/v1/settings",{},{error:false}),
+  ]);
+  if (sett.res.ok && sett.data && sett.data.settings) state.settings = sett.data.settings;
+  const { res, data } = cat;
   const list = $("modelsList"); list.innerHTML = "";
   const models = (res.ok && data && data.models)||[];
   const def = (data && data.default_model)||state.model;
@@ -3555,8 +3673,10 @@ async function loadModelsView() {
     return;
   }
   models.forEach(m => {
-    const isDefault = m.id === def;
-    const isActive = m.id === state.model;
+    const isDefault = m.id === def || m.name === def;
+    const isActive = m.id === state.model || m.name === state.model;
+    const isExternal = !!m.external || m.kind === "external";
+    const needsKey = isExternal && m.has_api_key === false;
     list.appendChild(uiCard({
       icon: "cpu",
       title: m.name || m.id,
@@ -3564,20 +3684,24 @@ async function loadModelsView() {
       badges: [
         isDefault ? {text:"Default", cls:"green"} : null,
         isActive ? {text:"In use", cls:"blue"} : null,
-        {text: "Context "+(m.context_length||"—")+"k", cls:"gray"},
+        isExternal ? {text:"External", cls:"gray"} : null,
+        needsKey ? {text:"Needs key", cls:"gray"} : null,
+        !isExternal ? {text: "Context "+(m.context_length||"—")+"k", cls:"gray"} : null,
       ].filter(Boolean),
       actions: isDefault ? [] : [
-        btnPrimary("Set default", "check", async () => {
+        btnPrimary(needsKey ? "Add key in Settings" : "Set default", needsKey ? "settings" : "check", async () => {
+          if (needsKey) { setView("settings"); loadSettingsTab && loadSettingsTab("ai"); return; }
           state.model = m.id;
           await api("/v1/settings",{method:"PATCH",body:JSON.stringify({default_model:m.id})},{success:(m.name||m.id)+" set as default"});
           renderModels(); loadModelsView();
         }),
       ],
-      more: !isActive ? [{
+      more: (!isActive && !needsKey) ? [{
         label: "Use now",
         icon: "zap",
-        onClick: () => {
+        onClick: async () => {
           state.model = m.id;
+          await api("/v1/settings",{method:"PATCH",body:JSON.stringify({default_model:m.id})},{error:false});
           renderModels();
           updateComposerChip && updateComposerChip();
           toast((m.name||m.id)+" selected","success");
@@ -3753,20 +3877,162 @@ async function loadSettingsTab(tab) {
     });
     box.appendChild(saveBtn);
   } else if (tab === "ai") {
-    const form = document.createElement("form"); form.className = "form-grid";
-    form.innerHTML = "<label>Default model<input name='default_model' value='"+escapeHtml(s.default_model||"OM-1.0")+"'/></label>"+
+    const llmOn = s.llm_enabled !== false;
+    const providers = s.llm_providers || {};
+    const keysSet = s.llm_api_keys_set || {};
+    const activeId = String(s.default_model || state.model || "OM-1.0").toLowerCase();
+    const LLM_CATALOG = [
+      { id: "om", name: "OM-1.0", vendor: "OM AI (owned)", owned: true },
+      { id: "gpt", name: "GPT", vendor: "OpenAI", hint: "OPENAI_API_KEY" },
+      { id: "claude", name: "Claude", vendor: "Anthropic", hint: "ANTHROPIC_API_KEY" },
+      { id: "gemini", name: "Gemini", vendor: "Google", hint: "GOOGLE_API_KEY" },
+      { id: "llama", name: "Llama", vendor: "Meta via Groq", hint: "GROQ_API_KEY" },
+      { id: "mistral", name: "Mistral", vendor: "Mistral AI", hint: "MISTRAL_API_KEY" },
+      { id: "qwen", name: "Qwen", vendor: "Alibaba", hint: "DASHSCOPE_API_KEY" },
+      { id: "deepseek", name: "DeepSeek", vendor: "DeepSeek", hint: "DEEPSEEK_API_KEY" },
+      { id: "grok", name: "Grok", vendor: "xAI", hint: "XAI_API_KEY" },
+    ];
+    const isActive = (id) => {
+      if (id === "om") return activeId === "om" || activeId === "om-1.0" || activeId === "om1.0";
+      return activeId === id;
+    };
+    const providerRows = LLM_CATALOG.map(p => {
+      const on = p.owned ? providers[p.id] !== false : !!providers[p.id];
+      const hasKey = p.owned || !!keysSet[p.id];
+      let badge = "";
+      if (p.owned || isActive(p.id)) badge = '<span class="llm-provider-badge owned">In use</span>';
+      else if (on && hasKey) badge = '<span class="llm-provider-badge on">Ready</span>';
+      else if (on) badge = '<span class="llm-provider-badge warn">Needs API key</span>';
+      return '<div class="llm-provider-row" data-llm="'+p.id+'">'+
+        '<div class="llm-provider-meta"><div class="llm-provider-name">'+escapeHtml(p.name)+badge+"</div>"+
+        '<div class="llm-provider-vendor">'+escapeHtml(p.vendor)+(p.hint ? " · key: "+escapeHtml(p.hint) : "")+"</div></div>"+
+        '<div class="llm-provider-actions">'+
+        (p.owned ? "" : '<button type="button" class="llm-use-btn" data-use="'+p.id+'"'+(on && hasKey ? "" : " disabled")+'>Use</button>')+
+        (p.owned ? '<button type="button" class="llm-use-btn'+(isActive("om")?" active":"")+'" data-use="om">Use</button>' : "")+
+        '<label class="sw-wrap"><input type="checkbox" class="aiLlmProvider" data-provider="'+p.id+'"'+(on?" checked":"")+(p.owned?' disabled title="Owned brain — always available"':"")+'/><span class="sw-track"></span><span class="sw-thumb"></span></label>'+
+        "</div>"+
+        (p.owned ? "" : '<div class="llm-key-row'+(on?" show":"")+'" data-key-for="'+p.id+'"><input type="password" class="aiLlmKey" data-provider="'+p.id+'" autocomplete="off" placeholder="'+(hasKey?"API key saved — paste new key to replace":"Paste API key to use "+p.name)+'"/></div>')+
+        "</div>";
+    }).join("");
+    const form = document.createElement("form"); form.className = "form-grid"; form.id = "aiSettingsForm";
+    form.innerHTML =
+      "<h3 style='margin:0;font-size:14px;font-weight:700;color:var(--text)'>Language model</h3>"+
+      '<div class="toggle-row"><div><div class="toggle-label">Enable LLM</div><div class="toggle-sub">Allow chat replies from enabled models</div></div>'+
+      '<label class="sw-wrap"><input type="checkbox" id="aiLlmEnabled" name="llm_enabled"'+(llmOn?" checked":"")+'/><span class="sw-track"></span><span class="sw-thumb"></span></label></div>'+
+      '<div id="aiLlmOptions" style="'+(llmOn?"":"display:none")+'" class="settings-section">'+
+      '<div class="toggle-row"><div><div class="toggle-label">LLM only</div><div class="toggle-sub">Direct model replies — skip agent, RAG, and live knowledge</div></div>'+
+      '<label class="sw-wrap"><input type="checkbox" id="aiLlmOnly" name="llm_only"'+(s.llm_only?" checked":"")+'/><span class="sw-track"></span><span class="sw-thumb"></span></label></div>'+
+      '<div id="aiLlmProvidersBox" class="llm-provider-box">'+
+      "<h4>LLMs to use</h4>"+
+      '<p class="llm-hint">1) Enable a model 2) Paste its API key 3) Click <strong>Use</strong> 4) Save. Chat then routes to that model.</p>'+
+      providerRows+
+      "</div>"+
+      '<div id="aiLayerSwitches">'+
+      '<div class="toggle-row"><div><div class="toggle-label">Memory</div><div class="toggle-sub">Remember facts across conversations</div></div>'+
+      '<label class="sw-wrap"><input type="checkbox" id="aiMemory" name="memory_enabled"'+(s.memory_enabled!==false?" checked":"")+'/><span class="sw-track"></span><span class="sw-thumb"></span></label></div>'+
+      '<div class="toggle-row"><div><div class="toggle-label">Knowledge (RAG)</div><div class="toggle-sub">Use your knowledge base in replies</div></div>'+
+      '<label class="sw-wrap"><input type="checkbox" id="aiRag" name="rag_enabled"'+(s.rag_enabled!==false?" checked":"")+'/><span class="sw-track"></span><span class="sw-thumb"></span></label></div>'+
+      '<div class="toggle-row"><div><div class="toggle-label">Live knowledge</div><div class="toggle-sub">Freshness hints for time-sensitive questions</div></div>'+
+      '<label class="sw-wrap"><input type="checkbox" id="aiLive" name="live_knowledge_enabled"'+(s.live_knowledge_enabled?" checked":"")+'/><span class="sw-track"></span><span class="sw-thumb"></span></label></div>'+
+      '<div class="toggle-row"><div><div class="toggle-label">Agent brain</div><div class="toggle-sub">Intent routing, tools, and structured planning</div></div>'+
+      '<label class="sw-wrap"><input type="checkbox" id="aiAgent" name="agent_brain_enabled"'+(s.agent_brain_enabled!==false?" checked":"")+'/><span class="sw-track"></span><span class="sw-thumb"></span></label></div>'+
+      "</div></div>"+
+      "<label>Active model<input name='default_model' id='aiDefaultModel' value='"+escapeHtml(s.default_model||"OM-1.0")+"' readonly/></label>"+
       "<label>Temperature<input name='temperature' type='number' min='0' max='1' step='0.05' value='"+(s.temperature??0.2)+"'/></label>"+
       "<label>Max tokens<input name='max_tokens' type='number' min='64' max='8192' value='"+(s.max_tokens||1024)+"'/></label>"+
-      '<div class="toggle-row"><div><div class="toggle-label">Memory</div><div class="toggle-sub">Remember facts across conversations</div></div>'+
-      '<label class="sw-wrap"><input type="checkbox" name="memory_enabled"'+(s.memory_enabled!==false?" checked":"")+'><div class="sw-track"></div><div class="sw-thumb"></div></label></div>'+
       '<button type="submit" class="btn-primary">'+svg("check",14)+" Save</button>";
+    const syncLlmUi = () => {
+      const on = !!$("aiLlmEnabled").checked;
+      const only = !!$("aiLlmOnly").checked;
+      const opts = $("aiLlmOptions");
+      const layers = $("aiLayerSwitches");
+      if (opts) opts.style.display = on ? "" : "none";
+      if (layers) {
+        layers.style.opacity = only ? "0.45" : "1";
+        ["aiRag","aiLive","aiAgent"].forEach(id => {
+          const el = $(id); if (el) el.disabled = only;
+        });
+      }
+      form.querySelectorAll(".aiLlmProvider").forEach(inp => {
+        const id = inp.getAttribute("data-provider");
+        const row = inp.closest(".llm-provider-row");
+        const keyRow = row && row.querySelector('.llm-key-row[data-key-for="'+id+'"]');
+        const useBtn = row && row.querySelector(".llm-use-btn");
+        if (keyRow) keyRow.classList.toggle("show", !!inp.checked && id !== "om");
+        const hasKey = id === "om" || !!(keysSet[id]) || !!(row && row.querySelector(".aiLlmKey") && row.querySelector(".aiLlmKey").value);
+        if (useBtn && id !== "om") useBtn.disabled = !(inp.checked && hasKey);
+        const nameEl = row && row.querySelector(".llm-provider-name");
+        if (!nameEl) return;
+        let badge = nameEl.querySelector(".llm-provider-badge");
+        if (badge) badge.remove();
+        const active = String(($("aiDefaultModel")||{}).value||"").toLowerCase();
+        if (id === "om" || active === id) nameEl.insertAdjacentHTML("beforeend", '<span class="llm-provider-badge owned">In use</span>');
+        else if (inp.checked && hasKey) nameEl.insertAdjacentHTML("beforeend", '<span class="llm-provider-badge on">Ready</span>');
+        else if (inp.checked) nameEl.insertAdjacentHTML("beforeend", '<span class="llm-provider-badge warn">Needs API key</span>');
+      });
+      form.querySelectorAll(".llm-use-btn").forEach(btn => {
+        const id = btn.getAttribute("data-use");
+        const active = String(($("aiDefaultModel")||{}).value||"OM-1.0");
+        btn.classList.toggle("active", active === id || (id === "om" && (active === "OM-1.0" || active === "om")));
+      });
+    };
+    form.addEventListener("click", e => {
+      const btn = e.target && e.target.closest && e.target.closest(".llm-use-btn");
+      if (!btn || btn.disabled) return;
+      e.preventDefault();
+      const id = btn.getAttribute("data-use");
+      const modelId = id === "om" ? "OM-1.0" : id;
+      const dm = $("aiDefaultModel");
+      if (dm) dm.value = modelId;
+      state.model = modelId;
+      syncLlmUi();
+      toast((id === "om" ? "OM-1.0" : id.toUpperCase())+" selected — click Save","success");
+    });
+    form.addEventListener("change", e => {
+      if (e.target && (e.target.id === "aiLlmEnabled" || e.target.id === "aiLlmOnly" || e.target.classList.contains("aiLlmProvider") || e.target.classList.contains("aiLlmKey"))) syncLlmUi();
+    });
+    form.addEventListener("input", e => {
+      if (e.target && e.target.classList.contains("aiLlmKey")) syncLlmUi();
+    });
     form.addEventListener("submit", async e => {
       e.preventDefault();
       const fd = new FormData(e.target);
-      const { res: r2, data: d2 } = await api("/v1/settings",{method:"PATCH",body:JSON.stringify({default_model:String(fd.get("default_model")||"").trim(),temperature:parseFloat(fd.get("temperature")),max_tokens:parseInt(fd.get("max_tokens")),memory_enabled:!!fd.get("memory_enabled")})},{success:"AI settings saved"});
-      if (r2.ok && d2) { state.settings = d2.settings; state.model = d2.settings.default_model||state.model; renderModels(); }
+      const llm_providers = {};
+      form.querySelectorAll(".aiLlmProvider").forEach(inp => {
+        llm_providers[inp.getAttribute("data-provider")] = !!inp.checked;
+      });
+      if (llm_providers.om === false) llm_providers.om = true;
+      const llm_api_keys = {};
+      form.querySelectorAll(".aiLlmKey").forEach(inp => {
+        const v = String(inp.value||"").trim();
+        if (v) llm_api_keys[inp.getAttribute("data-provider")] = v;
+      });
+      const payload = {
+        llm_enabled: !!$("aiLlmEnabled").checked,
+        llm_only: !!$("aiLlmOnly").checked,
+        memory_enabled: !!$("aiMemory").checked,
+        rag_enabled: !!$("aiRag").checked,
+        live_knowledge_enabled: !!$("aiLive").checked,
+        agent_brain_enabled: !!$("aiAgent").checked,
+        llm_providers,
+        llm_api_keys,
+        default_model: String(fd.get("default_model")||"OM-1.0").trim(),
+        temperature: parseFloat(fd.get("temperature")),
+        max_tokens: parseInt(fd.get("max_tokens"), 10),
+      };
+      const { res: r2, data: d2 } = await api("/v1/settings",{method:"PATCH",body:JSON.stringify(payload)},{success:"AI settings saved — model ready"});
+      if (r2.ok && d2) {
+        state.settings = d2.settings;
+        state.model = d2.settings.default_model||state.model;
+        Object.assign(keysSet, d2.settings.llm_api_keys_set||{});
+        form.querySelectorAll(".aiLlmKey").forEach(inp => { inp.value = ""; inp.placeholder = "API key saved — paste new key to replace"; });
+        await loadModelsCatalog();
+        renderModels();
+        syncLlmUi();
+      }
     });
     box.appendChild(form);
+    syncLlmUi();
   } else if (tab === "privacy") {
     const form = document.createElement("form");
     form.className = "form-grid";

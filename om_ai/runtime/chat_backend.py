@@ -513,8 +513,19 @@ def chat_reply(
             provider=info.provider,
             live_knowledge=merged_lk or None,
         )
+        intent_v = brain_decision.intent.value
+
+        def _out(text: str) -> tuple[str, ChatBackendInfo]:
+            from om_ai.response_engine import format_assistant_reply
+
+            try:
+                polished = format_assistant_reply(text or "", intent=intent_v, enhance=True)
+            except Exception:
+                polished = (text or "").strip()
+            return polished, info_lk
+
         if prefer_grounded and grounded_allowed and grounded:
-            return grounded, info_lk
+            return _out(grounded)
 
         try:
             text = native_chat(messages, **kwargs)
@@ -527,6 +538,21 @@ def chat_reply(
 
         # Model-first: accept any usable generation. No canned greeting/self overrides.
         fail = is_low_quality_reply(text)
+        # Tiny models often start with "Hello" then derail — use Agent Brain fallback.
+        if (
+            not fail
+            and brain_decision.intent.value in {"greeting", "identity"}
+            and brain_decision.structured_fallback
+        ):
+            from om_ai.runtime.chat_orchestrator import (
+                is_nonsensical_smalltalk,
+                looks_like_assistant_chitchat,
+            )
+
+            probe = (usable_generation_text(text) or text or "").strip()
+            if is_nonsensical_smalltalk(probe) or not looks_like_assistant_chitchat(probe):
+                return _out(brain_decision.structured_fallback)
+
         if not fail:
             cleaned = usable_generation_text(text) or ""
             cleaned = cleaned.lstrip(" ,.;:\"'`-—–")
@@ -561,18 +587,18 @@ def chat_reply(
                         if not alt_clean or looks_like_web_spam(alt_clean):
                             continue
                         if not _looks_scripted(alt_clean):
-                            return alt_clean, info_lk
+                            return _out(alt_clean)
                         best = alt_clean
                 except Exception as exc:
                     logger.debug("script diversify skipped: %s", exc)
                 # Prefer any model variant over injecting canned copy.
-                return best, info_lk
+                return _out(best)
             if cleaned and not looks_like_web_spam(cleaned):
-                return cleaned, info_lk
+                return _out(cleaned)
             fail = "spam"
 
         if grounded_allowed and grounded and not looks_like_web_spam(grounded):
-            return grounded, info_lk
+            return _out(grounded)
 
         # Safer OM-1.0 retry with stronger anti-repetition (still model output only).
         try:
@@ -592,7 +618,7 @@ def chat_reply(
             if not retry_fail:
                 retry = (usable_generation_text(retry) or "").lstrip(" ,.;:\"'`-—–")
                 if retry and not looks_like_web_spam(retry):
-                    return retry, info_lk
+                    return _out(retry)
                 retry_fail = "spam"
             if retry_fail:
                 fail = retry_fail
@@ -604,11 +630,10 @@ def chat_reply(
         if not rescued and brain_decision.structured_fallback:
             rescued = brain_decision.structured_fallback
         if rescued:
-            return rescued, info_lk
+            return _out(rescued)
 
         # No static chat templates — only the engine empty hint if model failed.
-        return EMPTY_GENERATION_FALLBACK, info_lk
-
+        return _out(EMPTY_GENERATION_FALLBACK)
     messages = with_runtime_date_context(messages)
     if info.backend == "openai":
         text = chat_via_openai(

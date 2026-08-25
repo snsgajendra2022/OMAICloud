@@ -29,6 +29,8 @@ class TrainingConfig:
     output_dir: str = "artifacts/checkpoints"
     seed: int = 42
     num_workers: int = 0
+    keep_last_step_checkpoints: int = 2
+    min_free_gb: float = 1.0
 
 
 class Trainer:
@@ -67,9 +69,42 @@ class Trainer:
         cosine = 0.5 * (1 + math.cos(math.pi * min(1.0, progress)))
         return self.cfg.learning_rate * (self.cfg.min_lr_ratio + (1 - self.cfg.min_lr_ratio) * cosine)
 
+    @staticmethod
+    def _free_bytes(path: Path) -> int | None:
+        try:
+            usage = os.statvfs(path)
+            return int(usage.f_bavail * usage.f_frsize)
+        except OSError:
+            return None
+
+    def _ensure_disk_space(self, path: Path) -> None:
+        free = self._free_bytes(path.parent if path.suffix else path)
+        need = int(max(0.5, float(self.cfg.min_free_gb)) * (1024**3))
+        if free is not None and free < need:
+            free_gb = free / (1024**3)
+            raise RuntimeError(
+                f"Not enough disk space to save checkpoint at {path} "
+                f"(free={free_gb:.2f} GiB, need>={self.cfg.min_free_gb} GiB). "
+                f"Delete old artifacts/checkpoints/*/step-*.pt or unused runs, then retry."
+            )
+
+    def _prune_step_checkpoints(self) -> None:
+        keep = max(0, int(self.cfg.keep_last_step_checkpoints))
+        root = Path(self.cfg.output_dir)
+        steps = sorted(
+            root.glob("step-*.pt"),
+            key=lambda p: p.stat().st_mtime,
+        )
+        for old in steps[:-keep] if keep else steps:
+            try:
+                old.unlink(missing_ok=True)
+            except OSError:
+                pass
+
     def save_checkpoint(self, path: str | Path, extra: dict | None = None):
         p = Path(path)
         p.parent.mkdir(parents=True, exist_ok=True)
+        self._ensure_disk_space(p)
         payload = {
             "model": self.model.state_dict(),
             "optimizer": self.optimizer.state_dict(),
@@ -83,9 +118,21 @@ class Trainer:
         try:
             torch.save(payload, tmp)
             os.replace(tmp, p)
+        except Exception as exc:
+            if tmp.exists():
+                tmp.unlink(missing_ok=True)
+            msg = str(exc).lower()
+            if "iostream" in msg or "unexpected pos" in msg or "no space" in msg:
+                raise RuntimeError(
+                    f"Checkpoint write failed (often disk full) while saving {p}: {exc}. "
+                    f"Free space under artifacts/checkpoints/ and retry with --resume."
+                ) from exc
+            raise
         finally:
             if tmp.exists():
                 tmp.unlink(missing_ok=True)
+        if p.name.startswith("step-"):
+            self._prune_step_checkpoints()
 
     def load_checkpoint(self, path: str | Path):
         p = Path(path)

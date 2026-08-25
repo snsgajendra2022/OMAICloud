@@ -1,0 +1,39 @@
+{
+  "project": "Genesis-JARVIS",
+  "parent": "OM AI Operating Intelligence Platform",
+  "document": "docs/PROJECT_GENESIS_JARVIS.md",
+  "engineering": "docs/JARVIS_OPERATING_INTELLIGENCE.md",
+  "layers": {
+    "buildable_now": [
+      "cognitive_core_partial",
+      "memory_rag_agents",
+      "response_experience",
+      "owned_model_pipeline_20m",
+      "oi_facade_apis",
+      "hardware_contracts_stub"
+    ],
+    "near_future": [
+      "dense_rag",
+      "repo_coding_tools",
+      "iot_mcu_drivers",
+      "robotics_sim",
+      "voice_vision_production_adapters",
+      "omai_100m_to_7b"
+    ],
+    "long_term_research": [
+      "neuromorphic",
+      "organic_electronics",
+      "microbial_neural_mesh",
+      "bio_electronic_interfaces",
+      "adaptive_organic_memory",
+      "holographic_spatial_ui"
+    ]
+  },
+  "practical_path": [
+    "Build OM AI brain + agent stack",
+    "Connect electronics / sensors / robotics (gated)",
+    "Research bio-digital interfaces in controlled programs",
+    "Expand toward full Genesis-JARVIS"
+  ],
+  "api_status": "GET /v1/oi/status"
+}

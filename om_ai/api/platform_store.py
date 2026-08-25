@@ -763,7 +763,24 @@ class PlatformStore:
             "response_style": "balanced",
             "language": "en",
             "temperature": 0.7,
+            "llm_enabled": True,
+            "llm_only": False,
             "memory_enabled": True,
+            "rag_enabled": True,
+            "live_knowledge_enabled": False,
+            "agent_brain_enabled": True,
+            "llm_providers": {
+                "om": True,
+                "gpt": False,
+                "claude": False,
+                "gemini": False,
+                "llama": False,
+                "mistral": False,
+                "qwen": False,
+                "deepseek": False,
+                "grok": False,
+            },
+            "llm_api_keys": {},
             "notifications_email": False,
             "notifications_push": True,
             "notifications_tasks": True,
@@ -782,11 +799,52 @@ class PlatformStore:
             data = json.loads(row["data"] or "{}")
         except json.JSONDecodeError:
             data = {}
-        return {**defaults, **data}
+        merged = {**defaults, **data}
+        # Deep-merge provider toggles so new catalog keys appear for old saves.
+        providers = {**(defaults.get("llm_providers") or {}), **(merged.get("llm_providers") or {})}
+        merged["llm_providers"] = providers
+        keys = dict(merged.get("llm_api_keys") or {})
+        merged["llm_api_keys"] = keys
+        # Never expose raw secrets to API clients — only which keys are set.
+        merged["llm_api_keys_set"] = {k: bool(str(v or "").strip()) for k, v in keys.items()}
+        # Keep llm_api_keys internal for chat routing; strip in route layer if needed.
+        return merged
+
+    def get_settings_public(self, tenant_id: str, actor: str) -> dict[str, Any]:
+        """Settings safe for the browser (API keys redacted)."""
+        from om_ai.runtime.external_llms import EXTERNAL_IDS, resolve_api_key
+
+        s = self.get_settings(tenant_id, actor)
+        out = dict(s)
+        raw_keys = dict(out.pop("llm_api_keys", None) or {})
+        keys_set = {k: bool(str(v or "").strip()) for k, v in raw_keys.items()}
+        for pid in EXTERNAL_IDS:
+            if resolve_api_key(pid, raw_keys):
+                keys_set[pid] = True
+        out["llm_api_keys_set"] = keys_set
+        return out
 
     def update_settings(self, tenant_id: str, actor: str, patch: dict[str, Any]) -> dict[str, Any]:
         current = self.get_settings(tenant_id, actor)
-        merged = {**current, **(patch or {})}
+        patch = dict(patch or {})
+        if "llm_providers" in patch and isinstance(patch["llm_providers"], dict):
+            patch["llm_providers"] = {
+                **(current.get("llm_providers") or {}),
+                **patch["llm_providers"],
+            }
+        if "llm_api_keys" in patch and isinstance(patch["llm_api_keys"], dict):
+            merged_keys = dict(current.get("llm_api_keys") or {})
+            for k, v in patch["llm_api_keys"].items():
+                val = "" if v is None else str(v).strip()
+                if val in {"", "••••", "****", "***", "[set]"}:
+                    continue
+                if val.lower() in {"clear", "none", "-"}:
+                    merged_keys.pop(k, None)
+                    continue
+                merged_keys[str(k)] = val
+            patch["llm_api_keys"] = merged_keys
+        merged = {**current, **patch}
+        merged.pop("llm_api_keys_set", None)
         now = _utc()
         with self._lock:
             self._conn.execute(
@@ -798,7 +856,7 @@ class PlatformStore:
                 (tenant_id, actor, json.dumps(merged), now),
             )
             self._conn.commit()
-        return merged
+        return self.get_settings_public(tenant_id, actor)
 
     # --- knowledge sources ---
     def list_knowledge_sources(

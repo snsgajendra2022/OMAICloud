@@ -1,0 +1,79 @@
+{
+  "built_at": "2026-08-25T11:09:58+00:00",
+  "root": "data/omai-corpus-v1",
+  "phase": "OMAI-Corpus-v1-production-pipeline",
+  "pipeline_complete_pct": 100.0,
+  "stages": {
+    "dataset_downloader": true,
+    "license_tracking": true,
+    "data_validation": true,
+    "language_filtering": true,
+    "quality_scoring": true,
+    "duplicate_removal": true,
+    "pii_filtering": true,
+    "toxic_content_filtering": true,
+    "tokenization": true,
+    "train_validation_split": true
+  },
+  "fetch": [],
+  "cleaned_docs": 186,
+  "rejected": {
+    "license": 0,
+    "quality": 0,
+    "toxic": 0,
+    "spam": 0,
+    "lang": 0,
+    "empty": 0,
+    "too_short": 8
+  },
+  "dedupe": {
+    "input": "data/omai-corpus-v1/filtered/all.jsonl",
+    "output": "data/omai-corpus-v1/deduplicated/all.jsonl",
+    "records": 94,
+    "exact_duplicates_removed": 92,
+    "near_dup_audit": {
+      "input": "data/omai-corpus-v1/filtered/all.jsonl",
+      "output": "data/omai-corpus-v1/audit/near_dup_view.jsonl",
+      "records": 94
+    }
+  },
+  "tokenization": {
+    "enabled": true,
+    "tokenizer": "artifacts/tokenizer-production-65536.json",
+    "docs": 89,
+    "tokens": 837141,
+    "path": "data/omai-corpus-v1/tokenized/train.ids.jsonl"
+  },
+  "train_docs": 89,
+  "validation_docs": 5,
+  "train_jsonl": "data/omai-corpus-v1/train/shard-00001.jsonl",
+  "train_txt": "data/omai-corpus-v1/train/corpus.txt",
+  "validation_jsonl": "data/omai-corpus-v1/validation/shard-00001.jsonl",
+  "note": "Pipeline software is complete. Scale collection (FineWeb full / dumps) is still required before 1B\u201370B token budgets are met.",
+  "sources_synced": {
+    "wikipedia": 1,
+    "books": 1,
+    "code": 0,
+    "science": 0,
+    "conversations": 2,
+    "custom": 1
+  },
+  "layout_validation": {
+    "ok": true,
+    "missing_dirs": [],
+    "has_train_txt": true,
+    "train_bytes": 3320043,
+    "has_build_report": true,
+    "root": "data/omai-corpus-v1"
+  },
+  "pipeline": "om_ai.data_pipeline",
+  "flow": [
+    "raw",
+    "cleaner",
+    "language_filter",
+    "quality",
+    "deduplicator",
+    "tokenizer",
+    "train/validation"
+  ]
+}

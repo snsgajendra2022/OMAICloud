@@ -52,8 +52,20 @@ def compose_fallback(
     q = (user_text or "").strip()[:180]
 
     if intent == "greeting":
+        qlow = (user_text or "").lower()
+        if "how are you" in qlow or "how's it" in qlow:
+            return (
+                "👋 I’m doing well — thanks for asking.\n\n"
+                "I’m **OM AI**, here with you in your private workspace.\n\n"
+                "## I can help with\n"
+                "- Code development\n"
+                "- Project analysis\n"
+                "- AI implementation\n\n"
+                "How can I help you today?"
+            )
         return (
-            f"{opener} I’m OM — here for real conversation, not just answers. "
+            f"👋 {opener}\n\n"
+            "I’m **OM AI** — here for real conversation, not just answers.\n\n"
             "What’s on your mind?"
         )
 

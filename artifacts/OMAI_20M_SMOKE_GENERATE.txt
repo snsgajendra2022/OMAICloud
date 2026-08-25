@@ -1,0 +1,3 @@
+{'device': 'cpu', 'parameters': 19990784, 'tokenizer': {'backend': 'huggingface-tokenizers', 'vocab_size': 65536, 'chat_tokens_available': True, 'fingerprint': 'c5fd9dae73db06519f580abc44db49809cc6901d7db044f36363ecb269b5b738', 'source_path': 'artifacts/tokenizer-production-65536.json', 'special_tokens': {'<pad>': 0, '<bos>': 1, '<eos>': 2, '<unk>': 3, '<system>': 4, '</system>': 5, '<user>': 6, '</user>': 7, '<assistant>': 8, '</assistant>': 9}, 'pad_id': 0, 'bos_id': 1, 'eos_id': 2, 'unk_id': 3}, 'tokenizer_fingerprint': 'c5fd9dae73db06519f580abc44db49809cc6901d7db044f36363ecb269b5b738', 'checkpoint': 'artifacts/checkpoints/omai-20m-base/latest.pt'}
+ and a I she
+and had all.”

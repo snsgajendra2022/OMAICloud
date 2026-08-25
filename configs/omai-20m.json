@@ -1,0 +1,19 @@
+{
+  "name": "OMAI-20M",
+  "description": "Milestone-1 prove brain: 6 layers, 8 heads, ~20M params. Validates tokenizer→train→ckpt→infer. Not ChatGPT-class. Full target context 2048 when VRAM allows; local default 512.",
+  "vocab_size": 65536,
+  "max_seq_len": 512,
+  "n_layers": 6,
+  "n_heads": 8,
+  "n_kv_heads": 8,
+  "d_model": 256,
+  "d_ff": 704,
+  "rope_theta": 10000.0,
+  "dropout": 0.0,
+  "bias": false,
+  "tie_embeddings": true,
+  "use_rmsnorm": true,
+  "gradient_checkpointing": false,
+  "parameter_goal_note": "~20M with d_model=256. Roadmap diagram listed hidden=512 which is ~50M+ with this vocab — see configs/omai-50m-validate.json for that shape.",
+  "target_context": 2048
+}

@@ -1,0 +1,366 @@
+[
+  {
+    "id": "cognitive_core",
+    "name": "Cognitive Core",
+    "horizon": "current",
+    "layer": 1,
+    "topics": [
+      "reasoning",
+      "planning",
+      "decision making",
+      "problem decomposition",
+      "prediction",
+      "self-evaluation",
+      "Observe-Understand-Plan-Execute-Verify-Improve"
+    ],
+    "example_kinds": [
+      "architecture",
+      "reasoning",
+      "checklist"
+    ]
+  },
+  {
+    "id": "human_understanding",
+    "name": "Human Understanding",
+    "horizon": "current",
+    "layer": 2,
+    "topics": [
+      "natural language",
+      "technical language",
+      "business language",
+      "scientific language",
+      "intent disambiguation",
+      "emotion/context cues"
+    ],
+    "example_kinds": [
+      "intent",
+      "clarify",
+      "explain"
+    ]
+  },
+  {
+    "id": "knowledge_engine",
+    "name": "Universal Knowledge Engine",
+    "horizon": "current",
+    "layer": 3,
+    "topics": [
+      "knowledge graphs",
+      "concept relationships",
+      "science/tech/math overview",
+      "RAG grounding",
+      "citation honesty"
+    ],
+    "example_kinds": [
+      "explain",
+      "compare",
+      "retrieve-plan"
+    ]
+  },
+  {
+    "id": "software",
+    "name": "Software Engineering Brain",
+    "horizon": "current",
+    "layer": 4,
+    "topics": [
+      "system design",
+      "API design",
+      "databases",
+      "security",
+      "DevOps",
+      "testing",
+      "Python/FastAPI",
+      "TypeScript/React",
+      "repo understanding"
+    ],
+    "example_kinds": [
+      "architecture",
+      "coding",
+      "review"
+    ]
+  },
+  {
+    "id": "autonomous_coding",
+    "name": "Autonomous Coding Agents",
+    "horizon": "current",
+    "layer": 5,
+    "topics": [
+      "architecture agent",
+      "backend/frontend agents",
+      "database agent",
+      "security/testing/devops agents",
+      "requirement\u2192deploy workflow"
+    ],
+    "example_kinds": [
+      "agent-plan",
+      "workflow",
+      "coding"
+    ]
+  },
+  {
+    "id": "memory",
+    "name": "Memory Architecture",
+    "horizon": "current",
+    "layer": 6,
+    "topics": [
+      "short-term memory",
+      "long-term memory",
+      "experience memory",
+      "skill memory",
+      "memory\u2192knowledge\u2192decisions"
+    ],
+    "example_kinds": [
+      "architecture",
+      "explain",
+      "checklist"
+    ]
+  },
+  {
+    "id": "digital_twin",
+    "name": "Digital Twin Intelligence",
+    "horizon": "near_future",
+    "layer": 7,
+    "topics": [
+      "software project twin",
+      "device/machine twin",
+      "environment twin",
+      "simulate-before-change",
+      "school transport twin example"
+    ],
+    "example_kinds": [
+      "architecture",
+      "simulation",
+      "scenario"
+    ]
+  },
+  {
+    "id": "agent_civilization",
+    "name": "Agent Civilization",
+    "horizon": "current",
+    "layer": 8,
+    "topics": [
+      "OM master agent",
+      "research/engineering/science agents",
+      "business/security/automation/hardware agents",
+      "agent collaboration protocols"
+    ],
+    "example_kinds": [
+      "agent-plan",
+      "workflow",
+      "architecture"
+    ]
+  },
+  {
+    "id": "electronics",
+    "name": "Electronics Intelligence",
+    "horizon": "current",
+    "layer": 9,
+    "topics": [
+      "ESP32",
+      "Arduino",
+      "STM32",
+      "Raspberry Pi",
+      "Jetson",
+      "FPGA basics",
+      "MQTT/CAN/BLE/WiFi/Serial",
+      "sensors and PCB basics"
+    ],
+    "example_kinds": [
+      "architecture",
+      "electronics",
+      "checklist"
+    ]
+  },
+  {
+    "id": "robotics",
+    "name": "Robotics Intelligence",
+    "horizon": "current",
+    "layer": 10,
+    "topics": [
+      "robot controller stack",
+      "vision/navigation",
+      "motion planning",
+      "actuators/motors",
+      "safety e-stop",
+      "sim-first autonomy"
+    ],
+    "example_kinds": [
+      "architecture",
+      "robotics",
+      "scenario"
+    ]
+  },
+  {
+    "id": "scientific_research",
+    "name": "Scientific Research Engine",
+    "horizon": "current",
+    "layer": 11,
+    "topics": [
+      "hypothesis design",
+      "experiment planning",
+      "physics/chemistry/biology concepts",
+      "materials and energy basics",
+      "analysis honesty"
+    ],
+    "example_kinds": [
+      "research",
+      "explain",
+      "checklist"
+    ]
+  },
+  {
+    "id": "bio_digital",
+    "name": "Bio-Digital Research",
+    "horizon": "research",
+    "layer": 12,
+    "topics": [
+      "bio-electronics",
+      "neuromorphic computing",
+      "organic sensors",
+      "brain-inspired computing",
+      "synthetic biology concepts"
+    ],
+    "example_kinds": [
+      "research",
+      "horizon",
+      "explain"
+    ]
+  },
+  {
+    "id": "microbial_computing",
+    "name": "Microbial Computing Research",
+    "horizon": "research",
+    "layer": 13,
+    "topics": [
+      "electroactive microbes",
+      "electron transfer",
+      "signal analysis",
+      "adaptive biological networks"
+    ],
+    "example_kinds": [
+      "research",
+      "horizon",
+      "explain"
+    ]
+  },
+  {
+    "id": "adaptive_memory_research",
+    "name": "Adaptive Memory Research",
+    "horizon": "research",
+    "layer": 14,
+    "topics": [
+      "experience\u2192pattern\u2192memory",
+      "neuromorphic chips",
+      "adaptive materials",
+      "AI weights vs biological analogy"
+    ],
+    "example_kinds": [
+      "research",
+      "compare",
+      "explain"
+    ]
+  },
+  {
+    "id": "energy",
+    "name": "Energy Intelligence",
+    "horizon": "near_future",
+    "layer": 15,
+    "topics": [
+      "power systems",
+      "batteries/storage",
+      "renewables",
+      "bio-energy research",
+      "AI energy optimization"
+    ],
+    "example_kinds": [
+      "architecture",
+      "explain",
+      "checklist"
+    ]
+  },
+  {
+    "id": "human_interface",
+    "name": "Human Interface",
+    "horizon": "current",
+    "layer": 16,
+    "topics": [
+      "voice/text/vision",
+      "streaming UX",
+      "AR/VR spatial concepts",
+      "calm professional personality",
+      "response experience blocks"
+    ],
+    "example_kinds": [
+      "ux",
+      "explain",
+      "architecture"
+    ]
+  },
+  {
+    "id": "self_improvement",
+    "name": "Self Improvement System",
+    "horizon": "current",
+    "layer": 17,
+    "topics": [
+      "observe-measure-learn-optimize-update",
+      "feedback\u2192SFT/DPO",
+      "eval gates before promote",
+      "continuous learning honesty"
+    ],
+    "example_kinds": [
+      "workflow",
+      "checklist",
+      "architecture"
+    ]
+  },
+  {
+    "id": "safety",
+    "name": "Safety System",
+    "horizon": "current",
+    "layer": 18,
+    "topics": [
+      "action validation",
+      "data protection",
+      "risky-action confirmation",
+      "decision explanation",
+      "hardware dry-run defaults"
+    ],
+    "example_kinds": [
+      "safety",
+      "checklist",
+      "scenario"
+    ]
+  },
+  {
+    "id": "response_intelligence",
+    "name": "Response Intelligence",
+    "horizon": "current",
+    "layer": 19,
+    "topics": [
+      "structured answers",
+      "Understanding\u2192Analysis\u2192Architecture\u2192Implementation\u2192Validation\u2192Next",
+      "markdown/streaming presentation"
+    ],
+    "example_kinds": [
+      "format",
+      "explain",
+      "rewrite"
+    ]
+  },
+  {
+    "id": "genesis",
+    "name": "Genesis-JARVIS Platform Integration",
+    "horizon": "near_future",
+    "layer": 0,
+    "topics": [
+      "full stack integration",
+      "horizon separation",
+      "digital\u2192physical\u2192research path",
+      "OM-1.0 evolution roadmap"
+    ],
+    "example_kinds": [
+      "architecture",
+      "roadmap",
+      "horizon"
+    ]
+  }
+]

@@ -1,0 +1,89 @@
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+{
+  "built_at": "2026-08-25T10:07:17+00:00",
+  "root": "data/omai-corpus-v1",
+  "phase": "OMAI-Corpus-v1-production-pipeline",
+  "pipeline_complete_pct": 100.0,
+  "stages": {
+    "dataset_downloader": true,
+    "license_tracking": true,
+    "data_validation": true,
+    "language_filtering": true,
+    "quality_scoring": true,
+    "duplicate_removal": true,
+    "pii_filtering": true,
+    "toxic_content_filtering": true,
+    "tokenization": true,
+    "train_validation_split": true
+  },
+  "fetch": [
+    {
+      "source_id": "om-owned",
+      "path": "data/omai-corpus-v1/raw/conversations/om-owned.jsonl",
+      "docs": 1,
+      "bytes": 10727,
+      "ok": true,
+      "detail": "local"
+    },
+    {
+      "source_id": "wikipedia-en",
+      "path": "",
+      "docs": 0,
+      "bytes": 0,
+      "ok": false,
+      "detail": "name 'UA' is not defined"
+    },
+    {
+      "source_id": "gutenberg",
+      "path": "",
+      "docs": 0,
+      "bytes": 0,
+      "ok": false,
+      "detail": "name 'UA' is not defined"
+    },
+    {
+      "source_id": "fineweb",
+      "path": "data/omai-corpus-v1/raw/fineweb/fineweb.jsonl",
+      "docs": 12,
+      "bytes": 28667,
+      "ok": true,
+      "detail": "hf_datasets"
+    },
+    {
+      "source_id": "open-assistant",
+      "path": "data/omai-corpus-v1/raw/conversations/open-assistant.jsonl",
+      "docs": 11,
+      "bytes": 11220,
+      "ok": true,
+      "detail": "hf_datasets"
+    }
+  ],
+  "cleaned_docs": 116,
+  "rejected": {
+    "license": 0,
+    "quality": 0,
+    "toxic": 0,
+    "spam": 0,
+    "lang": 0,
+    "empty": 0,
+    "too_short": 5
+  },
+  "dedupe": {
+    "input": "data/omai-corpus-v1/filtered/all.jsonl",
+    "output": "data/omai-corpus-v1/deduplicated/all.jsonl",
+    "records": 93
+  },
+  "tokenization": {
+    "enabled": true,
+    "tokenizer": "artifacts/tokenizer-production-65536.json",
+    "docs": 88,
+    "tokens": 833736,
+    "path": "data/omai-corpus-v1/tokenized/train.ids.jsonl"
+  },
+  "train_docs": 88,
+  "validation_docs": 5,
+  "train_jsonl": "data/omai-corpus-v1/train/shard-00001.jsonl",
+  "train_txt": "data/omai-corpus-v1/train/corpus.txt",
+  "validation_jsonl": "data/omai-corpus-v1/validation/shard-00001.jsonl",
+  "note": "Pipeline software is complete. Scale collection (FineWeb full / dumps) is still required before 1B\u201370B token budgets are met."
+}

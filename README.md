@@ -11,7 +11,7 @@ This repository is **working software** (architecture, trainers, agents, API). I
 - Local OM-1.0 smoke/long checkpoints prove the native pipeline; they are **not** frontier capability
 - No fabricated benchmark leaderboard scores are claimed
 
-See `docs/IMPLEMENTATION_STATUS.md` and `docs/EXTERNAL_ASSETS_REQUIRED.md`.
+See `docs/IMPLEMENTATION_STATUS.md`, `docs/EXTERNAL_ASSETS_REQUIRED.md`, **`docs/PROJECT_GENESIS_JARVIS.md`**, **`docs/OM10_GENESIS_CORPUS_SPEC.md`** (19-layer training corpus), **`docs/OM10_GENESIS_TRAINING.md`**, **`docs/OWN_MODEL_MILESTONE1.md`**, **`docs/OWN_INTELLIGENCE_ROADMAP.md`**, **`docs/RESPONSE_EXPERIENCE.md`**, and **`docs/JARVIS_OPERATING_INTELLIGENCE.md`**.
 
 ## Quick start (OM-1.0 native)
 
@@ -56,7 +56,7 @@ One-shot tiny pipeline: `python scripts/run_actual_training_pipeline.py --steps 
 | `om-ai model-info` | OM-1.0 native info (or `--config` architecture estimate) |
 | `om-ai train-om1` | Local OM-1.0 smoke / continue training |
 | `om-ai tokenizer train\|inspect\|encode\|decode` | Byte-BPE tokenizer |
-| `om-ai corpus import\|validate\|dedupe\|audit\|shard\|stats` | Corpus governance |
+| `om-ai corpus catalog\|fetch\|build-v1\|import\|validate\|…` | OMAI-Corpus-v1 + governance ([docs/OMAI_CORPUS_V1.md](docs/OMAI_CORPUS_V1.md)) |
 | `om-ai pretrain` / `om-ai train` | Causal pretraining |
 | `om-ai sft` / `om-ai reward` / `om-ai dpo` | Post-training |
 | `om-ai evaluate` / `om-ai benchmark` | Local eval harness |

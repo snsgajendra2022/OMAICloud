@@ -1,0 +1,40 @@
+{
+  "milestone": "Milestone 1 — OMAI-Corpus-v1 + First Own Weights",
+  "updated_at": "2026-08-25T10:43:30+00:00",
+  "tracker": {
+    "software_platform_pct": 97,
+    "tokenizer_pct": 85,
+    "corpus_pipeline_pct": 95,
+    "omai_20m_pct": 90,
+    "first_own_checkpoint": true,
+    "omai_1b_pct": 0,
+    "omai_7b_pct": 0,
+    "omai_70b_pct": 0
+  },
+  "owned_stack": {
+    "corpus": "data/omai-corpus-v1/",
+    "tokenizer": "artifacts/tokenizer-production-65536.json",
+    "config": "configs/omai-20m.json",
+    "parameters": 21597440,
+    "checkpoint": "artifacts/checkpoints/omai-20m-base/latest.pt",
+    "inference": "om-ai generate",
+    "third_party_llm_brain": false
+  },
+  "train": {
+    "steps": 100,
+    "loss_start": 11.15,
+    "loss_end": 6.84,
+    "device": "cpu",
+    "architecture": "6L / 8H / d256 / ctx512 / RMSNorm / SwiGLU / RoPE"
+  },
+  "next": [
+    "Longer OMAI-20M train + more corpus volume",
+    "OMAI-Tokenizer-v1 domain specials (<|code|>, <|reasoning|>)",
+    "OMAI-100M → 1B on GPU",
+    "Parallel: memory + tools + agents"
+  ],
+  "docs": [
+    "docs/OWN_MODEL_MILESTONE1.md",
+    "docs/OWN_INTELLIGENCE_ROADMAP.md"
+  ]
+}

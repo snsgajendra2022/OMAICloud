@@ -1,0 +1,115 @@
+=== OMAI-20M prove-the-brain ===
+device=cpu steps=100 out=artifacts/checkpoints/omai-20m-base
+{
+  "built_at": "2026-08-25T10:42:11+00:00",
+  "root": "data/omai-corpus-v1",
+  "phase": "OMAI-Corpus-v1-production-pipeline",
+  "pipeline_complete_pct": 100.0,
+  "stages": {
+    "dataset_downloader": true,
+    "license_tracking": true,
+    "data_validation": true,
+    "language_filtering": true,
+    "quality_scoring": true,
+    "duplicate_removal": true,
+    "pii_filtering": true,
+    "toxic_content_filtering": true,
+    "tokenization": true,
+    "train_validation_split": true
+  },
+  "fetch": [],
+  "cleaned_docs": 186,
+  "rejected": {
+    "license": 0,
+    "quality": 0,
+    "toxic": 0,
+    "spam": 0,
+    "lang": 0,
+    "empty": 0,
+    "too_short": 8
+  },
+  "dedupe": {
+    "input": "data/omai-corpus-v1/filtered/all.jsonl",
+    "output": "data/omai-corpus-v1/deduplicated/all.jsonl",
+    "records": 94,
+    "exact_duplicates_removed": 92,
+    "near_dup_audit": {
+      "input": "data/omai-corpus-v1/filtered/all.jsonl",
+      "output": "data/omai-corpus-v1/audit/near_dup_view.jsonl",
+      "records": 94
+    }
+  },
+  "tokenization": {
+    "enabled": true,
+    "tokenizer": "artifacts/tokenizer-production-65536.json",
+    "docs": 89,
+    "tokens": 837141,
+    "path": "data/omai-corpus-v1/tokenized/train.ids.jsonl"
+  },
+  "train_docs": 89,
+  "validation_docs": 5,
+  "train_jsonl": "data/omai-corpus-v1/train/shard-00001.jsonl",
+  "train_txt": "data/omai-corpus-v1/train/corpus.txt",
+  "validation_jsonl": "data/omai-corpus-v1/validation/shard-00001.jsonl",
+  "note": "Pipeline software is complete. Scale collection (FineWeb full / dumps) is still required before 1B\u201370B token budgets are met.",
+  "sources_synced": {
+    "wikipedia": 1,
+    "books": 1,
+    "code": 0,
+    "science": 0,
+    "conversations": 2,
+    "custom": 1
+  },
+  "layout_validation": {
+    "ok": true,
+    "missing_dirs": [],
+    "has_train_txt": true,
+    "train_bytes": 3320043,
+    "has_build_report": true,
+    "root": "data/omai-corpus-v1"
+  },
+  "pipeline": "om_ai.data_pipeline",
+  "flow": [
+    "raw",
+    "cleaner",
+    "language_filter",
+    "quality",
+    "deduplicator",
+    "tokenizer",
+    "train/validation"
+  ]
+}
+{"event": "om1_train_start", "name": "OM-1.0", "config": "configs/omai-20m.json", "data": "data/omai-corpus-v1/train/corpus.txt", "tokenizer": "artifacts/tokenizer-production-65536.json", "tokenizer_fingerprint": "c5fd9dae73db06519f580abc44db49809cc6901d7db044f36363ecb269b5b738", "device": "cpu", "parameters": 21597440, "dataset_blocks": 230, "steps": 100, "max_tokens": 200000, "max_docs": 1500, "output": "artifacts/checkpoints/omai-20m-base", "not_70b": true, "not_chatgpt": true, "clamp": null}
+{"step": 1, "loss": 11.15452, "lr": 5.9999999999999995e-05, "steps_per_sec": 1.026}
+{"step": 10, "loss": 10.27276, "lr": 0.00029882064935914164, "steps_per_sec": 1.926}
+{"step": 20, "loss": 9.27825, "lr": 0.000285788459525803, "steps_per_sec": 2.231}
+{"step": 30, "loss": 8.33771, "lr": 0.0002596669658767859, "steps_per_sec": 2.15}
+{"step": 40, "loss": 7.6975, "lr": 0.00022328683756569652, "steps_per_sec": 2.177}
+{"step": 50, "loss": 7.15069, "lr": 0.00018059042599089415, "steps_per_sec": 1.807}
+{"step": 60, "loss": 6.9495, "lr": 0.0001362045498495942, "steps_per_sec": 1.733}
+{"step": 70, "loss": 6.91733, "lr": 9.4939107539536e-05, "steps_per_sec": 1.839}
+{"step": 80, "loss": 6.67702, "lr": 6.126585003432406e-05, "steps_per_sec": 1.926}
+{"step": 90, "loss": 6.76514, "lr": 3.88337972790728e-05, "steps_per_sec": 1.995}
+{"step": 100, "loss": 6.8388, "lr": 3.0073810258974985e-05, "steps_per_sec": 2.052}
+{"event": "om1_train_done", "steps": 100, "last_loss": 6.838802337646484, "checkpoint": "artifacts/checkpoints/omai-20m-base/latest.pt", "registry_metadata": "/Users/gajendrarawat/Downloads/om-ai-operating-brain 3/artifacts/models/om-1.0/metadata.json", "tokenizer_fingerprint": "c5fd9dae73db06519f580abc44db49809cc6901d7db044f36363ecb269b5b738", "trained": true, "device": "cpu", "parameters": 21597440}
+{
+  "steps": 100,
+  "last_loss": 6.838802337646484,
+  "checkpoint": "artifacts/checkpoints/omai-20m-base/latest.pt",
+  "registry_metadata": "/Users/gajendrarawat/Downloads/om-ai-operating-brain 3/artifacts/models/om-1.0/metadata.json",
+  "tokenizer_fingerprint": "c5fd9dae73db06519f580abc44db49809cc6901d7db044f36363ecb269b5b738",
+  "trained": true,
+  "device": "cpu",
+  "parameters": 21597440
+}
+{
+  "milestone": "OMAI-20M prove-the-brain",
+  "checkpoint": "artifacts/checkpoints/omai-20m-base/latest.pt",
+  "exists": true,
+  "bytes": 259239509,
+  "config": "configs/omai-20m.json",
+  "tokenizer": "artifacts/tokenizer-production-65536.json",
+  "data": "data/omai-corpus-v1/train/corpus.txt",
+  "owned": true,
+  "note": "Prototype brain only \u2014 scale 100M\u21921B\u21927B\u219270B with more data/compute."
+}
