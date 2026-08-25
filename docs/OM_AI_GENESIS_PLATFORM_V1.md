@@ -1,7 +1,31 @@
 # OM AI Genesis Platform v1.0 — System Architecture
 
-**Status:** Master specification mapped onto this repository.  
-**Models:** OM-1.0 (foundation) → OM-7.0 (advanced) → OM-70.0 (large-scale) — shapes + training path; weights require compute + licensed data.
+**Status:** Production foundation **implemented** (software layers verified).  
+**Report:** `artifacts/GENESIS_PLATFORM_REPORT.json` · `om-ai system build` → **45/45**  
+**Models:** OM-1.0 (foundation) → OM-7.0 → OM-70.0 — shapes + training path; weights need GPU + licensed data.
+
+**Cursor execution master prompt:**  
+[`docs/prompts/OM_AI_GENESIS_PLATFORM_PRODUCTION_MASTER_PROMPT.md`](prompts/OM_AI_GENESIS_PLATFORM_PRODUCTION_MASTER_PROMPT.md)
+
+## EXISTING vs IMPLEMENTED (2026-08-25)
+
+| Layer | Status | Location |
+|---|---|---|
+| 1 Intelligence Core | ✅ | `om_ai/core/intent_engine/`, `core/response/`, `core/reasoning/` |
+| 2 Reasoning Engine | ✅ | `om_ai/core/reasoning/` + `om_ai/reasoning/` |
+| 3 Knowledge Brain | ✅ | `knowledge/`, `knowledge_brain/`, `knowledge_universe/`, `knowledge/corpus.py` |
+| 4 Memory System | ✅ | `om_ai/memory/layers.py` (short/conversation/user/project/experience/skill) |
+| 5 Agent System | ✅ | `om_ai/agents/roles.py` + orchestrator |
+| 6 Tool System | ✅ | `om_ai/tools/` |
+| 7 Coding Intelligence | ✅ | `om_ai/coding_brain/` + coding agent |
+| 8 Multimodal | 🟡 | Document AI ready; vision/voice stubs (`multimodal/*`) |
+| 9 Evaluation | ✅ | `om_ai/evaluation/` + benchmarks |
+| 10 Continuous Learning | ✅ | `om_ai/learning/` + continuous |
+| 11 Training Pipeline | ✅ | `om_ai/training/`, `configs/`, `training/` |
+| 12 Security | ✅ | `om_ai/security/` |
+| 13 Enterprise | ✅ | `om_ai/enterprise/` + tenancy |
+
+**External only:** OM-1B/7B/70B weights · massive licensed corpora · GPU time · trained vision/ASR/TTS.
 
 ## Vision
 
@@ -51,13 +75,14 @@ Honest rule: **prompt ≠ weights**. Path = corpus + RAG + SFT + scale.
 ## Commands
 
 ```bash
+om-ai system build
+om-ai intent classify "Create React login page"
+om-ai reason "Create React login page"
+om-ai knowledge status
+om-ai evaluate run
+om-ai continuous export
 om-ai knowledge-brain catalog
-om-ai knowledge-brain init
 om-ai knowledge-brain generate --count 2000
-om-ai genesis generate --count 5000
-om-ai sft --checkpoint artifacts/checkpoints/omai-20m-base/latest.pt \
-  --data data/om-knowledge-brain-v1/train/om_knowledge_instruct_v1.jsonl \
-  --output artifacts/checkpoints/om-1.0-knowledge-sft
 ```
 
 Related: [`PROJECT_GENESIS_JARVIS.md`](PROJECT_GENESIS_JARVIS.md), [`OM10_GENESIS_CORPUS_SPEC.md`](OM10_GENESIS_CORPUS_SPEC.md), [`OWN_INTELLIGENCE_ROADMAP.md`](OWN_INTELLIGENCE_ROADMAP.md).

@@ -76,6 +76,17 @@ def compose_fallback(
             "How can I support you right now?"
         )
 
+    if intent in {"coding", "agent", "knowledge"}:
+        try:
+            from om_ai.core.reasoning.pipeline import run_reasoning_pipeline
+
+            result = run_reasoning_pipeline(user_text or q, retrieve=True)
+            md = (result.get("markdown") or "").strip()
+            if md and len(md) > 80:
+                return f"{opener}\n\n{md}".strip()
+        except Exception:
+            pass
+
     if intent == "coding":
         lines = [opener, "", "Here’s a practical plan for that coding task:"]
         for b in plan_bullets or []:

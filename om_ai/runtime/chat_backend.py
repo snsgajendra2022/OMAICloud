@@ -517,9 +517,19 @@ def chat_reply(
 
         def _out(text: str) -> tuple[str, ChatBackendInfo]:
             from om_ai.response_engine import format_assistant_reply
+            from om_ai.core.response.intelligence import ensure_intelligent_response
 
             try:
-                polished = format_assistant_reply(text or "", intent=intent_v, enhance=True)
+                repaired = ensure_intelligent_response(
+                    user_text,
+                    text or "",
+                    intent=intent_v,
+                )
+                polished = format_assistant_reply(
+                    repaired.get("final") or text or "",
+                    intent=intent_v,
+                    enhance=True,
+                )
             except Exception:
                 polished = (text or "").strip()
             return polished, info_lk
@@ -536,7 +546,7 @@ def chat_reply(
                 f"OM-1.0 checkpoint unavailable. ({exc})"
             ) from exc
 
-        # Model-first: accept any usable generation. No canned greeting/self overrides.
+        # Model-first: accept usable generation; reject garbled tiny-model soup.
         fail = is_low_quality_reply(text)
         # Tiny models often start with "Hello" then derail — use Agent Brain fallback.
         if (
@@ -552,6 +562,12 @@ def chat_reply(
             probe = (usable_generation_text(text) or text or "").strip()
             if is_nonsensical_smalltalk(probe) or not looks_like_assistant_chitchat(probe):
                 return _out(brain_decision.structured_fallback)
+
+        # Coding / planning: prefer structured reasoning if model is weak/garbled.
+        if fail and brain_decision.intent.value in {"coding", "agent", "knowledge"}:
+            rescued_early = brain_decision.after_model(text) or brain_decision.structured_fallback
+            if rescued_early:
+                return _out(rescued_early)
 
         if not fail:
             cleaned = usable_generation_text(text) or ""

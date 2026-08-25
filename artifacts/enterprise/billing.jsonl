@@ -1,0 +1,6 @@
+{"ts": 1787668695.349065, "tenant_id": "default", "model": "om-1.0", "tokens_in": 5, "tokens_out": 295, "cost_usd": 0.0003}
+{"ts": 1787668697.1216488, "tenant_id": "default", "model": "om-1.0", "tokens_in": 4, "tokens_out": 436, "cost_usd": 0.00044}
+{"ts": 1787668731.6742551, "tenant_id": "default", "model": "om-1.0", "tokens_in": 4, "tokens_out": 436, "cost_usd": 0.00044}
+{"ts": 1787668733.4554281, "tenant_id": "default", "model": "om-1.0", "tokens_in": 5, "tokens_out": 295, "cost_usd": 0.0003}
+{"ts": 1787668765.7893171, "tenant_id": "default", "model": "om-1.0", "tokens_in": 4, "tokens_out": 436, "cost_usd": 0.00044}
+{"ts": 1787668814.855063, "tenant_id": "default", "model": "om-1.0", "tokens_in": 4, "tokens_out": 436, "cost_usd": 0.00044}

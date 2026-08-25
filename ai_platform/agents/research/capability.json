@@ -1,0 +1,9 @@
+{
+  "name": "research",
+  "version": "1.0",
+  "capabilities": ["summarize", "compare", "retrieve_knowledge", "report"],
+  "tools": ["knowledge.search", "retrieval"],
+  "policies": ["no_invented_citations"],
+  "evaluator": "om_ai.improvement.evaluator",
+  "executor": "services.knowledge_service.KnowledgeService"
+}

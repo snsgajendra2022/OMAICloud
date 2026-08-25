@@ -1,0 +1,46 @@
+{
+  "status": "ok",
+  "feedback_stored": true,
+  "training_sample_created": true,
+  "improvement_queue_updated": true,
+  "recipe": {
+    "cycle": [
+      "User interaction",
+      "Feedback capture",
+      "Export SFT + preference JSONL",
+      "om-ai sft / om-ai dpo",
+      "Eval suite",
+      "Promote checkpoint if scores rise"
+    ],
+    "commands": {
+      "sft": "om-ai sft --config configs/omai-20m.json --tokenizer artifacts/tokenizer-production-65536.json --checkpoint <base.pt> --data data/continuous/sft_replay.jsonl --output artifacts/checkpoints/om-continuous-sft --steps 500 --device mps",
+      "dpo": "om-ai dpo --config configs/omai-20m.json --tokenizer artifacts/tokenizer-production-65536.json --checkpoint <sft.pt> --data data/continuous/preference_replay.jsonl --output artifacts/checkpoints/om-continuous-dpo --steps 300 --device mps",
+      "eval": "om-ai eval suite --out artifacts/eval/post-continuous.json"
+    },
+    "exported": {
+      "sft_rows": 29,
+      "preference_rows": 6
+    },
+    "paths": {
+      "sft": "data/continuous/sft_replay.jsonl",
+      "preference": "data/continuous/preference_replay.jsonl"
+    }
+  },
+  "improvement_plan": {
+    "weak_areas": [],
+    "actions": [],
+    "cycle": [
+      "User conversation",
+      "Quality check",
+      "Feedback",
+      "Training example",
+      "Dataset update",
+      "Future fine-tune"
+    ]
+  },
+  "next": [
+    "om-ai sft --config configs/omai-20m.json --tokenizer artifacts/tokenizer-production-65536.json --checkpoint <base.pt> --data data/continuous/sft_replay.jsonl --output artifacts/checkpoints/om-continuous-sft --steps 500 --device mps",
+    "om-ai dpo --config configs/omai-20m.json --tokenizer artifacts/tokenizer-production-65536.json --checkpoint <sft.pt> --data data/continuous/preference_replay.jsonl --output artifacts/checkpoints/om-continuous-dpo --steps 300 --device mps",
+    "om-ai eval suite --out artifacts/eval/post-continuous.json"
+  ]
+}

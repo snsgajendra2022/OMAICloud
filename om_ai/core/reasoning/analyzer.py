@@ -26,9 +26,9 @@ class IntentResult:
 
 class IntentAnalyzer:
     _PATTERNS: list[tuple[str, str, re.Pattern[str]]] = [
-        ("coding", "software", re.compile(r"\b(code|api|react|fastapi|bug|refactor|deploy|test)\b", re.I)),
+        ("coding", "software", re.compile(r"\b(code|api|react|fastapi|bug|refactor|deploy|test|login|jsx|tsx|typescript|javascript)\b", re.I)),
+        ("architecture", "engineering", re.compile(r"\b(design|architect|system|scale|management|school|erp|sms)\b", re.I)),
         ("research", "science", re.compile(r"\b(research|paper|physics|history|survey)\b", re.I)),
-        ("architecture", "engineering", re.compile(r"\b(design|architect|system|scale)\b", re.I)),
         ("debug", "software", re.compile(r"\b(error|exception|fail|broken|fix)\b", re.I)),
         ("business", "business", re.compile(r"\b(erp|crm|revenue|market|strategy)\b", re.I)),
     ]

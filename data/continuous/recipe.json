@@ -14,7 +14,7 @@
   },
   "exported": {
     "sft_rows": 29,
-    "preference_rows": 5
+    "preference_rows": 10
   },
   "paths": {
     "sft": "/Users/gajendrarawat/Downloads/om-ai-operating-brain 3/data/continuous/sft_replay.jsonl",

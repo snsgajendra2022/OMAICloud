@@ -36,8 +36,9 @@ class VerificationEngine:
             checks += ["Mentions tests or validation", "Avoids committing secrets"]
         text = (solution.solution or "").lower()
         failed = []
-        if intent.intent in {"coding", "debug"} and "test" not in text:
-            failed.append("Coding answer should mention tests")
+        if intent.intent in {"coding", "debug"}:
+            if not any(w in text for w in ("test", "tests", "testing", "validation", "validate")):
+                failed.append("Coding answer should mention tests or validation")
         passed = not failed
         score = 0.85 if passed else 0.55
         validation = checks + ([f"FAIL: {f}" for f in failed] if failed else ["All heuristic checks passed"])
@@ -45,5 +46,5 @@ class VerificationEngine:
             validation=validation,
             passed=passed,
             score=score,
-            meta={"verifier": "om-verify-v1"},
+            meta={"verifier": "om-verify-v2"},
         )

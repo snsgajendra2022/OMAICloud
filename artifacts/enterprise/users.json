@@ -1,0 +1,23 @@
+{
+  "2a873fa0-ede4-436d-988a-e6b3f9f85f9c": {
+    "id": "2a873fa0-ede4-436d-988a-e6b3f9f85f9c",
+    "email": "admin@om.local",
+    "role": "admin",
+    "org": "default",
+    "created_at": 1787668731.677502
+  },
+  "9de8ed22-0f14-4af0-92ac-51ef97282604": {
+    "id": "9de8ed22-0f14-4af0-92ac-51ef97282604",
+    "email": "admin@om.local",
+    "role": "admin",
+    "org": "default",
+    "created_at": 1787668765.791807
+  },
+  "4b4c7a86-6eb7-43cd-aafe-c85ed55aa7c1": {
+    "id": "4b4c7a86-6eb7-43cd-aafe-c85ed55aa7c1",
+    "email": "admin@om.local",
+    "role": "admin",
+    "org": "default",
+    "created_at": 1787668814.857155
+  }
+}

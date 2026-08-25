@@ -2,6 +2,10 @@
 
 Target: **everything around the model is built and verified**.
 
+**Next full build (13-layer Cognitive OS):** paste  
+[`docs/prompts/OM_AI_GENESIS_PLATFORM_PRODUCTION_MASTER_PROMPT.md`](prompts/OM_AI_GENESIS_PLATFORM_PRODUCTION_MASTER_PROMPT.md)  
+into a new Cursor Agent chat.
+
 ```bash
 om-ai system build
 ```

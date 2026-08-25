@@ -3,6 +3,9 @@
 **Updated:** 2026-08-25  
 **Honesty:** Software can be completed in-repo. **1B / 7B / 70B intelligence** needs licensed data + GPU time. This doc tracks both.
 
+**Canonical ChatGPT gap analysis:** [`OM_CHATGPT_GAP_ANALYSIS.md`](OM_CHATGPT_GAP_ANALYSIS.md)  
+**Rule:** OM needs the full intelligence stack around the model — not only bigger weights.
+
 ## Status board
 
 | Layer | Status | Notes |

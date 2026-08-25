@@ -497,6 +497,14 @@ def reason_cmd(args):
         print(trace.as_markdown())
 
 
+def intent_cmd(args):
+    from om_ai.core.intent_engine import classify, route
+
+    c = classify(args.text)
+    payload = {"classification": c.to_dict(), "route": route(c)}
+    print(json.dumps(payload, indent=2))
+
+
 def eval_suite_cmd(args):
     from om_ai.eval import run_suite
 
@@ -524,10 +532,10 @@ def coding_cmd(args):
 
 
 def continuous_cmd(args):
-    from om_ai.continuous import export_learning_bundle
+    from om_ai.learning import run_learning_cycle
 
     if args.sub == "export":
-        print(json.dumps(export_learning_bundle(args.out, db_path=args.db), indent=2))
+        print(json.dumps(run_learning_cycle(out_dir=args.out), indent=2))
 
 
 def upgrade_cmd(args):
@@ -535,8 +543,126 @@ def upgrade_cmd(args):
         from om_ai.foundation import upgrade_foundation
 
         print(json.dumps(upgrade_foundation(args.root or None), indent=2))
+    elif args.target == "sprint1":
+        from om_ai.improvement import run_sprint1_demo
+        from om_ai.knowledge.factory import process_document
+        from om_ai.agents.runtime import run_agent
+        from om_ai.core.response.intelligence import ensure_intelligent_response
+        from pathlib import Path
+        import time
+
+        root = Path(args.root or Path.cwd()).resolve()
+        sample = root / "data" / "om-foundation-corpus" / "raw" / "om_system_build_sample.txt"
+        sample.parent.mkdir(parents=True, exist_ok=True)
+        if not sample.is_file():
+            sample.write_text(
+                "OM Knowledge Factory sample. React FastAPI security validation testing.\n",
+                encoding="utf-8",
+            )
+        report = {
+            "name": "om-upgrade-sprint1",
+            "ts": time.time(),
+            "improvement_engine": run_sprint1_demo(),
+            "knowledge_factory": process_document(sample),
+            "agent_runtime": run_agent("Add health check endpoint", root=str(root), apply=False),
+            "response_quality": ensure_intelligent_response(
+                "Create React login page",
+                "Rege — it’s Let’s a piece login maybe",
+                intent="coding",
+            ),
+        }
+        # drop huge nested markdown in CLI print
+        rq = report["response_quality"]
+        report["response_quality"] = {
+            "repaired": rq.get("repaired"),
+            "analysis": rq.get("analysis"),
+            "final_preview": (rq.get("final") or "")[:500],
+            "improvement_status": (rq.get("improvement") or {}).get("status"),
+        }
+        out = root / "artifacts" / "OM_UPGRADE_SPRINT1_REPORT.json"
+        out.parent.mkdir(parents=True, exist_ok=True)
+        out.write_text(json.dumps(report, indent=2, default=str) + "\n", encoding="utf-8")
+        report["report_path"] = str(out)
+        print(json.dumps(report, indent=2, default=str))
     else:
         raise SystemExit(f"Unknown upgrade target: {args.target}")
+
+
+def improve_cmd(args):
+    from om_ai.improvement import improve_from_exchange
+
+    print(
+        json.dumps(
+            improve_from_exchange(args.question, args.answer, out_dir=args.out),
+            indent=2,
+            default=str,
+        )
+    )
+
+
+def agent_runtime_cmd(args):
+    from om_ai.agents.runtime import run_agent
+
+    print(
+        json.dumps(
+            run_agent(args.task, root=args.root, apply=args.apply, run_tests=args.tests),
+            indent=2,
+            default=str,
+        )
+    )
+
+
+def platform_cmd(args):
+    import sys
+    from pathlib import Path
+
+    root = Path(__file__).resolve().parents[1]
+    if str(root) not in sys.path:
+        sys.path.insert(0, str(root))
+
+    if args.sub == "build":
+        from om_ai.platform import build_enterprise_platform
+
+        print(json.dumps(build_enterprise_platform(args.root or None), indent=2, default=str))
+    elif args.sub == "health":
+        from services.api_gateway import APIGateway
+
+        print(json.dumps(APIGateway().health(), indent=2, default=str))
+    elif args.sub == "route":
+        from services.api_gateway import APIGateway
+
+        print(json.dumps(APIGateway().handle(args.path, **_platform_kwargs(args)), indent=2, default=str))
+    elif args.sub == "workflow":
+        from ai_platform.orchestration import OrchestrationPlatform
+
+        print(
+            json.dumps(
+                OrchestrationPlatform().execute(args.request, root=args.root or "."),
+                indent=2,
+                default=str,
+            )
+        )
+    else:
+        raise SystemExit(f"Unknown platform subcommand: {args.sub}")
+
+
+def _platform_kwargs(args) -> dict:
+    kw = {}
+    if getattr(args, "prompt", None):
+        kw["prompt"] = args.prompt
+        kw["question"] = args.prompt
+    if getattr(args, "question", None):
+        kw["question"] = args.question
+        kw["prompt"] = args.question
+    if getattr(args, "task", None):
+        kw["task"] = args.task
+    if getattr(args, "query", None):
+        kw["query"] = args.query
+    if getattr(args, "path_arg", None):
+        kw["path"] = args.path_arg
+    if getattr(args, "answer", None):
+        kw["answer"] = args.answer
+    return kw
 
 
 def system_cmd(args):
@@ -569,11 +695,14 @@ def evaluate_run_cmd(args):
     scores = report.get("scores") or {}
     # Human-readable + JSON
     print("OM Evaluation Report")
-    print(f"Reasoning Score: {scores.get('architecture', 0)}%")
+    print(f"Reasoning Score: {scores.get('reasoning', scores.get('architecture', 0))}%")
     print(f"Coding Score: {scores.get('coding', 0)}%")
     print(f"Knowledge Score: {scores.get('knowledge', 0)}%")
+    print(f"Math Score: {scores.get('math', 0)}%")
+    print(f"Agents Score: {scores.get('agents', 0)}%")
     print(f"Security Score: {scores.get('security', 0)}%")
     print(f"Completeness: {scores.get('completeness', 0)}%")
+    print(f"Improvement: {report.get('improvement', 'n/a')}")
     print(f"Report Generated: {args.out}")
     print(json.dumps(report, indent=2))
 
@@ -989,6 +1118,12 @@ def main():
     rs.add_argument("--json", action="store_true")
     rs.set_defaults(func=reason_cmd)
 
+    intentp = sp.add_parser("intent", help="OM intent engine (classify → route)")
+    intents = intentp.add_subparsers(dest="sub", required=True)
+    intentc = intents.add_parser("classify", help="Classify user text intent/domain/agent")
+    intentc.add_argument("text")
+    intentc.set_defaults(func=intent_cmd)
+
     evs = sp.add_parser("eval", help="OM Evaluation Platform")
     evss = evs.add_subparsers(dest="sub", required=True)
     evsuite = evss.add_parser("suite", help="Run om_eval_suite_v1 (heuristic or model)")
@@ -1017,9 +1152,43 @@ def main():
     conte.set_defaults(func=continuous_cmd)
 
     up = sp.add_parser("upgrade", help="Run OM foundation / platform upgrades")
-    up.add_argument("target", choices=["foundation"], help="Upgrade target")
+    up.add_argument("target", choices=["foundation", "sprint1"], help="Upgrade target")
     up.add_argument("--root", default="", help="Repo root (default: cwd)")
     up.set_defaults(func=upgrade_cmd)
+
+    imp = sp.add_parser("improve", help="OM Self-Improvement Engine (score → dataset → queue)")
+    imp.add_argument("--question", required=True)
+    imp.add_argument("--answer", required=True)
+    imp.add_argument("--out", default="data/om_training/improvements")
+    imp.set_defaults(func=improve_cmd)
+
+    ar = sp.add_parser("agent-runtime", help="OM Agent Runtime (route → plan → gated act)")
+    ar.add_argument("--task", required=True)
+    ar.add_argument("--root", default=".")
+    ar.add_argument("--apply", action="store_true")
+    ar.add_argument("--tests", action="store_true")
+    ar.set_defaults(func=agent_runtime_cmd)
+
+    plat = sp.add_parser("platform", help="OM Enterprise Production Platform")
+    plats = plat.add_subparsers(dest="sub", required=True)
+    platb = plats.add_parser("build", help="Build/verify enterprise architecture")
+    platb.add_argument("--root", default="")
+    platb.set_defaults(func=platform_cmd)
+    plath = plats.add_parser("health", help="API gateway + services health")
+    plath.set_defaults(func=platform_cmd)
+    platr = plats.add_parser("route", help="Route through API/Model gateway")
+    platr.add_argument("--path", required=True, help="chat|reason|agent|knowledge.search|evaluate|improve|metrics")
+    platr.add_argument("--prompt", default="")
+    platr.add_argument("--question", default="")
+    platr.add_argument("--task", default="")
+    platr.add_argument("--query", default="")
+    platr.add_argument("--path-arg", default="", dest="path_arg")
+    platr.add_argument("--answer", default="")
+    platr.set_defaults(func=platform_cmd)
+    platw = plats.add_parser("workflow", help="Run orchestration workflow")
+    platw.add_argument("--request", required=True)
+    platw.add_argument("--root", default=".")
+    platw.set_defaults(func=platform_cmd)
 
     sysp = sp.add_parser("system", help="OM production system build / self-check")
     syss = sysp.add_subparsers(dest="sub", required=True)

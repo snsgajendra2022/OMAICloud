@@ -10,6 +10,7 @@ Requires-Dist: uvicorn[standard]>=0.30.0
 Requires-Dist: pydantic>=2.8.0
 Requires-Dist: numpy>=1.26.0
 Requires-Dist: httpx>=0.27.0
+Requires-Dist: python-multipart>=0.0.9
 Provides-Extra: dev
 Requires-Dist: pytest>=8.0; extra == "dev"
 Requires-Dist: ruff>=0.6; extra == "dev"
@@ -22,7 +23,7 @@ Requires-Dist: soundfile>=0.12; extra == "voice"
 
 # OM AI Operating Brain v0.3
 
-Self-hosted, API-independent AI platform foundation: train and run your own models, agents, memory, and RAG without calling OpenAI, Anthropic, or Google model APIs.
+Self-hosted, API-independent AI platform: train and run **OM-1.0** natively — no Ollama, Llama proxy, or third-party LLM required for the default serve path.
 
 ## Honesty about weights
 
@@ -30,43 +31,55 @@ This repository is **working software** (architecture, trainers, agents, API). I
 
 - Architecture presets under `configs/` describe model **shapes**
 - Useful intelligence requires licensed data + real GPU training that produce checkpoint files
-- Included `artifacts/demo/om-tiny-dpo.pt` proves the training pipeline runs end-to-end on toy data — it is not frontier capability
+- Local OM-1.0 smoke/long checkpoints prove the native pipeline; they are **not** frontier capability
 - No fabricated benchmark leaderboard scores are claimed
 
-See `docs/IMPLEMENTATION_STATUS.md` and `docs/EXTERNAL_ASSETS_REQUIRED.md`.
+See `docs/IMPLEMENTATION_STATUS.md`, `docs/EXTERNAL_ASSETS_REQUIRED.md`, **`docs/OM_FOUNDATION_UPGRADE_V1.md`**, **`docs/OM_COMPLETION_ROADMAP.md`**, **`docs/OM_AI_GENESIS_PLATFORM_V1.md`**, **`docs/OM_KNOWLEDGE_BRAIN_1600_2026.md`**, **`docs/PROJECT_GENESIS_JARVIS.md`**, **`docs/OM10_GENESIS_CORPUS_SPEC.md`**, **`docs/OM10_GENESIS_TRAINING.md`**, **`docs/OWN_MODEL_MILESTONE1.md`**, **`docs/OWN_INTELLIGENCE_ROADMAP.md`**, **`docs/RESPONSE_EXPERIENCE.md`**, and **`docs/JARVIS_OPERATING_INTELLIGENCE.md`**.
 
-## Quick start (venv)
+## Quick start (OM-1.0 native)
 
 ```bash
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -e '.[dev]'
 
+# Optional: short smoke train (creates a real OM checkpoint)
+om-ai train-om1 --config configs/om-1.0-local.json --steps 20
+
+# Inspect native model / registry
+om-ai model-info
+
+# Serve OM-1.0 only (loads checkpoint; never falls back to Ollama)
+om-ai serve --host 127.0.0.1 --port 8080
+# Workspace UI: http://127.0.0.1:8080/chat
+```
+
+Default env (see `.env.example`):
+
+- `OM_MODEL_PROVIDER=om_native`
+- `OM_MODEL_CHECKPOINT=artifacts/checkpoints/om-1.0-long/latest.pt` (or smoke if long missing)
+- Missing checkpoint → clear error / HTTP 503 — **no** third-party LLM fallback
+
+Tiny architecture demo (optional):
+
+```bash
 om-ai tokenizer train --input data/example_corpus.txt --output artifacts/tokenizer.json --vocab-size 512
 om-ai train --config configs/tiny.json --data data/example_corpus.txt --tokenizer artifacts/tokenizer.json --steps 20
 om-ai generate --config configs/tiny.json --tokenizer artifacts/tokenizer.json --checkpoint artifacts/checkpoints/latest.pt --prompt "OM AI"
-
-om-ai serve --host 127.0.0.1 --port 8080
-# http://127.0.0.1:8080/docs
 ```
 
 One-shot tiny pipeline: `python scripts/run_actual_training_pipeline.py --steps 5`
 
-cd "/path/to/om-ai-operating-brain"
-source .venv/bin/activate
-pip install -e '.[deepSpeed]'
-export OM_AI_70B_DATA=/data/licensed-corpus   # ≥1GB, preferably much larger
-export OM_AI_70B_TOKENIZER=/data/tokenizer-bytebpe-65536.json  # OM ByteBPE + chat tokens
-export OM_AI_70B_OUTPUT=/checkpoints/om-70b
-./scripts/train_70b.sh
+**OM-70B:** Mac prepares corpus/tokenizer/configs; final train is on a CUDA+DeepSpeed server — see [`docs/SERVER_70B_HANDOFF.md`](docs/SERVER_70B_HANDOFF.md). Pack upload set: `./scripts/pack_for_70b_server.sh`.
 
 ## Major CLI commands
 
 | Command | Purpose |
 |---------|---------|
-| `om-ai model-info` | Parameter estimate from config |
+| `om-ai model-info` | OM-1.0 native info (or `--config` architecture estimate) |
+| `om-ai train-om1` | Local OM-1.0 smoke / continue training |
 | `om-ai tokenizer train\|inspect\|encode\|decode` | Byte-BPE tokenizer |
-| `om-ai corpus import\|validate\|dedupe\|audit\|shard\|stats` | Corpus governance |
+| `om-ai corpus catalog\|fetch\|build-v1\|import\|validate\|…` | OMAI-Corpus-v1 + governance ([docs/OMAI_CORPUS_V1.md](docs/OMAI_CORPUS_V1.md)) |
 | `om-ai pretrain` / `om-ai train` | Causal pretraining |
 | `om-ai sft` / `om-ai reward` / `om-ai dpo` | Post-training |
 | `om-ai evaluate` / `om-ai benchmark` | Local eval harness |
@@ -75,17 +88,19 @@ export OM_AI_70B_OUTPUT=/checkpoints/om-70b
 | `om-ai registry list\|register` | Model lifecycle registry |
 | `om-ai bundle` | Checkpoint bundle + integrity |
 | `om-ai project-scan` | Local project discovery |
-| `om-ai serve` | FastAPI server |
+| `om-ai serve` | FastAPI server (OM native by default) |
 
 ## What v0.3 includes
 
 - From-scratch decoder-only Transformer (RoPE, GQA/MHA, SwiGLU, KV cache, optional cross-attention)
 - Custom byte-level BPE; corpus governance and sharding
+- OM-1.0 native backend (`om_ai/backends/om_native.py`) + registry under `artifacts/models/om-1.0/`
+- Live knowledge stubs (`om_ai/live_knowledge/`) — HTTP/search retrieval, **not** another LLM
 ## Training at scale
 
-- Tiny / single GPU: `om-ai train ...`
+- Tiny / single GPU: `om-ai train ...` or `om-ai train-om1 ...`
 - OM-70B launcher (GPU cluster): `om-ai train-70b --data ... --tokenizer ... --output ...`
-- See `docs/TRAINING_70B.md` — `serve` never starts 70B training
+- Mac → server handoff: `docs/SERVER_70B_HANDOFF.md` (also `docs/TRAINING_70B.md`). `serve` never starts 70B training.
 
 - Single-process training; DDP/FSDP; optional DeepSpeed
 - SFT, reward model, DPO, PPO infrastructure
@@ -104,3 +119,72 @@ Python ≥ 3.11, PyTorch ≥ 2.4. Linux + CUDA for serious distributed training.
 ## Frontier-model reality
 
 Owning a capable private model still means: licensed corpus → tokenizer → cluster pretrain → SFT/alignment → eval → deployed weights. This repo is the engineering foundation for that process — not a substitute for the training work itself.
+{
+  "steps": 250000,
+  "last_loss": 0.5564836859703064,
+  "checkpoint": "artifacts/checkpoints/om-1.0-long/latest.pt",
+  "registry_metadata": "/Users/gajendrarawat/Downloads/om-ai-operating-brain 3/artifacts/models/om-1.0/metadata.json",
+  "tokenizer_fingerprint": "13b365fd78f468e96137462cbef86f008192415c3bb825653f1bbf16f12ddb5f",
+  "trained": true,
+  "device": "mps",
+  "parameters": 3300608
+}
+
+
+1
+
+om-ai train-om1 \
+  --config configs/om-1.0-local.json \
+  --data data/production-corpus/raw/fineweb-100mb.txt \
+  --tokenizer artifacts/tokenizer-production-65536.json \
+  --steps 5000 \
+  --batch-size 4 \
+  --max-tokens 10000000 \
+  --max-docs 100000 \
+  --checkpoint-every 500 \
+  --log-every 25 \
+  --device mps \
+  --precision auto \
+  --resume artifacts/checkpoints/om-1.0-base/latest.pt \
+  --output artifacts/checkpoints/om-1.0-base
+
+  2
+
+  om-ai train-om1 \
+  --config configs/om-1.0-local.json \
+  --data data/production-corpus/raw/fineweb-100mb.txt \
+  --tokenizer artifacts/tokenizer-production-65536.json \
+  --steps 20000 \
+  --batch-size 4 \
+  --max-tokens 25000000 \
+  --max-docs 250000 \
+  --checkpoint-every 1000 \
+  --log-every 50 \
+  --device mps \
+  --precision auto \
+  --resume artifacts/checkpoints/om-1.0-base/latest.pt \
+  --output artifacts/checkpoints/om-1.0-base
+
+./scripts/train_om1_mac_native.sh
+
+
+om-ai train-om1 \
+  --config configs/om-1.0-local.json \
+  --data data/production-corpus/raw/fineweb-100mb.txt \
+  --tokenizer artifacts/tokenizer-production-65536.json \
+  --steps 70000000000000 \
+  --batch-size 4 \
+  --max-tokens 7500000000 \
+  --max-docs 75000000 \
+  --checkpoint-every 70000 \
+  --log-every 7000 \
+  --device mps \
+  --precision auto \
+  --resume artifacts/checkpoints/om-1.0-base/latest.pt \
+  --output artifacts/checkpoints/om-1.0-base
+
+
+  if any chnages chat thi sfind the issue if this is worng ans show then fixed this and but complte pelasedo not stap if this is not complted eplase anny thing need chat here pelase and complte this and chat you can only chat and undestend what missing and complted  this  please do not need anyhting static and local need to all prodection complted pelase 
+
+
+  

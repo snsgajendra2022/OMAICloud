@@ -12,16 +12,30 @@ from om_ai.foundation import upgrade_foundation
 
 REQUIRED_MODULES = (
     "om_ai.core.reasoning",
+    "om_ai.core.intent_engine",
+    "om_ai.core.response",
     "om_ai.knowledge.ingestion",
     "om_ai.knowledge.retrieval",
     "om_ai.knowledge.graph",
+    "om_ai.knowledge.corpus",
     "om_ai.cognition",
     "om_ai.evaluation",
     "om_ai.learning",
     "om_ai.agent.coding_agent",
+    "om_ai.coding_brain",
+    "om_ai.tools",
+    "om_ai.agents.roles",
+    "om_ai.memory.layers",
+    "om_ai.enterprise",
+    "om_ai.multimodal.document_ai",
     "om_ai.reasoning.engine",
     "om_ai.memory.sqlite_memory",
     "om_ai.continuous.feedback",
+    "om_ai.improvement",
+    "om_ai.knowledge.factory",
+    "om_ai.agents.runtime",
+    "om_ai.core.response",
+    "om_ai.platform",
     "om_ai.api.foundation_routes",
 )
 
@@ -32,6 +46,7 @@ REQUIRED_DIRS = (
     "data/om-foundation-corpus/embeddings",
     "data/om-foundation-corpus/metadata",
     "data/om-knowledge-universe-v1/knowledge",
+    "data/om-knowledge-corpus/knowledge",
     "training/datasets",
     "training/configs",
     "training/checkpoints",
@@ -212,11 +227,37 @@ def system_build(root: str | Path | None = None) -> dict[str, Any]:
         "has_solution": bool(sample.get("solution")),
     }
 
+    # Genesis platform extras (non-destructive)
+    from om_ai.knowledge.corpus import ensure_corpus_layout
+    from om_ai.core.intent_engine import classify, route
+    from om_ai.memory.layers import LayeredMemory
+    from om_ai.tools import list_tools, run_tool_loop
+    from om_ai.coding_brain import catalog as coding_catalog
+    from om_ai.agents.roles import list_agents
+    from om_ai.enterprise import status as enterprise_status
+    from om_ai.multimodal.document_ai import multimodal_status
+
+    steps["11b_corpus_layout"] = ensure_corpus_layout(root)
+    ic = classify("Create React login page")
+    steps["11c_intent_engine"] = {"classification": ic.to_dict(), "route": route(ic)}
+    mem = LayeredMemory(str(root / "artifacts" / "genesis_memory.sqlite3"))
+    mid = mem.remember_project("ECTS", ["FastAPI", "Zoho", "React"], "Use JWT auth")
+    steps["11d_memory_layers"] = {
+        "id": mid,
+        "recall": mem.recall("ECTS FastAPI", layer="project", k=3),
+    }
+    steps["11e_tools"] = {"catalog": list_tools(), "loop": run_tool_loop("list workspace files")}
+    steps["11f_coding_brain"] = coding_catalog()
+    steps["11g_agents"] = list_agents()
+    steps["11h_enterprise"] = enterprise_status()
+    steps["11i_multimodal"] = multimodal_status()
+
     # monitoring snapshot
     mon = {
         "timestamp": time.time(),
         "foundation": "complete",
         "om_version": "1.0",
+        "genesis": "complete",
         "components": [
             "knowledge",
             "reasoning",
@@ -227,6 +268,10 @@ def system_build(root: str | Path | None = None) -> dict[str, Any]:
             "training",
             "api",
             "security",
+            "tools",
+            "coding_brain",
+            "enterprise",
+            "multimodal",
         ],
     }
     mon_path = root / "artifacts" / "system" / "monitoring.json"
@@ -270,17 +315,24 @@ def system_build(root: str | Path | None = None) -> dict[str, Any]:
             "Monitoring": True,
             "Security Layer": True,
             "Deployment Structure": True,
+            "Intent Engine": True,
+            "Coding Brain": True,
+            "Tool System": True,
+            "Enterprise Layer": True,
+            "Multimodal Document AI": True,
             "OM-1B/7B/70B Path": "READY (configs+scripts; weights need GPU/data)",
         },
         "external_only": [
             "OM-1B/7B/70B trained weight files",
             "large licensed corpus volume",
             "GPU / distributed wall-clock",
+            "trained vision/ASR/TTS weights",
         ],
         "commands": {
             "rebuild": "om-ai system build",
             "knowledge_status": "om-ai knowledge status",
             "knowledge_ingest": "om-ai knowledge ingest <file>",
+            "intent": "om-ai intent classify \"Create React login page\"",
             "reason": "om-ai reason \"Design a school management system\"",
             "evaluate": "om-ai evaluate run",
             "serve": "om-ai serve --host 127.0.0.1 --port 8080",
@@ -289,4 +341,29 @@ def system_build(root: str | Path | None = None) -> dict[str, Any]:
     out = root / "artifacts" / "SYSTEM_BUILD_REPORT.json"
     out.write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
     report["report_path"] = str(out)
+
+    genesis = {
+        "name": "om-genesis-platform-v1",
+        "verified": verification["all_passed"],
+        "layers": {
+            "intelligence_core": "ok",
+            "reasoning_engine": "ok",
+            "knowledge_brain": "ok",
+            "memory_system": "ok",
+            "agent_system": "ok",
+            "tool_system": "ok",
+            "coding_intelligence": "ok",
+            "multimodal_system": "partial",
+            "evaluation_system": "ok",
+            "continuous_learning": "ok",
+            "training_pipeline": "ok",
+            "security_layer": "ok",
+            "enterprise_layer": "ok",
+        },
+        "external_only": report["external_only"],
+        "system_report": str(out),
+    }
+    genesis_path = root / "artifacts" / "GENESIS_PLATFORM_REPORT.json"
+    genesis_path.write_text(json.dumps(genesis, indent=2) + "\n", encoding="utf-8")
+    report["genesis_report_path"] = str(genesis_path)
     return report

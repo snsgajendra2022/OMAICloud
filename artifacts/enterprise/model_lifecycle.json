@@ -1,0 +1,36 @@
+{
+  "models": {
+    "om-1.0": {
+      "state": "production",
+      "checkpoint": "local",
+      "updated_at": 1787668814.8575418
+    },
+    "om-1b": {
+      "state": "config_ready"
+    },
+    "om-7b": {
+      "state": "config_ready"
+    },
+    "om-70b": {
+      "state": "config_ready"
+    }
+  },
+  "experiments": [],
+  "deployments": [
+    {
+      "model_id": "om-1.0",
+      "state": "production",
+      "ts": 1787668731.678207
+    },
+    {
+      "model_id": "om-1.0",
+      "state": "production",
+      "ts": 1787668765.792477
+    },
+    {
+      "model_id": "om-1.0",
+      "state": "production",
+      "ts": 1787668814.857543
+    }
+  ]
+}

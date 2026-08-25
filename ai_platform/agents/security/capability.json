@@ -1,0 +1,9 @@
+{
+  "name": "security",
+  "version": "1.0",
+  "capabilities": ["review", "secrets_scan", "policy_check"],
+  "tools": ["policy_engine"],
+  "policies": ["deny_unrestricted_shell"],
+  "evaluator": "om_ai.core.response.intelligence",
+  "executor": "ai_platform.orchestration.PolicyEngine"
+}

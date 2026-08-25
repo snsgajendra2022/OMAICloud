@@ -162,8 +162,39 @@ class UnifiedOrchestrator:
         prompt = "\n\n".join(prompt_parts) if prompt_parts else req.text
         modalities_used.append("text")
 
-        # ── 5. LLM generation ─────────────────────────────────────────
+        # ── 5. LLM generation (or document-AI fallback without weights) ─
         if self._llm is None:
+            if rag_context or req.documents:
+                try:
+                    from om_ai.core.reasoning.pipeline import run_reasoning_pipeline
+
+                    hits = list(rag_context)[:6]
+                    if not hits and req.documents:
+                        from om_ai.multimodal.document_ai import analyze_document
+
+                        for d in req.documents[:2]:
+                            info = analyze_document(d, question=req.text or "Summarize this document")
+                            if info.get("preview"):
+                                hits.append(str(info["preview"])[:400])
+                            if info.get("answer"):
+                                return UnifiedResponse(
+                                    text=str(info["answer"]),
+                                    modalities_used=list(set(modalities_used + ["document", "text"])),
+                                    rag_sources=rag_sources or [str(d)],
+                                    asr_transcripts=asr_transcripts,
+                                    vision_descriptions=vision_descriptions,
+                                )
+                    ask = req.text or "Summarize the attached documents"
+                    md = run_reasoning_pipeline(ask, knowledge_hits=hits, retrieve=False).get("markdown") or ""
+                    return UnifiedResponse(
+                        text=md,
+                        modalities_used=list(set(modalities_used + ["document", "text"])),
+                        rag_sources=rag_sources,
+                        asr_transcripts=asr_transcripts,
+                        vision_descriptions=vision_descriptions,
+                    )
+                except Exception as exc:
+                    logger.debug("document AI fallback failed: %s", exc)
             return UnifiedResponse(
                 text="",
                 modalities_used=modalities_used,

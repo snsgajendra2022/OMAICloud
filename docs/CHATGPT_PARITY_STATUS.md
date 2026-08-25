@@ -1,45 +1,44 @@
-# CHATGPT PARITY — WHAT OM COMPLETED vs WHAT REMAINS
+# CHATGPT PARITY — STATUS
 
-**Updated:** 2026-08-25
+**Updated:** 2026-08-25  
+**Canonical gap analysis:** [`OM_CHATGPT_GAP_ANALYSIS.md`](OM_CHATGPT_GAP_ANALYSIS.md)
 
-## Completed in this push (software + local training)
+## One-line truth
+
+ChatGPT = finished brain + product.  
+OM = finished factory + early brain. Software ~**97%**. Chat intelligence ~**18–25%**.
+
+## Completed (software + local training)
 
 | Item | Status |
 |------|--------|
-| Longer local context (`max_seq_len` 128 → **256**) | DONE |
-| Human EQ system prompt + Agent Brain warm fallbacks | DONE |
-| Login bootstrap defaults (Library, Assistants, Prompts, Memory, Welcome chat…) | DONE |
-| Chat SFT v4 corpus (`data/om-chat-sft-v4-complete.jsonl`, ~2.7k rows) | DONE |
-| Preference DPO set (`data/om-chat-dpo-v4.jsonl`, 1200 rows) | DONE |
-| SFT v4 → `artifacts/checkpoints/om-1.0-chat-sft-v4/latest.pt` | DONE |
-| DPO v4 → `artifacts/checkpoints/om-1.0-chat-dpo-v4/latest.pt` | DONE |
-| `.env` pointed at DPO v4 + serve restarted | DONE |
-| One-shot script `scripts/complete_chat_parity_push.sh` | DONE |
-| Generation defaults warmer (temp/top_p/max tokens) | DONE |
+| Chat UI (`/chat`) + More / Regenerate / Share | DONE |
+| Native OM serve (no required third-party LLM) | DONE |
+| SFT/DPO chat checkpoints (local) | DONE (`om-1.0-chat-dpo-v4`) |
+| Knowledge Brain + Universe layout | DONE (needs data volume) |
+| Reasoning pipeline (intent→plan→verify→reflect) | DONE **v2** (domain templates + markdown) |
+| Eval suite + continuous feedback export | DONE **expanded** + learning cycle |
+| Chat garble gate + reasoning fallback | DONE (rejects Prime-Minister-style soup) |
+| Document AI multimodal path | DONE (vision/voice still need weights) |
+| `om-ai system build` production foundation | DONE (35/35 verified) |
 
-## Cannot be “completed” on a Mac without a GPU cluster
+## Cannot finish on Mac without GPU cluster
 
 | Item | Reality |
 |------|---------|
-| ChatGPT-equal intelligence | Needs **billions+** of trained parameters |
-| OM-1B / 7B / 13B / 70B learned weights | Configs exist; **training not executed at scale** |
-| Frontier benchmarks at ChatGPT level | Not measured / not reached |
-| Fake 70B `.pt` files | **Will never be created** (honesty rule) |
+| ChatGPT-equal intelligence | Needs billions+ trained parameters |
+| OM-1B / 7B / 70B learned weights | Configs exist; scale training not run |
+| Frontier benchmarks | Not reached |
+| Fake 70B `.pt` | **Never** |
 
-## How to finish local push + reload chat
+## Next software sprints (no GPU required)
 
-```bash
-# If SFT already finished:
-ls artifacts/checkpoints/om-1.0-chat-sft-v4/latest.pt
+1. Bulk knowledge ingest + graph/ranking  
+2. Reasoning + coding agent tool loops + sandbox  
+3. Broader eval (math / agents / safety / long context)  
+4. Continuous learning: quality gate → auto export → train recipe  
+5. Multimodal wiring (use existing ViT/ASR stubs when weights appear)
 
-# Optional DPO:
-om-ai dpo --config configs/om-1.0-local.json \
-  --tokenizer artifacts/tokenizer-production-65536.json \
-  --checkpoint artifacts/checkpoints/om-1.0-chat-sft-v4/latest.pt \
-  --data data/om-chat-dpo-v4.jsonl --steps 800 --device cpu \
-  --output artifacts/checkpoints/om-1.0-chat-dpo-v4
+## Reload chat after checkpoint change
 
-# Point .env at the new checkpoint, restart serve, hard-refresh browser.
-```
-
-**Honest score after this push (local):** roughly **~18–25% vs ChatGPT intelligence** (better chat feel), **~97% software platform**.
+Point `.env` `OM_MODEL_CHECKPOINT` / `OM_AI_CHECKPOINT`, restart `om-ai serve`, hard-refresh browser.

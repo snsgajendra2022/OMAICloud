@@ -3,16 +3,28 @@
   "mode": "PRODUCTION_FOUNDATION_COMPLETE",
   "om_version": "1.0",
   "root": "/Users/gajendrarawat/Downloads/om-ai-operating-brain 3",
-  "elapsed_sec": 6.89,
+  "elapsed_sec": 10.28,
   "verified": true,
   "verification": {
-    "passed": 35,
-    "total": 35,
+    "passed": 45,
+    "total": 45,
     "accuracy": 1.0,
     "all_passed": true,
     "checks": [
       {
         "name": "import:om_ai.core.reasoning",
+        "ok": true,
+        "detail": "imported",
+        "status": "PASS"
+      },
+      {
+        "name": "import:om_ai.core.intent_engine",
+        "ok": true,
+        "detail": "imported",
+        "status": "PASS"
+      },
+      {
+        "name": "import:om_ai.core.response",
         "ok": true,
         "detail": "imported",
         "status": "PASS"
@@ -31,6 +43,12 @@
       },
       {
         "name": "import:om_ai.knowledge.graph",
+        "ok": true,
+        "detail": "imported",
+        "status": "PASS"
+      },
+      {
+        "name": "import:om_ai.knowledge.corpus",
         "ok": true,
         "detail": "imported",
         "status": "PASS"
@@ -55,6 +73,42 @@
       },
       {
         "name": "import:om_ai.agent.coding_agent",
+        "ok": true,
+        "detail": "imported",
+        "status": "PASS"
+      },
+      {
+        "name": "import:om_ai.coding_brain",
+        "ok": true,
+        "detail": "imported",
+        "status": "PASS"
+      },
+      {
+        "name": "import:om_ai.tools",
+        "ok": true,
+        "detail": "imported",
+        "status": "PASS"
+      },
+      {
+        "name": "import:om_ai.agents.roles",
+        "ok": true,
+        "detail": "imported",
+        "status": "PASS"
+      },
+      {
+        "name": "import:om_ai.memory.layers",
+        "ok": true,
+        "detail": "imported",
+        "status": "PASS"
+      },
+      {
+        "name": "import:om_ai.enterprise",
+        "ok": true,
+        "detail": "imported",
+        "status": "PASS"
+      },
+      {
+        "name": "import:om_ai.multimodal.document_ai",
         "ok": true,
         "detail": "imported",
         "status": "PASS"
@@ -120,6 +174,12 @@
         "status": "PASS"
       },
       {
+        "name": "dir:data/om-knowledge-corpus/knowledge",
+        "ok": true,
+        "detail": "/Users/gajendrarawat/Downloads/om-ai-operating-brain 3/data/om-knowledge-corpus/knowledge",
+        "status": "PASS"
+      },
+      {
         "name": "dir:training/datasets",
         "ok": true,
         "detail": "/Users/gajendrarawat/Downloads/om-ai-operating-brain 3/training/datasets",
@@ -170,7 +230,7 @@
       {
         "name": "knowledge:ingest+search",
         "ok": true,
-        "detail": "doc_id=ef8e250c-5021-4e90-9a58-0fe0e83c02c8 hits=3",
+        "detail": "doc_id=54634fd7-5110-4c12-9368-4a8fe48124fa hits=3",
         "status": "PASS"
       },
       {
@@ -182,13 +242,13 @@
       {
         "name": "evaluation:suite",
         "ok": true,
-        "detail": "{\"coding\": 100.0, \"architecture\": 100.0, \"security\": 100.0, \"completeness\": 100.0, \"math\": 100.0, \"knowledge\": 100.0}",
+        "detail": "{\"coding\": 100.0, \"architecture\": 100.0, \"reasoning\": 100.0, \"security\": 100.0, \"completeness\": 100.0, \"math\": 100.0, \"knowledge\": 100.0, \"agents\": 100.0, \"long_context\": 100.0}",
         "status": "PASS"
       },
       {
         "name": "learning:feedback+export",
         "ok": true,
-        "detail": "feedback=acf5c851-1156-4a11-835e-36bf7d47980e exported={'sft_rows': 29, 'preference_rows': 4}",
+        "detail": "feedback=c371a7ed-10a1-4659-b725-69f92c0e3564 exported={'sft_rows': 29, 'preference_rows': 7}",
         "status": "PASS"
       },
       {
@@ -258,12 +318,311 @@
       ],
       "has_solution": true
     },
+    "11b_corpus_layout": {
+      "root": "/Users/gajendrarawat/Downloads/om-ai-operating-brain 3/data/om-knowledge-corpus/knowledge",
+      "buckets": [
+        "science",
+        "engineering",
+        "programming",
+        "ai",
+        "history",
+        "business",
+        "mathematics",
+        "robotics",
+        "electronics"
+      ],
+      "created_readmes": [
+        "/Users/gajendrarawat/Downloads/om-ai-operating-brain 3/data/om-knowledge-corpus/knowledge/science/README.md",
+        "/Users/gajendrarawat/Downloads/om-ai-operating-brain 3/data/om-knowledge-corpus/knowledge/engineering/README.md",
+        "/Users/gajendrarawat/Downloads/om-ai-operating-brain 3/data/om-knowledge-corpus/knowledge/programming/README.md",
+        "/Users/gajendrarawat/Downloads/om-ai-operating-brain 3/data/om-knowledge-corpus/knowledge/ai/README.md",
+        "/Users/gajendrarawat/Downloads/om-ai-operating-brain 3/data/om-knowledge-corpus/knowledge/history/README.md",
+        "/Users/gajendrarawat/Downloads/om-ai-operating-brain 3/data/om-knowledge-corpus/knowledge/business/README.md",
+        "/Users/gajendrarawat/Downloads/om-ai-operating-brain 3/data/om-knowledge-corpus/knowledge/mathematics/README.md",
+        "/Users/gajendrarawat/Downloads/om-ai-operating-brain 3/data/om-knowledge-corpus/knowledge/robotics/README.md",
+        "/Users/gajendrarawat/Downloads/om-ai-operating-brain 3/data/om-knowledge-corpus/knowledge/electronics/README.md"
+      ],
+      "ok": true
+    },
+    "11c_intent_engine": {
+      "classification": {
+        "intent": "coding",
+        "domain": "frontend",
+        "framework": "react",
+        "task": "Help implement or improve the code.",
+        "agent": "coding",
+        "confidence": 0.88,
+        "entities": [
+          "Create",
+          "React",
+          "login",
+          "page"
+        ],
+        "meta": {
+          "source": "om-intent-engine-v1",
+          "understanding": "coding"
+        }
+      },
+      "route": {
+        "agent": "coding",
+        "pipeline": "coding_brain",
+        "intent": {
+          "intent": "coding",
+          "domain": "frontend",
+          "framework": "react",
+          "task": "Help implement or improve the code.",
+          "agent": "coding",
+          "confidence": 0.88,
+          "entities": [
+            "Create",
+            "React",
+            "login",
+            "page"
+          ],
+          "meta": {
+            "source": "om-intent-engine-v1",
+            "understanding": "coding"
+          }
+        },
+        "next": [
+          "Retrieve knowledge / memory",
+          "Run selected agent",
+          "Verify quality / security",
+          "Return formatted response"
+        ]
+      }
+    },
+    "11d_memory_layers": {
+      "id": 1,
+      "recall": [
+        {
+          "id": 1,
+          "content": "Project: ECTS\nStack: FastAPI, Zoho, React\nPrevious decisions: Use JWT auth",
+          "kind": "semantic",
+          "metadata": {
+            "layer": "project",
+            "project": "ECTS",
+            "stack": [
+              "FastAPI",
+              "Zoho",
+              "React"
+            ]
+          }
+        }
+      ]
+    },
+    "11e_tools": {
+      "catalog": {
+        "file_manager": "Read/write/list files (workspace scoped)",
+        "terminal": "Allowlisted shell commands",
+        "browser": "Gated web fetch / browse",
+        "database": "SQL / RAG store access",
+        "api_client": "HTTP API calls with SSRF guards",
+        "git": "Status / diff / commit helpers",
+        "cloud": "Cloud automation stubs",
+        "automation": "Workflow automation stubs"
+      },
+      "loop": {
+        "goal": "list workspace files",
+        "selected": "file_manager",
+        "result": {
+          "tool": "file_manager",
+          "ok": true,
+          "output": [
+            {
+              "text": "OM AI Foundation sample. Physics mechanics energy motion. School management systems use FastAPI React and PostgreSQL.",
+              "score": 0.0,
+              "doc_id": "2c5beeb6-1609-49bb-a91a-ede5a168769b",
+              "metadata": {
+                "filename": "om_system_build_sample.txt",
+                "title": "Om System Build Sample",
+                "domain": "physics",
+                "year": "",
+                "topics": [
+                  "foundation",
+                  "sample",
+                  "physics",
+                  "mechanics",
+                  "energy",
+                  "motion",
+                  "school",
+                  "management"
+                ],
+                "source_path": "data/om-foundation-corpus/raw/om_system_build_sample.txt",
+                "doc_id": "2c5beeb6-1609-49bb-a91a-ede5a168769b",
+                "chunk_index": 0
+              }
+            }
+          ]
+        },
+        "analysis": "Inspect output; retry with another tool if insufficient."
+      }
+    },
+    "11f_coding_brain": {
+      "languages": [
+        "Python",
+        "JavaScript",
+        "TypeScript",
+        "Java",
+        "C++",
+        "Rust",
+        "Go",
+        "PHP",
+        "SQL"
+      ],
+      "frameworks": [
+        "React",
+        "Next.js",
+        "FastAPI",
+        "Laravel",
+        "Spring Boot",
+        "Django",
+        "Express"
+      ],
+      "features": [
+        "code_generation",
+        "code_explanation",
+        "bug_fixing",
+        "architecture_design",
+        "security_review",
+        "testing"
+      ]
+    },
+    "11g_agents": [
+      {
+        "name": "master",
+        "capabilities": [
+          "route",
+          "plan",
+          "delegate",
+          "verify"
+        ],
+        "description": "OM Master orchestrator"
+      },
+      {
+        "name": "coding",
+        "capabilities": [
+          "read_repo",
+          "understand_files",
+          "create_code",
+          "modify_code",
+          "run_tests",
+          "debug"
+        ],
+        "description": "Software engineering agent"
+      },
+      {
+        "name": "research",
+        "capabilities": [
+          "analyze_papers",
+          "reports",
+          "compare_tech",
+          "summarize"
+        ],
+        "description": "Research agent"
+      },
+      {
+        "name": "database",
+        "capabilities": [
+          "schema",
+          "queries",
+          "migrations",
+          "performance"
+        ],
+        "description": "Database agent"
+      },
+      {
+        "name": "security",
+        "capabilities": [
+          "review",
+          "threats",
+          "secrets",
+          "sandbox"
+        ],
+        "description": "Security agent"
+      },
+      {
+        "name": "devops",
+        "capabilities": [
+          "ci",
+          "deploy",
+          "containers",
+          "observability"
+        ],
+        "description": "DevOps agent"
+      },
+      {
+        "name": "business",
+        "capabilities": [
+          "strategy",
+          "markets",
+          "ops",
+          "reporting"
+        ],
+        "description": "Business agent"
+      },
+      {
+        "name": "science",
+        "capabilities": [
+          "physics",
+          "biology",
+          "chemistry",
+          "math"
+        ],
+        "description": "Science agent"
+      },
+      {
+        "name": "hardware",
+        "capabilities": [
+          "electronics",
+          "sensors",
+          "embedded"
+        ],
+        "description": "Hardware agent"
+      },
+      {
+        "name": "robotics",
+        "capabilities": [
+          "control",
+          "perception",
+          "planning",
+          "sim"
+        ],
+        "description": "Robotics agent"
+      }
+    ],
+    "11h_enterprise": {
+      "features": {
+        "multi_user": true,
+        "organizations": true,
+        "roles": true,
+        "api_keys": true,
+        "usage_tracking": "partial",
+        "monitoring": true,
+        "logs": true
+      },
+      "tenancy": "TenantDirectory available",
+      "tenant_directory": "TenantDirectory",
+      "security": "auth/RBAC available",
+      "monitoring": "observability package available"
+    },
+    "11i_multimodal": {
+      "document": "ready",
+      "vision": "stub \u2014 needs trained vision weights",
+      "voice": "stub \u2014 needs ASR/TTS weights",
+      "image": "stub \u2014 describe_image unavailable until vision wired",
+      "video": "not implemented",
+      "how_to": {
+        "document": "from om_ai.multimodal.document_ai import analyze_document",
+        "orchestrator": "UnifiedOrchestrator(...).run(documents=[...])"
+      }
+    },
     "12_monitoring": {
       "path": "/Users/gajendrarawat/Downloads/om-ai-operating-brain 3/artifacts/system/monitoring.json"
     },
     "13_self_check": {
-      "passed": 35,
-      "total": 35,
+      "passed": 45,
+      "total": 45,
       "all_passed": true
     }
   },
@@ -287,17 +646,24 @@
     "Monitoring": true,
     "Security Layer": true,
     "Deployment Structure": true,
+    "Intent Engine": true,
+    "Coding Brain": true,
+    "Tool System": true,
+    "Enterprise Layer": true,
+    "Multimodal Document AI": true,
     "OM-1B/7B/70B Path": "READY (configs+scripts; weights need GPU/data)"
   },
   "external_only": [
     "OM-1B/7B/70B trained weight files",
     "large licensed corpus volume",
-    "GPU / distributed wall-clock"
+    "GPU / distributed wall-clock",
+    "trained vision/ASR/TTS weights"
   ],
   "commands": {
     "rebuild": "om-ai system build",
     "knowledge_status": "om-ai knowledge status",
     "knowledge_ingest": "om-ai knowledge ingest <file>",
+    "intent": "om-ai intent classify \"Create React login page\"",
     "reason": "om-ai reason \"Design a school management system\"",
     "evaluate": "om-ai evaluate run",
     "serve": "om-ai serve --host 127.0.0.1 --port 8080"

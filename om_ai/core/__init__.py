@@ -9,6 +9,8 @@ from om_ai.core.reasoning import (
     VerificationEngine,
     run_reasoning_pipeline,
 )
+from om_ai.core.intent_engine import classify, route
+from om_ai.core.response import check_quality, format_response
 
 __all__ = [
     "IntentAnalyzer",
@@ -17,4 +19,8 @@ __all__ = [
     "VerificationEngine",
     "ReflectionEngine",
     "run_reasoning_pipeline",
+    "classify",
+    "route",
+    "check_quality",
+    "format_response",
 ]

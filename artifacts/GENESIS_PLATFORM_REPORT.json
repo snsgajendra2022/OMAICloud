@@ -1,0 +1,26 @@
+{
+  "name": "om-genesis-platform-v1",
+  "verified": true,
+  "layers": {
+    "intelligence_core": "ok",
+    "reasoning_engine": "ok",
+    "knowledge_brain": "ok",
+    "memory_system": "ok",
+    "agent_system": "ok",
+    "tool_system": "ok",
+    "coding_intelligence": "ok",
+    "multimodal_system": "partial",
+    "evaluation_system": "ok",
+    "continuous_learning": "ok",
+    "training_pipeline": "ok",
+    "security_layer": "ok",
+    "enterprise_layer": "ok"
+  },
+  "external_only": [
+    "OM-1B/7B/70B trained weight files",
+    "large licensed corpus volume",
+    "GPU / distributed wall-clock",
+    "trained vision/ASR/TTS weights"
+  ],
+  "system_report": "/Users/gajendrarawat/Downloads/om-ai-operating-brain 3/artifacts/SYSTEM_BUILD_REPORT.json"
+}

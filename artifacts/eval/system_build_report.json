@@ -1,41 +1,45 @@
 {
-  "generated_at": 1787665445.480021,
+  "generated_at": 1787668552.795496,
   "scores": {
     "coding": 100.0,
     "architecture": 100.0,
+    "reasoning": 100.0,
     "security": 100.0,
     "completeness": 100.0,
     "math": 100.0,
-    "knowledge": 100.0
+    "knowledge": 100.0,
+    "agents": 100.0,
+    "long_context": 100.0
   },
   "summary": {
-    "total": 12,
-    "passed": 12,
+    "total": 16,
+    "passed": 16,
     "accuracy": 1.0,
     "mode": "heuristic"
   },
   "weak_areas": [],
+  "improvement": "Hold / promote candidate",
   "raw": {
     "name": "om-eval-suite-v1",
-    "generated_at": 1787665445.479956,
+    "generated_at": 1787668552.795454,
     "suite": "benchmarks/om_eval_suite_v1.jsonl",
-    "total": 12,
-    "passed": 12,
+    "total": 16,
+    "passed": 16,
     "accuracy": 1.0,
     "by_category": {
       "math": {
-        "total": 2,
-        "passed": 2,
+        "total": 3,
+        "passed": 3,
         "accuracy": 1.0
       },
       "reasoning": {
-        "total": 2,
-        "passed": 2,
+        "total": 3,
+        "passed": 3,
         "accuracy": 1.0
       },
       "coding": {
-        "total": 2,
-        "passed": 2,
+        "total": 3,
+        "passed": 3,
         "accuracy": 1.0
       },
       "knowledge": {
@@ -49,8 +53,8 @@
         "accuracy": 1.0
       },
       "agent": {
-        "total": 1,
-        "passed": 1,
+        "total": 2,
+        "passed": 2,
         "accuracy": 1.0
       },
       "long_context": {

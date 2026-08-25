@@ -1,0 +1,9 @@
+{
+  "name": "coding",
+  "version": "1.0",
+  "capabilities": ["read_repo", "plan", "generate_code", "propose_patches", "suggest_tests", "debug"],
+  "tools": ["file_manager", "terminal", "git"],
+  "policies": ["no_secret_commit", "dry_run_default"],
+  "evaluator": "om_ai.improvement.evaluator",
+  "executor": "om_ai.agents.runtime.AgentRuntime"
+}

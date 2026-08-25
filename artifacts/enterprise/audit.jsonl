@@ -1,0 +1,35 @@
+{"ts": 1787668694.029135, "action": "reason", "actor": "", "tenant_id": "default", "meta": {"keys": ["question"]}}
+{"ts": 1787668694.0361118, "action": "knowledge.search", "actor": "", "tenant_id": "default", "meta": {"keys": ["query"]}}
+{"ts": 1787668694.036936, "action": "agent", "actor": "", "tenant_id": "default", "meta": {"keys": ["task", "root"]}}
+{"ts": 1787668695.345994, "action": "chat", "actor": "", "tenant_id": "default", "meta": {"keys": ["prompt"]}}
+{"ts": 1787668696.497948, "action": "reason", "actor": "", "tenant_id": "default", "meta": {"keys": ["question"]}}
+{"ts": 1787668696.506946, "action": "knowledge.search", "actor": "", "tenant_id": "default", "meta": {"keys": ["query"]}}
+{"ts": 1787668696.507981, "action": "agent", "actor": "", "tenant_id": "default", "meta": {"keys": ["task", "root"]}}
+{"ts": 1787668697.11805, "action": "chat", "actor": "", "tenant_id": "default", "meta": {"keys": ["prompt"]}}
+{"ts": 1787668697.1218, "action": "metrics", "actor": "", "tenant_id": "default", "meta": {"keys": []}}
+{"ts": 1787668697.982811, "action": "metrics", "actor": "", "tenant_id": "default", "meta": {"keys": []}}
+{"ts": 1787668730.421265, "action": "reason", "actor": "", "tenant_id": "default", "meta": {"keys": ["question"]}}
+{"ts": 1787668730.434412, "action": "knowledge.search", "actor": "", "tenant_id": "default", "meta": {"keys": ["query"]}}
+{"ts": 1787668730.4354649, "action": "agent", "actor": "", "tenant_id": "default", "meta": {"keys": ["task", "root"]}}
+{"ts": 1787668731.6690829, "action": "chat", "actor": "", "tenant_id": "default", "meta": {"keys": ["prompt"]}}
+{"ts": 1787668731.674577, "action": "metrics", "actor": "", "tenant_id": "default", "meta": {"keys": []}}
+{"ts": 1787668731.6769521, "action": "users.create", "actor": "", "tenant_id": "default", "meta": {"keys": ["email", "role"]}}
+{"ts": 1787668731.677727, "action": "lifecycle.promote", "actor": "", "tenant_id": "default", "meta": {"keys": ["model_id", "state"]}}
+{"ts": 1787668732.869386, "action": "reason", "actor": "", "tenant_id": "default", "meta": {"keys": ["question"]}}
+{"ts": 1787668732.874176, "action": "knowledge.search", "actor": "", "tenant_id": "default", "meta": {"keys": ["query"]}}
+{"ts": 1787668732.875073, "action": "agent", "actor": "", "tenant_id": "default", "meta": {"keys": ["task", "root"]}}
+{"ts": 1787668733.451703, "action": "chat", "actor": "", "tenant_id": "default", "meta": {"keys": ["prompt"]}}
+{"ts": 1787668764.506602, "action": "reason", "actor": "", "tenant_id": "default", "meta": {"keys": ["question"]}}
+{"ts": 1787668764.5188081, "action": "knowledge.search", "actor": "", "tenant_id": "default", "meta": {"keys": ["query"]}}
+{"ts": 1787668764.5197299, "action": "agent", "actor": "", "tenant_id": "default", "meta": {"keys": ["task", "root"]}}
+{"ts": 1787668765.784995, "action": "chat", "actor": "", "tenant_id": "default", "meta": {"keys": ["prompt"]}}
+{"ts": 1787668765.7895832, "action": "metrics", "actor": "", "tenant_id": "default", "meta": {"keys": []}}
+{"ts": 1787668765.791276, "action": "users.create", "actor": "", "tenant_id": "default", "meta": {"keys": ["email", "role"]}}
+{"ts": 1787668765.792042, "action": "lifecycle.promote", "actor": "", "tenant_id": "default", "meta": {"keys": ["model_id", "state"]}}
+{"ts": 1787668813.62653, "action": "reason", "actor": "", "tenant_id": "default", "meta": {"keys": ["question"]}}
+{"ts": 1787668813.6376278, "action": "knowledge.search", "actor": "", "tenant_id": "default", "meta": {"keys": ["query"]}}
+{"ts": 1787668813.638316, "action": "agent", "actor": "", "tenant_id": "default", "meta": {"keys": ["task", "root"]}}
+{"ts": 1787668814.8512828, "action": "chat", "actor": "", "tenant_id": "default", "meta": {"keys": ["prompt"]}}
+{"ts": 1787668814.8552818, "action": "metrics", "actor": "", "tenant_id": "default", "meta": {"keys": []}}
+{"ts": 1787668814.8566248, "action": "users.create", "actor": "", "tenant_id": "default", "meta": {"keys": ["email", "role"]}}
+{"ts": 1787668814.857238, "action": "lifecycle.promote", "actor": "", "tenant_id": "default", "meta": {"keys": ["model_id", "state"]}}

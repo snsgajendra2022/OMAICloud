@@ -118,10 +118,53 @@ def looks_like_assistant_chitchat(text: str | None) -> bool:
     return any(m in low for m in markers)
 
 
+def is_garbled_generation(text: str | None) -> bool:
+    """Detect tiny-model nonsense (mixed-script spam, random proper nouns, fragment soup)."""
+    s = (text or "").strip()
+    if not s:
+        return True
+    has_dev = bool(re.search(r"[\u0900-\u097F]", s))
+    words = re.findall(r"[A-Za-z']+", s)
+    low = s.lower()
+    # Classic derail phrases seen from undertrained OM-1.0 chat
+    if any(
+        p in low
+        for p in (
+            "prime minister",
+            "powered byhi",
+            "dail name",
+            "car sim",
+            "cold speed",
+            "preferred form",
+            "low fat",
+        )
+    ):
+        return True
+    # Mixed Devanagari + English fragment soup (not intentional bilingual help)
+    if has_dev and len(words) >= 6:
+        intentional = any(
+            x in s.lower() or x in s
+            for x in ("namaste", "नमस्ते", "धन्यवाद", "हिंदी", "hindi", "english meaning")
+        )
+        short = sum(1 for w in words if len(w) <= 2)
+        weird = sum(1 for w in words if re.search(r"[A-Z]{2,}", w) and w.lower() not in {"om", "ai", "api", "ui"})
+        if not intentional and (short >= 3 or "syntax" in low or weird >= 2):
+            return True
+    # High comma / fragment density without clear sentence structure
+    if len(words) >= 10 and s.count(",") >= 4 and s.count(".") == 0 and "http" not in low:
+        return True
+    # Broken emoji + script mash
+    if "👋" in s and has_dev and len(words) >= 5 and "om ai" not in low:
+        return True
+    return False
+
+
 def is_nonsensical_smalltalk(text: str | None) -> bool:
     """Detect undertrained greeting derails (e.g. 'Hello! I’m on Car sim…')."""
     s = (text or "").strip()
     if not s:
+        return True
+    if is_garbled_generation(s):
         return True
     low = s.lower()
     if any(
@@ -179,6 +222,8 @@ def is_low_quality_reply(text: str | None) -> str:
         return "spam"
     if is_degenerate_generation(cleaned):
         return "degenerate"
+    if is_garbled_generation(cleaned):
+        return "garbled"
     if is_nonsensical_smalltalk(cleaned):
         return "nonsensical"
     # Catch classic base-model loops: "upgrade upgrade", "membership…"

@@ -1,0 +1,256 @@
+{
+  "name": "om-enterprise-platform-v1",
+  "mode": "ENTERPRISE_PRODUCTION_ARCHITECTURE",
+  "om_version": "1.0",
+  "verified": true,
+  "elapsed_sec": 1.24,
+  "layout": {
+    "created": [],
+    "total": 35
+  },
+  "gateway_health": {
+    "service": "api-gateway",
+    "status": "healthy",
+    "version": "1.0",
+    "om_version": "1.0",
+    "detail": {
+      "services": {
+        "identity": {
+          "service": "identity-service",
+          "status": "healthy",
+          "version": "1.0",
+          "om_version": "1.0",
+          "detail": {
+            "auth": "om_ai.security.auth"
+          },
+          "ts": 1787668813.6243572
+        },
+        "users": {
+          "service": "user-service",
+          "status": "healthy",
+          "version": "1.0",
+          "om_version": "1.0",
+          "detail": {},
+          "ts": 1787668813.624359
+        },
+        "billing": {
+          "service": "billing-service",
+          "status": "healthy",
+          "version": "1.0",
+          "om_version": "1.0",
+          "detail": {
+            "mode": "local_ledger"
+          },
+          "ts": 1787668813.624361
+        },
+        "audit": {
+          "service": "audit-service",
+          "status": "healthy",
+          "version": "1.0",
+          "om_version": "1.0",
+          "detail": {},
+          "ts": 1787668813.624361
+        },
+        "model_gateway": {
+          "service": "model-gateway",
+          "status": "healthy",
+          "version": "1.0",
+          "om_version": "1.0",
+          "detail": {
+            "catalog": [
+              "om-1.0",
+              "om-1b",
+              "om-7b",
+              "om-70b",
+              "embedding",
+              "vision",
+              "speech"
+            ],
+            "requests": 0
+          },
+          "ts": 1787668813.624363
+        },
+        "model_lifecycle": {
+          "service": "model-lifecycle",
+          "status": "healthy",
+          "version": "1.0",
+          "om_version": "1.0",
+          "detail": {},
+          "ts": 1787668813.6243641
+        },
+        "agents": {
+          "service": "agent-service",
+          "status": "healthy",
+          "version": "1.0",
+          "om_version": "1.0",
+          "detail": {
+            "agents": 10
+          },
+          "ts": 1787668813.6265118
+        },
+        "reasoning": {
+          "service": "reasoning-service",
+          "status": "healthy",
+          "version": "1.0",
+          "om_version": "1.0",
+          "detail": {},
+          "ts": 1787668813.626514
+        },
+        "knowledge": {
+          "service": "knowledge-service",
+          "status": "healthy",
+          "version": "1.0",
+          "om_version": "1.0",
+          "detail": {},
+          "ts": 1787668813.626515
+        },
+        "retrieval": {
+          "service": "retrieval-service",
+          "status": "healthy",
+          "version": "1.0",
+          "om_version": "1.0",
+          "detail": {
+            "backend": "PersistentKnowledgeBase TF-IDF"
+          },
+          "ts": 1787668813.6265159
+        },
+        "memory": {
+          "service": "memory-service",
+          "status": "healthy",
+          "version": "1.0",
+          "om_version": "1.0",
+          "detail": {
+            "backend": "sqlite+layers"
+          },
+          "ts": 1787668813.626517
+        },
+        "evaluation": {
+          "service": "evaluation-service",
+          "status": "healthy",
+          "version": "1.0",
+          "om_version": "1.0",
+          "detail": {},
+          "ts": 1787668813.626517
+        },
+        "learning": {
+          "service": "learning-service",
+          "status": "healthy",
+          "version": "1.0",
+          "om_version": "1.0",
+          "detail": {},
+          "ts": 1787668813.626518
+        }
+      },
+      "unhealthy": []
+    },
+    "ts": 1787668813.626521
+  },
+  "agent_capabilities": [
+    {
+      "name": "coding",
+      "version": "1.0",
+      "capabilities": [
+        "read_repo",
+        "plan",
+        "generate_code",
+        "propose_patches",
+        "suggest_tests",
+        "debug"
+      ],
+      "tools": [
+        "file_manager",
+        "terminal",
+        "git"
+      ],
+      "policies": [
+        "no_secret_commit",
+        "dry_run_default"
+      ],
+      "evaluator": "om_ai.improvement.evaluator",
+      "executor": "om_ai.agents.runtime.AgentRuntime"
+    },
+    {
+      "name": "research",
+      "version": "1.0",
+      "capabilities": [
+        "summarize",
+        "compare",
+        "retrieve_knowledge",
+        "report"
+      ],
+      "tools": [
+        "knowledge.search",
+        "retrieval"
+      ],
+      "policies": [
+        "no_invented_citations"
+      ],
+      "evaluator": "om_ai.improvement.evaluator",
+      "executor": "services.knowledge_service.KnowledgeService"
+    },
+    {
+      "name": "security",
+      "version": "1.0",
+      "capabilities": [
+        "review",
+        "secrets_scan",
+        "policy_check"
+      ],
+      "tools": [
+        "policy_engine"
+      ],
+      "policies": [
+        "deny_unrestricted_shell"
+      ],
+      "evaluator": "om_ai.core.response.intelligence",
+      "executor": "ai_platform.orchestration.PolicyEngine"
+    }
+  ],
+  "orchestration_demo": {
+    "ok": true,
+    "latency_ms": 1228,
+    "steps": [
+      "intent",
+      "plan",
+      "retrieve",
+      "execute",
+      "verify",
+      "quality",
+      "respond"
+    ],
+    "response_preview": "## Understanding\nUser wants help with: Create React login page\n\n## Analysis\n- Intent: `coding`\n- Domain: `software`\n- Agents: master, coding, testing, security\n\n## Architecture\n- src/Login.jsx \u2014 form UI + validation\n- src/Login.css \u2014 responsive layout\n- Optional: auth API client + error states\n\n## Plan\n1. Map repository / interfaces\n2. Retrieve docs + prior decisions\n3. Write failing test or repro"
+  },
+  "completion": {
+    "Enterprise Architecture": true,
+    "Microservices": true,
+    "API Gateway": true,
+    "Model Gateway": true,
+    "Model Lifecycle": true,
+    "User / Billing / Audit": true,
+    "Agent Platform": true,
+    "Knowledge + Retrieval": true,
+    "Memory Platform": true,
+    "Reasoning Platform": true,
+    "Evaluation Service": true,
+    "Learning / Improvement": true,
+    "Orchestration": true,
+    "Security": true,
+    "Monitoring snapshot": true,
+    "Docker/K8s scaffolding": true,
+    "Training path OM-1\u21927\u219270": true,
+    "Distributed mesh": "in-process local; split deploy via Docker/K8s",
+    "GPU cluster": "EXTERNAL"
+  },
+  "external_only": [
+    "OM-1B/7B/70B trained weights",
+    "Managed Postgres/Vector/Graph at scale",
+    "GPU Kubernetes nodes",
+    "External billing provider"
+  ],
+  "commands": {
+    "build": "om-ai platform build",
+    "gateway_chat": "om-ai platform route --path chat --prompt \"...\"",
+    "workflow": "om-ai platform workflow --request \"Create React login page\"",
+    "metrics": "om-ai platform route --path metrics"
+  }
+}

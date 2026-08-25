@@ -1,0 +1,66 @@
+{
+  "ts": 1787668814.857607,
+  "gateway": "healthy",
+  "model_metrics": {
+    "requests": 0,
+    "errors": 0,
+    "tokens_in": 0,
+    "tokens_out": 0,
+    "catalog": {
+      "om-1.0": {
+        "role": "foundation",
+        "status": "local"
+      },
+      "om-1b": {
+        "role": "small",
+        "status": "config_ready"
+      },
+      "om-7b": {
+        "role": "mid",
+        "status": "config_ready"
+      },
+      "om-70b": {
+        "role": "large",
+        "status": "config_ready"
+      },
+      "embedding": {
+        "role": "retrieval",
+        "status": "tfidf_local"
+      },
+      "vision": {
+        "role": "multimodal",
+        "status": "stub"
+      },
+      "speech": {
+        "role": "multimodal",
+        "status": "stub"
+      }
+    }
+  },
+  "billing": {
+    "tenant_id": "default",
+    "events": 6,
+    "cost_usd": 0.00236
+  },
+  "workflow_latency_ms": 1228,
+  "services": [
+    "identity",
+    "users",
+    "billing",
+    "audit",
+    "model_gateway",
+    "model_lifecycle",
+    "agents",
+    "reasoning",
+    "knowledge",
+    "retrieval",
+    "memory",
+    "evaluation",
+    "learning"
+  ],
+  "agent_capabilities": [
+    "coding",
+    "research",
+    "security"
+  ]
+}

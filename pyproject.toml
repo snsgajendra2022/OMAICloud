@@ -29,7 +29,7 @@ om-ai = "om_ai.cli:main"
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["om_ai*"]
+include = ["om_ai*", "services*", "ai_platform*"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

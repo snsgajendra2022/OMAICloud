@@ -8,11 +8,17 @@
     "OM-1B",
     "OM-70B",
     "OM-7B",
+    "Om System Build Sample",
     "Reasoning",
     "Retrieval",
     "Training",
+    "energy",
+    "foundation",
     "knowledge",
-    "reasoning"
+    "mechanics",
+    "physics",
+    "reasoning",
+    "sample"
   ],
   "edges": [
     {
@@ -64,6 +70,36 @@
       "s": "OM-1.0",
       "r": "has_layer",
       "o": "knowledge"
+    },
+    {
+      "s": "Om System Build Sample",
+      "r": "in_domain",
+      "o": "physics"
+    },
+    {
+      "s": "Om System Build Sample",
+      "r": "about",
+      "o": "foundation"
+    },
+    {
+      "s": "Om System Build Sample",
+      "r": "about",
+      "o": "sample"
+    },
+    {
+      "s": "Om System Build Sample",
+      "r": "about",
+      "o": "physics"
+    },
+    {
+      "s": "Om System Build Sample",
+      "r": "about",
+      "o": "mechanics"
+    },
+    {
+      "s": "Om System Build Sample",
+      "r": "about",
+      "o": "energy"
     }
   ]
 }

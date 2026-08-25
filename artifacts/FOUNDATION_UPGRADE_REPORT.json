@@ -10,8 +10,8 @@
     ],
     "5_run_tests": {
       "ran": true,
-      "exit_code": 0,
-      "stdout_tail": ".......                                                                  [100%]\n7 passed in 3.10s\n",
+      "exit_code": 1,
+      "stdout_tail": "                             [100%]\n=================================== FAILURES ===================================\n____________________________ test_reasoning_engine _____________________________\n\n    def test_reasoning_engine():\n        t = reason(\"Design a FastAPI auth service with JWT\")\n        assert t.decomposition and t.plan and t.critique\n        assert \"Understanding\" in t.as_markdown()\n>       assert t.meta.get(\"domain\") == \"coding\"\nE       AssertionError: assert 'software' == 'coding'\nE         \nE         - coding\nE         + software\n\ntests/test_completion_foundations.py:27: AssertionError\n=========================== short test summary info ============================\nFAILED tests/test_completion_foundations.py::test_reasoning_engine - Assertio...\n1 failed, 6 passed in 5.35s\n",
       "stderr_tail": ""
     },
     "6_generate_report": "/Users/gajendrarawat/Downloads/om-ai-operating-brain 3/artifacts/eval/foundation_report.json"
@@ -37,10 +37,13 @@
   "evaluation_scores": {
     "coding": 100.0,
     "architecture": 100.0,
+    "reasoning": 100.0,
     "security": 100.0,
     "completeness": 100.0,
     "math": 100.0,
-    "knowledge": 100.0
+    "knowledge": 100.0,
+    "agents": 100.0,
+    "long_context": 100.0
   },
   "checklist": {
     "Knowledge Corpus Layout": true,

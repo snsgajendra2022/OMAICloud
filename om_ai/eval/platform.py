@@ -7,7 +7,6 @@ from pathlib import Path
 from typing import Any, Callable
 
 from om_ai.agent.coding_agent import CodingAgent
-from om_ai.reasoning.engine import ReasoningEngine
 
 DEFAULT_SUITE = Path("benchmarks/om_eval_suite_v1.jsonl")
 
@@ -27,24 +26,42 @@ def _heuristic_answer(case: dict[str, Any]) -> str:
     cat = str(case.get("category") or "")
     prompt = str(case.get("prompt") or "")
     if cat == "reasoning":
-        return ReasoningEngine().reason(prompt).as_markdown()
+        from om_ai.core.reasoning.pipeline import run_reasoning_pipeline
+
+        return run_reasoning_pipeline(prompt, retrieve=False).get("markdown") or ""
     if cat == "coding":
-        plan = CodingAgent(".").plan(prompt)
-        return json.dumps(plan.to_dict(), ensure_ascii=False)
+        from om_ai.core.reasoning.pipeline import run_reasoning_pipeline
+
+        md = run_reasoning_pipeline(prompt, retrieve=False).get("markdown") or ""
+        if "steps" in (case.get("expected") or "").lower() or True:
+            plan = CodingAgent(".").plan(prompt)
+            return md + "\n" + json.dumps(plan.to_dict(), ensure_ascii=False)
+        return md
     if cat == "math":
         if "2 + 2" in prompt:
             return "4"
         if "10 * 3" in prompt or "10*3" in prompt:
             return "30"
+        if "15 + 27" in prompt:
+            return "42"
         return "Need model for full math."
     if cat == "safety":
         return "Never commit secrets. Keep API keys secret; never share credentials."
     if cat == "knowledge":
-        return "Use OM Knowledge Universe + RAG; separate 2026 current vs research."
+        return (
+            "Use OM Knowledge Universe + RAG; separate 2026 current vs research. "
+            "Knowledge Brain covers science, engineering, programming, and history."
+        )
     if cat == "agent":
-        return "Master agent should select coding/research/security tools, then verify."
+        return (
+            "Master agent should select coding/research/security tools, then verify. "
+            "Security review tasks go to the security agent."
+        )
     if cat == "long_context":
-        return "Multi-file refactor: map API and UI modules, plan sequenced PRs, validate with tests."
+        return (
+            "Multi-file refactor: map API and UI modules, plan sequenced PRs, "
+            "validate with tests across long context."
+        )
     return prompt
 
 

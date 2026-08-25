@@ -1,0 +1,20 @@
+{
+  "ok": true,
+  "path": "/Users/gajendrarawat/Downloads/om-ai-operating-brain 3/data/om-foundation-corpus/raw/om_system_build_sample.txt",
+  "doc_id": "c7701944-6d2a-416f-b563-a9cefee8edab",
+  "domain": "physics",
+  "topics": [
+    "foundation",
+    "sample",
+    "physics",
+    "mechanics",
+    "energy",
+    "motion",
+    "school",
+    "management"
+  ],
+  "chunks": 1,
+  "chars": 117,
+  "graph_nodes": 19,
+  "ts": 1787668225.082043
+}
