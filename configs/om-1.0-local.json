@@ -1,8 +1,8 @@
 {
   "name": "OM-1.0-local",
-  "description": "Small architecture for Mac verification / smoke training. Not 70B.",
+  "description": "Mac/local OM-1.0 chat architecture. Same ~20M body as prior chat-SFT; longer context for better thread memory.",
   "vocab_size": 65536,
-  "max_seq_len": 128,
+  "max_seq_len": 256,
   "n_layers": 4,
   "n_heads": 4,
   "n_kv_heads": 4,
@@ -14,5 +14,5 @@
   "tie_embeddings": true,
   "use_rmsnorm": true,
   "gradient_checkpointing": false,
-  "parameter_goal_note": "~20M params with production 65k vocab / max_seq_len=128. Mac MPS smoke — not ChatGPT-class."
+  "parameter_goal_note": "~20M params, max_seq_len=256. Not ChatGPT-class; maximizes local capability pending 1B+ GPU training."
 }

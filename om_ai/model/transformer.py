@@ -258,7 +258,13 @@ class OMTransformer(nn.Module):
                 labels.reshape(-1),
                 ignore_index=-100,
             )
-        result = {"logits": logits, "loss": loss, "caches": new_caches if use_cache else None}
+        result = {
+            "logits": logits,
+            "loss": loss,
+            "caches": new_caches if use_cache else None,
+            # Always expose final block states for critics (PPO value head, etc.).
+            "last_hidden_state": x,
+        }
         if output_hidden_states:
             result["hidden_states"] = x
         return result

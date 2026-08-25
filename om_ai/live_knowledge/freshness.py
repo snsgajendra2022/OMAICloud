@@ -77,7 +77,7 @@ _GREETING_START = re.compile(
 def _normalize_chat(text: str) -> str:
     t = (text or "").strip().lower()
     t = t.replace("'", " ").replace("’", " ").replace("`", " ")
-    t = re.sub(r"[^\w\s]+", " ", t)
+    t = re.sub(r"[^\w\s]+", " ", t, flags=re.UNICODE)
     return re.sub(r"\s+", " ", t).strip()
 
 
@@ -91,6 +91,9 @@ def is_chitchat(text: str) -> bool:
 
 def is_greeting_like(text: str) -> bool:
     """Loose greeting detector (e.g. 'good morning bhai'). Never retrieve for these."""
+    raw = (text or "").strip()
+    if re.match(r"^(नमस्ते|नमस्कार|हेलो|हैलो)([\s!.?]|$)", raw):
+        return True
     if is_chitchat(text):
         return True
     cleaned = _normalize_chat(text)

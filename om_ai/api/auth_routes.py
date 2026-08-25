@@ -168,6 +168,16 @@ def register(req: RegisterRequest, request: Request) -> JSONResponse:
 
     user = result["user"]
     _sync_chat_profile(user)
+    try:
+        from om_ai.api.onboarding import bootstrap_user_workspace
+
+        bootstrap_user_workspace(
+            user.get("tenant_id") or "default",
+            f"user:{user['id']}",
+            display_name=str(user.get("display_name") or user.get("email") or ""),
+        )
+    except Exception:
+        logger.debug("register bootstrap skipped", exc_info=True)
     _audit_auth(
         "auth.register",
         f"user:{user['id']}",
@@ -195,6 +205,16 @@ def login(req: LoginRequest, request: Request) -> JSONResponse:
 
     user = result["user"]
     _sync_chat_profile(user)
+    try:
+        from om_ai.api.onboarding import bootstrap_user_workspace
+
+        bootstrap_user_workspace(
+            user.get("tenant_id") or "default",
+            f"user:{user['id']}",
+            display_name=str(user.get("display_name") or user.get("email") or ""),
+        )
+    except Exception:
+        logger.debug("login bootstrap skipped", exc_info=True)
     _audit_auth(
         "auth.login",
         f"user:{user['id']}",

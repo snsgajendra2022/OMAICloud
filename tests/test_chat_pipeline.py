@@ -38,6 +38,30 @@ def test_sft_uses_same_chat_special_tokens(tmp_path):
     assert any(v != -100 for v in labels[idx + 1 :])
 
 
+def test_sft_accepts_messages_chat_matrix(tmp_path):
+    tok = ByteBPETokenizer.base()
+    p = tmp_path / "sft_messages.jsonl"
+    p.write_text(
+        json.dumps(
+            {
+                "messages": [
+                    {"role": "system", "content": "You are OM AI."},
+                    {"role": "user", "content": "Hi"},
+                    {"role": "assistant", "content": "Hello — how can I help?"},
+                    {"role": "user", "content": "Who are you?"},
+                    {"role": "assistant", "content": "I'm OM AI."},
+                ]
+            }
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    ds = SFTDataset(str(p), tok, 256)
+    ids, labels = ds[0]
+    assert tok.assistant_id in ids
+    assert any(v != -100 for v in labels)
+
+
 def test_preference_uses_chat_tokens(tmp_path):
     tok = ByteBPETokenizer.base()
     p = tmp_path / "pref.jsonl"

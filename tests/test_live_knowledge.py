@@ -42,6 +42,7 @@ def test_router_decision():
 
 
 def test_enrich_injects_context_without_llm(monkeypatch):
+    monkeypatch.setenv("OM_LIVE_KNOWLEDGE", "1")
     monkeypatch.delenv("OM_LIVE_KNOWLEDGE_NETWORK", raising=False)
     msgs = [{"role": "user", "content": "What is the latest news today?"}]
     out, meta = enrich_messages_for_live_knowledge(msgs, allow_network=False)
@@ -52,6 +53,7 @@ def test_enrich_injects_context_without_llm(monkeypatch):
 
 
 def test_enrich_with_local_index_grounds_reply(monkeypatch):
+    monkeypatch.setenv("OM_LIVE_KNOWLEDGE", "1")
     monkeypatch.delenv("OM_LIVE_KNOWLEDGE_NETWORK", raising=False)
     idx = LocalSearchIndex()
     idx.add(

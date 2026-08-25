@@ -15,6 +15,33 @@ def test_capitalize_title():
     assert capitalize_title("") == ""
 
 
+def test_make_chat_title_rejects_assistant_greeting():
+    from om_ai.memory.conversations import make_chat_title, _assistant_like_title
+
+    assert _assistant_like_title("Hi! I'm OM AI. How can I help you today?")
+    assert make_chat_title("Hi! I'm OM AI. How can I help you today?") == ""
+    assert make_chat_title("नमस्ते") == "नमस्ते"
+    assert make_chat_title("hiii").startswith("H")
+
+
+def test_auto_title_repairs_assistant_greeting(tmp_path):
+    store = ConversationStore(str(tmp_path / "chat.db"))
+    conv = store.create_conversation("t1", "alice", title="Hi! I'm OM AI. How can I help you today?")
+    store.append_messages(
+        conv.id,
+        "t1",
+        "alice",
+        [
+            {"role": "user", "content": "Ram Ram ji"},
+            {"role": "assistant", "content": "Hi! I'm OM AI. How can I help you today?"},
+        ],
+    )
+    updated = store.get_conversation(conv.id, "t1", "alice")
+    assert updated.title.startswith("Ram")
+    listed = store.list_conversations("t1", "alice")
+    assert listed[0].title.startswith("Ram")
+
+
 def test_conversation_crud_and_messages(tmp_path):
     store = ConversationStore(str(tmp_path / "chat.db"))
     conv = store.create_conversation("t1", "alice", title="New chat")

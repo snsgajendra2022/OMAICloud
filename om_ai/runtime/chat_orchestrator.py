@@ -32,13 +32,13 @@ def _env_int(name: str, default: int) -> int:
 
 
 def generation_config(**overrides: Any) -> dict[str, Any]:
-    """ChatGPT-style sampling defaults for OM-1.0 chat (env-overridable)."""
+    """Natural conversational sampling for OM-1.0 chat (env-overridable)."""
     cfg = {
-        "temperature": _env_float("OM_CHAT_TEMPERATURE", 0.2),
-        "top_p": _env_float("OM_CHAT_TOP_P", 0.85),
-        "top_k": _env_int("OM_CHAT_TOP_K", 20),
-        "repetition_penalty": _env_float("OM_CHAT_REPETITION_PENALTY", 1.1),
-        "max_new_tokens": _env_int("OM_CHAT_MAX_NEW_TOKENS", 64),
+        "temperature": _env_float("OM_CHAT_TEMPERATURE", 0.45),
+        "top_p": _env_float("OM_CHAT_TOP_P", 0.9),
+        "top_k": _env_int("OM_CHAT_TOP_K", 40),
+        "repetition_penalty": _env_float("OM_CHAT_REPETITION_PENALTY", 1.12),
+        "max_new_tokens": _env_int("OM_CHAT_MAX_NEW_TOKENS", 96),
         "min_new_tokens": _env_int("OM_CHAT_MIN_NEW_TOKENS", 1),
     }
     for k, v in overrides.items():
@@ -71,9 +71,9 @@ def build_chat_messages(
     """
     msgs = _normalize_messages(messages)
     non_system = [m for m in msgs if m["role"] != "system"]
-    # Keep last few turns to reduce noise for tiny context windows.
-    if compact and len(non_system) > 4:
-        non_system = non_system[-4:]
+    # Keep last few turns so OM accounts for the conversation thread.
+    if compact and len(non_system) > 8:
+        non_system = non_system[-8:]
 
     system = active_system_prompt(compact=compact)
     if extra_system and extra_system.strip():
@@ -83,39 +83,12 @@ def build_chat_messages(
     return [{"role": "system", "content": system}] + non_system
 
 
-_GREETING_REPLY = "Hi! I'm OM AI. How can I help you today?"
-_OM_SELF_REPLY = (
-    "I'm OM AI, powered by the OM-1.0 native model running locally on your machine. "
-    "How can I help?"
-)
-_CLARIFY_REPLY = (
-    "I didn't catch a clear answer there. Could you rephrase that in one short sentence?"
-)
-
-
 def policy_recovery_reply(
     user_text: str, *, reason: str = "", language: str = "en"
 ) -> str | None:
-    """Last-resort reply when generation is empty/spam after retries.
-
-    Prefer OM-1.0 output; use short safe replies only if the base model
-    still dumps corpus junk (common before chat SFT finishes).
-    """
-    if reason not in {"degenerate", "spam", "empty"}:
-        return None
-    from om_ai.live_knowledge.freshness import is_greeting_like, is_om_self_query
-
-    if is_greeting_like(user_text):
-        if language in {"hi", "hi-Latn"}:
-            return "Namaste! Main OM AI hoon. Aaj main aapki kaise madad kar sakta hoon?"
-        return _GREETING_REPLY
-    if is_om_self_query(user_text):
-        if language in {"hi", "hi-Latn"}:
-            return "Main OM AI hoon — OM-1.0 local model. Aap kya karna chahenge?"
-        return _OM_SELF_REPLY
-    if language in {"hi", "hi-Latn"}:
-        return "Mujhe clear jawab nahi mila. Kya aap ek short sentence mein dobara bata sakte hain?"
-    return _CLARIFY_REPLY
+    """Never inject canned chat. The model reply (or EMPTY fallback) is the source of truth."""
+    del user_text, reason, language  # kept for call-site compatibility
+    return None
 
 
 def looks_like_assistant_chitchat(text: str | None) -> bool:
@@ -137,6 +110,7 @@ def looks_like_assistant_chitchat(text: str | None) -> bool:
         "hi", "hello", "hey", "help", "om ai", "welcome",
         "how can i", "what can i", "good morning", "good evening",
         "nice to meet", "i'm om", "i am om", "how's it", "how are you",
+        "नमस्ते", "मदद",
     )
     return any(m in low for m in markers)
 

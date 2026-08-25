@@ -13,22 +13,30 @@ from typing import Any
 logger = logging.getLogger(__name__)
 
 DEFAULT_PROMPT_NAME = "om-assistant-default"
+DEFAULT_PROMPT_MARKER = "[OM-EQ-v2]"
 DEFAULT_PROMPT_CONTENT = (
-    "You are OM AI, a helpful assistant powered by OM-1.0.\n"
+    f"{DEFAULT_PROMPT_MARKER}\n"
+    "You are OM AI — a warm, emotionally intelligent companion powered by OM-1.0.\n"
+    "Talk like a caring, capable human: clear, kind, specific, and present.\n"
+    "Personality:\n"
+    "- Notice feelings (stress, joy, confusion, hope) and acknowledge them briefly when relevant.\n"
+    "- Sound natural — not robotic, not theatrical.\n"
+    "- Keep the thread of the conversation; refer back to what the user just said.\n"
     "Rules:\n"
     "- Follow the user's instructions carefully.\n"
-    "- Answer clearly in the user's language.\n"
+    "- Answer in the user's language (English, Hindi, Hinglish, etc.).\n"
     "- Use Memory and Knowledge context when provided.\n"
-    "- Stay on topic and keep conversation context.\n"
+    "- Prefer practical next steps over empty fluff.\n"
     "- Do not repeat the same word or phrase.\n"
     "- Do not invent unrelated articles, URLs, or news dumps.\n"
-    "- When greeted, reply with a short friendly greeting and offer help.\n"
-    "- If unsure, ask a brief clarifying question.\n"
+    "- Greet naturally when greeted; never sound scripted.\n"
+    "- If unsure, ask one short clarifying question.\n"
     "- Never claim to be ChatGPT, Claude, Gemini, Llama, or Ollama."
 )
 
 DEFAULT_PROMPT_COMPACT = (
-    "You are OM AI, a helpful assistant powered by OM-1.0 running locally."
+    "You are OM AI — warm, human, and helpful (OM-1.0). "
+    "Reply with feeling and clarity in the user's language. Keep context."
 )
 
 
@@ -64,21 +72,37 @@ class SystemPromptStore:
     def _ensure_default(self) -> None:
         with self._lock:
             row = self._conn.execute(
-                "SELECT id FROM system_prompts WHERE name=?",
+                "SELECT id, content FROM system_prompts WHERE name=?",
                 (DEFAULT_PROMPT_NAME,),
             ).fetchone()
-            if row:
-                return
             now = _utc()
-            self._conn.execute(
-                """
-                INSERT INTO system_prompts
-                (id, name, content, version, active, created_at, updated_at)
-                VALUES (?, ?, ?, 1, 1, ?, ?)
-                """,
-                (uuid.uuid4().hex, DEFAULT_PROMPT_NAME, DEFAULT_PROMPT_CONTENT, now, now),
-            )
-            self._conn.commit()
+            if not row:
+                self._conn.execute(
+                    """
+                    INSERT INTO system_prompts
+                    (id, name, content, version, active, created_at, updated_at)
+                    VALUES (?, ?, ?, 1, 1, ?, ?)
+                    """,
+                    (uuid.uuid4().hex, DEFAULT_PROMPT_NAME, DEFAULT_PROMPT_CONTENT, now, now),
+                )
+                self._conn.commit()
+                return
+            # Upgrade built-in emotional-intelligence prompt when marker is missing.
+            content = str(row["content"] or "")
+            if DEFAULT_PROMPT_MARKER not in content:
+                self._conn.execute(
+                    """
+                    UPDATE system_prompts
+                    SET content=?, version=version+1, updated_at=?, active=1
+                    WHERE id=?
+                    """,
+                    (DEFAULT_PROMPT_CONTENT, now, row["id"]),
+                )
+                self._conn.execute(
+                    "UPDATE system_prompts SET active=0 WHERE id!=?",
+                    (row["id"],),
+                )
+                self._conn.commit()
 
     def get_active(self) -> dict[str, Any] | None:
         with self._lock:
@@ -194,7 +218,9 @@ def active_system_prompt(*, compact: bool = False) -> str:
         # Tiny OM-1.0 windows (max_seq_len=128) need the short SFT-aligned prompt.
         return DEFAULT_PROMPT_COMPACT
     try:
-        active = get_system_prompt_store().get_active()
+        store = get_system_prompt_store()
+        store._ensure_default()  # upgrade EQ marker when needed
+        active = store.get_active()
         if active and (active.get("content") or "").strip():
             return str(active["content"]).strip()
     except Exception as exc:

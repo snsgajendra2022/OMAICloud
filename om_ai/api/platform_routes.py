@@ -122,6 +122,22 @@ def create_workspace(
     return get_platform_store().create_workspace(ctx.tenant_id, ctx.actor, name=req.name)
 
 
+@router.post("/v1/workspace/bootstrap")
+def bootstrap_workspace(ctx: TenantContext = Depends(require_auth)) -> dict[str, Any]:
+    """Ensure Library / Assistants / Prompts / Memory / welcome chat defaults exist."""
+    from om_ai.api.onboarding import bootstrap_user_workspace
+
+    display = ""
+    try:
+        from om_ai.api.conversations import get_store
+
+        prof = get_store().get_profile(ctx.tenant_id, ctx.actor)
+        display = str(getattr(prof, "display_name", "") or "")
+    except Exception:
+        display = ""
+    return bootstrap_user_workspace(ctx.tenant_id, ctx.actor, display_name=display)
+
+
 # ---------- Search ----------
 @router.get("/v1/search")
 def global_search(

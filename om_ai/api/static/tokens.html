@@ -122,14 +122,14 @@
     <a class="brand" href="/chat"><span class="mark" aria-hidden="true">OM</span> OM</a>
     <nav>
       <a href="/chat">← Back to chat</a>
-    </nav>
+      </nav>
   </header>
 
   <main class="wrap">
     <div class="hero">
       <h1>API Keys</h1>
       <p class="sub">Create machine tokens for scripts, SDKs, and OpenAI-compatible clients. The full secret is shown only once after create.</p>
-    </div>
+        </div>
 
     <section class="card">
       <div class="card-head">
@@ -139,40 +139,40 @@
         </div>
       </div>
       <div class="grid">
-        <div>
+              <div>
           <label for="tokenName">Name</label>
           <input id="tokenName" maxlength="64" placeholder="mac-cli" autocomplete="off" />
-        </div>
-        <div>
+              </div>
+                <div>
           <label for="tokenRole">Role</label>
-          <select id="tokenRole">
-            <option value="agent">agent</option>
+                  <select id="tokenRole">
+                    <option value="agent">agent</option>
             <option value="operator">operator</option>
-            <option value="viewer">viewer</option>
-          </select>
-        </div>
+                    <option value="viewer">viewer</option>
+                  </select>
+                </div>
         <button type="button" class="btn btn-primary" id="createBtn">Create key</button>
-      </div>
+              </div>
       <div class="msg" id="msg"></div>
       <div class="secret" id="secretBox">
         <strong>Copy this key now — it will not be shown again.</strong>
         <div class="secret-row">
           <code id="secretValue"></code>
           <button type="button" class="btn btn-primary" id="copyBtn">Copy key</button>
-        </div>
+              </div>
       </div>
-    </section>
+            </section>
 
     <section class="card">
       <div class="card-head">
         <div>
           <h2>Your keys</h2>
           <p class="hint">Full secrets are never stored in plain text. Copy the prefix for reference, or create a new key if you lost the secret.</p>
-        </div>
-      </div>
+              </div>
+          </div>
       <div class="list" id="listBox"><div class="empty">Loading…</div></div>
-    </section>
-  </main>
+      </section>
+    </main>
 
   <div class="toast" id="toast"></div>
 
@@ -195,15 +195,15 @@
       toastEl.classList.add("show");
       clearTimeout(toastTimer);
       toastTimer = setTimeout(() => toastEl.classList.remove("show"), 1800);
-    }
+      }
 
-    function escapeHtml(s) {
+      function escapeHtml(s) {
       return String(s)
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;");
-    }
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;");
+      }
 
     async function copyText(text, okLabel) {
       const value = String(text || "");
@@ -249,13 +249,13 @@
       $("createBtn").disabled = true;
       try {
         const res = await fetch("/v1/tokens", {
-          method: "POST",
+            method: "POST",
           credentials: "include",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ name, role, tenant_id: "default" }),
         });
         const data = await res.json().catch(() => ({}));
-        if (!res.ok) {
+          if (!res.ok) {
           const detail = data.detail || data.error || ("HTTP " + res.status);
           throw new Error(typeof detail === "string" ? detail : JSON.stringify(detail));
         }
@@ -267,9 +267,9 @@
         setMsg("API key created — copy it now", true);
         await copyText(secret, "Key copied");
         await listTokens();
-      } catch (e) {
+        } catch (e) {
         setMsg(String(e.message || e), false);
-      } finally {
+        } finally {
         $("createBtn").disabled = false;
       }
     }
@@ -311,33 +311,33 @@
         actions.appendChild(revokeBtn);
       }
       return el;
-    }
+      }
 
-    async function listTokens() {
-      try {
+      async function listTokens() {
+        try {
         const res = await fetch("/v1/tokens", { credentials: "include" });
         const data = await res.json().catch(() => ({}));
         if (!res.ok) {
           const detail = data.detail || ("HTTP " + res.status);
           throw new Error(typeof detail === "string" ? detail : JSON.stringify(detail));
         }
-        const tokens = data.tokens || [];
+          const tokens = data.tokens || [];
         listBox.innerHTML = "";
-        if (!tokens.length) {
+          if (!tokens.length) {
           listBox.innerHTML = '<div class="empty"><strong>No API keys yet</strong>Create one above to authenticate scripts and clients.</div>';
-          return;
-        }
+            return;
+          }
         tokens.forEach(t => listBox.appendChild(keyCard(t)));
-      } catch (e) {
+        } catch (e) {
         listBox.innerHTML = '<div class="empty"><strong>Could not load keys</strong>' + escapeHtml(String(e.message || e)) + "</div>";
+        }
       }
-    }
 
-    async function revokeToken(id) {
+      async function revokeToken(id) {
       if (!id || !confirm("Revoke this API key? Apps using it will stop working.")) return;
-      try {
+        try {
         const res = await fetch("/v1/tokens/" + encodeURIComponent(id), {
-          method: "DELETE",
+            method: "DELETE",
           credentials: "include",
         });
         const data = await res.json().catch(() => ({}));
@@ -347,8 +347,8 @@
         }
         setMsg("Key revoked", true);
         toast("Key revoked");
-        await listTokens();
-      } catch (e) {
+          await listTokens();
+        } catch (e) {
         setMsg(String(e.message || e), false);
       }
     }
@@ -361,7 +361,7 @@
 
     (async function boot() {
       const ok = await ensureSession();
-      if (!ok) return;
+        if (!ok) return;
       await listTokens();
     })();
   </script>

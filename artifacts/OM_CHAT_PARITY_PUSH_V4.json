@@ -1,0 +1,18 @@
+{
+  "stage": "CHAT_PARITY_PUSH_V4_COMPLETE",
+  "updated_at": "2026-08-25T09:17:00+00:00",
+  "sft_data": "data/om-chat-sft-v4-complete.jsonl",
+  "sft_rows": 2761,
+  "dpo_data": "data/om-chat-dpo-v4.jsonl",
+  "dpo_rows": 1200,
+  "sft_ckpt": "artifacts/checkpoints/om-1.0-chat-sft-v4/latest.pt",
+  "dpo_ckpt": "artifacts/checkpoints/om-1.0-chat-dpo-v4/latest.pt",
+  "active_serve_checkpoint": "artifacts/checkpoints/om-1.0-chat-dpo-v4/latest.pt",
+  "config": "configs/om-1.0-local.json",
+  "params_approx": "20M",
+  "max_seq_len": 256,
+  "chatgpt_intelligence_claim": false,
+  "estimated_vs_chatgpt_pct": "18-25",
+  "software_platform_pct": 97,
+  "note": "Local SFT+DPO push complete. ChatGPT-class still requires 1B–70B GPU training."
+}

@@ -1,17 +1,27 @@
-"""Stubs for later OM-1.0 phases (11–15). Not wired into chat this run."""
+"""Protocol aliases for OM backends — point at real modules (not unfinished work).
+
+Historically this file held PHASE 11–15 TODOs. Those capabilities now live in:
+  - live knowledge → ``om_ai.live_knowledge``
+  - tools / agent actions → ``om_ai.actions``, ``om_ai.agents``
+  - RAG → ``om_ai.knowledge.rag``
+  - continuous learning → ``om_ai.continuous``
+
+MCP bridge remains an optional integration contract until a concrete MCP transport
+is configured for a deployment.
+"""
 from __future__ import annotations
 
 from typing import Any, Protocol
 
 
 class LiveKnowledgeBackend(Protocol):
-    """PHASE 11 — TODO: live knowledge / retrieval interface."""
+    """Contract matching live-knowledge retrieval backends."""
 
     def retrieve(self, query: str, *, k: int = 5) -> list[dict[str, Any]]: ...
 
 
 class ToolRouter(Protocol):
-    """PHASE 12 — TODO: tool calling router."""
+    """Contract for listing and invoking registered tools."""
 
     def list_tools(self) -> list[str]: ...
 
@@ -19,9 +29,25 @@ class ToolRouter(Protocol):
 
 
 class MCPBridge(Protocol):
-    """PHASE 13 — TODO: MCP server bridge."""
+    """Optional Model Context Protocol transport (deployment-specific)."""
 
     def connect(self, endpoint: str) -> None: ...
 
 
-# PHASE 14–15: RAG orchestration + continuous learning hooks — TODO.
+def resolve_live_knowledge():
+    """Return the in-repo live-knowledge engine factory when available."""
+    from om_ai.live_knowledge.engine import LiveKnowledgeEngine
+
+    return LiveKnowledgeEngine
+
+
+def resolve_tool_surface():
+    """Return primary tool/action exports used by the agent stack."""
+    from om_ai.actions import KnowledgeSearchTool, SafeShellTool, Tool, ToolResult
+
+    return {
+        "Tool": Tool,
+        "ToolResult": ToolResult,
+        "SafeShellTool": SafeShellTool,
+        "KnowledgeSearchTool": KnowledgeSearchTool,
+    }

@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import logging
 import os
+import re
 from dataclasses import dataclass
 from datetime import date
 from typing import Any, Callable
@@ -36,6 +37,31 @@ OM_SYSTEM_IDENTITY = (
 )
 
 OM_SYSTEM_IDENTITY_COMPACT = "You are OM AI (OM-1.0 native language model)."
+
+# Old SFT-memorized one-liners — never return these as "final"; re-sample from the model.
+_SCRIPT_TEMPLATES = {
+    "Hi! I'm OM AI. How can I help you today?",
+    "Hi! How can I help you today?",
+    "नमस्ते! मैं OM AI हूँ। आज मैं आपकी कैसे मदद कर सकता हूँ?",
+    "I'm OM AI, powered by OM-1.0. How can I help?",
+    "मैं OM AI हूँ — OM-1.0 मॉडल। आप क्या करना चाहेंगे?",
+}
+
+
+def _looks_scripted(text: str | None) -> bool:
+    s = (text or "").strip()
+    if not s:
+        return False
+    if s in _SCRIPT_TEMPLATES:
+        return True
+    # Near-exact scripted greets from early SFT.
+    low = s.lower()
+    return bool(
+        re.fullmatch(
+            r"hi[!.,]?\s+i'?m\s+om\s+ai\.?\s+how\s+can\s+i\s+help\s+you\s+today\??",
+            low,
+        )
+    )
 
 
 def _latest_user_text(messages: list[dict]) -> str:
@@ -337,18 +363,15 @@ def chat_reply(
         build_chat_messages,
         generation_config,
         is_low_quality_reply,
-        looks_like_assistant_chitchat,
-        policy_recovery_reply,
     )
     from om_ai.runtime.intelligence import enrich_for_chat
 
     info = resolve_backend(local_loaded=local_loaded, native_ready=native_ready)
-    # Tiny OM-1.0 chat-SFT collapses with UI defaults (temp 0.7–0.8, 1024 tokens).
-    # Prefer env/sampling defaults unless the client asks for a low temperature.
+    # Prefer natural sampling for OM-1.0; clamp only extreme UI values.
     if info.backend == "om_native":
-        env_temp = _env_float("OM_CHAT_TEMPERATURE", 0.2)
-        env_max = _env_int("OM_CHAT_MAX_NEW_TOKENS", 64)
-        if temperature is None or float(temperature) > 0.35:
+        env_temp = _env_float("OM_CHAT_TEMPERATURE", 0.45)
+        env_max = _env_int("OM_CHAT_MAX_NEW_TOKENS", 96)
+        if temperature is None or float(temperature) > 0.7:
             temperature = env_temp
         if max_new_tokens is None or int(max_new_tokens) > env_max:
             max_new_tokens = env_max
@@ -395,14 +418,14 @@ def chat_reply(
         user_text = _latest_user_text(messages)
         from om_ai.live_knowledge.freshness import is_greeting_like, is_om_self_query
 
-        # Tiny local windows: keep sampling close to greedy so SFT chat sticks.
+        # Slightly warmer greetings so replies vary (still model-generated).
         if is_greeting_like(user_text) or is_om_self_query(user_text):
-            kwargs["temperature"] = min(float(kwargs["temperature"]), 0.15)
-            kwargs["top_k"] = min(int(kwargs["top_k"]), 20)
-            kwargs["top_p"] = min(float(kwargs["top_p"]), 0.85)
-            kwargs["max_new_tokens"] = min(int(kwargs["max_new_tokens"]), 48)
+            kwargs["temperature"] = max(float(kwargs["temperature"]), 0.5)
+            kwargs["top_p"] = max(float(kwargs["top_p"]), 0.9)
+            kwargs["top_k"] = max(int(kwargs["top_k"]), 40)
+            kwargs["max_new_tokens"] = min(max(int(kwargs["max_new_tokens"]), 64), 96)
             kwargs["min_new_tokens"] = 1
-            kwargs["repetition_penalty"] = max(float(kwargs["repetition_penalty"]), 1.05)
+            kwargs["repetition_penalty"] = max(float(kwargs["repetition_penalty"]), 1.08)
 
         info_base = ChatBackendInfo(
             backend=info.backend,
@@ -413,6 +436,18 @@ def chat_reply(
         )
         if intel.direct_reply:
             return intel.direct_reply, info_base
+
+        # Agent Brain v1: intent → memory/RAG/plan hints (self-owned, no external LLM).
+        from om_ai.agent import AgentBrain
+
+        brain_decision = AgentBrain().prepare(
+            messages,
+            tenant_id=tenant_id or "default",
+            actor=actor or "",
+            project_id=project_id,
+            project_instructions=project_instructions or "",
+        )
+        messages = brain_decision.packed_messages or messages
 
         # Prefer a single short system for tiny OM-1.0 windows.
         # Do NOT stack extra system lines — that breaks chat-SFT greets.
@@ -425,6 +460,11 @@ def chat_reply(
                 if len(hint) > 120:
                     hint = hint[:117] + "..."
                 extra = f"{extra}\n{hint}" if extra else hint
+            if brain_decision.extra_system:
+                bh = brain_decision.extra_system.strip()
+                if len(bh) > 160:
+                    bh = bh[:157] + "..."
+                extra = f"{extra}\n{bh}" if extra else bh
 
         # Chat template: system + turns. Compact for tiny local windows.
         messages = build_chat_messages(
@@ -451,6 +491,8 @@ def chat_reply(
             grounded = strip_live_knowledge_boilerplate(grounded)
             if looks_like_web_spam(grounded):
                 grounded = ""
+        if not grounded and brain_decision.prefer_grounded:
+            grounded = brain_decision.prefer_grounded.strip()
         prefer_grounded = bool(lk_meta.get("prefer_grounded_reply")) and bool(grounded)
         grounded_env = (_env("OM_LIVE_KNOWLEDGE_GROUNDED") or "0").lower()
         grounded_allowed = (
@@ -459,6 +501,10 @@ def chat_reply(
         merged_lk = {
             **({k: v for k, v in lk_meta.items() if k != "grounded_reply"} or {}),
             "intelligence": intel.meta,
+            "agent_brain": {
+                "intent": brain_decision.intent.value,
+                **(brain_decision.meta or {}),
+            },
         }
         info_lk = ChatBackendInfo(
             backend=info.backend,
@@ -479,53 +525,88 @@ def chat_reply(
                 f"OM-1.0 checkpoint unavailable. ({exc})"
             ) from exc
 
+        # Model-first: accept any usable generation. No canned greeting/self overrides.
         fail = is_low_quality_reply(text)
-        if not fail and is_greeting_like(user_text) and not looks_like_assistant_chitchat(text):
-            fail = "spam"
-        if not fail and is_om_self_query(user_text):
-            low = (text or "").lower()
-            if "om" not in low:
-                fail = "spam"
         if not fail:
             cleaned = usable_generation_text(text) or ""
             cleaned = cleaned.lstrip(" ,.;:\"'`-—–")
-            if cleaned:
+            if cleaned and looks_like_web_spam(cleaned):
+                first = re.split(r"(?<=[.!?।])\s+", cleaned, maxsplit=1)[0].strip()
+                if first and not looks_like_web_spam(first) and len(first) <= 160:
+                    cleaned = first
+            # Memorized script line → warmer model re-samples (still not static text).
+            if cleaned and _looks_scripted(cleaned):
+                best = cleaned
+                try:
+                    for attempt in range(3):
+                        alt_kwargs = dict(kwargs)
+                        alt_kwargs.update(
+                            {
+                                "temperature": 0.7 + 0.1 * attempt,
+                                "top_p": 0.92,
+                                "top_k": 60,
+                                "max_new_tokens": max(int(kwargs["max_new_tokens"]), 80),
+                                "repetition_penalty": max(
+                                    float(kwargs["repetition_penalty"]), 1.18
+                                ),
+                            }
+                        )
+                        alt = native_chat(messages, **alt_kwargs)
+                        alt_fail = is_low_quality_reply(alt)
+                        if alt_fail:
+                            continue
+                        alt_clean = (usable_generation_text(alt) or "").lstrip(
+                            " ,.;:\"'`-—–"
+                        )
+                        if not alt_clean or looks_like_web_spam(alt_clean):
+                            continue
+                        if not _looks_scripted(alt_clean):
+                            return alt_clean, info_lk
+                        best = alt_clean
+                except Exception as exc:
+                    logger.debug("script diversify skipped: %s", exc)
+                # Prefer any model variant over injecting canned copy.
+                return best, info_lk
+            if cleaned and not looks_like_web_spam(cleaned):
                 return cleaned, info_lk
+            fail = "spam"
 
         if grounded_allowed and grounded and not looks_like_web_spam(grounded):
             return grounded, info_lk
 
-        # Safer OM-1.0 retry with stronger anti-repetition.
+        # Safer OM-1.0 retry with stronger anti-repetition (still model output only).
         try:
             retry_kwargs = dict(kwargs)
             retry_kwargs.update(
                 {
                     "max_new_tokens": max(int(kwargs["max_new_tokens"]), 96),
-                    "temperature": 0.55,
+                    "temperature": 0.4,
                     "top_p": 0.9,
                     "top_k": 40,
-                    "repetition_penalty": max(float(kwargs["repetition_penalty"]), 1.2),
-                    "min_new_tokens": 8,
+                    "repetition_penalty": max(float(kwargs["repetition_penalty"]), 1.12),
+                    "min_new_tokens": 1,
                 }
             )
             retry = native_chat(messages, **retry_kwargs)
             retry_fail = is_low_quality_reply(retry)
             if not retry_fail:
                 retry = (usable_generation_text(retry) or "").lstrip(" ,.;:\"'`-—–")
-                if retry:
+                if retry and not looks_like_web_spam(retry):
                     return retry, info_lk
-            else:
+                retry_fail = "spam"
+            if retry_fail:
                 fail = retry_fail
         except Exception as exc:
             logger.debug("native retry skipped: %s", exc)
 
-        # Only a minimal clarify fallback when generation is still unusable.
-        recovered = policy_recovery_reply(
-            user_text, reason=fail or "empty", language=intel.language
-        )
-        if recovered:
-            return recovered, info_lk
+        # Agent Brain structured fallback (coding/agent/knowledge) before empty hint.
+        rescued = brain_decision.after_model(None)
+        if not rescued and brain_decision.structured_fallback:
+            rescued = brain_decision.structured_fallback
+        if rescued:
+            return rescued, info_lk
 
+        # No static chat templates — only the engine empty hint if model failed.
         return EMPTY_GENERATION_FALLBACK, info_lk
 
     messages = with_runtime_date_context(messages)

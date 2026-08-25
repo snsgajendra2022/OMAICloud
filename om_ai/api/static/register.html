@@ -6,74 +6,283 @@
   <title>Create account · OM</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <style>
     :root {
-      --bg: #F8FAFC; --panel: #FFFFFF; --border: #E5E7EB;
-      --text: #111827; --muted: #6B7280; --primary: #111827;
-      --accent: #2563EB; --ok: #059669; --err: #DC2626;
+      --ink: #0B1220;
+      --text: #111827;
+      --muted: #64748B;
+      --line: rgba(15, 23, 42, 0.10);
+      --panel: rgba(255, 255, 255, 0.86);
+      --field: #FFFFFF;
+      --accent: #2563EB;
+      --ok: #059669;
+      --err: #DC2626;
       --sans: "Plus Jakarta Sans", system-ui, sans-serif;
     }
     * { box-sizing: border-box; }
     html, body { height: 100%; margin: 0; }
     body {
-      font-family: var(--sans); color: var(--text); background: var(--bg);
-      display: grid; place-items: center; padding: 24px;
+      font-family: var(--sans);
+      color: var(--text);
+      min-height: 100%;
+      display: grid;
+      place-items: center;
+      padding: 28px 18px;
+      background:
+        radial-gradient(900px 520px at 8% -10%, rgba(37, 99, 235, 0.16), transparent 55%),
+        radial-gradient(780px 480px at 100% 0%, rgba(15, 23, 42, 0.10), transparent 50%),
+        linear-gradient(160deg, #F4F7FB 0%, #EEF2F7 42%, #E8EDF5 100%);
+      overflow-x: hidden;
     }
-    .shell {
-      width: min(420px, 100%); background: var(--panel); border: 1px solid var(--border);
-      border-radius: 20px; padding: 36px 32px 28px;
-      box-shadow: 0 20px 50px rgba(17, 24, 39, 0.06);
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(15, 23, 42, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(15, 23, 42, 0.03) 1px, transparent 1px);
+      background-size: 48px 48px;
+      mask-image: radial-gradient(ellipse at center, black 20%, transparent 75%);
+      pointer-events: none;
+      animation: gridDrift 28s linear infinite;
     }
-    .brand { display: flex; align-items: center; gap: 12px; margin-bottom: 28px; }
-    .mark { width: 36px; height: 36px; border-radius: 10px; background: linear-gradient(145deg, #1f2937, #111827); }
-    .brand h1 { margin: 0; font-size: 20px; letter-spacing: -0.03em; }
-    .brand p { margin: 2px 0 0; color: var(--muted); font-size: 13px; }
-    h2 { margin: 0 0 6px; font-size: 24px; letter-spacing: -0.03em; font-weight: 650; }
-    .sub { margin: 0 0 22px; color: var(--muted); font-size: 14px; line-height: 1.45; }
-    label { display: block; font-size: 13px; font-weight: 600; margin: 0 0 6px; color: var(--muted); }
+    @keyframes gridDrift {
+      from { transform: translate3d(0, 0, 0); }
+      to { transform: translate3d(-24px, -24px, 0); }
+    }
+    @keyframes riseIn {
+      from { opacity: 0; transform: translateY(14px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes markPulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.04); }
+    }
+    .stage {
+      width: min(980px, 100%);
+      display: grid;
+      grid-template-columns: 1.05fr 0.95fr;
+      gap: 0;
+      border: 1px solid var(--line);
+      border-radius: 28px;
+      overflow: hidden;
+      background: var(--panel);
+      backdrop-filter: blur(18px);
+      box-shadow: 0 30px 80px rgba(15, 23, 42, 0.10);
+      animation: riseIn 0.55s ease both;
+    }
+    .hero {
+      position: relative;
+      padding: 48px 44px;
+      color: #F8FAFC;
+      background:
+        radial-gradient(520px 320px at 20% 15%, rgba(37, 99, 235, 0.35), transparent 60%),
+        linear-gradient(155deg, #0B1220 0%, #152238 55%, #1B2A44 100%);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 560px;
+    }
+    .hero::after {
+      content: "";
+      position: absolute;
+      inset: auto -20% -30% 20%;
+      height: 280px;
+      background: radial-gradient(circle, rgba(37, 99, 235, 0.28), transparent 68%);
+      pointer-events: none;
+    }
+    .mark {
+      width: 52px;
+      height: 52px;
+      border-radius: 16px;
+      display: grid;
+      place-items: center;
+      font-size: 15px;
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      color: #fff;
+      background: linear-gradient(145deg, #334155, #0F172A);
+      border: 1px solid rgba(255,255,255,0.12);
+      animation: markPulse 4.8s ease-in-out infinite;
+    }
+    .hero-copy { position: relative; z-index: 1; margin-top: 56px; }
+    .hero-copy .wordmark {
+      margin: 0 0 14px;
+      font-size: clamp(48px, 7vw, 72px);
+      line-height: 0.92;
+      letter-spacing: -0.06em;
+      font-weight: 800;
+    }
+    .hero-copy p {
+      margin: 0;
+      max-width: 28ch;
+      color: rgba(248, 250, 252, 0.72);
+      font-size: 16px;
+      line-height: 1.55;
+      font-weight: 500;
+    }
+    .hero-meta {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 40px;
+    }
+    .chip {
+      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(255,255,255,0.06);
+      border-radius: 999px;
+      padding: 8px 12px;
+      font-size: 12px;
+      font-weight: 650;
+      color: rgba(248,250,252,0.84);
+      letter-spacing: 0.01em;
+    }
+    .panel {
+      padding: 48px 44px;
+      background: rgba(255,255,255,0.92);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      animation: riseIn 0.65s ease 0.08s both;
+    }
+    .panel-kicker {
+      margin: 0 0 8px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .panel h1 {
+      margin: 0 0 8px;
+      font-size: 30px;
+      letter-spacing: -0.04em;
+      font-weight: 750;
+      color: var(--ink);
+    }
+    .panel .sub {
+      margin: 0 0 28px;
+      color: var(--muted);
+      font-size: 14.5px;
+      line-height: 1.5;
+    }
+    label {
+      display: block;
+      font-size: 13px;
+      font-weight: 650;
+      margin: 0 0 7px;
+      color: #334155;
+    }
+    .field { margin-bottom: 14px; }
     input {
-      width: 100%; border: 1px solid var(--border); background: #fff;
-      border-radius: 12px; padding: 12px 14px; font: inherit; font-size: 15px;
-      margin-bottom: 14px; outline: none; color: var(--text);
+      width: 100%;
+      border: 1px solid var(--line);
+      background: var(--field);
+      border-radius: 14px;
+      padding: 13px 14px;
+      font: inherit;
+      font-size: 15px;
+      outline: none;
+      color: var(--text);
+      transition: border-color .15s ease, box-shadow .15s ease, transform .15s ease;
     }
-    input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(37,99,235,0.12); }
+    input::placeholder { color: #94A3B8; }
+    input:hover { border-color: rgba(37, 99, 235, 0.28); }
+    input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
+      transform: translateY(-1px);
+    }
     button.primary {
-      width: 100%; border: 0; border-radius: 12px; padding: 13px 16px;
-      background: var(--primary); color: #fff; font: inherit; font-weight: 650;
-      font-size: 15px; cursor: pointer; margin-top: 4px;
+      width: 100%;
+      border: 0;
+      border-radius: 14px;
+      padding: 14px 16px;
+      margin-top: 8px;
+      background: var(--ink);
+      color: #fff;
+      font: inherit;
+      font-weight: 700;
+      font-size: 15px;
+      letter-spacing: -0.01em;
+      cursor: pointer;
+      transition: transform .15s ease, background .15s ease, opacity .15s ease;
     }
-    button.primary:hover { background: #1f2937; }
-    button.primary:disabled { opacity: 0.55; cursor: not-allowed; }
-    .msg { min-height: 20px; margin: 12px 0 0; font-size: 13px; color: var(--muted); }
+    button.primary:hover { background: #152238; transform: translateY(-1px); }
+    button.primary:active { transform: translateY(0); }
+    button.primary:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
+    .msg {
+      min-height: 20px;
+      margin: 12px 0 0;
+      font-size: 13px;
+      color: var(--muted);
+    }
     .msg.err { color: var(--err); }
     .msg.ok { color: var(--ok); }
     .foot {
-      margin-top: 22px; padding-top: 18px; border-top: 1px solid var(--border);
-      text-align: center; font-size: 14px; color: var(--muted);
+      margin-top: 26px;
+      padding-top: 18px;
+      border-top: 1px solid var(--line);
+      text-align: center;
+      font-size: 14px;
+      color: var(--muted);
     }
-    .foot a { color: var(--accent); font-weight: 650; text-decoration: none; }
+    .foot a {
+      color: var(--accent);
+      font-weight: 700;
+      text-decoration: none;
+    }
+    .foot a:hover { text-decoration: underline; }
+    @media (max-width: 860px) {
+      body { padding: 16px; align-items: stretch; }
+      .stage { grid-template-columns: 1fr; }
+      .hero { min-height: auto; padding: 28px 24px 24px; }
+      .hero-copy { margin-top: 28px; }
+      .hero-copy .wordmark { font-size: 44px; }
+      .hero-meta { margin-top: 24px; }
+      .panel { padding: 28px 24px 30px; }
+    }
   </style>
 </head>
 <body>
-  <main class="shell">
-    <div class="brand">
-      <div class="mark" aria-hidden="true"></div>
-      <div><h1>OM</h1><p>AI workspace</p></div>
-    </div>
-    <h2>Create account</h2>
-    <p class="sub">Create your workspace, then start chatting.</p>
-    <form id="registerForm">
-      <label for="name">Name</label>
-      <input id="name" type="text" maxlength="80" autocomplete="name" placeholder="Your name" />
-      <label for="email">Email</label>
-      <input id="email" type="email" required autocomplete="username" placeholder="you@example.com" />
-      <label for="password">Password</label>
-      <input id="password" type="password" required minlength="8" autocomplete="new-password" placeholder="At least 8 characters" />
-      <button class="primary" id="submitBtn" type="submit">Create account &amp; open chat</button>
-      <p class="msg" id="msg" role="status"></p>
-    </form>
-    <div class="foot">Already have an account? <a href="/login">Sign in</a></div>
+  <main class="stage">
+    <section class="hero" aria-label="OM brand">
+      <div class="mark" aria-hidden="true">OM</div>
+      <div class="hero-copy">
+        <p class="wordmark">OM</p>
+        <p>Create your workspace and start chatting with OM-1.0.</p>
+      </div>
+      <div class="hero-meta">
+        <span class="chip">OM-1.0</span>
+        <span class="chip">Private workspace</span>
+        <span class="chip">Secure by default</span>
+      </div>
+    </section>
+    <section class="panel">
+      <p class="panel-kicker">AI workspace</p>
+      <h1>Create account</h1>
+      <p class="sub">Set up your workspace, then open chat.</p>
+      <form id="registerForm">
+        <div class="field">
+          <label for="name">Name</label>
+          <input id="name" type="text" maxlength="80" autocomplete="name" placeholder="Your name" />
+        </div>
+        <div class="field">
+          <label for="email">Email</label>
+          <input id="email" type="email" required autocomplete="username" placeholder="you@example.com" />
+        </div>
+        <div class="field">
+          <label for="password">Password</label>
+          <input id="password" type="password" required minlength="8" autocomplete="new-password" placeholder="At least 8 characters" />
+        </div>
+        <button class="primary" id="submitBtn" type="submit">Create account &amp; open chat</button>
+        <p class="msg" id="msg" role="status"></p>
+      </form>
+      <div class="foot">Already have an account? <a href="/login">Sign in</a></div>
+    </section>
   </main>
   <script>
     (function () {

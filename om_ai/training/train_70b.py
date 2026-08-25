@@ -242,9 +242,9 @@ def run_train_70b(
     save_status(st)
     t0 = time.time()
     if strategy == "deepspeed_zero3":
-        try:
-            import deepspeed  # noqa: F401
-        except ImportError:
+        import importlib.util
+
+        if importlib.util.find_spec("deepspeed") is None:
             st.stage = "FAILED"
             _log(st, "DeepSpeed not installed. On the GPU cluster: pip install -e '.[deepSpeed]'")
             save_status(st)

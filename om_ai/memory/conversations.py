@@ -11,7 +11,7 @@ import json
 import sqlite3
 import uuid
 from contextlib import contextmanager
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, fields
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Generator, Iterator
@@ -27,6 +27,38 @@ def capitalize_title(text: str) -> str:
     if not s:
         return s
     return s[:1].upper() + s[1:]
+
+
+def _assistant_like_title(text: str) -> bool:
+    """True when a sidebar title looks like an OM assistant greeting, not a user prompt."""
+    s = (text or "").strip().lower()
+    if not s:
+        return False
+    markers = (
+        "i'm om ai",
+        "i’m om ai",
+        "i am om ai",
+        "how can i help you today",
+        "how can i help?",
+        "नमस्ते! मैं om ai",
+        "मैं om ai हूँ",
+        "fire away whenever",
+        "tell me what you need",
+    )
+    return any(m in s for m in markers)
+
+
+def make_chat_title(text: str, *, max_chars: int = 48) -> str:
+    """Build a sidebar title from user text (Unicode-safe character trim)."""
+    s = (text or "").strip().replace("\n", " ")
+    s = " ".join(s.split())
+    if not s or _assistant_like_title(s):
+        return ""
+    chars = list(s)  # code-point aware for Devanagari / emoji
+    if len(chars) > max_chars:
+        s = "".join(chars[: max_chars - 1]).rstrip() + "…"
+    return capitalize_title(s)
+
 
 
 _DDL = """
@@ -324,7 +356,10 @@ class ConversationStore:
                    COALESCE(c.pinned, 0) AS pinned,
                    COALESCE(c.archived, 0) AS archived,
                    c.project_id, c.share_token,
-                   (SELECT COUNT(*) FROM chat_messages m WHERE m.conversation_id = c.id) AS message_count
+                   (SELECT COUNT(*) FROM chat_messages m WHERE m.conversation_id = c.id) AS message_count,
+                   (SELECT m2.content FROM chat_messages m2
+                    WHERE m2.conversation_id = c.id AND m2.role = 'user'
+                    ORDER BY m2.created_at ASC, m2.rowid ASC LIMIT 1) AS first_user
             FROM conversations c
             WHERE c.tenant_id = ? AND c.actor = ?
         """
@@ -345,7 +380,33 @@ class ConversationStore:
             params.append(project_id)
         q += " ORDER BY COALESCE(c.pinned, 0) DESC, c.updated_at DESC"
         rows = self._conn.execute(q, params).fetchall()
-        return [Conversation(**dict(r)) for r in rows]
+        out: list[Conversation] = []
+        repairs: list[tuple[str, str]] = []
+        for r in rows:
+            data = dict(r)
+            first_user = str(data.pop("first_user", None) or "").strip()
+            title = str(data.get("title") or "")
+            if first_user and (
+                not title.strip()
+                or title.strip() == "New chat"
+                or _assistant_like_title(title)
+            ):
+                fixed = make_chat_title(first_user)
+                if fixed and fixed != title:
+                    data["title"] = fixed
+                    repairs.append((fixed, data["id"]))
+            # Conversation dataclass ignores unknown keys via explicit fields only
+            allowed = {f.name for f in fields(Conversation)}
+            payload = {k: v for k, v in data.items() if k in allowed}
+            out.append(Conversation(**payload))
+        if repairs:
+            with self._tx():
+                for title, cid in repairs:
+                    self._conn.execute(
+                        "UPDATE conversations SET title = ? WHERE id = ?",
+                        (title, cid),
+                    )
+        return out
     def create_conversation(
         self,
         tenant_id: str,
@@ -567,13 +628,35 @@ class ConversationStore:
                 )
                 created.append(Message(mid, conversation_id, role, content, now))
             new_title = conv.title
-            if auto_title and (conv.title == "New chat" or not conv.title.strip()):
+            needs_title = (
+                auto_title
+                and (
+                    not (conv.title or "").strip()
+                    or conv.title.strip() == "New chat"
+                    or _assistant_like_title(conv.title)
+                )
+            )
+            if needs_title:
+                user_text = ""
                 for msg in messages:
                     if msg.get("role") == "user" and str(msg.get("content") or "").strip():
-                        text = str(msg["content"]).strip().replace("\n", " ")
-                        text = text[:60] + ("…" if len(text) > 60 else "")
-                        new_title = capitalize_title(text)
+                        user_text = str(msg["content"]).strip()
                         break
+                if not user_text:
+                    row = self._conn.execute(
+                        """
+                        SELECT content FROM chat_messages
+                        WHERE conversation_id = ? AND role = 'user'
+                        ORDER BY created_at ASC, rowid ASC
+                        LIMIT 1
+                        """,
+                        (conversation_id,),
+                    ).fetchone()
+                    if row:
+                        user_text = str(row["content"] or "").strip()
+                titled = make_chat_title(user_text)
+                if titled:
+                    new_title = titled
             self._conn.execute(
                 """
                 UPDATE conversations SET title = ?, updated_at = ?

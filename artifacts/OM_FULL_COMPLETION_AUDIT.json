@@ -1,0 +1,380 @@
+{
+  "local_project_complete_pct": 68,
+  "chatgpt_class_complete_pct": 60,
+  "area_scores": {
+    "files": 100,
+    "config": 100,
+    "training": 43,
+    "model": 56,
+    "chat": 70,
+    "product": 92,
+    "serve": 0,
+    "roadmap": 28
+  },
+  "checks": [
+    {
+      "area": "files",
+      "item": "Chat API",
+      "status": "PASS",
+      "pct": 100,
+      "note": "om_ai/api/openai_compat.py"
+    },
+    {
+      "area": "files",
+      "item": "Main API",
+      "status": "PASS",
+      "pct": 100,
+      "note": "om_ai/api/main.py"
+    },
+    {
+      "area": "files",
+      "item": "Chat UI",
+      "status": "PASS",
+      "pct": 100,
+      "note": "om_ai/api/static/chat.html"
+    },
+    {
+      "area": "files",
+      "item": "Chat backend",
+      "status": "PASS",
+      "pct": 100,
+      "note": "om_ai/runtime/chat_backend.py"
+    },
+    {
+      "area": "files",
+      "item": "Chat orchestrator",
+      "status": "PASS",
+      "pct": 100,
+      "note": "om_ai/runtime/chat_orchestrator.py"
+    },
+    {
+      "area": "files",
+      "item": "Engine/inference",
+      "status": "PASS",
+      "pct": 100,
+      "note": "om_ai/runtime/engine.py"
+    },
+    {
+      "area": "files",
+      "item": "Native backend",
+      "status": "PASS",
+      "pct": 100,
+      "note": "om_ai/backends/om_native.py"
+    },
+    {
+      "area": "files",
+      "item": "Tokenizer",
+      "status": "PASS",
+      "pct": 100,
+      "note": "om_ai/tokenizer/byte_bpe.py"
+    },
+    {
+      "area": "files",
+      "item": "System prompts",
+      "status": "PASS",
+      "pct": 100,
+      "note": "om_ai/runtime/system_prompts.py"
+    },
+    {
+      "area": "files",
+      "item": "Intelligence",
+      "status": "PASS",
+      "pct": 100,
+      "note": "om_ai/runtime/intelligence.py"
+    },
+    {
+      "area": "files",
+      "item": "SFT trainer",
+      "status": "PASS",
+      "pct": 100,
+      "note": "om_ai/training/sft.py"
+    },
+    {
+      "area": "files",
+      "item": "Auth",
+      "status": "PASS",
+      "pct": 100,
+      "note": "om_ai/api/auth_routes.py"
+    },
+    {
+      "area": "files",
+      "item": "Conversations",
+      "status": "PASS",
+      "pct": 100,
+      "note": "om_ai/api/conversations.py"
+    },
+    {
+      "area": "files",
+      "item": "Projects/platform",
+      "status": "PASS",
+      "pct": 100,
+      "note": "om_ai/api/platform_routes.py"
+    },
+    {
+      "area": "files",
+      "item": "Config local",
+      "status": "PASS",
+      "pct": 100,
+      "note": "configs/om-1.0-local.json"
+    },
+    {
+      "area": "files",
+      "item": "Chat SFT data",
+      "status": "PASS",
+      "pct": 100,
+      "note": "data/om-chat-sft.jsonl"
+    },
+    {
+      "area": "files",
+      "item": "Tokenizer file",
+      "status": "PASS",
+      "pct": 100,
+      "note": "artifacts/tokenizer-production-65536.json"
+    },
+    {
+      "area": "files",
+      "item": "Base ckpt",
+      "status": "PASS",
+      "pct": 100,
+      "note": "artifacts/checkpoints/om-1.0-base/latest.pt"
+    },
+    {
+      "area": "files",
+      "item": "Chat SFT ckpt",
+      "status": "PASS",
+      "pct": 100,
+      "note": "artifacts/checkpoints/om-1.0-chat-sft/latest.pt"
+    },
+    {
+      "area": "config",
+      "item": "Checkpoint = chat-sft",
+      "status": "PASS",
+      "pct": 100,
+      "note": "artifacts/checkpoints/om-1.0-chat-sft/latest.pt"
+    },
+    {
+      "area": "config",
+      "item": "Provider om_native",
+      "status": "PASS",
+      "pct": 100,
+      "note": "om_native"
+    },
+    {
+      "area": "config",
+      "item": "Rate limit off",
+      "status": "PASS",
+      "pct": 100,
+      "note": "0"
+    },
+    {
+      "area": "config",
+      "item": "Live knowledge off",
+      "status": "PASS",
+      "pct": 100,
+      "note": ""
+    },
+    {
+      "area": "training",
+      "item": "Base pretrain",
+      "status": "PASS",
+      "pct": 100,
+      "note": "global_step=250000/250000"
+    },
+    {
+      "area": "training",
+      "item": "Chat SFT",
+      "status": "PASS",
+      "pct": 100,
+      "note": "step=4000/4000"
+    },
+    {
+      "area": "training",
+      "item": "SFT dataset size",
+      "status": "PARTIAL",
+      "pct": 17,
+      "note": "170 rows (need 10k+ for strong chat)"
+    },
+    {
+      "area": "training",
+      "item": "DPO/RLHF",
+      "status": "FAIL",
+      "pct": 0,
+      "note": "Not run for chat-sft path"
+    },
+    {
+      "area": "training",
+      "item": "Large-scale pretrain (1B+)",
+      "status": "FAIL",
+      "pct": 0,
+      "note": "Still tiny local architecture"
+    },
+    {
+      "area": "model",
+      "item": "Weights load",
+      "status": "PASS",
+      "pct": 100,
+      "note": "layers=4 d=256 seq=128"
+    },
+    {
+      "area": "model",
+      "item": "Context window",
+      "status": "PARTIAL",
+      "pct": 20,
+      "note": "max_seq_len=128 (ChatGPT-class needs 8k+)"
+    },
+    {
+      "area": "model",
+      "item": "Parameter scale",
+      "status": "FAIL",
+      "pct": 5,
+      "note": "~20M params; ChatGPT-class is billions"
+    },
+    {
+      "area": "model",
+      "item": "Tokenizer+chat specials",
+      "status": "PASS",
+      "pct": 100,
+      "note": "65536 + <system>/<user>/<assistant>"
+    },
+    {
+      "area": "chat",
+      "item": "Greeting",
+      "status": "PASS",
+      "pct": 100,
+      "note": "\"Hello! I'm OM AI \u2014 what would you like to work on?\""
+    },
+    {
+      "area": "chat",
+      "item": "Identity",
+      "status": "PASS",
+      "pct": 100,
+      "note": "\"I'm OM AI, powered by the OM-1.0 model running locally on your machine.\""
+    },
+    {
+      "area": "chat",
+      "item": "Simple fact",
+      "status": "PASS",
+      "pct": 100,
+      "note": "'28. 45 dressing\u2013Bossal now says in a few direct information about general parks In this way, at El Paso v. example will '"
+    },
+    {
+      "area": "chat",
+      "item": "Reasoning/explain",
+      "status": "PARTIAL",
+      "pct": 25,
+      "note": "'React in questions and comments used to are taking a change on, on, and do not answer, \" laser in just one\\'s words that you can follow\"'"
+    },
+    {
+      "area": "chat",
+      "item": "Writing task",
+      "status": "PARTIAL",
+      "pct": 25,
+      "note": "'armed main focus.'"
+    },
+    {
+      "area": "product",
+      "item": "Chat streaming UI",
+      "status": "PASS",
+      "pct": 100,
+      "note": ""
+    },
+    {
+      "area": "product",
+      "item": "Projects UI",
+      "status": "PASS",
+      "pct": 100,
+      "note": ""
+    },
+    {
+      "area": "product",
+      "item": "Assistants UI",
+      "status": "PASS",
+      "pct": 90,
+      "note": ""
+    },
+    {
+      "area": "product",
+      "item": "Settings UI",
+      "status": "PASS",
+      "pct": 90,
+      "note": ""
+    },
+    {
+      "area": "product",
+      "item": "Memory UI",
+      "status": "PASS",
+      "pct": 80,
+      "note": ""
+    },
+    {
+      "area": "serve",
+      "item": ":8087/chat",
+      "status": "DOWN",
+      "pct": 0,
+      "note": "<urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "area": "serve",
+      "item": ":8086/chat",
+      "status": "DOWN",
+      "pct": 0,
+      "note": "<urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "area": "serve",
+      "item": ":8085/chat",
+      "status": "DOWN",
+      "pct": 0,
+      "note": "<urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "area": "serve",
+      "item": ":8082/chat",
+      "status": "DOWN",
+      "pct": 0,
+      "note": "<urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "area": "serve",
+      "item": "Any live server",
+      "status": "FAIL",
+      "pct": 0,
+      "note": ""
+    },
+    {
+      "area": "roadmap",
+      "item": "Agent loop production",
+      "status": "PARTIAL",
+      "pct": 40,
+      "note": "Orchestrator exists; not full ChatGPT agents"
+    },
+    {
+      "area": "roadmap",
+      "item": "Reliable long chat memory",
+      "status": "PARTIAL",
+      "pct": 50,
+      "note": "Memory layer present; tiny context limits quality"
+    },
+    {
+      "area": "roadmap",
+      "item": "Web tools grounded answers",
+      "status": "PARTIAL",
+      "pct": 30,
+      "note": "Live knowledge off / stubs"
+    },
+    {
+      "area": "roadmap",
+      "item": "Multimodal vision/voice",
+      "status": "PARTIAL",
+      "pct": 20,
+      "note": "Modules exist; not production chat-ready"
+    },
+    {
+      "area": "roadmap",
+      "item": "Frontier model size (7B+)",
+      "status": "FAIL",
+      "pct": 0,
+      "note": "Need train-om1/70b on larger hardware"
+    }
+  ]
+}

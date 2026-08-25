@@ -21,13 +21,22 @@ def test_build_chat_messages_includes_system_and_user():
     assert msgs[-1] == {"role": "user", "content": "hii"}
 
 
-def test_generation_config_defaults():
+def test_generation_config_defaults(monkeypatch):
+    for key in (
+        "OM_CHAT_TEMPERATURE",
+        "OM_CHAT_TOP_P",
+        "OM_CHAT_TOP_K",
+        "OM_CHAT_REPETITION_PENALTY",
+        "OM_CHAT_MAX_NEW_TOKENS",
+        "OM_CHAT_MIN_NEW_TOKENS",
+    ):
+        monkeypatch.delenv(key, raising=False)
     cfg = generation_config()
-    assert cfg["temperature"] == 0.2
-    assert cfg["top_p"] == 0.85
-    assert cfg["top_k"] == 20
-    assert cfg["repetition_penalty"] == 1.1
-    assert cfg["max_new_tokens"] == 64
+    assert cfg["temperature"] == 0.45
+    assert cfg["top_p"] == 0.9
+    assert cfg["top_k"] == 40
+    assert cfg["repetition_penalty"] == 1.12
+    assert cfg["max_new_tokens"] == 96
 
 
 def test_generation_config_overrides():
@@ -42,14 +51,11 @@ def test_quality_gate_flags_spam_and_loops():
     assert is_low_quality_reply("Hi! How can I help you today?") == ""
 
 
-def test_policy_recovery_greeting_on_spam():
-    reply = policy_recovery_reply("hii", reason="spam")
-    assert reply is not None
-    assert "OM AI" in reply or "help" in reply.lower()
+def test_policy_recovery_never_injects_static():
+    assert policy_recovery_reply("hii", reason="spam") is None
     assert policy_recovery_reply("hii", reason="") is None
-    clarify = policy_recovery_reply("explain quantum physics", reason="spam")
-    assert clarify is not None
-    assert "rephrase" in clarify.lower() or "sentence" in clarify.lower()
+    assert policy_recovery_reply("explain quantum physics", reason="spam") is None
+    assert policy_recovery_reply("नमस्ते", reason="empty", language="hi") is None
 
 
 def test_assistant_chitchat_requires_markers():

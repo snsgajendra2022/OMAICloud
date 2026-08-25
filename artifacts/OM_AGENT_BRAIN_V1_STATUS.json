@@ -1,0 +1,30 @@
+{
+  "status": "completed",
+  "phase": "agent_brain_v1",
+  "finished_at": "2026-08-24T14:09:55Z",
+  "package": "om_ai/agent/",
+  "wired_into": "om_ai/runtime/chat_backend.py",
+  "capabilities": {
+    "intent_routing": true,
+    "tiny_context_packer": true,
+    "memory_rag_hints": true,
+    "coding_agent_plans": true,
+    "structured_fallback": true,
+    "external_llm": false
+  },
+  "honest": {
+    "architecture_same_type_as_chatgpt": true,
+    "equal_to_chatgpt_today": false,
+    "model_still": "~20M / 128 ctx Mac smoke",
+    "next": [
+      "OM-100M train",
+      "longer context",
+      "larger SFT/DPO",
+      "GPU scale"
+    ]
+  },
+  "env": {
+    "OM_AGENT_BRAIN": "1 (default on)"
+  },
+  "tests": "tests/test_agent_brain.py"
+}

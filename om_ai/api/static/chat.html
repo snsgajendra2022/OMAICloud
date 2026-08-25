@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
+<meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate"/>
 <title>OM · Workspace</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
@@ -27,8 +28,12 @@ a{color:inherit;text-decoration:none;}
 .hidden{display:none!important;}
 svg.icon{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;}
 
-/* ── SIDEBAR ── */
-.sidebar{width:var(--sw);flex-shrink:0;background:var(--side);border-right:1px solid var(--border);display:flex;flex-direction:column;height:100%;z-index:40;transition:width .22s ease,transform .22s ease;position:relative;padding-bottom:60px;}
+/* ── SIDEBAR (no hover/motion animations) ── */
+.sidebar,.sidebar *,.sidebar *::before,.sidebar *::after{
+  transition:none!important;
+  animation:none!important;
+}
+.sidebar{width:var(--sw);flex-shrink:0;background:var(--side);border-right:1px solid var(--border);display:flex;flex-direction:column;height:100%;z-index:40;position:relative;padding-bottom:60px;}
 body.collapsed .sidebar{width:64px;}
 body.collapsed .side-label,body.collapsed .nav-label,body.collapsed .user-meta,
 body.collapsed .brand-text,body.collapsed .ws-switcher{display:none!important;}
@@ -54,7 +59,7 @@ body.dark .logo{background:linear-gradient(145deg,#2563EB,#1D4ED8);}
 body.dark .collapse-btn:hover,body.dark .icon-btn:hover,body.dark .ghost-btn:hover{background:rgba(255,255,255,.08);}
 .icon-btn.danger:hover{color:var(--danger);background:rgba(220,38,38,.1);}
 .btn-new{width:100%;border:1px solid var(--border);background:var(--bg);border-radius:10px;padding:10px 12px;font-weight:600;font-size:13.5px;text-align:left;display:flex;align-items:center;gap:8px;}
-.btn-new:hover{border-color:#94A3B8;box-shadow:0 2px 8px rgba(17,24,39,.06);}
+.btn-new:hover{border-color:#94A3B8;}
 
 .side-nav-wrap{flex:1 1 0%;min-height:0;overflow-y:auto;padding:0 0 8px;display:flex;flex-direction:column;}
 .nav{display:flex;flex-direction:column;gap:1px;padding:0 8px;overflow:visible;max-height:none;}
@@ -63,8 +68,8 @@ body.dark .collapse-btn:hover,body.dark .icon-btn:hover,body.dark .ghost-btn:hov
 body.dark .nav-btn:hover{background:rgba(255,255,255,.06);}
 .nav-btn.active{background:#E8EEF7;color:var(--accent);font-weight:650;}
 body.dark .nav-btn.active{background:rgba(59,130,246,.15);color:#93C5FD;}
-.nav-more-btn .nav-more-chev{margin-left:auto;opacity:.7;transition:transform .15s ease;}
-.nav-more-btn.open .nav-more-chev{transform:rotate(180deg);}
+.nav-more-btn .nav-more-chev{margin-left:auto;opacity:.7;}
+.nav-more-btn.open .nav-more-chev{transform:none;opacity:1;}
 body.collapsed .nav-more-chev{display:none;}
 .nav-more-list{display:none;flex-direction:column;gap:1px;padding:2px 0 4px;}
 .nav-more-list.open{display:flex;}
@@ -81,29 +86,39 @@ body:not(.chat-mode) .side-nav-wrap{flex:1 1 0%;max-height:none;}
 body.dark .conv-filter-btn.active{background:rgba(59,130,246,.15);border-color:rgba(59,130,246,.3);color:#93C5FD;}
 .conv-panel{overflow-y:auto;padding:4px 8px 12px;flex:1;min-height:0;}
 .group-label{font-size:11px;font-weight:650;color:var(--muted);letter-spacing:.04em;text-transform:uppercase;padding:10px 10px 4px;}
-.conv-item{width:100%;border:0;background:transparent;text-align:left;padding:7px 10px;border-radius:10px;font-size:13px;display:flex;align-items:center;gap:6px;margin-bottom:1px;position:relative;}
+.group-label-day{
+  padding:12px 10px 6px;font-size:11px;font-weight:700;letter-spacing:.06em;
+  color:var(--muted);text-transform:uppercase;position:sticky;top:0;z-index:2;
+  background:linear-gradient(180deg,var(--side) 70%,transparent);margin-top:4px;
+}
+.group-label-day:first-child,.day-group:first-child .group-label-day{padding-top:8px;margin-top:0;}
+.day-group{margin:0 0 6px;}
+.day-group .conv-item{margin-bottom:1px;}
+.conv-item{width:100%;border:0;background:transparent;text-align:left;padding:7px 28px 7px 10px;border-radius:10px;font-size:13px;display:flex;align-items:center;gap:6px;margin-bottom:1px;position:relative;box-sizing:border-box;}
+.conv-item .ci-meta{display:flex;flex-direction:column;gap:1px;flex:1;min-width:0;}
+.conv-item .ci-date{font-size:10px;color:var(--muted);font-weight:500;letter-spacing:.01em;}
 .conv-item:hover{background:rgba(0,0,0,.05);}
 body.dark .conv-item:hover{background:rgba(255,255,255,.06);}
 .conv-item.active{background:#E8EEF7;font-weight:600;}
 body.dark .conv-item.active{background:rgba(59,130,246,.12);}
-.conv-item .ci-title{flex:1;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;}
+.conv-item .ci-title{flex:1;min-width:0;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;}
 .conv-pin-icon{color:var(--accent);flex-shrink:0;font-size:10px;}
-.conv-more-btn{border:0;background:transparent;color:var(--muted);border-radius:6px;padding:3px 4px;line-height:0;display:none;flex-shrink:0;align-items:center;}
-.conv-item:hover .conv-more-btn,.conv-item.active .conv-more-btn{display:inline-flex;}
+.conv-more-btn{position:absolute;right:4px;top:50%;margin-top:-12px;width:24px;height:24px;border:0;background:transparent;color:var(--muted);border-radius:6px;padding:0;line-height:0;display:inline-flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;flex-shrink:0;}
+.conv-item:hover .conv-more-btn,.conv-item.active .conv-more-btn{opacity:1;pointer-events:auto;}
 .conv-more-btn:hover{background:var(--soft);color:var(--text);}
 .side-proj-section{margin:4px 0 10px;}
 .side-proj-block{margin:0 0 10px;padding:2px 0 4px;}
-.side-proj-head{width:100%;border:0;background:transparent;text-align:left;padding:8px 10px;border-radius:10px;font-size:13px;font-weight:650;display:flex;align-items:center;gap:8px;color:var(--text);cursor:pointer;min-height:38px;box-sizing:border-box;}
+.side-proj-head{width:100%;border:0;background:transparent;text-align:left;padding:8px 36px 8px 10px;border-radius:10px;font-size:13px;font-weight:650;display:flex;align-items:center;gap:8px;color:var(--text);cursor:pointer;min-height:38px;box-sizing:border-box;position:relative;}
 .side-proj-head:hover{background:rgba(0,0,0,.05);}
 body.dark .side-proj-head:hover{background:rgba(255,255,255,.06);}
 .side-proj-head.active{background:transparent;color:var(--accent);box-shadow:inset 0 0 0 1px #BFDBFE;}
 body.dark .side-proj-head.active{background:transparent;color:#93C5FD;box-shadow:inset 0 0 0 1px rgba(59,130,246,.35);}
-.side-proj-head .sp-chev{flex-shrink:0;opacity:.55;transition:transform .15s ease;display:inline-flex;}
-.side-proj-head.open .sp-chev{transform:rotate(90deg);}
+.side-proj-head .sp-chev{flex-shrink:0;opacity:.55;display:inline-flex;}
+.side-proj-head.open .sp-chev{transform:none;}
 .side-proj-head .sp-name{flex:1;min-width:0;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;}
 .side-proj-head .sp-count{font-size:11px;font-weight:600;color:var(--muted);flex-shrink:0;}
-.side-proj-head .sp-new{border:0;background:transparent;color:var(--muted);border-radius:6px;padding:2px 4px;line-height:0;display:none;flex-shrink:0;}
-.side-proj-head:hover .sp-new,.side-proj-head.active .sp-new{display:inline-flex;}
+.side-proj-head .sp-new{position:absolute;right:6px;top:50%;margin-top:-12px;width:24px;height:24px;border:0;background:transparent;color:var(--muted);border-radius:6px;padding:0;line-height:0;display:inline-flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;flex-shrink:0;}
+.side-proj-head:hover .sp-new,.side-proj-head.active .sp-new{opacity:1;pointer-events:auto;}
 .side-proj-head .sp-new:hover{background:var(--soft);color:var(--text);}
 .side-proj-chats{padding:4px 0 2px 8px;display:none;flex-direction:column;gap:4px;border-left:2px solid var(--border);margin:6px 4px 2px 16px;}
 .side-proj-chats.open{display:flex;}
@@ -179,6 +194,7 @@ body.dark .model-btn:hover{background:rgba(59,130,246,.1);}
 .row.user .bubble{background:var(--primary);color:var(--bg);border-bottom-right-radius:6px;}
 .row.assistant .bubble{background:var(--side);border:1px solid var(--border);border-bottom-left-radius:6px;}
 .bubble[data-stream="1"].is-typing{padding:14px 18px;min-height:44px;display:inline-flex;align-items:center;}
+.bubble[data-stream="1"]:not(.is-typing) .typing-dots{display:none!important;}
 .typing-dots{display:inline-flex;align-items:center;gap:5px;height:14px;}
 .typing-dots span{width:7px;height:7px;border-radius:50%;background:var(--muted);opacity:.35;animation:typingDot 1.15s ease-in-out infinite;}
 .typing-dots span:nth-child(2){animation-delay:.18s;}
@@ -818,6 +834,56 @@ function setBusy(v) {
   els.sendBtn.disabled = v || !els.input.value.trim();
   els.stopBtn.classList.toggle("show", v);
   els.sendBtn.style.display = v ? "none" : "";
+  if (!v) clearTypingAnimation();
+}
+
+function chatTitleFromText(text, maxChars) {
+  const limit = maxChars || 42;
+  let s = String(text || "").trim().replace(/\s+/g, " ");
+  if (!s) return "New chat";
+  const low = s.toLowerCase();
+  const bad = [
+    "i'm om ai", "i’m om ai", "i am om ai", "how can i help you today",
+    "fire away whenever", "tell me what you need",
+  ];
+  if (bad.some(m => low.includes(m))) return "New chat";
+  const chars = Array.from(s);
+  if (chars.length > limit) s = chars.slice(0, limit - 1).join("").replace(/\s+$/,"") + "…";
+  return s.charAt(0).toUpperCase() + s.slice(1);
+}
+
+function clearTypingAnimation() {
+  if (state._typingTimer) { clearTimeout(state._typingTimer); state._typingTimer = null; }
+  (state.messages || []).forEach(m => { if (m && m._streaming) delete m._streaming; });
+  document.querySelectorAll('.bubble[data-stream="1"]').forEach(b => {
+    b.removeAttribute("data-stream");
+    b.classList.remove("is-typing");
+  });
+}
+
+function armTypingTimeout() {
+  if (state._typingTimer) clearTimeout(state._typingTimer);
+  state._typingTimer = setTimeout(() => {
+    // Over-time: stop the bouncing dots even if the request hangs.
+    clearTypingAnimation();
+    renderMessages();
+    if (state.busy) setBusy(false);
+  }, 90000);
+}
+
+function applyOptimisticTitle(prompt) {
+  const title = chatTitleFromText(prompt);
+  if (!title || title === "New chat" || !state.currentId) return;
+  const conv = state.conversations.find(c => c.id === state.currentId);
+  if (conv && (!conv.title || conv.title === "New chat" || /om ai|how can i help/i.test(conv.title))) {
+    conv.title = title;
+    renderConvList();
+    updateTopTitle();
+  }
+}
+
+function syncTopTitle() {
+  updateTopTitle();
 }
 
 function displayName() {
@@ -890,9 +956,10 @@ function updateTopTitle() {
     els.topTitle.textContent = nav ? nav[1] : state.view;
     return;
   }
-  els.topTitle.textContent = state.currentId
+  const raw = state.currentId
     ? ((state.conversations.find(c => c.id === state.currentId)||{}).title||"Chat")
     : "New chat";
+  els.topTitle.textContent = chatTitleFromText(raw, 56);
 }
 
 /* ─── NAV ─── */
@@ -1000,15 +1067,98 @@ function buildNav() {
 }
 
 /* ─── CONVERSATION LIST ─── */
+function parseConvDate(iso) {
+  if (iso == null || iso === "") return null;
+  if (iso instanceof Date) return Number.isNaN(iso.getTime()) ? null : iso;
+  let s = String(iso).trim();
+  if (!s) return null;
+  // "2026-08-24 15:13:10" → ISO
+  if (/^\d{4}-\d{2}-\d{2} /.test(s)) s = s.replace(" ", "T");
+  // Trim fractional seconds to ms (Safari can reject 6-digit micros)
+  s = s.replace(/(\.\d{3})\d+/, "$1");
+  // Naive local-looking timestamps from API → treat as UTC
+  if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?$/.test(s)) s += "Z";
+  // Normalize +00:00 → Z for broader parser support
+  s = s.replace(/\+00:00$/, "Z").replace(/-00:00$/, "Z");
+  const d = new Date(s);
+  if (!Number.isNaN(d.getTime())) return d;
+  // Last resort: date-only
+  const m = s.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if (m) {
+    const local = new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]));
+    return Number.isNaN(local.getTime()) ? null : local;
+  }
+  return null;
+}
+
+function startOfLocalDay(d) {
+  return new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
+}
+
+function convTimestamp(c) {
+  return c && (c.updated_at || c.updatedAt || c.created_at || c.createdAt) || null;
+}
+
 function dayBucket(iso) {
-  const d = iso ? new Date(iso) : null;
-  if (!d || Number.isNaN(d.getTime())) return "Previous";
+  const d = parseConvDate(iso);
+  if (!d) return "Older";
   const now = new Date();
-  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  const yesterday = new Date(today); yesterday.setDate(yesterday.getDate()-1);
-  if (d >= today) return "Today";
-  if (d >= yesterday) return "Yesterday";
-  return "Previous";
+  const diffMs = startOfLocalDay(now) - startOfLocalDay(d);
+  const diffDays = Math.floor(diffMs / 86400000 + 1e-9);
+  if (diffDays <= 0) return "Today";
+  if (diffDays === 1) return "Yesterday";
+  if (diffDays < 7) return "Previous 7 Days";
+  if (diffDays < 30) return "Previous 30 Days";
+  // Older: calendar month label (ChatGPT-style)
+  const sameYear = d.getFullYear() === now.getFullYear();
+  return sameYear
+    ? d.toLocaleString(undefined, { month: "long" })
+    : d.toLocaleString(undefined, { month: "long", year: "numeric" });
+}
+
+const DAY_GROUP_FIXED = ["Today", "Yesterday", "Previous 7 Days", "Previous 30 Days"];
+
+function sortChatsByUpdated(list) {
+  return (list || []).slice().sort((a, b) => {
+    const ta = parseConvDate(convTimestamp(a));
+    const tb = parseConvDate(convTimestamp(b));
+    return (tb ? tb.getTime() : 0) - (ta ? ta.getTime() : 0);
+  });
+}
+
+function groupChatsByDay(list) {
+  const groups = {};
+  const order = [];
+  sortChatsByUpdated(list).forEach(c => {
+    const key = dayBucket(convTimestamp(c));
+    if (!groups[key]) {
+      groups[key] = [];
+      order.push(key);
+    }
+    groups[key].push(c);
+  });
+  // Stable ChatGPT order: fixed buckets first, then month labels by recency of first item
+  const fixed = DAY_GROUP_FIXED.filter(k => groups[k] && groups[k].length);
+  const rest = order.filter(k => !DAY_GROUP_FIXED.includes(k) && k !== "Older");
+  const older = groups.Older && groups.Older.length ? ["Older"] : [];
+  return { groups, order: fixed.concat(rest, older) };
+}
+
+function appendDayGroupedChats(parent, list) {
+  const { groups, order } = groupChatsByDay(list || []);
+  order.forEach(label => {
+    const items = groups[label] || [];
+    if (!items.length) return;
+    const wrap = document.createElement("div");
+    wrap.className = "day-group";
+    wrap.setAttribute("data-day-group", label);
+    const h = document.createElement("div");
+    h.className = "group-label group-label-day";
+    h.textContent = label;
+    wrap.appendChild(h);
+    items.forEach(c => wrap.appendChild(makeConvItem(c)));
+    parent.appendChild(wrap);
+  });
 }
 
 function showConvCtxMenu(e, c) {
@@ -1132,7 +1282,7 @@ function renderConvList() {
         empty.textContent = "No chats yet";
         list.appendChild(empty);
       } else {
-        chats.forEach(c => list.appendChild(makeConvItem(c)));
+        appendDayGroupedChats(list, chats);
       }
       wrap.appendChild(list);
       sec.appendChild(wrap);
@@ -1154,35 +1304,34 @@ function renderConvList() {
     return;
   }
 
-  const groups = {Today:[],Yesterday:[],Previous:[]};
-  freeChats.forEach(c => groups[dayBucket(c.updated_at)].push(c));
-  const chatsLabel = document.createElement("div");
-  chatsLabel.className = "group-label";
-  chatsLabel.textContent =
-    filter === "archived" ? "Archived" :
-    filter === "pinned" ? "Pinned" :
-    "Chats";
-  els.convList.appendChild(chatsLabel);
-  ["Today","Yesterday","Previous"].forEach(label => {
-    const list = groups[label];
-    if (!list.length) return;
-    const h = document.createElement("div");
-    h.className = "group-label"; h.textContent = label;
-    h.style.paddingTop = "6px";
-    els.convList.appendChild(h);
-    list.forEach(c => els.convList.appendChild(makeConvItem(c)));
-  });
+  if (filter === "archived" || filter === "pinned") {
+    const chatsLabel = document.createElement("div");
+    chatsLabel.className = "group-label";
+    chatsLabel.textContent = filter === "archived" ? "Archived" : "Pinned";
+    els.convList.appendChild(chatsLabel);
+  }
+
+  appendDayGroupedChats(els.convList, freeChats);
 }
 
 function makeConvItem(c) {
   const btn = document.createElement("button");
   btn.type = "button";
   btn.className = "conv-item"+(c.id === state.currentId ? " active":"");
+  const when = parseConvDate(convTimestamp(c));
+  const dateLabel = when
+    ? when.toLocaleString(undefined, {month:"short", day:"numeric", hour:"2-digit", minute:"2-digit"})
+    : "";
   btn.innerHTML =
     (c.pinned ? '<span class="conv-pin-icon">'+svg("pin",10)+"</span>" : "")+
-    '<span class="ci-title"></span>'+
+    '<span class="ci-meta"><span class="ci-title"></span>'+
+    (dateLabel ? '<span class="ci-date"></span>' : "")+
+    "</span>"+
     '<button type="button" class="conv-more-btn" title="More options">'+svg("moreV",14)+"</button>";
-  btn.querySelector(".ci-title").textContent = c.title||"New chat";
+  btn.querySelector(".ci-title").textContent = chatTitleFromText(c.title||"New chat");
+  btn.querySelector(".ci-title").title = String(c.title||"New chat");
+  const dateEl = btn.querySelector(".ci-date");
+  if (dateEl) dateEl.textContent = dateLabel;
   btn.querySelector(".conv-more-btn").addEventListener("click", e => showConvCtxMenu(e, c));
   btn.addEventListener("click", e => {
     if (e.target.closest(".conv-more-btn")) return;
@@ -1357,6 +1506,7 @@ function updateStreamBubble(text) {
     bubble.innerHTML = typingIndicatorHtml();
   } else {
     bubble.classList.remove("is-typing");
+    bubble.removeAttribute("aria-busy");
     bubble.innerHTML = renderMarkdown(body);
   }
   els.messages.scrollTop = els.messages.scrollHeight;
@@ -1520,21 +1670,24 @@ async function sendPrompt(text) {
   if (!state.currentId) {
     try { await createChat("New chat"); } catch (e) { return; }
   }
+  applyOptimisticTitle(prompt);
   state.messages.push({role:"user",content:prompt});
   state.messages.push({role:"assistant",content:"",_streaming:true});
-  renderMessages(); setBusy(true);
+  renderMessages(); setBusy(true); armTypingTimeout();
   const reqMsgs = buildRequestMessages();
   try {
     const reply = await streamCompletion(reqMsgs);
     const clean = String(reply||"").trim()||"(empty reply)";
     const last = state.messages[state.messages.length-1];
     if (last && last.role === "assistant") { last.content = clean; delete last._streaming; }
+    clearTypingAnimation();
     renderMessages();
     try { await appendTurn(prompt, clean); } catch (_) { toast("Reply ok, save failed","error"); }
   } catch (e) {
     if (e.name === "AbortError") {
       const last = state.messages[state.messages.length-1];
       if (last && last.role === "assistant") { last.content = (last.content||"").trim()||"(stopped)"; delete last._streaming; }
+      clearTypingAnimation();
       renderMessages();
       const final = state.messages[state.messages.length-1];
       if (final && final.role === "assistant" && final.content && final.content !== "(stopped)") {
@@ -1543,10 +1696,11 @@ async function sendPrompt(text) {
     } else {
       if (state.messages.length && state.messages[state.messages.length-1].role === "assistant") state.messages.pop();
       if (state.messages.length && state.messages[state.messages.length-1].role === "user") state.messages.pop();
+      clearTypingAnimation();
       renderMessages();
       if (e.message !== "unauthorized") toast(e.message||"Request failed","error");
     }
-  } finally { state.abort = null; setBusy(false); }
+  } finally { state.abort = null; setBusy(false); clearTypingAnimation(); }
 }
 
 function stopStream() { if (state.abort) state.abort.abort(); }
@@ -2187,12 +2341,12 @@ function parseProjectHash() {
 
 function relativeUpdated(iso) {
   if (!iso) return "";
-  const d = new Date(iso); const now = Date.now();
-  if (Number.isNaN(d.getTime())) return iso;
-  const diff = now - d.getTime();
-  if (diff < 86400000 && new Date(now).toDateString() === d.toDateString()) return "Today";
-  if (diff < 172800000) return "Yesterday";
-  return fmtDate(iso);
+  const d = parseConvDate(iso);
+  if (!d) return String(iso);
+  const bucket = dayBucket(iso);
+  return bucket === "Older"
+    ? d.toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })
+    : bucket;
 }
 
 async function openProjectCreateModal() {
@@ -3840,6 +3994,12 @@ async function init() {
   applyDarkMode();
   await Promise.all([loadWorkspaces(), loadModelsCatalog(), loadNotifications()]);
   try {
+    const boot = await api("/v1/workspace/bootstrap",{method:"POST",body:"{}"},{error:false});
+    if (boot.res.ok && boot.data && boot.data.created) {
+      state.bootstrap = boot.data;
+    }
+  } catch (_) {}
+  try {
     const asst = await api("/v1/assistants",{},{error:false});
     if (asst.res.ok) state.assistants = (asst.data && asst.data.assistants)||[];
     const proj = await api("/v1/projects",{},{error:false});
@@ -3855,7 +4015,10 @@ async function init() {
     if (deepLink) await loadConversation(deepLink);
     else {
       const last = (me.data && me.data.last_conversation_id)||(state.profile && state.profile.last_conversation_id);
+      const welcomeId = state.bootstrap && state.bootstrap.created && state.bootstrap.created.conversation_id;
       if (last && state.conversations.some(c => c.id === last)) await loadConversation(last);
+      else if (welcomeId && state.conversations.some(c => c.id === welcomeId)) await loadConversation(welcomeId);
+      else if (state.conversations.length) await loadConversation(state.conversations[0].id);
       else renderMessages();
     }
   }

@@ -47,10 +47,17 @@ class Trainer:
         if torch.cuda.is_available(): torch.cuda.manual_seed_all(seed)
 
     def _amp_dtype(self):
-        if self.cfg.precision == "bf16": return torch.bfloat16
-        if self.cfg.precision == "fp16": return torch.float16
-        if self.cfg.precision == "auto" and self.device.type == "cuda":
-            return torch.bfloat16 if torch.cuda.is_bf16_supported() else torch.float16
+        if self.cfg.precision == "fp32":
+            return None
+        if self.cfg.precision == "bf16":
+            return torch.bfloat16
+        if self.cfg.precision == "fp16":
+            return torch.float16
+        if self.cfg.precision == "auto":
+            if self.device.type == "cuda":
+                return torch.bfloat16 if torch.cuda.is_bf16_supported() else torch.float16
+            if self.device.type == "mps":
+                return torch.float16
         return None
 
     def _lr(self, step):
@@ -116,18 +123,33 @@ class Trainer:
                 except StopIteration:
                     iterator = iter(loader); x, y = next(iterator)
                 x, y = x.to(self.device), y.to(self.device)
-                context = torch.autocast(device_type=self.device.type, dtype=amp_dtype, enabled=amp_dtype is not None and self.device.type in {"cuda", "cpu"})
+                use_autocast = amp_dtype is not None and self.device.type in {"cuda", "mps", "cpu"}
+                context = torch.autocast(
+                    device_type=self.device.type,
+                    dtype=amp_dtype,
+                    enabled=use_autocast,
+                )
                 with context:
                     out = self.model(x, labels=y)
                     loss = out["loss"] / self.cfg.grad_accum_steps
-                scaler.scale(loss).backward()
+                if scaler.is_enabled():
+                    scaler.scale(loss).backward()
+                else:
+                    loss.backward()
                 total_loss += float(loss.detach())
 
-            scaler.unscale_(self.optimizer)
+            if scaler.is_enabled():
+                scaler.unscale_(self.optimizer)
             torch.nn.utils.clip_grad_norm_(self.model.parameters(), self.cfg.grad_clip)
             lr = self._lr(self.global_step)
-            for group in self.optimizer.param_groups: group["lr"] = lr
-            scaler.step(self.optimizer); scaler.update(); self.optimizer.zero_grad(set_to_none=True)
+            for group in self.optimizer.param_groups:
+                group["lr"] = lr
+            if scaler.is_enabled():
+                scaler.step(self.optimizer)
+                scaler.update()
+            else:
+                self.optimizer.step()
+            self.optimizer.zero_grad(set_to_none=True)
             self.global_step += 1
 
             if self.global_step % self.cfg.log_every == 0 or self.global_step == 1:

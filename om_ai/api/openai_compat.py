@@ -389,7 +389,7 @@ async def chat_completions(
                 yield "data: [DONE]\n\n"
                 return
 
-            step = max(1, len(text) // 20) if text else 1
+            step = 2 if text else 1
             for i in range(0, len(text), step):
                 piece = text[i : i + step]
                 yield _sse(

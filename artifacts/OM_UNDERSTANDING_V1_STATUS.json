@@ -1,0 +1,9 @@
+{
+  "status": "completed",
+  "phase": "cognitive_understanding_v1",
+  "finished_at": "2026-08-24T15:06:26Z",
+  "package": "om_ai/understanding/",
+  "wired_into": "om_ai/agent/brain.py + chat_backend",
+  "env": "OM_UNDERSTANDING=1 (default on)",
+  "honest": "Improves messy-message understanding on current OM; does not equal ChatGPT-scale intelligence alone."
+}

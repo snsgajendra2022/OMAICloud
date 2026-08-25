@@ -188,17 +188,22 @@ def check_disk(output_path: str | Path, *, min_free_gb: float = 500.0) -> CheckR
 
 
 def check_deepspeed_optional() -> CheckResult:
-    try:
-        import deepspeed  # noqa: F401
+    import importlib.util
 
-        return CheckResult("deepspeed", True, "deepspeed import ok", required=False)
-    except ImportError:
+    # Do not import deepspeed here — mismatched CUDA builds can segfault on macOS/CPU.
+    if importlib.util.find_spec("deepspeed") is not None:
         return CheckResult(
             "deepspeed",
-            False,
-            "not installed — pip install -e '.[deepSpeed]' on the training cluster",
+            True,
+            "deepspeed package detected (import deferred until GPU train)",
             required=False,
         )
+    return CheckResult(
+        "deepspeed",
+        False,
+        "not installed — pip install -e '.[deepSpeed]' on the training cluster",
+        required=False,
+    )
 
 
 def run_preflight(

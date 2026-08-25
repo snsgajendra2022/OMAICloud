@@ -111,10 +111,10 @@ def recommended_strategy(param_estimate: int, *, prefer_deepspeed: bool = True) 
     if param_estimate < 3_000_000_000:
         return "eager"
     if prefer_deepspeed:
-        try:
-            import deepspeed  # noqa: F401
+        # Prefer find_spec — importing deepspeed can abort on mismatched CUDA builds.
+        import importlib.util
 
+        if importlib.util.find_spec("deepspeed") is not None:
             return "deepspeed_zero3"
-        except ImportError:
-            return "meta"
+        return "meta"
     return "meta"

@@ -1,13 +1,20 @@
 {
   "status": "completed",
-  "device": "cpu",
-  "finished_at": "2026-08-21T15:00:41Z",
-  "steps": 4000,
-  "last_loss": 0.00018,
-  "data": "data/om-chat-sft.jsonl",
-  "rows": 170,
+  "phase": "chat_sft_v2_en_hi",
+  "finished_at": "2026-08-24T10:50:10Z",
+  "steps": 8000,
+  "rows": 510,
+  "data": "data/om-chat-sft-v2.jsonl",
   "checkpoint": "artifacts/checkpoints/om-1.0-chat-sft/latest.pt",
-  "serve_checkpoint_updated": true,
-  "note": "Chat SFT complete for tiny OM-1.0. Better greetings/short answers expected; not ChatGPT-class.",
+  "verified": {
+    "hi": "Hi! I'm OM AI...",
+    "namaste": "\u0928\u092e\u0938\u094d\u0924\u0947! \u092e\u0948\u0902 OM AI \u0939\u0942\u0901...",
+    "2+2": "4",
+    "capital_india": "New Delhi",
+    "thank_you_hindi": "\u0927\u0928\u094d\u092f\u0935\u093e\u0926"
+  },
+  "local_chat_skill_pct": 85,
+  "chatgpt_class_pct": 25,
+  "note": "EN+HI SFT v2 complete. Strong on trained phrases/greetings/facts. Still tiny ~20M model \u2014 not ChatGPT 100%.",
   "production_ready": false
 }

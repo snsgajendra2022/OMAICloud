@@ -24,7 +24,11 @@ from om_ai.training import (
     RewardModel,
     RewardConfig,
     RewardTrainer,
+    PPOConfig,
+    PPOTrainer,
+    RolloutBuffer,
 )
+from om_ai.training.ppo import Rollout, ValueHead, compute_advantages
 from om_ai.eval import EvaluationHarness, BenchmarkRunner
 from om_ai.runtime import LocalLLMEngine
 from om_ai.continuous import FeedbackStore, build_sft_replay, build_preference_replay
@@ -184,11 +188,24 @@ def sft(args):
     tc = SFTConfig(
         steps=args.steps,
         batch_size=args.batch_size,
+        grad_accum_steps=getattr(args, "grad_accum", 1),
         learning_rate=args.lr,
+        precision=getattr(args, "precision", "auto"),
         output_dir=args.output,
         checkpoint_every=args.checkpoint_every,
     )
-    print(json.dumps({"stage": "sft", "device": str(dev), "rows": len(ds), "parameters": model.exact_parameter_count()}))
+    print(
+        json.dumps(
+            {
+                "stage": "sft",
+                "device": str(dev),
+                "rows": len(ds),
+                "parameters": model.exact_parameter_count(),
+                "grad_accum": tc.grad_accum_steps,
+                "precision": tc.precision,
+            }
+        )
+    )
     print(json.dumps(SFTTrainer(model, ds, tc, str(dev)).train(), indent=2))
 
 
@@ -213,6 +230,88 @@ def dpo(args):
     )
     print(json.dumps({"stage": "dpo", "device": str(dev), "rows": len(ds), "beta": args.beta}))
     print(json.dumps(DPOTrainer(model, ds, dc, str(dev)).train(), indent=2))
+
+
+def ppo(args):
+    """Smoke / infrastructure PPO: one policy update from synthetic rollouts.
+
+    Real RLHF requires reward-model scoring + live rollouts. This command proves
+    GAE + clipped surrogate + KL path executes on an OM checkpoint.
+    """
+    import copy
+
+    cfg, tok, policy, dev = load_model(args.config, args.tokenizer, args.checkpoint, args.device)
+    ref = copy.deepcopy(policy)
+    value_head = ValueHead(cfg.d_model).to(dev)
+    pc = PPOConfig(lr=args.lr, ppo_epochs=max(1, args.epochs), kl_coef=args.kl_coef)
+    trainer = PPOTrainer(policy, value_head, ref, pc, device=dev)
+
+    prompt_ids = tok.encode(args.prompt, add_bos=True)[: max(1, cfg.max_seq_len // 4)]
+    response_ids = tok.encode(args.response, add_eos=True)[: max(1, cfg.max_seq_len // 4)]
+    if not response_ids:
+        response_ids = [tok.eos_id]
+
+    full = torch.tensor([prompt_ids + response_ids], dtype=torch.long, device=dev)
+    resp_mask = torch.zeros_like(full, dtype=torch.bool)
+    resp_mask[0, len(prompt_ids) :] = True
+    with torch.no_grad():
+        logprobs = trainer.compute_logprobs(policy, full, resp_mask).detach().cpu().tolist()
+        ref_lp = trainer.compute_logprobs(ref, full, resp_mask).detach().cpu().tolist()
+        out = policy(full, use_cache=False)
+        hidden = out.get("last_hidden_state")
+        if hidden is not None:
+            vals = value_head(hidden[:, len(prompt_ids) :, :]).squeeze(0).detach().cpu().tolist()
+            if isinstance(vals, float):
+                vals = [vals]
+        else:
+            vals = [0.0] * len(response_ids)
+
+    # Align lengths to response token count used by GAE
+    t = len(response_ids)
+    logprobs = (logprobs + [0.0] * t)[:t]
+    ref_lp = (ref_lp + [0.0] * t)[:t]
+    vals = (list(vals) + [0.0] * t)[:t]
+
+    buf = RolloutBuffer(max_rollouts=max(1, args.rollouts))
+    for _ in range(buf.max_rollouts):
+        r = Rollout(
+            prompt_ids=list(prompt_ids),
+            response_ids=list(response_ids),
+            logprobs=list(logprobs),
+            ref_logprobs=list(ref_lp),
+            values=list(vals),
+            reward=float(args.reward),
+        )
+        compute_advantages(r, gamma=pc.gamma, lam=pc.lam)
+        buf.add(r)
+
+    stats = trainer.train_epoch(buf)
+    out_dir = Path(args.output)
+    out_dir.mkdir(parents=True, exist_ok=True)
+    ckpt = out_dir / "latest.pt"
+    torch.save(
+        {
+            "model": policy.state_dict(),
+            "value_head": value_head.state_dict(),
+            "stage": "ppo",
+            "trained": True,
+            "stats": stats,
+        },
+        ckpt,
+    )
+    print(
+        json.dumps(
+            {
+                "stage": "ppo",
+                "device": str(dev),
+                "rollouts": len(buf.rollouts),
+                "checkpoint": str(ckpt),
+                "note": "Synthetic rollouts prove infrastructure; not production RLHF",
+                "stats": stats,
+            },
+            indent=2,
+        )
+    )
 
 
 def generate(args):
@@ -478,6 +577,8 @@ def main():
     sf.add_argument("--checkpoint", required=True)
     sf.add_argument("--steps", type=int, default=1000)
     sf.add_argument("--batch-size", type=int, default=2)
+    sf.add_argument("--grad-accum", type=int, default=1)
+    sf.add_argument("--precision", default="auto", choices=["auto", "fp32", "fp16", "bf16"])
     sf.add_argument("--lr", type=float, default=2e-5)
     sf.add_argument("--output", default="artifacts/sft")
     sf.add_argument("--checkpoint-every", type=int, default=100)
@@ -508,6 +609,21 @@ def main():
     dp.add_argument("--output", default="artifacts/dpo")
     dp.add_argument("--device")
     dp.set_defaults(func=dpo)
+
+    pp = sp.add_parser("ppo", help="PPO/RLHF infrastructure smoke (synthetic rollouts)")
+    pp.add_argument("--config", required=True)
+    pp.add_argument("--tokenizer", required=True)
+    pp.add_argument("--checkpoint", required=True)
+    pp.add_argument("--output", default="artifacts/ppo")
+    pp.add_argument("--lr", type=float, default=1e-5)
+    pp.add_argument("--epochs", type=int, default=1)
+    pp.add_argument("--rollouts", type=int, default=2)
+    pp.add_argument("--reward", type=float, default=1.0)
+    pp.add_argument("--kl-coef", type=float, default=0.1)
+    pp.add_argument("--prompt", default="User: hello")
+    pp.add_argument("--response", default="Assistant: hi")
+    pp.add_argument("--device")
+    pp.set_defaults(func=ppo)
 
     g = sp.add_parser("generate")
     g.add_argument("--config", required=True)
