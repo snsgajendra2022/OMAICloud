@@ -1,5 +1,5 @@
 {
-  "generated_at": 1787668552.795496,
+  "generated_at": 1787669373.0957491,
   "scores": {
     "coding": 100.0,
     "architecture": 100.0,
@@ -21,7 +21,7 @@
   "improvement": "Hold / promote candidate",
   "raw": {
     "name": "om-eval-suite-v1",
-    "generated_at": 1787668552.795454,
+    "generated_at": 1787669373.0957031,
     "suite": "benchmarks/om_eval_suite_v1.jsonl",
     "total": 16,
     "passed": 16,
