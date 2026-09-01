@@ -437,6 +437,64 @@ def chat_reply(
         if intel.direct_reply:
             return intel.direct_reply, info_base
 
+        # Absolute Intelligence OS — full cognitive cycle (memory/knowledge/reason/agents/learn)
+        absolute_on = (_env("OM_ABSOLUTE_OS") or "1").lower() not in {"0", "false", "no", "off"}
+        if absolute_on and user_text.strip() and not (
+            is_greeting_like(user_text) and len(user_text.split()) <= 4
+        ):
+            try:
+                from om_ai.operating_intelligence import OperatingIntelligence
+
+                cycle = OperatingIntelligence().run(
+                    user_text,
+                    context={
+                        "tenant_id": tenant_id or "default",
+                        "actor": actor or "",
+                        "project_id": project_id,
+                        "messages": messages,
+                        "project_instructions": project_instructions or "",
+                    },
+                    dry_run=True,
+                )
+                abs_reply = (cycle.response or "").strip()
+                if abs_reply and len(abs_reply) > 40:
+                    info_abs = ChatBackendInfo(
+                        backend=info.backend,
+                        model=info.model,
+                        detail=info.detail,
+                        provider=info.provider,
+                        live_knowledge={
+                            "intelligence": intel.meta,
+                            "absolute_os": {
+                                "intent": (cycle.understood or {}).get("intent"),
+                                "agents": (cycle.agents or {}).get("agents"),
+                                "knowledge_source": (cycle.knowledge or {}).get("source"),
+                                "verification": cycle.verification,
+                                "growth_ok": bool((cycle.growth or {}).get("ok", True)),
+                            },
+                        },
+                    )
+                    # Still polish via response intelligence
+                    from om_ai.response_engine import format_assistant_reply
+                    from om_ai.core.response.intelligence import ensure_intelligent_response
+
+                    try:
+                        repaired = ensure_intelligent_response(
+                            user_text,
+                            abs_reply,
+                            intent=str((cycle.understood or {}).get("intent") or "chat"),
+                        )
+                        polished = format_assistant_reply(
+                            repaired.get("final") or abs_reply,
+                            intent=str((cycle.understood or {}).get("intent") or "chat"),
+                            enhance=True,
+                        )
+                    except Exception:
+                        polished = abs_reply
+                    return polished, info_abs
+            except Exception as exc:
+                logger.debug("absolute OS cycle skipped: %s", exc)
+
         # Agent Brain v1: intent → memory/RAG/plan hints (self-owned, no external LLM).
         from om_ai.agent import AgentBrain
 
@@ -491,13 +549,18 @@ def chat_reply(
             grounded = strip_live_knowledge_boilerplate(grounded)
             if looks_like_web_spam(grounded):
                 grounded = ""
-        if not grounded and brain_decision.prefer_grounded:
-            grounded = brain_decision.prefer_grounded.strip()
+        dataset_grounded = ""
+        if brain_decision.prefer_grounded:
+            dataset_grounded = brain_decision.prefer_grounded.strip()
+        if not grounded and dataset_grounded:
+            grounded = dataset_grounded
         prefer_grounded = bool(lk_meta.get("prefer_grounded_reply")) and bool(grounded)
         grounded_env = (_env("OM_LIVE_KNOWLEDGE_GROUNDED") or "0").lower()
-        grounded_allowed = (
+        live_grounded_allowed = (
             grounded_env not in {"0", "false", "no", "off"} and not skip_live
         )
+        # Dataset / RAG grounded answers are always allowed (local corpora, not web).
+        grounded_allowed = live_grounded_allowed or bool(dataset_grounded)
         merged_lk = {
             **({k: v for k, v in lk_meta.items() if k != "grounded_reply"} or {}),
             "intelligence": intel.meta,
@@ -505,6 +568,7 @@ def chat_reply(
                 "intent": brain_decision.intent.value,
                 **(brain_decision.meta or {}),
             },
+            "dataset_grounded": bool(dataset_grounded),
         }
         info_lk = ChatBackendInfo(
             backend=info.backend,
@@ -534,7 +598,11 @@ def chat_reply(
                 polished = (text or "").strip()
             return polished, info_lk
 
-        if prefer_grounded and grounded_allowed and grounded:
+        # Prefer local dataset/RAG grounded reply before tiny-model garble.
+        if dataset_grounded and len(dataset_grounded) > 80:
+            return _out(dataset_grounded)
+
+        if prefer_grounded and live_grounded_allowed and grounded:
             return _out(grounded)
 
         try:

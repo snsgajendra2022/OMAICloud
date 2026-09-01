@@ -38,12 +38,39 @@ def repair_response(question: str, answer: str, *, intent: str = "chat") -> str:
     analysis = analyze_response(question, answer)
     if analysis["action"] == "accept":
         return answer
-    # Prefer reasoning pipeline for coding/design; else compose_fallback
+
+    # Prefer real dataset brain / RAG before any template
+    try:
+        from om_ai.brain.dataset_engine import grounded_or_none
+
+        hit = grounded_or_none(question or "")
+        if hit and len(hit) > 60:
+            return hit
+    except Exception:
+        pass
+
+    import os
+
+    if os.environ.get("OM_STATIC_TEMPLATES", "0").strip() in {"1", "true", "yes", "on"}:
+        from om_ai.agent.useful_reply import useful_reply_for
+
+        useful = useful_reply_for(question, intent=intent or "chat")
+        if useful:
+            return useful
+
     qlow = (question or "").lower()
-    if any(w in qlow for w in ("code", "react", "api", "login", "design", "fix", "bug")):
+    if any(
+        w in qlow
+        for w in ("code", "react", "api", "login", "design", "fix", "bug", "python", "paython")
+    ):
         from om_ai.core.reasoning.pipeline import run_reasoning_pipeline
 
-        return run_reasoning_pipeline(question, retrieve=True).get("markdown") or answer
+        result = run_reasoning_pipeline(question, retrieve=True)
+        sol = str(result.get("solution") or "")
+        if "```" in sol:
+            return sol
+        return result.get("markdown") or answer
+
     from om_ai.agent.verifier import compose_fallback
 
     return compose_fallback(intent=intent or "chat", user_text=question)

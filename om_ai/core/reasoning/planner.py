@@ -4,7 +4,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Any
 
-from .analyzer import IntentResult
+from .analyzer import PERFORMANCE_CAUSES, IntentResult
 
 
 @dataclass
@@ -27,17 +27,30 @@ class PlanningEngine:
             "Validate result",
         ]
         agents = ["master"]
-        if intent.intent in {"coding", "debug", "architecture"}:
+        meta: dict[str, Any] = {"planner": "om-plan-v2"}
+        if intent.intent == "performance":
+            causes = list(intent.meta.get("causes") or PERFORMANCE_CAUSES)
             base = [
-                "Map repository / interfaces",
-                "Retrieve docs + prior decisions",
-                "Write failing test or reproduction",
-                "Implement minimal change",
-                "Run tests and review security",
+                "Confirm the symptom and when it started",
+                "Check possible causes: " + ", ".join(causes),
+                "Gather evidence (waterfall, slow query log, bundle size) before scaling",
+                "Fix the cheapest confirmed bottleneck first",
+                "Re-measure",
+            ]
+            agents = ["master", "coding", "testing"]
+            meta["causes"] = causes
+            meta["avoid"] = intent.meta.get("avoid") or "Do not immediately say increase server"
+        elif intent.intent in {"coding", "debug", "architecture"}:
+            base = [
+                "Map requirement → architecture → technology",
+                "Cover frontend, backend, data, auth, and security when building apps",
+                "Implement the smallest complete slice",
+                "Add tests and validation",
+                "Note deployment and secrets handling",
             ]
             agents = ["master", "coding", "testing", "security"]
         elif intent.intent == "research":
             agents = ["master", "research", "science"]
         elif intent.intent == "business":
             agents = ["master", "business", "data"]
-        return PlanResult(plan=base, agents=agents, meta={"planner": "om-plan-v1"})
+        return PlanResult(plan=base, agents=agents, meta=meta)

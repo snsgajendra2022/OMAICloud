@@ -18,29 +18,50 @@ def search_knowledge(
     query: str,
     *,
     tenant_id: str = "default",
-    k: int = 3,
+    k: int = 6,
 ) -> list[str]:
-    """Best-effort RAG snippets from the local knowledge base."""
+    """Best-effort RAG snippets from the local knowledge base (+ dataset brain)."""
     if not query.strip() or not _env_flag("OM_CHAT_RAG", True):
         return []
+    out: list[str] = []
+    # Prefer dataset-brain hit as first snippet (full answer compressed)
+    try:
+        from om_ai.brain.dataset_engine import retrieve_answer
+
+        hit = retrieve_answer(query, k=3)
+        if hit and hit.get("answer"):
+            out.append(str(hit["answer"])[:900])
+    except Exception as exc:
+        logger.debug("dataset brain skipped: %s", exc)
+
     try:
         from om_ai.knowledge.rag import PersistentKnowledgeBase
 
-        kb = PersistentKnowledgeBase()
+        kb_path = os.environ.get("OM_AI_KB") or "artifacts/knowledge.sqlite3"
+        kb = PersistentKnowledgeBase(kb_path)
         try:
             hits = kb.search(query, tenant_id, k=k)
         except TypeError:
             hits = kb.search(query, k=k)
-        out: list[str] = []
         for h in hits or []:
             text = getattr(h, "text", None) or (h.get("text") if isinstance(h, dict) else str(h))
             text = str(text or "").strip()
-            if text:
-                out.append(text[:240])
-        return out
+            if text and text not in out:
+                out.append(text[:400])
+        # Also search default RAG db if different
+        if kb_path != "artifacts/om_ai_rag.sqlite3":
+            try:
+                kb2 = PersistentKnowledgeBase("artifacts/om_ai_rag.sqlite3")
+                for h in kb2.search(query, tenant_id, k=max(2, k // 2)) or []:
+                    text = getattr(h, "text", None) or (h.get("text") if isinstance(h, dict) else str(h))
+                    text = str(text or "").strip()
+                    if text and text not in out:
+                        out.append(text[:400])
+            except Exception:
+                pass
     except Exception as exc:
         logger.debug("knowledge search skipped: %s", exc)
-        return []
+    return out[:k]
 
 
 def recall_memory(

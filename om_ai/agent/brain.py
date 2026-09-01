@@ -26,6 +26,7 @@ def _map_understanding_intent(u: UnderstandingResult) -> ChatIntent:
         "knowledge": ChatIntent.knowledge,
         "coding": ChatIntent.coding,
         "debugging": ChatIntent.coding,
+        "performance": ChatIntent.agent,
         "planning": ChatIntent.agent,
         "completion": ChatIntent.agent,
         "understanding_feature": ChatIntent.agent,

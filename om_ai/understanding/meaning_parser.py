@@ -2,10 +2,10 @@
 from __future__ import annotations
 
 import re
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from om_ai.understanding.intent_detector import IntentResult
-from om_ai.understanding.typo_corrector import correct_typos
+from om_ai.understanding.language_brain import LanguageUnderstanding, understand_language
 
 
 @dataclass(slots=True)
@@ -15,6 +15,9 @@ class MeaningResult:
     understood_meaning: str
     goal: str
     confidence: float
+    tokens: list[tuple[str, str]] = field(default_factory=list)
+    canonical_intent: str = ""
+    language: str = "en"
 
 
 _GOAL_PATTERNS: list[tuple[re.Pattern[str], str]] = [
@@ -47,7 +50,8 @@ _GOAL_PATTERNS: list[tuple[re.Pattern[str], str]] = [
 
 def parse_meaning(original: str, *, intent: IntentResult | None = None) -> MeaningResult:
     raw = (original or "").strip()
-    corrected = correct_typos(raw)
+    lang: LanguageUnderstanding = understand_language(raw)
+    corrected = lang.corrected
     intent = intent or IntentResult("chat", "general", True, 0.5)
 
     goal = "Help with the user's request."
@@ -62,14 +66,20 @@ def parse_meaning(original: str, *, intent: IntentResult | None = None) -> Meani
         )
     elif intent.intent == "debugging":
         goal = "Diagnose the failure and provide a practical fix."
+    elif intent.intent == "performance":
+        goal = (
+            "Diagnose why the site is slow (DB, images, JS bundle, API, cache, server) "
+            "before scaling hardware."
+        )
     elif intent.intent == "ui_design":
         goal = "Improve UI quality with concrete suggestions."
     elif intent.intent == "coding":
-        goal = "Help implement or improve the code."
+        goal = lang.canonical_intent or "Help implement or improve the code."
     elif intent.intent == "completion":
         goal = "Complete the remaining work fully."
+    elif lang.canonical_intent and len(lang.canonical_intent.split()) >= 3:
+        goal = lang.canonical_intent
 
-    # Build a short human-readable paraphrase.
     if intent.intent == "understanding_feature":
         understood = (
             "User wants OM AI to understand messages even when there are "
@@ -77,6 +87,10 @@ def parse_meaning(original: str, *, intent: IntentResult | None = None) -> Meani
             "think, and reply."
         )
         conf = max(0.9, intent.confidence)
+    elif lang.canonical_intent and lang.tokens:
+        gloss = "; ".join(f"{a} = {b}" for a, b in lang.tokens[:6])
+        understood = f"{lang.canonical_intent}. {gloss}"
+        conf = min(0.96, 0.82 + 0.03 * len(lang.tokens))
     elif corrected.lower() != raw.lower() and len(corrected.split()) >= 4:
         understood = f"User means: {corrected}"
         conf = min(0.95, 0.7 + 0.05 * abs(len(raw) - len(corrected)))
@@ -87,7 +101,6 @@ def parse_meaning(original: str, *, intent: IntentResult | None = None) -> Meani
         understood = f"User is asking about: {corrected or raw}"
         conf = intent.confidence
 
-    # Confidence penalty if message is extremely short / empty.
     if len((corrected or raw).split()) <= 1:
         conf = min(conf, 0.5)
 
@@ -97,4 +110,7 @@ def parse_meaning(original: str, *, intent: IntentResult | None = None) -> Meani
         understood_meaning=understood,
         goal=goal,
         confidence=round(conf, 2),
+        tokens=list(lang.tokens),
+        canonical_intent=lang.canonical_intent,
+        language=lang.language,
     )

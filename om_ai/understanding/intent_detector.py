@@ -43,7 +43,20 @@ _RULES: list[tuple[re.Pattern[str], str, str, bool, float]] = [
     ),
     (
         re.compile(
-            r"\b(code|coding|implement|function|api|react|python|typescript|sql|docker)\b",
+            r"\b(slow|latency|lagging|performance)\b.*\b(site|website|app|page)\b|"
+            r"\b(site|website|app|page)\b.*\b(slow|latency|lagging)\b",
+            re.I,
+        ),
+        "performance",
+        "software",
+        True,
+        0.9,
+    ),
+    (
+        re.compile(
+            r"\b(code|coding|implement|function|api|react|python|paython|payhthon|"
+            r"typescript|sql|docker|create\s+\w*\s*code|write\s+\w*\s*code|"
+            r"login\s+page|signup\s+page)\b",
             re.I,
         ),
         "coding",

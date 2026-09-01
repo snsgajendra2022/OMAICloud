@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import Any
 
 from om_ai.eval.platform import run_suite
+from om_ai.evaluation.online import evaluate_response
 
 
 def score_dimensions(result: dict[str, Any]) -> dict[str, float]:

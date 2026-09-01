@@ -5,6 +5,7 @@ from .rag import (
     ChunkRecord,
     chunk_text,
 )
+from .selector import KnowledgeProfile, select_knowledge
 
 __all__ = [
     "LocalKnowledgeBase",
@@ -12,4 +13,6 @@ __all__ = [
     "KnowledgeDoc",
     "ChunkRecord",
     "chunk_text",
+    "KnowledgeProfile",
+    "select_knowledge",
 ]

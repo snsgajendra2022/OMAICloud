@@ -32,14 +32,21 @@ def execute_for_chat(
 
     if intent in {"knowledge", "agent", "coding", "chat"}:
         bundle.knowledge_snippets = search_knowledge(
-            user_text, tenant_id=tenant_id, k=3
+            user_text, tenant_id=tenant_id, k=8
         )
         bundle.memory_snippets = recall_memory(
             user_text,
             tenant_id=tenant_id,
             actor=actor,
             project_id=project_id,
+            limit=6,
         )
+        # If dataset/RAG returned a strong long answer, use it as grounded reply
+        if bundle.knowledge_snippets and len(bundle.knowledge_snippets[0]) > 200:
+            top = bundle.knowledge_snippets[0]
+            if top.startswith("**OM dataset brain**") or "Answer:" in top[:80]:
+                bundle.grounded_reply = top
+                bundle.notes.append("dataset_grounded")
 
     if intent in {"knowledge", "agent"}:
         grounded = maybe_live_grounding(user_text, messages)

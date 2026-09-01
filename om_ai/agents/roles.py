@@ -45,10 +45,20 @@ ROLES: dict[str, AgentRole] = {
         ["review", "threats", "secrets", "sandbox"],
         "Security agent",
     ),
+    "testing": AgentRole(
+        "testing",
+        ["test_plan", "regression", "edge_cases", "ci"],
+        "Testing agent",
+    ),
+    "deployment": AgentRole(
+        "deployment",
+        ["docker", "compose", "env", "health", "tls"],
+        "Deployment agent",
+    ),
     "devops": AgentRole(
         "devops",
         ["ci", "deploy", "containers", "observability"],
-        "DevOps agent",
+        "DevOps / deployment agent",
     ),
     "business": AgentRole(
         "business",

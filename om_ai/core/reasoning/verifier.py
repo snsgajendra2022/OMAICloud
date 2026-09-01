@@ -32,13 +32,20 @@ class VerificationEngine:
             "No invented citations",
             "Unsafe actions remain gated",
         ]
-        if intent.intent in {"coding", "debug"}:
+        if intent.intent in {"coding", "debug", "performance"}:
             checks += ["Mentions tests or validation", "Avoids committing secrets"]
+        if intent.intent == "performance":
+            checks.append("Lists causes before recommending scale-up")
         text = (solution.solution or "").lower()
         failed = []
         if intent.intent in {"coding", "debug"}:
             if not any(w in text for w in ("test", "tests", "testing", "validation", "validate")):
                 failed.append("Coding answer should mention tests or validation")
+        if intent.intent == "performance":
+            if "increase server" in text and not any(
+                c.lower() in text for c in ("database", "bundle", "cache", "latency")
+            ):
+                failed.append("Performance answer jumped to scaling without diagnosing causes")
         passed = not failed
         score = 0.85 if passed else 0.55
         validation = checks + ([f"FAIL: {f}" for f in failed] if failed else ["All heuristic checks passed"])

@@ -1,6 +1,8 @@
 # Architecture — OM AI Operating Brain v0.3
 
-OM AI is a self-hosted platform: model code, training, agents, memory, RAG, and API run locally. It does **not** call OpenAI/Anthropic/Google model APIs.
+OM AI is a self-hosted **cognitive operating system**: model code, training, agents, memory, RAG, and API run locally. It does **not** call OpenAI/Anthropic/Google model APIs and does not include ChatGPT weights or private OpenAI training data.
+
+Operating-system pillars, gaps, and roadmap: **[OM_OPERATING_SYSTEM.md](OM_OPERATING_SYSTEM.md)**.
 
 ## Layers
 

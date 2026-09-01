@@ -19,8 +19,10 @@ _CODING = re.compile(
     r"\b("
     r"code|coding|bug|debug|error|stack\s*trace|exception|"
     r"function|class|api|endpoint|refactor|implement|typescript|javascript|"
-    r"python|react|java|sql|docker|kubernetes|git|pr\b|pull\s+request|"
-    r"write\s+(?:a\s+)?(?:script|function|component|test)|fix\s+(?:my\s+)?(?:code|bug)"
+    r"python|paython|payhthon|pyhton|react|java|sql|docker|kubernetes|git|pr\b|pull\s+request|"
+    r"write\s+(?:a\s+)?(?:script|function|component|test)|fix\s+(?:my\s+)?(?:code|bug)|"
+    r"create\s+(?:a\s+)?(?:python|paython|script|code)|"
+    r"analy[sz]e?\s+(?:python|paython|code)|analysis\s+(?:python|paython|code)"
     r")\b",
     re.IGNORECASE,
 )

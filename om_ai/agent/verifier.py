@@ -44,9 +44,58 @@ def compose_fallback(
     knowledge_snippets: list[str] | None = None,
     grounded_reply: str = "",
 ) -> str:
-    """Structured assistant reply when the tiny model fails (still own stack)."""
+    """Reply when the tiny model fails — prefer real datasets / RAG / memory over templates."""
     if grounded_reply.strip():
         return grounded_reply.strip()
+
+    # 1) Dataset brain (ingested instruct / SFT corpora) — real knowledge, not dummy text
+    try:
+        from om_ai.brain.dataset_engine import grounded_or_none
+
+        hit = grounded_or_none(user_text or "")
+        if hit and len(hit) > 60:
+            return hit
+    except Exception:
+        pass
+
+    # 2) RAG snippets already gathered by Agent Brain
+    if knowledge_snippets:
+        body = "\n\n".join(f"- {s}" for s in knowledge_snippets[:5] if s)
+        if body.strip():
+            return (
+                "**From OM knowledge memory**\n\n"
+                f"{body}\n\n"
+                f"Ask: { (user_text or '')[:160] }\n\n"
+                "I can go deeper — ask a sharper question or say `create python code` / paste an error."
+            )
+
+    # 3) Reasoning pipeline (may still pull knowledge)
+    if intent in {"coding", "agent", "knowledge", "chat"}:
+        try:
+            from om_ai.core.reasoning.pipeline import run_reasoning_pipeline
+
+            result = run_reasoning_pipeline(user_text or "", retrieve=True)
+            sol = str(result.get("solution") or "").strip()
+            if "```" in sol and len(sol) > 80:
+                return sol
+            md = (result.get("markdown") or "").strip()
+            # Prefer solution/markdown only if it isn't empty plan soup
+            if sol and len(sol) > 120 and "Prefer smallest safe change" not in sol:
+                return sol
+            if md and "```" in md:
+                return md
+        except Exception:
+            pass
+
+    # 4) Optional static helpers — OFF by default (OM_STATIC_TEMPLATES=1 to enable)
+    import os
+
+    if os.environ.get("OM_STATIC_TEMPLATES", "0").strip() in {"1", "true", "yes", "on"}:
+        from om_ai.agent.useful_reply import useful_reply_for
+
+        useful = useful_reply_for(user_text, intent=intent)
+        if useful:
+            return useful
 
     opener = _feeling_opener(user_text)
     q = (user_text or "").strip()[:180]
@@ -55,78 +104,30 @@ def compose_fallback(
         qlow = (user_text or "").lower()
         if "how are you" in qlow or "how's it" in qlow:
             return (
-                "👋 I’m doing well — thanks for asking.\n\n"
-                "I’m **OM AI**, here with you in your private workspace.\n\n"
-                "## I can help with\n"
-                "- Code development\n"
-                "- Project analysis\n"
-                "- AI implementation\n\n"
-                "How can I help you today?"
+                "I’m doing well — thanks for asking.\n\n"
+                "I’m **OM AI** on your private stack (model + knowledge brain + memory).\n\n"
+                "Ask me anything from your datasets, code, or plans."
             )
-        return (
-            f"👋 {opener}\n\n"
-            "I’m **OM AI** — here for real conversation, not just answers.\n\n"
-            "What’s on your mind?"
-        )
+        return f"{opener}\n\nI’m **OM AI**. What’s the task?"
 
     if intent == "identity":
         return (
-            f"{opener} I’m OM AI running on OM-1.0 in your private workspace. "
-            "I can chat, remember context, use your Knowledge/Memory, and help with plans. "
-            "How can I support you right now?"
-        )
-
-    if intent in {"coding", "agent", "knowledge"}:
-        try:
-            from om_ai.core.reasoning.pipeline import run_reasoning_pipeline
-
-            result = run_reasoning_pipeline(user_text or q, retrieve=True)
-            md = (result.get("markdown") or "").strip()
-            if md and len(md) > 80:
-                return f"{opener}\n\n{md}".strip()
-        except Exception:
-            pass
-
-    if intent == "coding":
-        lines = [opener, "", "Here’s a practical plan for that coding task:"]
-        for b in plan_bullets or []:
-            lines.append(f"- {b}")
-        if not plan_bullets:
-            lines.append("- Clarify the exact error or goal")
-            lines.append("- Locate the relevant files")
-            lines.append("- Apply a minimal fix and verify")
-        lines.append("")
-        lines.append("Share the file path or error log and I’ll go deeper on the next turn.")
-        return "\n".join(lines)
-
-    if intent == "agent":
-        lines = [opener, "", f"Goal: {q or 'Help with your request'}", "", "Plan:"]
-        for b in plan_bullets or ["Understand the need", "Break it into steps", "Deliver a clear answer"]:
-            lines.append(f"- {b}")
-        if knowledge_snippets:
-            lines.append("")
-            lines.append("From knowledge:")
-            for s in knowledge_snippets[:2]:
-                lines.append(f"- {s[:160]}")
-        return "\n".join(lines)
-
-    if intent == "knowledge" and knowledge_snippets:
-        return (
-            f"{opener}\n\nBased on what I have in knowledge:\n"
-            + "\n".join(f"- {s[:200]}" for s in knowledge_snippets[:3])
+            "I’m OM AI — local model + dataset brain + memory/RAG in your workspace. "
+            "Run `om-ai brain power` to load corpora, then ask real questions."
         )
 
     if intent == "memory":
         return (
-            f"{opener} I’ll keep what matters from our chats when Memory is enabled. "
-            "Tell me what you’d like me to remember."
+            f"{opener} Memory is on when enabled in settings. "
+            "Tell me facts to remember (name, prefs) and I’ll store them."
         )
 
-    # Default chat — human, context-aware bridge
     if q:
         return (
-            f"{opener} I hear you about “{q}”. "
-            "Tell me a bit more about what you need — a short answer, steps, or just someone to think with — "
-            "and I’ll meet you there."
+            f"{opener}\n\n"
+            f"**Understood:** {q}\n\n"
+            "I don’t have a strong dataset match yet for that. "
+            "Load corpora with `om-ai brain power`, or ask with more detail "
+            "(code error, file path, or exact goal)."
         )
-    return f"{opener} What would you like to talk about?"
+    return f"{opener} What should we work on?"

@@ -8,20 +8,23 @@ LANGUAGES = [
     "JavaScript",
     "TypeScript",
     "Java",
-    "C++",
-    "Rust",
-    "Go",
+    "C#",
     "PHP",
+    "Go",
+    "Rust",
     "SQL",
 ]
 
 FRAMEWORKS = [
     "React",
     "Next.js",
+    "Angular",
+    "Vue",
     "FastAPI",
+    "Django",
     "Laravel",
     "Spring Boot",
-    "Django",
+    ".NET",
     "Express",
 ]
 

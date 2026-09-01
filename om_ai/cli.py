@@ -487,6 +487,82 @@ def knowledge_universe_cmd(args):
         print(json.dumps(process_stub(args.root), indent=2))
 
 
+def brain_cmd(args):
+    """Power OM chat from real local datasets (memory + QA retrieval)."""
+    from om_ai.brain import power_from_datasets, status
+
+    if args.sub == "status":
+        print(json.dumps(status(), indent=2))
+        return
+    if args.sub == "power":
+        report = power_from_datasets(
+            limit_per_file=int(args.limit),
+            stride=int(args.stride),
+            also_rag=not args.no_rag,
+            rag_limit=int(args.rag_limit),
+        )
+        print(json.dumps(report, indent=2))
+        return
+    if args.sub == "ask":
+        from om_ai.brain.dataset_engine import retrieve_answer
+
+        hit = retrieve_answer(args.query or "")
+        print(json.dumps(hit or {"ok": False, "error": "no_match"}, indent=2, default=str))
+        return
+    raise SystemExit(f"unknown brain subcommand: {args.sub}")
+
+
+def absolute_cmd(args):
+    """OM Absolute Intelligence Architecture — cognitive OS cycle."""
+    from om_ai.operating_intelligence import OperatingIntelligence, capability_status
+
+    if args.sub == "status":
+        print(json.dumps(capability_status(), indent=2))
+        return
+    if args.sub == "identity":
+        from om_ai.identity import DIRECTIVE_MARKDOWN, identity_card
+
+        print(DIRECTIVE_MARKDOWN)
+        print("\n--- JSON ---\n")
+        print(json.dumps(identity_card(), indent=2))
+        return
+    if args.sub == "cycle":
+        result = OperatingIntelligence().run(
+            args.goal,
+            context={"actor": getattr(args, "actor", "") or ""},
+            dry_run=True,
+        )
+        print("OM Absolute Intelligence Cycle")
+        print(f"Intent: {(result.understood or {}).get('intent')}")
+        print(f"Agents: {(result.agents or {}).get('agents')}")
+        print(
+            f"Knowledge: {(result.knowledge or {}).get('source')} "
+            f"({(result.knowledge or {}).get('count')})"
+        )
+        print(f"Verified: {(result.verification or {}).get('ok')}")
+        qg = (result.verification or {}).get("quality_gate") or {}
+        print(f"Quality: {qg.get('ok')} issues={qg.get('issues')}")
+        print("---")
+        print(result.response)
+        print("---")
+        print(
+            json.dumps(
+                {
+                    "meta": {
+                        k: result.meta.get(k)
+                        for k in ("architecture", "system_name", "assumption", "style")
+                    },
+                    "growth": result.growth,
+                    "neural": (result.neural or {}).get("status"),
+                },
+                indent=2,
+                default=str,
+            )
+        )
+        return
+    raise SystemExit(f"unknown absolute subcommand: {args.sub}")
+
+
 def reason_cmd(args):
     from om_ai.reasoning import reason
 
@@ -1112,6 +1188,37 @@ def main():
     kup = kus.add_parser("process", help="Write clean/dedupe/embed process plan")
     kup.add_argument("--root", default="data/om-knowledge-universe-v1")
     kup.set_defaults(func=knowledge_universe_cmd)
+
+    br = sp.add_parser(
+        "brain",
+        help="Power chat from real datasets (QA memory + RAG) — not static templates",
+    )
+    brs = br.add_subparsers(dest="sub", required=True)
+    brp = brs.add_parser("power", help="Ingest knowledge-brain / genesis / chat SFT into QA+RAG")
+    brp.add_argument("--limit", type=int, default=8000, help="Max pairs per corpus file")
+    brp.add_argument("--stride", type=int, default=5, help="Take every Nth line (1=all)")
+    brp.add_argument("--rag-limit", type=int, default=2500, help="Pairs also written into RAG KB")
+    brp.add_argument("--no-rag", action="store_true", help="Skip RAG KB ingest")
+    brp.set_defaults(func=brain_cmd)
+    brst = brs.add_parser("status", help="Show dataset-brain pair counts")
+    brst.set_defaults(func=brain_cmd)
+    bra = brs.add_parser("ask", help="Retrieve a dataset-grounded answer (debug)")
+    bra.add_argument("query")
+    bra.set_defaults(func=brain_cmd)
+
+    ab = sp.add_parser(
+        "absolute",
+        help="OM Absolute Intelligence Architecture (cognitive OS status/cycle)",
+    )
+    abs_ = ab.add_subparsers(dest="sub", required=True)
+    abs_st = abs_.add_parser("status", help="Layer capability board")
+    abs_st.set_defaults(func=absolute_cmd)
+    abs_id = abs_.add_parser("identity", help="Print OM Operating Mind Genesis identity")
+    abs_id.set_defaults(func=absolute_cmd)
+    abs_cy = abs_.add_parser("cycle", help="Run Observe→Learn cognitive cycle")
+    abs_cy.add_argument("goal")
+    abs_cy.add_argument("--actor", default="")
+    abs_cy.set_defaults(func=absolute_cmd)
 
     rs = sp.add_parser("reason", help="OM reasoning engine (decompose→plan→verify→critique)")
     rs.add_argument("question")

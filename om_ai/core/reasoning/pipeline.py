@@ -81,11 +81,21 @@ def run_reasoning_pipeline(
     *,
     knowledge_hits: list[str] | None = None,
     retrieve: bool = True,
+    messages: list[dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
     hits = list(knowledge_hits or [])
     if retrieve and not hits:
         hits = _retrieve_knowledge(question)
-    intent = IntentAnalyzer().analyze(question)
+    knowledge_profile = None
+    try:
+        from om_ai.knowledge.selector import select_knowledge
+
+        knowledge_profile = select_knowledge(question, hits)
+        if knowledge_profile.kept:
+            hits = knowledge_profile.kept
+    except Exception:
+        knowledge_profile = None
+    intent = IntentAnalyzer().analyze(question, messages=messages)
     plan = PlanningEngine().plan(intent)
     solution = SolutionGenerator().solve(
         question, intent, plan, knowledge_hits=hits
@@ -107,10 +117,11 @@ def run_reasoning_pipeline(
         "weak_areas": reflection.weak_areas,
         "training_hints": reflection.training_hints,
         "markdown": "",
+        "knowledge": knowledge_profile.to_dict() if knowledge_profile else {},
         "meta": {
-            "pipeline": "om-foundation-reasoning-v2",
+            "pipeline": "om-human-like-reasoning-v1",
             "knowledge_hits": len(hits),
-            "solver": (solution.meta or {}).get("template"),
+            **(solution.meta or {}),
         },
     }
     result["markdown"] = format_reasoning_markdown(result)

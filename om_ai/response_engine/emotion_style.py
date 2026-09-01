@@ -4,9 +4,10 @@ from __future__ import annotations
 import random
 
 EXPERIENCE_PHASES = (
-    "Understanding request…",
+    "Thinking…",
     "Checking context…",
-    "Preparing answer…",
+    "Creating architecture…",
+    "Here is the solution…",
 )
 
 _OPENERS_GREETING = (

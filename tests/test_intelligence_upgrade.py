@@ -7,20 +7,23 @@ from om_ai.multimodal.document_ai import multimodal_status
 from om_ai.runtime.chat_orchestrator import is_garbled_generation, is_low_quality_reply
 
 
-def test_reasoning_react_login_has_code():
+def test_reasoning_react_login_not_static_by_default():
     r = run_reasoning_pipeline("Create React login page", retrieve=False)
-    md = r["markdown"]
-    assert "## Understanding" in md
-    assert "## Architecture" in md
-    assert "Login.jsx" in md
-    assert "validate" in md.lower() or "validation" in md.lower()
+    meta = (r.get("meta") or {})
+    solver_meta = meta.get("solver") if isinstance(meta, dict) else None
+    # v3 solver: no hardcoded Login.jsx unless OM_STATIC_TEMPLATES=1
+    assert "Login.jsx" not in r.get("solution", "") or meta.get("template") == "react_login_static"
+    assert r["markdown"]
+    assert "## Understanding" in r["markdown"] or "## Plan" in r["markdown"]
 
 
-def test_reasoning_school_management():
+def test_reasoning_school_management_not_static_by_default():
     r = run_reasoning_pipeline("Design a school management system", retrieve=False)
-    md = r["markdown"]
-    assert "Architecture" in md
-    assert "Students" in md or "students" in r["solution"].lower()
+    meta = r.get("meta") or {}
+    # Should be plan/dataset path, not canned SMS architecture unless static flag
+    if meta.get("template") != "school_management_static":
+        assert "static demo" not in r["solution"].lower() or meta.get("source") != "static_demo"
+    assert "Architecture" in r["markdown"] or "Plan" in r["markdown"] or "Plan" in r["solution"]
 
 
 def test_garbled_quality_gate():

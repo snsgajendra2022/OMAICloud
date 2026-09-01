@@ -45,6 +45,13 @@ def _plan_for(intent: str, goal: str) -> list[str]:
         "Propose a practical solution",
         "Verify the answer matches the user's goal",
     ]
+    if intent == "performance":
+        return [
+            "Restate the symptom (slow website/app)",
+            "List likely causes: DB queries, images, JS bundle, server, API latency, cache",
+            "Ask for evidence (timing, waterfall, logs) before scaling hardware",
+            "Propose the cheapest verification step first",
+        ]
     if intent == "debugging":
         return [
             "Restate the failure clearly",
@@ -67,10 +74,11 @@ def _plan_for(intent: str, goal: str) -> list[str]:
         ]
     if intent == "coding":
         return [
-            "Clarify the coding goal",
-            "Outline files/components involved",
-            "Provide implementation guidance",
-            "Suggest tests",
+            "Clarify requirement (not only one file)",
+            "Architecture: frontend, backend, data, auth, security",
+            "Choose technology from context or stated stack",
+            "Implement with validation",
+            "Testing and deployment notes",
         ]
     if intent == "completion":
         return [
@@ -89,8 +97,8 @@ def _public_understanding(meaning: MeaningResult, intent: IntentResult) -> str:
         return ""
     if meaning.confidence < 0.7:
         return ""
-    # Keep short for tiny context + UI.
-    return f"Understanding: {meaning.understood_meaning}"
+    title = meaning.canonical_intent or meaning.understood_meaning
+    return f"Understanding: {title}"
 
 
 def _system_hint(u: UnderstandingResult) -> str:
@@ -145,13 +153,19 @@ class UnderstandingPipeline:
             messages,
             project_instructions=project_instructions,
             memory_snippets=memory_snippets,
+            current_text=meaning.corrected or original,
         )
-        plan = _plan_for(intent.intent, meaning.goal)
+        goal = meaning.goal
+        understood = meaning.understood_meaning
+        if ctx.resolved_followup:
+            goal = ctx.resolved_followup
+            understood = ctx.resolved_followup
+        plan = _plan_for(intent.intent, goal)
         result = UnderstandingResult(
             original=original,
             corrected=meaning.corrected,
-            understood_meaning=meaning.understood_meaning,
-            goal=meaning.goal,
+            understood_meaning=understood,
+            goal=goal,
             intent=intent.intent,
             category=intent.category,
             needs_solution=intent.needs_solution,
@@ -161,6 +175,11 @@ class UnderstandingPipeline:
             meta={
                 "tokens_changed": meaning.corrected.lower() != original.lower(),
                 "context_users": len(ctx.recent_user),
+                "tokens": list(meaning.tokens),
+                "canonical_intent": meaning.canonical_intent,
+                "language": meaning.language,
+                "project_topic": ctx.project_topic,
+                "resolved_followup": ctx.resolved_followup,
             },
         )
         result.public_understanding = _public_understanding(meaning, intent)
