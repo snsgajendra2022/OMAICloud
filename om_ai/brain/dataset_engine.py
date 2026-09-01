@@ -4,6 +4,7 @@ Indexes instruction→output pairs from OM knowledge brain / genesis / chat SFT
 into a local SQLite TF-IDF store used when the tiny model fails quality checks.
 """
 from __future__ import annotations
+from om_ai.knowledge.quality_filter import KnowledgeQualityFilter
 
 import hashlib
 import json
@@ -19,12 +20,17 @@ from typing import Any, Iterable
 DEFAULT_QA_DB = "artifacts/brain_qa.sqlite3"
 DEFAULT_TENANT = "default"
 
-_CORPUS_CANDIDATES = [
-    "data/om-knowledge-brain-v1/train/om_knowledge_instruct_v1.jsonl",
-    "data/omai-genesis-v1/train/omai_genesis_instruct_v1.jsonl",
-    "data/om-chat-sft-v4-complete.jsonl",
-    "data/continuous/sft_replay.jsonl",
-]
+_CORPUS_PRIORITY = {
+
+    "om-knowledge-brain-v1": 1.0,
+
+    "om-chat-sft-v4-complete": 0.9,
+
+    "omai-genesis-v1": 0.8,
+
+    "sft_replay": 0.7,
+
+}
 
 
 def _repo_root() -> Path:
@@ -279,7 +285,7 @@ def status() -> dict[str, Any]:
     }
 
 
-def retrieve_answer(query: str, *, k: int = 5, min_score: float = 0.18) -> dict[str, Any] | None:
+def retrieve_answer(query: str, *, k: int = 5, min_score: float = 0.65) -> dict[str, Any] | None:
     """Return best dataset-grounded answer for a user query."""
     q = (query or "").strip()
     if not q:
@@ -352,32 +358,37 @@ def retrieve_answer(query: str, *, k: int = 5, min_score: float = 0.18) -> dict[
     scored.sort(key=lambda x: x[0], reverse=True)
     best_score, best = scored[0]
     answer = str(best["answer"] or "").strip()
-    if not answer:
+    quality = KnowledgeQualityFilter()
+    check = quality.validate(query, answer, best["domain"])
+    if not check["valid"]:
         return None
 
-    header = (
-        f"**OM dataset brain** (matched `{best['domain'] or 'general'}` · "
-        f"score {best_score:.2f} · source `{best['source']}`)\n\n"
-    )
-    body = answer
-    extras = []
+    related = []
+
     for sc, row in scored[1:k]:
         if sc < best_score * 0.75:
             break
-        snippet = " ".join(str(row["answer"] or "").strip().splitlines()[:3])[:220]
-        if snippet:
-            extras.append(f"- ({sc:.2f}) {snippet}")
-    if extras:
-        body += "\n\n### Related knowledge\n" + "\n".join(extras[:3])
 
+        snippet = " ".join(
+            str(row["answer"] or "").strip().splitlines()[:3]
+        )[:220]
+
+        if snippet:
+            related.append({
+                "score": sc,
+                "snippet": snippet,
+                "source": row["source"],
+                "domain": row["domain"],
+            })
     return {
-        "answer": header + body,
+        "answer": answer,
         "score": best_score,
         "source": best["source"],
         "domain": best["domain"],
         "question": best["question"],
         "id": best["id"],
         "candidates": len(scored),
+        "related": related[:3],
     }
 
 

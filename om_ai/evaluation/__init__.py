@@ -6,7 +6,6 @@ import time
 from pathlib import Path
 from typing import Any
 
-from om_ai.eval.platform import run_suite
 from om_ai.evaluation.online import evaluate_response
 
 
@@ -54,6 +53,8 @@ def run_evaluation(
     out: str | Path = "artifacts/eval/foundation_report.json",
     feed_learning: bool = True,
 ) -> dict[str, Any]:
+    from om_ai.eval.platform import run_suite
+
     result = run_suite(report_path=None)
     report = write_report(result, out)
     if feed_learning and report.get("weak_areas"):

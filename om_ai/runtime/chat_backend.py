@@ -437,6 +437,65 @@ def chat_reply(
         if intel.direct_reply:
             return intel.direct_reply, info_base
 
+        # Structured cognitive brain — instance.process(question), never import-time.
+        from om_ai.runtime.chat_orchestrator import run_cognitive_brain
+        from om_ai.response_engine import format_assistant_reply
+        from om_ai.understanding.query_kind import is_greeting, query_kind
+
+        skip_cog = is_greeting(user_text)
+        try:
+            if not skip_cog:
+                cog = run_cognitive_brain(user_text)
+                cog_answer = str(
+                    cog.get("user_response") or cog.get("answer") or ""
+                ).strip()
+                from om_ai.core.response.response_formatter import response_mode
+
+                if response_mode() == "developer":
+                    cog_answer = str(cog.get("developer_response") or cog_answer).strip()
+                cog_eval = cog.get("evaluation") or {}
+                cog_tech = cog.get("technology") or {}
+                cog_tasks = cog.get("tasks") or {}
+                kind = query_kind(user_text)
+                leak = any(
+                    token in cog_answer.lower()
+                    for token in ("agents:", "self-critique", "self critique", "knowledge context")
+                )
+                structured = bool(
+                    cog_tech.get("technology")
+                    or (cog_tasks.get("category") not in {None, "", "general"})
+                    or kind in {"knowledge", "coding", "business"}
+                )
+                if (
+                    structured
+                    and cog_answer
+                    and len(cog_answer) > 40
+                    and not leak
+                    and (kind in {"knowledge", "coding", "business"} or cog_eval.get("approved", True))
+                ):
+                    polished = format_assistant_reply(
+                        cog_answer,
+                        intent=kind if kind != "general" else str((cog.get("intent") or {}).get("intent") or "coding"),
+                        enhance=True,
+                    )
+                    info_cog = ChatBackendInfo(
+                        backend=info.backend,
+                        model=info.model,
+                        detail=info.detail,
+                        provider=info.provider,
+                        live_knowledge={
+                            "intelligence": intel.meta,
+                            "cognitive_brain": {
+                                "technology": cog_tech,
+                                "tasks": cog_tasks.get("tasks"),
+                                "evaluation": cog_eval,
+                            },
+                        },
+                    )
+                    return polished, info_cog
+        except Exception as exc:
+            logger.debug("OMCognitiveBrain.process skipped: %s", exc)
+
         # Absolute Intelligence OS — full cognitive cycle (memory/knowledge/reason/agents/learn)
         absolute_on = (_env("OM_ABSOLUTE_OS") or "1").lower() not in {"0", "false", "no", "off"}
         if absolute_on and user_text.strip() and not (

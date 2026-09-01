@@ -44,6 +44,7 @@ _TOKEN_GLOSS: dict[str, str] = {
 }
 
 _FRAMEWORKS = {
+    "react native": "React Native",
     "react": "React",
     "vue": "Vue",
     "angular": "Angular",
@@ -61,6 +62,7 @@ _FRAMEWORKS = {
 
 _OBJECTS: list[tuple[re.Pattern[str], str]] = [
     (re.compile(r"\b(login|sign\s*in|auth)\b.*\b(page|screen|ui)\b|\b(page|screen|ui)\b.*\b(login|sign\s*in)\b", re.I), "Login Page"),
+    (re.compile(r"\blogin\b.*\bdashboard\b|\bdashboard\b.*\blogin\b", re.I), "Login and Dashboard"),
     (re.compile(r"\b(signup|sign\s*up|register)\b", re.I), "Signup Page"),
     (re.compile(r"\bdashboard\b", re.I), "Dashboard"),
     (re.compile(r"\bapi\b.*\b(project|service|backend)\b|\b(project|service|backend)\b.*\bapi\b", re.I), "API Project"),
@@ -132,7 +134,7 @@ def canonical_task_title(corrected: str) -> str:
         action = "Explain"
 
     framework = ""
-    for key, label in _FRAMEWORKS.items():
+    for key, label in sorted(_FRAMEWORKS.items(), key=lambda kv: len(kv[0]), reverse=True):
         if re.search(rf"\b{re.escape(key)}\b", t):
             framework = label
             break

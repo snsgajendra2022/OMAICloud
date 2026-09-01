@@ -58,7 +58,20 @@ def test_policy_recovery_never_injects_static():
     assert policy_recovery_reply("नमस्ते", reason="empty", language="hi") is None
 
 
-def test_assistant_chitchat_requires_markers():
+def test_cognitive_brain_process_requires_question():
+    from om_ai.runtime.chat_orchestrator import run_cognitive_brain
+
+    result = run_cognitive_brain("create react native login and dashboard app")
+    tech = result["technology"]
+    assert tech["technology"] == "react native"
+    assert tech["category"] == "mobile"
+    assert tech["platform"] == "android_ios"
+    assert result["evaluation"]["approved"] is True
+    user = (result.get("user_response") or result.get("answer") or "").lower()
+    assert "react native" in user
+    assert "agents:" not in user
+    assert "self-critique" not in user
+    assert any("login" in str(t).lower() for t in (result["tasks"] or {}).get("tasks") or [])
     from om_ai.runtime.chat_orchestrator import looks_like_assistant_chitchat
 
     assert looks_like_assistant_chitchat("Hi! How can I help you today?")

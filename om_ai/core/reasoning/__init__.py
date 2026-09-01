@@ -1,4 +1,4 @@
-"""Core reasoning stack: analyze → plan → solve → verify → reflect."""
+"""OM-1.0 Cognition Layer — analyze, plan, solve, verify."""
 from __future__ import annotations
 
 from .analyzer import IntentAnalyzer
@@ -7,6 +7,7 @@ from .solver import SolutionGenerator
 from .verifier import VerificationEngine
 from .reflection import ReflectionEngine
 from .pipeline import run_reasoning_pipeline
+from .reasoning_chain import ReasoningChain
 
 __all__ = [
     "IntentAnalyzer",
@@ -15,4 +16,5 @@ __all__ = [
     "VerificationEngine",
     "ReflectionEngine",
     "run_reasoning_pipeline",
+    "ReasoningChain",
 ]

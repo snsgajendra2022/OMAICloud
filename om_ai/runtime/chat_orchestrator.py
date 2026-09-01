@@ -11,6 +11,13 @@ from om_ai.runtime.system_prompts import active_system_prompt
 logger = logging.getLogger(__name__)
 
 
+def run_cognitive_brain(question: str, *, knowledge: Any = None) -> dict[str, Any]:
+    """Run OMCognitiveBrain.process with a real user question (never at import)."""
+    from om_ai.core.cognitive.brain_pipeline import OMCognitiveBrain
+
+    return OMCognitiveBrain().process(question, knowledge=knowledge)
+
+
 def _env_float(name: str, default: float) -> float:
     raw = (os.getenv(name) or "").strip()
     if not raw:

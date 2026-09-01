@@ -279,6 +279,25 @@ def run_cycle(
         pass
 
     try:
+        from om_ai.core.response.response_formatter import ResponseFormatter, response_mode
+
+        fmt = ResponseFormatter()
+        payload = {
+            "question": goal,
+            "intent": {"intent": intent},
+            "answer": result.response,
+            "reasoning": result.cognition or {},
+            "technology": (result.cognition or {}).get("technology") or {},
+            "plan": result.plan or [],
+            "evaluation": (result.verification or {}).get("evaluation") or {},
+        }
+        if response_mode() != "developer":
+            result.response = fmt.format_user_response(payload)
+        result.meta["developer_response"] = fmt.format_developer_response(payload)
+    except Exception:
+        pass
+
+    try:
         from om_ai.memory.session import record_turn
 
         result.meta["memory_write"] = record_turn(

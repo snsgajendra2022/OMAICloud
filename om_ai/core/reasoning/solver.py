@@ -10,6 +10,17 @@ from .analyzer import IntentResult
 from .planner import PlanResult
 
 
+def _intent_engine():
+    from om_ai.cognition.intent_engine import IntentEngine
+
+    return IntentEngine()
+
+
+def _relevance_checker():
+    from om_ai.rag.relevance_checker import RelevanceChecker
+
+    return RelevanceChecker(min_score=0.65)
+
 def _static_templates_enabled() -> bool:
     return os.environ.get("OM_STATIC_TEMPLATES", "0").strip().lower() in {
         "1",
@@ -50,34 +61,75 @@ def _extract_code_block(text: str) -> str | None:
     return text.strip()
 
 
-def _solution_from_dataset(question: str) -> tuple[str, list[str], list[str], dict[str, Any]] | None:
+def _solution_from_dataset(
+    question: str,
+) -> tuple[str, list[str], list[str], dict[str, Any]] | None:
+    """
+    Retrieve dataset knowledge only when it is relevant to the user's
+    actual intent. Dataset text is treated as knowledge, not blindly
+    trusted as the final answer.
+    """
     try:
         from om_ai.brain.dataset_engine import retrieve_answer
 
-        hit = retrieve_answer(question, min_score=0.2)
+        # 1. Understand the user's request first.
+        detected_intent = _intent_engine().analyze(question)
+
+        # 2. Retrieve candidate knowledge.
+        hit = retrieve_answer(question, min_score=0.65)
+
         if not hit:
             return None
+
+        # 3. Validate retrieved knowledge against intent/domain/score.
+        decision = _relevance_checker().check(
+            question,
+            hit,
+            detected_intent,
+        )
+
+        if not decision.accepted:
+            return None
+
         answer = str(hit.get("answer") or "").strip()
+
         if len(answer) < 60:
             return None
-        arch = ["Retrieved from ingested OM corpora", "Verify against your repo"]
+
+        arch = [
+            "Intent-aware OM dataset retrieval",
+            "Retrieved knowledge passed relevance validation",
+        ]
+
         notes = [
             f"source={hit.get('source')}",
             f"domain={hit.get('domain')}",
             f"score={hit.get('score')}",
+            f"intent_domain={detected_intent.get('domain')}",
+            f"relevance={decision.reason}",
         ]
+
         meta = {
             "template": None,
             "source": "dataset_brain",
             "dataset_id": hit.get("id"),
             "score": hit.get("score"),
+            "intent": detected_intent,
+            "relevance": {
+                "accepted": decision.accepted,
+                "reason": decision.reason,
+                "confidence": decision.confidence,
+            },
         }
+
         body = (
             f"**Ask:** {question.strip()[:300]}\n\n"
             f"**Understanding:** {intent_understanding_stub(question)}\n\n"
             f"{answer}\n"
         )
+
         return body, arch, notes, meta
+
     except Exception:
         return None
 
@@ -258,6 +310,11 @@ class SolutionGenerator:
         q = (question or "").strip()
         hits = list(knowledge_hits or [])
         meta: dict[str, Any] = {"solver": "om-solver-v3"}
+        tech_name = str(((intent.meta or {}).get("technology") or {}).get("technology") or "").lower()
+        blob = " ".join(hits).lower()
+        hits_fit = True
+        if intent.intent in {"coding", "debug", "architecture"} and tech_name:
+            hits_fit = tech_name in blob or "```" in blob
 
         # 1) Real corpus retrieval (not canned code)
         ds = _solution_from_dataset(q)
@@ -267,8 +324,8 @@ class SolutionGenerator:
             return SolutionResult(solution=solution, architecture=arch, implementation_notes=notes, meta=meta)
 
         # 2) RAG / knowledge hits passed into pipeline
-        kh = _solution_from_knowledge_hits(q, hits, intent, plan)
-        if kh and ( "```" in kh[0] or len(hits) >= 2):
+        kh = _solution_from_knowledge_hits(q, hits, intent, plan) if hits_fit else None
+        if kh and ("```" in kh[0] or (len(hits) >= 2 and hits_fit and intent.intent not in {"coding", "debug", "architecture"})):
             solution, arch, notes, m = kh
             meta.update(m)
             return SolutionResult(solution=solution, architecture=arch, implementation_notes=notes, meta=meta)
@@ -293,7 +350,7 @@ class SolutionGenerator:
                 return SolutionResult(solution=solution, architecture=arch, implementation_notes=notes, meta=meta)
 
         # 5) Knowledge hits without code, or general intent
-        if kh:
+        if kh and hits_fit:
             solution, arch, notes, m = kh
             meta.update(m)
             return SolutionResult(solution=solution, architecture=arch, implementation_notes=notes, meta=meta)

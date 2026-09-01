@@ -10,7 +10,6 @@ import torch
 from om_ai.core.config import ModelConfig
 from om_ai.model import OMTransformer
 from om_ai.tokenizer import ByteBPETokenizer, load_tokenizer
-from om_ai.data import DatasetPipeline
 from om_ai.training import (
     Trainer,
     TrainingConfig,
@@ -134,6 +133,8 @@ def model_info(args):
 
 
 def tokenizer_train(args):
+    from om_ai.data import DatasetPipeline
+
     records = DatasetPipeline().process(DatasetPipeline.load(args.input))
     texts = [r.text for r in records]
     tok = ByteBPETokenizer.train(texts, vocab_size=args.vocab_size, min_pair_freq=args.min_pair_freq)

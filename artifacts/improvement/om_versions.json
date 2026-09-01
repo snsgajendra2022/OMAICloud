@@ -1,461 +1,36 @@
 {
   "om_version": "1.0",
-  "improve_cycle": 86,
-  "label": "OM-1.0-improve-86",
+  "improve_cycle": 137,
+  "label": "OM-1.0-improve-137",
   "history": [
     {
-      "ts": 1787730343.3137379,
-      "cycle": 37,
-      "note": "improve from: ionic login page ui code",
+      "ts": 1788246839.796764,
+      "cycle": 88,
+      "note": "improve from: Create react netive code for hi how are you",
       "metrics": {
-        "overall": 43.0,
+        "overall": 73.3,
         "weak": [
-          "structure",
-          "clarity",
-          "task_fit",
+          "security",
+          "code_quality"
+        ]
+      }
+    },
+    {
+      "ts": 1788246839.893795,
+      "cycle": 89,
+      "note": "improve from: create react netive code",
+      "metrics": {
+        "overall": 68.9,
+        "weak": [
+          "security",
           "code_quality",
           "overall"
         ]
       }
     },
     {
-      "ts": 1787730411.7243059,
-      "cycle": 38,
-      "note": "improve from: Hey \u2014 good to see you.\n\n## Understanding\nUser wants help with: Turn this into a ",
-      "metrics": {
-        "overall": 62.4,
-        "weak": [
-          "structure",
-          "clarity",
-          "code_quality",
-          "overall"
-        ]
-      }
-    },
-    {
-      "ts": 1787730424.485674,
-      "cycle": 39,
-      "note": "improve from: Hey \u2014 good to see you.\n\n## Understanding\nUser wants help with: Turn this into a ",
-      "metrics": {
-        "overall": 62.4,
-        "weak": [
-          "structure",
-          "clarity",
-          "code_quality",
-          "overall"
-        ]
-      }
-    },
-    {
-      "ts": 1787730427.361525,
-      "cycle": 40,
-      "note": "improve from: Hey \u2014 good to see you.\n\n## Understanding\nUser wants help with: Turn this into a ",
-      "metrics": {
-        "overall": 50.6,
-        "weak": [
-          "structure",
-          "clarity",
-          "task_fit",
-          "code_quality",
-          "overall"
-        ]
-      }
-    },
-    {
-      "ts": 1787730449.86427,
-      "cycle": 41,
-      "note": "improve from: For better answers:\n1) Share a little context (who / what / why)\n2) Say how you ",
-      "metrics": {
-        "overall": 50.7,
-        "weak": [
-          "structure",
-          "clarity",
-          "task_fit",
-          "code_quality",
-          "overall"
-        ]
-      }
-    },
-    {
-      "ts": 1787730482.154971,
-      "cycle": 42,
-      "note": "improve from: http://127.0.0.1:8080/chat do not stoping then you are not improve ypur nolage",
-      "metrics": {
-        "overall": 59.1,
-        "weak": [
-          "structure",
-          "clarity",
-          "task_fit",
-          "overall"
-        ]
-      }
-    },
-    {
-      "ts": 1787730507.7607691,
-      "cycle": 43,
-      "note": "improve from: remoev ti syou code ened garte thing ans pelase I\u2019m with you. I hear you about \u201c",
-      "metrics": {
-        "overall": 62.4,
-        "weak": [
-          "structure",
-          "clarity",
-          "code_quality",
-          "overall"
-        ]
-      }
-    },
-    {
-      "ts": 1787730533.85333,
-      "cycle": 44,
-      "note": "improve from: google find this uirl what is pm in ndta",
-      "metrics": {
-        "overall": 51.4,
-        "weak": [
-          "structure",
-          "clarity",
-          "task_fit",
-          "overall"
-        ]
-      }
-    },
-    {
-      "ts": 1787730584.017344,
-      "cycle": 45,
-      "note": "improve from: mp name in india",
-      "metrics": {
-        "overall": 49.0,
-        "weak": [
-          "structure",
-          "clarity",
-          "task_fit",
-          "overall"
-        ]
-      }
-    },
-    {
-      "ts": 1787733047.016342,
-      "cycle": 46,
-      "note": "improve from: hello how are you",
-      "metrics": {
-        "overall": 62.5,
-        "weak": [
-          "structure",
-          "clarity",
-          "task_fit",
-          "overall"
-        ]
-      }
-    },
-    {
-      "ts": 1787733744.970339,
-      "cycle": 47,
-      "note": "improve from: helloYou are Kids School AI Assistant \u2014 the universal AI assistant embedded in \"",
-      "metrics": {
-        "overall": 63.0,
-        "weak": [
-          "structure",
-          "clarity",
-          "code_quality",
-          "overall"
-        ]
-      }
-    },
-    {
-      "ts": 1787733790.250443,
-      "cycle": 48,
-      "note": "improve from: opne kg 1aYou are Kids School AI Assistant \u2014 the universal AI assistant embedded",
-      "metrics": {
-        "overall": 57.0,
-        "weak": [
-          "structure",
-          "clarity",
-          "code_quality",
-          "overall"
-        ]
-      }
-    },
-    {
-      "ts": 1787733806.625419,
-      "cycle": 49,
-      "note": "improve from: ad stduentYou are Kids School AI Assistant \u2014 the universal AI assistant embedded",
-      "metrics": {
-        "overall": 63.2,
-        "weak": [
-          "structure",
-          "clarity",
-          "code_quality",
-          "overall"
-        ]
-      }
-    },
-    {
-      "ts": 1787734066.567883,
-      "cycle": 50,
-      "note": "improve from: good moringYou are Kids School AI Assistant \u2014 the universal AI assistant embedde",
-      "metrics": {
-        "overall": 62.2,
-        "weak": [
-          "structure",
-          "clarity",
-          "code_quality",
-          "overall"
-        ]
-      }
-    },
-    {
-      "ts": 1787734081.660697,
-      "cycle": 51,
-      "note": "improve from: need screenshort dahsbaordYou are Kids School AI Assistant \u2014 the universal AI as",
-      "metrics": {
-        "overall": 62.6,
-        "weak": [
-          "structure",
-          "clarity",
-          "code_quality",
-          "overall"
-        ]
-      }
-    },
-    {
-      "ts": 1787734352.840102,
-      "cycle": 52,
-      "note": "improve from: screenshot send me in same screenYou are Kids School AI Assistant \u2014 the universa",
-      "metrics": {
-        "overall": 62.4,
-        "weak": [
-          "structure",
-          "clarity",
-          "code_quality",
-          "overall"
-        ]
-      }
-    },
-    {
-      "ts": 1787734367.395974,
-      "cycle": 53,
-      "note": "improve from: waht is this and ??You are Kids School AI Assistant \u2014 the universal AI assistant",
-      "metrics": {
-        "overall": 62.4,
-        "weak": [
-          "structure",
-          "clarity",
-          "code_quality",
-          "overall"
-        ]
-      }
-    },
-    {
-      "ts": 1787734369.6557791,
-      "cycle": 54,
-      "note": "improve from: this is correctYou are Kids School AI Assistant \u2014 the universal AI assistant emb",
-      "metrics": {
-        "overall": 63.0,
-        "weak": [
-          "structure",
-          "clarity",
-          "code_quality",
-          "overall"
-        ]
-      }
-    },
-    {
-      "ts": 1787734379.623512,
-      "cycle": 55,
-      "note": "improve from: thisis wrong ansYou are Kids School AI Assistant \u2014 the universal AI assistant em",
-      "metrics": {
-        "overall": 63.0,
-        "weak": [
-          "structure",
-          "clarity",
-          "code_quality",
-          "overall"
-        ]
-      }
-    },
-    {
-      "ts": 1787838814.639331,
-      "cycle": 56,
-      "note": "improve from: can you  hanlde my ai tool om",
-      "metrics": {
-        "overall": 65.4,
-        "weak": [
-          "structure",
-          "clarity",
-          "overall"
-        ]
-      }
-    },
-    {
-      "ts": 1787838837.382655,
-      "cycle": 57,
-      "note": "improve from: create paython code",
-      "metrics": {
-        "overall": 48.7,
-        "weak": [
-          "structure",
-          "clarity",
-          "task_fit",
-          "code_quality",
-          "overall"
-        ]
-      }
-    },
-    {
-      "ts": 1787838852.807065,
-      "cycle": 58,
-      "note": "improve from: Analysis payhthon",
-      "metrics": {
-        "overall": 54.2,
-        "weak": [
-          "structure",
-          "clarity",
-          "task_fit",
-          "overall"
-        ]
-      }
-    },
-    {
-      "ts": 1787838860.963564,
-      "cycle": 59,
-      "note": "improve from: go to dashbaord",
-      "metrics": {
-        "overall": 56.9,
-        "weak": [
-          "structure",
-          "clarity",
-          "task_fit",
-          "overall"
-        ]
-      }
-    },
-    {
-      "ts": 1787838989.819186,
-      "cycle": 60,
-      "note": "improve from: i am rohit hello om we are info to you i am ower for you  om please read the wor",
-      "metrics": {
-        "overall": 59.0,
-        "weak": [
-          "structure",
-          "clarity",
-          "task_fit",
-          "overall"
-        ]
-      }
-    },
-    {
-      "ts": 1787838999.672267,
-      "cycle": 61,
-      "note": "improve from: i am rohit om we are info to you i am ower for you om please read the world knol",
-      "metrics": {
-        "overall": 56.6,
-        "weak": [
-          "structure",
-          "clarity",
-          "task_fit",
-          "overall"
-        ]
-      }
-    },
-    {
-      "ts": 1787839195.150002,
-      "cycle": 62,
-      "note": "improve from: hiiii",
-      "metrics": {
-        "overall": 54.4,
-        "weak": [
-          "structure",
-          "clarity",
-          "task_fit",
-          "overall"
-        ]
-      }
-    },
-    {
-      "ts": 1787839198.276066,
-      "cycle": 63,
-      "note": "improve from: how are you",
-      "metrics": {
-        "overall": 62.5,
-        "weak": [
-          "structure",
-          "clarity",
-          "task_fit",
-          "overall"
-        ]
-      }
-    },
-    {
-      "ts": 1787839205.086263,
-      "cycle": 64,
-      "note": "improve from: Code development",
-      "metrics": {
-        "overall": 43.0,
-        "weak": [
-          "structure",
-          "clarity",
-          "task_fit",
-          "code_quality",
-          "overall"
-        ]
-      }
-    },
-    {
-      "ts": 1787839220.114809,
-      "cycle": 65,
-      "note": "improve from: create the react ragister page",
-      "metrics": {
-        "overall": 48.5,
-        "weak": [
-          "structure",
-          "clarity",
-          "task_fit",
-          "code_quality",
-          "overall"
-        ]
-      }
-    },
-    {
-      "ts": 1787839324.624383,
-      "cycle": 66,
-      "note": "improve from: do not need anyhting in dummy and static i have sue the mostted using power full",
-      "metrics": {
-        "overall": 69.2,
-        "weak": [
-          "structure",
-          "clarity",
-          "overall"
-        ]
-      }
-    },
-    {
-      "ts": 1787839855.7781088,
-      "cycle": 67,
-      "note": "improve from: how are you you can ai",
-      "metrics": {
-        "overall": 49.0,
-        "weak": [
-          "structure",
-          "clarity",
-          "task_fit",
-          "overall"
-        ]
-      }
-    },
-    {
-      "ts": 1787840033.651606,
-      "cycle": 68,
-      "note": "improve from: create signup page ui",
-      "metrics": {
-        "overall": 70.4,
-        "weak": [
-          "clarity",
-          "task_fit"
-        ]
-      }
-    },
-    {
-      "ts": 1787840330.483917,
-      "cycle": 69,
+      "ts": 1788248002.069442,
+      "cycle": 90,
       "note": "improve from: hii",
       "metrics": {
         "overall": 54.3,
@@ -468,33 +43,36 @@
       }
     },
     {
-      "ts": 1788243701.590573,
-      "cycle": 70,
-      "note": "improve from: didi you see this what is issue here to @solver.py (1-240)  this is store the co",
+      "ts": 1788248018.7051919,
+      "cycle": 91,
+      "note": "improve from: Create react  dashabrod for hi how are you",
       "metrics": {
-        "overall": 80.6,
+        "overall": 73.2,
         "weak": [
+          "security",
           "code_quality"
         ]
       }
     },
     {
-      "ts": 1788243701.653772,
-      "cycle": 71,
-      "note": "improve from: didi you see this what is issue here to @solver.py (1-240)  this is store the co",
+      "ts": 1788248018.901665,
+      "cycle": 92,
+      "note": "improve from: create react  dashabrod",
       "metrics": {
-        "overall": 80.6,
+        "overall": 66.4,
         "weak": [
-          "code_quality"
+          "security",
+          "code_quality",
+          "overall"
         ]
       }
     },
     {
-      "ts": 1788245186.68513,
-      "cycle": 72,
-      "note": "improve from: hello how are you?",
+      "ts": 1788248335.1405199,
+      "cycle": 93,
+      "note": "improve from: good moring",
       "metrics": {
-        "overall": 54.2,
+        "overall": 49.0,
         "weak": [
           "structure",
           "clarity",
@@ -504,11 +82,70 @@
       }
     },
     {
-      "ts": 1788245466.599051,
-      "cycle": 73,
+      "ts": 1788248359.1028311,
+      "cycle": 94,
+      "note": "improve from: Create React login/signup UI with validation and auth integration",
+      "metrics": {
+        "overall": 82.7,
+        "weak": [
+          "code_quality"
+        ]
+      }
+    },
+    {
+      "ts": 1788248359.347466,
+      "cycle": 95,
+      "note": "improve from: create the react netive screen of login and dashboard page withe css",
+      "metrics": {
+        "overall": 80.7,
+        "weak": [
+          "code_quality"
+        ]
+      }
+    },
+    {
+      "ts": 1788250914.297626,
+      "cycle": 96,
+      "note": "improve from: Explain that PM in India means Prime Minister (head of government).",
+      "metrics": {
+        "overall": 68.5,
+        "weak": [
+          "structure",
+          "clarity",
+          "overall"
+        ]
+      }
+    },
+    {
+      "ts": 1788251906.6154618,
+      "cycle": 97,
+      "note": "improve from: Explain that PM in India means Prime Minister (head of government).",
+      "metrics": {
+        "overall": 68.5,
+        "weak": [
+          "structure",
+          "clarity",
+          "overall"
+        ]
+      }
+    },
+    {
+      "ts": 1788251907.6625128,
+      "cycle": 98,
+      "note": "improve from: Create React Dashboard",
+      "metrics": {
+        "overall": 75.0,
+        "weak": [
+          "code_quality"
+        ]
+      }
+    },
+    {
+      "ts": 1788251970.624232,
+      "cycle": 99,
       "note": "improve from: hey",
       "metrics": {
-        "overall": 57.3,
+        "overall": 54.2,
         "weak": [
           "structure",
           "clarity",
@@ -518,11 +155,469 @@
       }
     },
     {
-      "ts": 1788245915.075837,
-      "cycle": 74,
-      "note": "improve from: Help implement or improve the code.",
+      "ts": 1788251973.268259,
+      "cycle": 100,
+      "note": "improve from: what is this",
       "metrics": {
-        "overall": 71.0,
+        "overall": 56.2,
+        "weak": [
+          "structure",
+          "clarity",
+          "overall"
+        ]
+      }
+    },
+    {
+      "ts": 1788251976.460804,
+      "cycle": 101,
+      "note": "improve from: what is this",
+      "metrics": {
+        "overall": 54.7,
+        "weak": [
+          "structure",
+          "clarity",
+          "task_fit",
+          "overall"
+        ]
+      }
+    },
+    {
+      "ts": 1788251977.9798038,
+      "cycle": 102,
+      "note": "improve from: What are you ding (for what are you ding)",
+      "metrics": {
+        "overall": 71.4,
+        "weak": [
+          "clarity"
+        ]
+      }
+    },
+    {
+      "ts": 1788251978.056237,
+      "cycle": 103,
+      "note": "improve from: what are you ding",
+      "metrics": {
+        "overall": 71.4,
+        "weak": [
+          "clarity"
+        ]
+      }
+    },
+    {
+      "ts": 1788252001.987246,
+      "cycle": 104,
+      "note": "improve from: Help Memory System",
+      "metrics": {
+        "overall": 69.1,
+        "weak": [
+          "clarity",
+          "overall"
+        ]
+      }
+    },
+    {
+      "ts": 1788252002.129365,
+      "cycle": 105,
+      "note": "improve from: why your are display this local and this I\u2019m OM AI \u2014 local model + dataset brain",
+      "metrics": {
+        "overall": 75.9,
+        "weak": [
+          "clarity"
+        ]
+      }
+    },
+    {
+      "ts": 1788252010.274187,
+      "cycle": 106,
+      "note": "improve from: i want this undestent ths local and what",
+      "metrics": {
+        "overall": 68.2,
+        "weak": [
+          "structure",
+          "clarity",
+          "overall"
+        ]
+      }
+    },
+    {
+      "ts": 1788252010.533916,
+      "cycle": 107,
+      "note": "improve from: i want this undestent ths local and what",
+      "metrics": {
+        "overall": 68.2,
+        "weak": [
+          "structure",
+          "clarity",
+          "overall"
+        ]
+      }
+    },
+    {
+      "ts": 1788252018.864311,
+      "cycle": 108,
+      "note": "improve from: Explain that PM in India means Prime Minister (head of government).",
+      "metrics": {
+        "overall": 81.0,
+        "weak": [
+          "clarity"
+        ]
+      }
+    },
+    {
+      "ts": 1788252019.056549,
+      "cycle": 109,
+      "note": "improve from: Knowledge context\nIn India, PM means Prime Minister \u2014 the head of government of ",
+      "metrics": {
+        "overall": 75.0,
+        "weak": [
+          "clarity",
+          "code_quality"
+        ]
+      }
+    },
+    {
+      "ts": 1788252189.698196,
+      "cycle": 110,
+      "note": "improve from: Hlo (for OM AI project)",
+      "metrics": {
+        "overall": 58.6,
+        "weak": [
+          "structure",
+          "clarity",
+          "overall"
+        ]
+      }
+    },
+    {
+      "ts": 1788252192.8362,
+      "cycle": 111,
+      "note": "improve from: hlo",
+      "metrics": {
+        "overall": 54.6,
+        "weak": [
+          "structure",
+          "clarity",
+          "task_fit",
+          "overall"
+        ]
+      }
+    },
+    {
+      "ts": 1788252289.259501,
+      "cycle": 112,
+      "note": "improve from: Review this function for bugs and suggest improvements:\n\nfunction merge(a, b) { ",
+      "metrics": {
+        "overall": 76.4,
+        "weak": [
+          "clarity"
+        ]
+      }
+    },
+    {
+      "ts": 1788252290.087806,
+      "cycle": 113,
+      "note": "improve from: Review this function for bugs and suggest improvements:\n\nfunction merge(a, b) { ",
+      "metrics": {
+        "overall": 76.4,
+        "weak": [
+          "clarity"
+        ]
+      }
+    },
+    {
+      "ts": 1788252398.828426,
+      "cycle": 114,
+      "note": "improve from: Explain that PM in India means Prime Minister (head of government).",
+      "metrics": {
+        "overall": 68.5,
+        "weak": [
+          "structure",
+          "clarity",
+          "overall"
+        ]
+      }
+    },
+    {
+      "ts": 1788252542.205388,
+      "cycle": 115,
+      "note": "improve from: hii",
+      "metrics": {
+        "overall": 54.2,
+        "weak": [
+          "structure",
+          "clarity",
+          "task_fit",
+          "overall"
+        ]
+      }
+    },
+    {
+      "ts": 1788252775.8135118,
+      "cycle": 116,
+      "note": "improve from: hi",
+      "metrics": {
+        "overall": 54.3,
+        "weak": [
+          "structure",
+          "clarity",
+          "task_fit",
+          "overall"
+        ]
+      }
+    },
+    {
+      "ts": 1788252786.313691,
+      "cycle": 117,
+      "note": "improve from: what is git",
+      "metrics": {
+        "overall": 60.4,
+        "weak": [
+          "clarity",
+          "task_fit",
+          "overall"
+        ]
+      }
+    },
+    {
+      "ts": 1788252786.526579,
+      "cycle": 118,
+      "note": "improve from: what is git",
+      "metrics": {
+        "overall": 60.4,
+        "weak": [
+          "clarity",
+          "task_fit",
+          "overall"
+        ]
+      }
+    },
+    {
+      "ts": 1788252811.3720472,
+      "cycle": 119,
+      "note": "improve from: hi",
+      "metrics": {
+        "overall": 54.4,
+        "weak": [
+          "structure",
+          "clarity",
+          "task_fit",
+          "overall"
+        ]
+      }
+    },
+    {
+      "ts": 1788252814.566881,
+      "cycle": 120,
+      "note": "improve from: what is GIT",
+      "metrics": {
+        "overall": 60.4,
+        "weak": [
+          "clarity",
+          "task_fit",
+          "overall"
+        ]
+      }
+    },
+    {
+      "ts": 1788252814.773988,
+      "cycle": 121,
+      "note": "improve from: what is GIT",
+      "metrics": {
+        "overall": 60.4,
+        "weak": [
+          "clarity",
+          "task_fit",
+          "overall"
+        ]
+      }
+    },
+    {
+      "ts": 1788253054.775527,
+      "cycle": 122,
+      "note": "improve from: Explain that PM in India means Prime Minister (head of government).",
+      "metrics": {
+        "overall": 80.9,
+        "weak": [
+          "clarity"
+        ]
+      }
+    },
+    {
+      "ts": 1788253082.597473,
+      "cycle": 123,
+      "note": "improve from: hello how are you?",
+      "metrics": {
+        "overall": 56.2,
+        "weak": [
+          "structure",
+          "clarity",
+          "overall"
+        ]
+      }
+    },
+    {
+      "ts": 1788253084.098996,
+      "cycle": 124,
+      "note": "improve from: Create React Dashboard",
+      "metrics": {
+        "overall": 66.7,
+        "weak": [
+          "clarity",
+          "task_fit",
+          "code_quality",
+          "overall"
+        ]
+      }
+    },
+    {
+      "ts": 1788253113.306375,
+      "cycle": 125,
+      "note": "improve from: hello how are you?",
+      "metrics": {
+        "overall": 61.4,
+        "weak": [
+          "structure",
+          "clarity",
+          "overall"
+        ]
+      }
+    },
+    {
+      "ts": 1788253114.544503,
+      "cycle": 126,
+      "note": "improve from: Explain that PM in India means Prime Minister (head of government).",
+      "metrics": {
+        "overall": 80.9,
+        "weak": [
+          "clarity"
+        ]
+      }
+    },
+    {
+      "ts": 1788253116.325161,
+      "cycle": 127,
+      "note": "improve from: Create React Dashboard",
+      "metrics": {
+        "overall": 66.7,
+        "weak": [
+          "clarity",
+          "task_fit",
+          "code_quality",
+          "overall"
+        ]
+      }
+    },
+    {
+      "ts": 1788253423.8818078,
+      "cycle": 128,
+      "note": "improve from: hello",
+      "metrics": {
+        "overall": 51.4,
+        "weak": [
+          "structure",
+          "clarity",
+          "task_fit",
+          "overall"
+        ]
+      }
+    },
+    {
+      "ts": 1788253429.4293811,
+      "cycle": 129,
+      "note": "improve from: what is GIT",
+      "metrics": {
+        "overall": 60.4,
+        "weak": [
+          "clarity",
+          "task_fit",
+          "overall"
+        ]
+      }
+    },
+    {
+      "ts": 1788253429.6396601,
+      "cycle": 130,
+      "note": "improve from: what is GIT",
+      "metrics": {
+        "overall": 60.4,
+        "weak": [
+          "clarity",
+          "task_fit",
+          "overall"
+        ]
+      }
+    },
+    {
+      "ts": 1788253497.546386,
+      "cycle": 131,
+      "note": "improve from: hello ram ram",
+      "metrics": {
+        "overall": 57.0,
+        "weak": [
+          "structure",
+          "clarity",
+          "task_fit",
+          "overall"
+        ]
+      }
+    },
+    {
+      "ts": 1788253510.613369,
+      "cycle": 132,
+      "note": "improve from: Help with the user's request.",
+      "metrics": {
+        "overall": 61.0,
+        "weak": [
+          "structure",
+          "clarity",
+          "overall"
+        ]
+      }
+    },
+    {
+      "ts": 1788253525.013742,
+      "cycle": 133,
+      "note": "improve from: hindu ??",
+      "metrics": {
+        "overall": 57.9,
+        "weak": [
+          "structure",
+          "task_fit",
+          "overall"
+        ]
+      }
+    },
+    {
+      "ts": 1788253821.07422,
+      "cycle": 134,
+      "note": "improve from: how are you",
+      "metrics": {
+        "overall": 56.9,
+        "weak": [
+          "structure",
+          "clarity",
+          "task_fit",
+          "overall"
+        ]
+      }
+    },
+    {
+      "ts": 1788253825.8961651,
+      "cycle": 135,
+      "note": "improve from: Are try to work git (for are try to work GIt)",
+      "metrics": {
+        "overall": 74.1,
+        "weak": [
+          "clarity"
+        ]
+      }
+    },
+    {
+      "ts": 1788253989.5581398,
+      "cycle": 136,
+      "note": "improve from: What is react (for are try to work GIt)",
+      "metrics": {
+        "overall": 73.9,
         "weak": [
           "security",
           "code_quality"
@@ -530,156 +625,18 @@
       }
     },
     {
-      "ts": 1788245916.548824,
-      "cycle": 75,
-      "note": "improve from: hello how are you?",
+      "ts": 1788253989.682722,
+      "cycle": 137,
+      "note": "improve from: what is react",
       "metrics": {
-        "overall": 54.2,
-        "weak": [
-          "structure",
-          "clarity",
-          "task_fit",
-          "overall"
-        ]
-      }
-    },
-    {
-      "ts": 1788245928.001079,
-      "cycle": 76,
-      "note": "improve from: Help implement or improve the code.",
-      "metrics": {
-        "overall": 71.0,
+        "overall": 67.1,
         "weak": [
           "security",
-          "code_quality"
-        ]
-      }
-    },
-    {
-      "ts": 1788245958.633003,
-      "cycle": 77,
-      "note": "improve from: Create React Dashboard",
-      "metrics": {
-        "overall": 75.0,
-        "weak": [
-          "code_quality"
-        ]
-      }
-    },
-    {
-      "ts": 1788245960.700431,
-      "cycle": 78,
-      "note": "improve from: Create React Dashboard",
-      "metrics": {
-        "overall": 75.0,
-        "weak": [
-          "code_quality"
-        ]
-      }
-    },
-    {
-      "ts": 1788245961.919827,
-      "cycle": 79,
-      "note": "improve from: hello how are you?",
-      "metrics": {
-        "overall": 54.2,
-        "weak": [
-          "structure",
-          "clarity",
-          "task_fit",
-          "overall"
-        ]
-      }
-    },
-    {
-      "ts": 1788246582.0384982,
-      "cycle": 80,
-      "note": "improve from: Explain that PM in India means Prime Minister (head of government).",
-      "metrics": {
-        "overall": 68.5,
-        "weak": [
-          "structure",
-          "clarity",
-          "overall"
-        ]
-      }
-    },
-    {
-      "ts": 1788246582.910961,
-      "cycle": 81,
-      "note": "improve from: Create React Dashboard",
-      "metrics": {
-        "overall": 75.0,
-        "weak": [
-          "code_quality"
-        ]
-      }
-    },
-    {
-      "ts": 1788246583.94623,
-      "cycle": 82,
-      "note": "improve from: hello how are you?",
-      "metrics": {
-        "overall": 54.2,
-        "weak": [
-          "structure",
-          "clarity",
-          "task_fit",
-          "overall"
-        ]
-      }
-    },
-    {
-      "ts": 1788246625.0050051,
-      "cycle": 83,
-      "note": "improve from: Explain that PM in India means Prime Minister (head of government).",
-      "metrics": {
-        "overall": 68.5,
-        "weak": [
-          "structure",
-          "clarity",
-          "overall"
-        ]
-      }
-    },
-    {
-      "ts": 1788246690.3994591,
-      "cycle": 84,
-      "note": "improve from: Explain that PM in India means Prime Minister (head of government).",
-      "metrics": {
-        "overall": 68.5,
-        "weak": [
-          "structure",
-          "clarity",
-          "overall"
-        ]
-      }
-    },
-    {
-      "ts": 1788246691.269245,
-      "cycle": 85,
-      "note": "improve from: Create React Dashboard",
-      "metrics": {
-        "overall": 75.0,
-        "weak": [
-          "code_quality"
-        ]
-      }
-    },
-    {
-      "ts": 1788246692.598996,
-      "cycle": 86,
-      "note": "improve from: hello how are you?",
-      "metrics": {
-        "overall": 54.2,
-        "weak": [
-          "structure",
-          "clarity",
-          "task_fit",
+          "code_quality",
           "overall"
         ]
       }
     }
   ],
-  "updated_at": 1788246692.5989969
+  "updated_at": 1788253989.682724
 }

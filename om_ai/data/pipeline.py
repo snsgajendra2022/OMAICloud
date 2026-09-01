@@ -11,7 +11,6 @@ import unicodedata
 
 from om_ai.tokenizer import ByteBPETokenizer
 
-
 @dataclass(slots=True)
 class DocumentRecord:
     text: str

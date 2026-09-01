@@ -69,6 +69,14 @@ class IntentAnalyzer:
         intent, domain = "general", "general"
         u_text = f"User wants help with: {q[:240]}"
         meta: dict[str, Any] = {"analyzer": "om-intent-v2"}
+        try:
+            from om_ai.understanding.query_kind import is_definitional, is_greeting
+
+            meta["query_kind_greeting"] = is_greeting(q)
+            meta["query_kind_definitional"] = is_definitional(q)
+        except Exception:
+            is_definitional = lambda _t: False  # noqa: E731
+            is_greeting = lambda _t: False  # noqa: E731
 
         try:
             from om_ai.understanding import understand_message
@@ -105,6 +113,13 @@ class IntentAnalyzer:
                 if pat.search(q):
                     intent, domain = name, dom
                     break
+
+        # Definitional / greeting always beat stack-token coding ("what is PM in India").
+        if is_definitional(q):
+            intent, domain = "research", "knowledge"
+        elif is_greeting(q):
+            intent, domain = "greeting", "social"
+            u_text = "User is greeting OM."
 
         if intent == "performance" or re.search(r"\b(website|site|app|page)\b.*\bslow\b|\bslow\b.*\b(website|site|app)\b", q, re.I):
             intent = "performance"

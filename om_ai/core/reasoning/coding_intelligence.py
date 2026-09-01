@@ -61,6 +61,7 @@ _PROJECT = re.compile(r"\b(create|make|build|new)\b.*\b(project|app|system|dashb
 _API = re.compile(r"\bapi\b", re.I)
 
 _STACK: list[tuple[str, str]] = [
+    ("react native", "React Native"),
     ("next", "Next.js"),
     ("react", "React"),
     ("vue", "Vue"),
@@ -98,9 +99,11 @@ def _stack(text: str) -> list[str]:
         if needle in t or f"{key}" in t.replace(".", " "):
             if label not in found:
                 found.append(label)
-    # avoid tagging Java from JavaScript
+    # avoid tagging Java from JavaScript, React from React Native
     if "Java" in found and "JavaScript" in found:
         found = [x for x in found if x != "Java"]
+    if "React Native" in found and "React" in found:
+        found = [x for x in found if x != "React"]
     return found
 
 
@@ -121,11 +124,19 @@ def is_project_ask(text: str) -> bool:
 
 
 def _files_for(kind: str, techs: list[str]) -> list[str]:
-    frontend = any(t in techs for t in ("React", "Next.js", "Vue", "Angular", "TypeScript", "JavaScript"))
+    frontend = any(t in techs for t in ("React Native", "React", "Next.js", "Vue", "Angular", "TypeScript", "JavaScript"))
     python_api = any(t in techs for t in ("FastAPI", "Django", "Flask", "Python"))
     php = any(t in techs for t in ("Laravel", "PHP"))
     files: list[str] = []
-    if frontend and "Next.js" in techs:
+    if "React Native" in techs:
+        files += [
+            "App.tsx",
+            "src/screens/LoginScreen.tsx",
+            "src/screens/DashboardScreen.tsx",
+            "src/navigation/",
+            "package.json",
+        ]
+    elif frontend and "Next.js" in techs:
         files += ["app/page.tsx", "app/layout.tsx", "components/", "lib/api.ts", ".env.example"]
     elif frontend:
         files += ["src/App.tsx", "src/pages/", "src/components/", "src/lib/api.ts", "package.json"]
@@ -154,8 +165,11 @@ def _files_for(kind: str, techs: list[str]) -> list[str]:
 
 def _install_for(techs: list[str]) -> list[str]:
     steps: list[str] = []
-    if any(t in techs for t in ("React", "Next.js", "Vue", "Angular", "TypeScript", "JavaScript", "Node.js", "Express")):
-        steps.append("Node 20+: `npm install` then `npm run dev`")
+    if any(t in techs for t in ("React Native", "React", "Next.js", "Vue", "Angular", "TypeScript", "JavaScript", "Node.js", "Express")):
+        if "React Native" in techs:
+            steps.append("React Native: `npx expo start` (or `npx react-native run-ios` / `run-android`)")
+        else:
+            steps.append("Node 20+: `npm install` then `npm run dev`")
     if any(t in techs for t in ("FastAPI", "Django", "Flask", "Python")):
         steps.append("Python 3.11+: `python -m venv .venv && pip install -r requirements.txt`")
         if "FastAPI" in techs:
