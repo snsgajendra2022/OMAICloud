@@ -334,9 +334,14 @@ def _compose_absolute_response(goal: str, state: Any, result: CycleResult) -> st
     sol = (result.cognition or {}).get("solution") or ""
     md = (result.cognition or {}).get("markdown") or ""
     grounded = (result.knowledge or {}).get("grounded_reply") or ""
+    ksource = (result.knowledge or {}).get("source") or ""
 
     def _has_code(text: str) -> bool:
         return "```" in (text or "")
+
+    if ksource == "fact_table" and grounded:
+        parts.append(grounded.strip())
+        return "\n\n".join(parts)
 
     # Coding / UI: prefer runnable solutions over weak topic matches
     if codingish:

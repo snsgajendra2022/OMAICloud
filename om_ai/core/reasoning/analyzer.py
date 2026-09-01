@@ -117,6 +117,16 @@ class IntentAnalyzer:
             )
 
         entities = re.findall(r"[A-Za-z][A-Za-z0-9_\-]{2,}", q)[:12]
+        try:
+            from om_ai.understanding.entities import expand_entities
+
+            for hit in expand_entities(q):
+                if hit.meaning not in entities:
+                    entities.append(hit.meaning)
+                if hit.context and hit.context not in entities:
+                    entities.append(hit.context)
+        except Exception:
+            pass
         return IntentResult(
             understanding=u_text,
             intent=intent,

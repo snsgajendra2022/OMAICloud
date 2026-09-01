@@ -175,6 +175,8 @@ _WORD_MAP: dict[str, str] = {
     "reat": "react",
     "reac": "react",
     "dahsborad": "dashboard",
+    "dahsbaord": "dashboard",
+    "dahsboard": "dashboard",
     "dashborad": "dashboard",
     "dashbaord": "dashboard",
     "dasboard": "dashboard",
@@ -232,6 +234,43 @@ _PHRASE_MAP: list[tuple[re.Pattern[str], str]] = [
     (re.compile(r"\bcomplte\s+this\b", re.I), "complete this"),
 ]
 
+# Unique prefixes for truncated last tokens ("dash" → dashboard).
+_PREFIX_WORDS = (
+    "dashboard",
+    "login",
+    "python",
+    "react",
+    "project",
+    "create",
+    "fastapi",
+    "typescript",
+    "javascript",
+    "architecture",
+    "laravel",
+    "django",
+    "java",
+    "php",
+    "golang",
+    "rust",
+)
+
+
+def _complete_truncated(s: str) -> str:
+    parts = s.split()
+    if not parts:
+        return s
+    last = re.sub(r"[^A-Za-z]", "", parts[-1])
+    if len(last) < 3:
+        return s
+    low = last.lower()
+    if low in _WORD_MAP or low in {w.lower() for w in _PREFIX_WORDS}:
+        return s
+    hits = [w for w in _PREFIX_WORDS if w.startswith(low) and w != low]
+    if len(hits) == 1:
+        parts[-1] = hits[0]
+        return " ".join(parts)
+    return s
+
 
 def correct_typos(text: str) -> str:
     """Normalize common typos / slang while preserving unknown words."""
@@ -254,4 +293,5 @@ def correct_typos(text: str) -> str:
             return fixed
         return tok
 
-    return re.sub(r"[A-Za-z']+", _replace_token, s)
+    s = re.sub(r"[A-Za-z']+", _replace_token, s)
+    return _complete_truncated(s)

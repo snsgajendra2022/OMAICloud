@@ -18,6 +18,7 @@ DOMAINS = (
     "history",
     "design",
     "artificial_intelligence",
+    "civics",
 )
 
 _DOMAIN_PATTERNS: list[tuple[str, re.Pattern[str]]] = [
@@ -59,6 +60,11 @@ class RankResult:
 
 
 def detect_domain(question: str) -> str:
+    q = question or ""
+    if re.search(r"\b(india|indian|bharat)\b", q, re.I) and re.search(
+        r"\b(pm|prime\s+minister|president|parliament)\b", q, re.I
+    ):
+        return "civics"
     for name, pat in _DOMAIN_PATTERNS:
         if pat.search(question or ""):
             return name

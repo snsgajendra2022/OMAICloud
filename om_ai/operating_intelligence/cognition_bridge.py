@@ -27,6 +27,7 @@ def think(
             "markdown": result.get("markdown") or "",
             "passed": result.get("passed"),
             "score": result.get("score"),
+            "confidence": result.get("confidence"),
             "critique": result.get("critique") or [],
             "engine": "core.reasoning.v2",
         }

@@ -58,6 +58,7 @@ _PAGE = re.compile(r"\b(page|screen|ui|component)\b", re.I)
 _APP = re.compile(r"\b(app|application|system|full.?stack|project)\b", re.I)
 _DASH = re.compile(r"\bdashboard\b", re.I)
 _PROJECT = re.compile(r"\b(create|make|build|new)\b.*\b(project|app|system|dashboard)\b", re.I)
+_API = re.compile(r"\bapi\b", re.I)
 
 _STACK: list[tuple[str, str]] = [
     ("next", "Next.js"),
@@ -129,7 +130,19 @@ def _files_for(kind: str, techs: list[str]) -> list[str]:
     elif frontend:
         files += ["src/App.tsx", "src/pages/", "src/components/", "src/lib/api.ts", "package.json"]
     if python_api:
-        files += ["app/main.py", "app/routers/", "app/models.py", "app/auth.py", "requirements.txt", "tests/"]
+        files += ["app/main.py", "app/routers/", "app/models.py", "app/schemas.py", "app/auth.py", "requirements.txt", "tests/"]
+    if kind == "python_api":
+        files = [
+            "app/main.py",
+            "app/routers/",
+            "app/models.py",
+            "app/schemas.py",
+            "app/deps.py",
+            "tests/test_health.py",
+            "requirements.txt",
+            ".env.example",
+            "Dockerfile",
+        ]
     if php:
         files += ["app/Http/Controllers/", "routes/api.php", "database/migrations/", "composer.json"]
     if "Docker" in techs or kind in {"full_login_system", "project", "dashboard"}:
@@ -165,9 +178,38 @@ def build_coding_blueprint(question: str, *, canonical: str = "") -> CodingBluep
     page_only = bool(_PAGE.search(q)) and not _APP.search(q) and not _DASH.search(q)
     dashboard = bool(_DASH.search(q))
     project = is_project_ask(q) and not page_only
+    has_api = bool(_API.search(q))
+    frontend = any(t in stack for t in ("React", "Next.js", "Vue", "Angular"))
+    python_backend = any(t in stack for t in ("Python", "FastAPI", "Django", "Flask"))
     req = canonical or q[:200]
 
-    if login and not page_only:
+    if python_backend and not frontend and not login and not dashboard and (has_api or project):
+        layers = ["HTTP API", "Schemas/models", "Persistence", "Auth (optional)", "Tests", "Deploy"]
+        arch = [
+            "ASGI API (FastAPI unless Django/Flask is stated)",
+            "Router per resource with Pydantic request/response models",
+            "Config and secrets from environment",
+            "Health endpoint plus one real resource",
+            "Automated tests for happy path and validation errors",
+        ]
+        techs = list(stack)
+        if "FastAPI" not in techs and "Django" not in techs and "Flask" not in techs:
+            techs = ["Python", "FastAPI"] + [t for t in techs if t != "Python"]
+        if "Python" not in techs:
+            techs.insert(0, "Python")
+        tests = [
+            "GET /health returns 200",
+            "Invalid payload is rejected",
+            "Auth required routes fail without a token",
+        ]
+        deploy = ["Uvicorn/Gunicorn behind TLS", "Migrate DB", "Do not commit secrets"]
+        notes = [
+            "Backend API project — not a React dashboard.",
+            "Important: Do not expose API keys.",
+        ]
+        kind = "python_api"
+        config = ["DATABASE_URL from env", "SECRET_KEY from env", "CORS allow-list"]
+    elif login and not page_only:
         layers = [
             "Frontend auth UI",
             "Backend API",
@@ -283,5 +325,19 @@ def build_coding_blueprint(question: str, *, canonical: str = "") -> CodingBluep
         deployment=deploy,
         notes=notes,
         markdown="\n".join(md_lines).strip() + "\n",
-        meta={"kind": kind, "static_templates": _static_ok(), "project_mode": kind in {"project", "dashboard", "full_login_system"}},
+        meta={
+            "kind": kind,
+            "task_type": (
+                "backend"
+                if kind == "python_api"
+                else "frontend"
+                if kind in {"login_page", "dashboard"}
+                else "fullstack"
+                if kind == "full_login_system"
+                else "software"
+            ),
+            "static_templates": _static_ok(),
+            "project_mode": kind
+            in {"project", "dashboard", "full_login_system", "python_api"},
+        },
     )

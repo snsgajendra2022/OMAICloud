@@ -13,6 +13,14 @@ from .reflection import ReflectionEngine
 def _retrieve_knowledge(question: str, k: int = 4) -> list[str]:
     hits: list[str] = []
     try:
+        from om_ai.knowledge.facts import lookup_fact
+
+        fact = lookup_fact(question)
+        if fact and fact.get("answer"):
+            hits.append(str(fact["answer"]))
+    except Exception:
+        pass
+    try:
         from om_ai.knowledge.retrieval import VectorKnowledgeLayer
 
         layer = VectorKnowledgeLayer()
@@ -22,7 +30,7 @@ def _retrieve_knowledge(question: str, k: int = 4) -> list[str]:
             else:
                 text = str(getattr(row, "text", "") or row)
             text = text.strip()
-            if text:
+            if text and text not in hits:
                 hits.append(text[:400])
     except Exception:
         try:
@@ -31,7 +39,7 @@ def _retrieve_knowledge(question: str, k: int = 4) -> list[str]:
             kb = PersistentKnowledgeBase()
             for row in kb.search(question, tenant_id="default", k=k) or []:
                 text = str(getattr(row, "text", "") or "").strip()
-                if text:
+                if text and text not in hits:
                     hits.append(text[:400])
         except Exception:
             pass
@@ -66,6 +74,7 @@ def format_reasoning_markdown(result: dict[str, Any]) -> str:
         *[f"- {v}" for v in (result.get("validation") or [])],
         f"- Passed: {result.get('passed')}",
         f"- Score: {result.get('score')}",
+        f"- Confidence: {result.get('confidence')}",
         "",
         "## Self-critique",
         *[f"- {c}" for c in (result.get("critique") or [])],
@@ -102,6 +111,11 @@ def run_reasoning_pipeline(
     )
     verify = VerificationEngine().verify(intent, solution)
     reflection = ReflectionEngine().reflect(verify, domain=intent.domain)
+    conf = float(verify.score or 0.0)
+    if knowledge_profile and knowledge_profile.kept:
+        conf = min(1.0, conf + 0.05)
+    if solution.meta.get("coding_kind"):
+        conf = min(1.0, conf + 0.05)
     result = {
         "understanding": intent.understanding,
         "intent": intent.to_dict(),
@@ -113,6 +127,7 @@ def run_reasoning_pipeline(
         "validation": verify.validation,
         "passed": verify.passed,
         "score": verify.score,
+        "confidence": round(conf, 3),
         "critique": reflection.critique,
         "weak_areas": reflection.weak_areas,
         "training_hints": reflection.training_hints,
@@ -121,6 +136,7 @@ def run_reasoning_pipeline(
         "meta": {
             "pipeline": "om-human-like-reasoning-v1",
             "knowledge_hits": len(hits),
+            "confidence": round(conf, 3),
             **(solution.meta or {}),
         },
     }

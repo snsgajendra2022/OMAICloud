@@ -79,6 +79,10 @@ def classify_intent(user_text: str) -> ChatIntent:
         return ChatIntent.identity
     if _MEMORY.search(t):
         return ChatIntent.memory
+    if re.search(r"^\s*(what|who)\s+is\b", t, re.I) and not re.search(
+        r"\b(create|make|build|implement|fix|debug)\b", t, re.I
+    ):
+        return ChatIntent.knowledge
     if _CODING.search(t):
         return ChatIntent.coding
     if _AGENT.search(t):

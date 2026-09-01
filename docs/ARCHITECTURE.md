@@ -2,7 +2,12 @@
 
 OM AI is a self-hosted **cognitive operating system**: model code, training, agents, memory, RAG, and API run locally. It does **not** call OpenAI/Anthropic/Google model APIs and does not include ChatGPT weights or private OpenAI training data.
 
-Operating-system pillars, gaps, and roadmap: **[OM_OPERATING_SYSTEM.md](OM_OPERATING_SYSTEM.md)**.
+Operating-system pillars, gaps, and roadmap:
+
+- [CURRENT_ARCHITECTURE.md](CURRENT_ARCHITECTURE.md)
+- [SYSTEM_GAP_ANALYSIS.md](SYSTEM_GAP_ANALYSIS.md)
+- [IMPLEMENTATION_ROADMAP.md](IMPLEMENTATION_ROADMAP.md)
+- [OM_OPERATING_SYSTEM.md](OM_OPERATING_SYSTEM.md)
 
 ## Layers
 

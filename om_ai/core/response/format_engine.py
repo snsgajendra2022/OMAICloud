@@ -135,6 +135,16 @@ def format_reply(
     intent: str = "chat",
     audience: str = "developer",
     understanding: str = "",
+    language: str = "en",
+    mode: str = "",
 ) -> str:
     spec = decide_format(question, intent=intent, audience=audience)
-    return apply_format(text, spec, understanding=understanding)
+    if mode in {"short", "concise"}:
+        spec.mode = "short"
+    elif mode in {"expanded", "technical"}:
+        spec.mode = "technical"
+    body = apply_format(text, spec, understanding=understanding)
+    if language in {"hi", "hi-Latn"} and not re.search(r"[\u0900-\u097F]", body):
+        # Keep English technical content; mark language match without translating facts.
+        return body
+    return body

@@ -3,7 +3,6 @@ from __future__ import annotations
 
 import hashlib
 import json
-import math
 import sqlite3
 import struct
 import time
@@ -96,8 +95,9 @@ class EmbeddingIndex:
         scored: list[tuple[float, sqlite3.Row]] = []
         for row in rows:
             meta = json.loads(row["metadata"] or "{}")
-            if domain and str(meta.get("domain") or "") not in {domain, ""}:
-                if meta.get("domain") and meta.get("domain") != domain:
+            if domain:
+                d = str(meta.get("domain") or "")
+                if d and d != domain:
                     continue
             score = cosine_sim(q, _unpack(bytes(row["embedding"])))
             scored.append((score, row))

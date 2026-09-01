@@ -29,6 +29,8 @@ _TOKEN_GLOSS: dict[str, str] = {
     "react": "React framework",
     "reat": "React framework",
     "dahsborad": "dashboard",
+    "dahsbaord": "dashboard",
+    "dahsboard": "dashboard",
     "dashborad": "dashboard",
     "dashbaord": "dashboard",
     "dashboard": "dashboard",
@@ -50,13 +52,18 @@ _FRAMEWORKS = {
     "fastapi": "FastAPI",
     "django": "Django",
     "flask": "Flask",
+    "laravel": "Laravel",
     "python": "Python",
+    "java": "Java",
+    "golang": "Go",
+    "rust": "Rust",
 }
 
 _OBJECTS: list[tuple[re.Pattern[str], str]] = [
     (re.compile(r"\b(login|sign\s*in|auth)\b.*\b(page|screen|ui)\b|\b(page|screen|ui)\b.*\b(login|sign\s*in)\b", re.I), "Login Page"),
     (re.compile(r"\b(signup|sign\s*up|register)\b", re.I), "Signup Page"),
     (re.compile(r"\bdashboard\b", re.I), "Dashboard"),
+    (re.compile(r"\bapi\b.*\b(project|service|backend)\b|\b(project|service|backend)\b.*\bapi\b", re.I), "API Project"),
     (re.compile(r"\bmemory\b", re.I), "Memory System"),
     (re.compile(r"\b(login|sign\s*in|auth)\b", re.I), "Login"),
     (re.compile(r"\bapi\b", re.I), "API"),

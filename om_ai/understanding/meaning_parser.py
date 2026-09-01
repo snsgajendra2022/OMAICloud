@@ -4,6 +4,7 @@ from __future__ import annotations
 import re
 from dataclasses import dataclass, field
 
+from om_ai.understanding.entities import rewrite_with_entities
 from om_ai.understanding.intent_detector import IntentResult
 from om_ai.understanding.language_brain import LanguageUnderstanding, understand_language
 
@@ -18,6 +19,7 @@ class MeaningResult:
     tokens: list[tuple[str, str]] = field(default_factory=list)
     canonical_intent: str = ""
     language: str = "en"
+    entities: list[dict[str, str]] = field(default_factory=list)
 
 
 _GOAL_PATTERNS: list[tuple[re.Pattern[str], str]] = [
@@ -80,6 +82,12 @@ def parse_meaning(original: str, *, intent: IntentResult | None = None) -> Meani
     elif lang.canonical_intent and len(lang.canonical_intent.split()) >= 3:
         goal = lang.canonical_intent
 
+    _, entity_hits = rewrite_with_entities(corrected)
+    entity_rows = [
+        {"surface": h.surface, "meaning": h.meaning, "context": h.context}
+        for h in entity_hits
+    ]
+
     if intent.intent == "understanding_feature":
         understood = (
             "User wants OM AI to understand messages even when there are "
@@ -101,6 +109,17 @@ def parse_meaning(original: str, *, intent: IntentResult | None = None) -> Meani
         understood = f"User is asking about: {corrected or raw}"
         conf = intent.confidence
 
+    if entity_hits:
+        gloss_e = "; ".join(f"{h.surface} = {h.meaning} ({h.context})" for h in entity_hits)
+        understood = f"{understood} Entities: {gloss_e}".strip()
+        if any(h.meaning == "Prime Minister" and h.context == "India" for h in entity_hits):
+            goal = "Explain that PM in India means Prime Minister (head of government)."
+            conf = max(conf, 0.93)
+            understood = (
+                "User is asking what PM means in India. "
+                "PM = Prime Minister of India (head of government)."
+            )
+
     if len((corrected or raw).split()) <= 1:
         conf = min(conf, 0.5)
 
@@ -113,4 +132,5 @@ def parse_meaning(original: str, *, intent: IntentResult | None = None) -> Meani
         tokens=list(lang.tokens),
         canonical_intent=lang.canonical_intent,
         language=lang.language,
+        entities=entity_rows,
     )

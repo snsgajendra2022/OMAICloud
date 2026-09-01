@@ -1,13 +1,13 @@
 # IMPLEMENTATION_ROADMAP.md
 
-## This pass (implement + test)
+## This pass (implemented and tested)
 
 1. Entity/meaning (PM + India); typo `dahsbaord`.
 2. Coding kinds: React login page (frontend), Python API project (backend).
 3. Knowledge: `EmbeddingIndex` (vector + metadata) used by retrieval; fact lookup for high-precision Q&A.
 4. Reasoning: confidence on pipeline output.
 5. Evaluation: relevance, correctness, intent-answered, missing, confidence.
-6. Tests in `tests/test_os_validation.py`.
+6. Tests in `tests/test_os_validation.py` — features are not marked complete until those tests pass.
 
 ## Next
 

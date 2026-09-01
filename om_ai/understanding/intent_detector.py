@@ -122,6 +122,11 @@ def detect_intent(text: str) -> IntentResult:
     t = (text or "").strip()
     if not t:
         return IntentResult("unknown", "general", False, 0.2)
+    # Definitional questions beat stack-token coding ("what is pm in india").
+    if re.search(r"^\s*(what|who)\s+is\b", t, re.I) and not re.search(
+        r"\b(create|make|build|implement|fix|debug)\b", t, re.I
+    ):
+        return IntentResult("knowledge", "qa", True, 0.9)
     for pat, intent, category, needs, conf in _RULES:
         if pat.search(t):
             return IntentResult(intent, category, needs, conf)

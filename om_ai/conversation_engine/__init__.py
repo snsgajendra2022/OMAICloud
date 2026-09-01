@@ -23,8 +23,9 @@ class ConversationState:
 
 
 _TECH = re.compile(
-    r"\b(react|next\.?js|vue|angular|svelte|fastapi|flask|django|python|typescript|"
-    r"javascript|node|sql|postgres|mongodb|docker|kubernetes|swift|kotlin)\b",
+    r"\b(react|next\.?js|vue|angular|svelte|fastapi|flask|django|laravel|python|typescript|"
+    r"javascript|node|sql|postgres|mongodb|docker|kubernetes|swift|kotlin|"
+    r"php|\.net|csharp|c#|golang| rust|java)\b",
     re.I,
 )
 
@@ -92,7 +93,19 @@ def classify_and_plan(
     )
 
     qlow = work.lower()
-    if intent.value == "coding" or cog.intent == "coding" or any(
+    definitional = bool(
+        re.match(r"^\s*(what|who)\s+is\b", work, re.I)
+        and not re.search(r"\b(create|make|build|implement)\b", work, re.I)
+    )
+    if definitional:
+        state.intent = "knowledge"
+        if not state.plan:
+            state.plan = [
+                "Retrieve knowledge/memory",
+                "Reason and verify",
+                "Answer clearly",
+            ]
+    elif intent.value == "coding" or cog.intent == "coding" or any(
         w in qlow for w in ("ui", "page", "signup", "login", "dashboard", "api", "code")
     ):
         state.intent = "coding" if intent.value == "chat" else intent.value

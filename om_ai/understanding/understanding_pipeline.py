@@ -6,6 +6,7 @@ from dataclasses import asdict, dataclass, field
 from typing import Any
 
 from om_ai.understanding.context_analyzer import ContextSnapshot, analyze_context
+from om_ai.understanding.context_engine import gather_context
 from om_ai.understanding.intent_detector import IntentResult, detect_intent
 from om_ai.understanding.meaning_parser import MeaningResult, parse_meaning
 from om_ai.understanding.typo_corrector import correct_typos
@@ -149,7 +150,13 @@ class UnderstandingPipeline:
             intent = intent_raw
 
         meaning = parse_meaning(original, intent=intent)
-        ctx: ContextSnapshot = analyze_context(
+        ctx_intel = gather_context(
+            messages,
+            project_instructions=project_instructions,
+            memory_snippets=memory_snippets,
+            current_text=meaning.corrected or original,
+        )
+        ctx: ContextSnapshot = ctx_intel.snapshot or analyze_context(
             messages,
             project_instructions=project_instructions,
             memory_snippets=memory_snippets,
@@ -171,7 +178,7 @@ class UnderstandingPipeline:
             needs_solution=intent.needs_solution,
             confidence=meaning.confidence,
             plan_steps=plan,
-            context_summary=ctx.summary,
+            context_summary=ctx_intel.summary or ctx.summary,
             meta={
                 "tokens_changed": meaning.corrected.lower() != original.lower(),
                 "context_users": len(ctx.recent_user),
@@ -180,6 +187,9 @@ class UnderstandingPipeline:
                 "language": meaning.language,
                 "project_topic": ctx.project_topic,
                 "resolved_followup": ctx.resolved_followup,
+                "entities": list(meaning.entities),
+                "preferences": list(ctx_intel.preferences),
+                "decisions": list(ctx_intel.decisions),
             },
         )
         result.public_understanding = _public_understanding(meaning, intent)

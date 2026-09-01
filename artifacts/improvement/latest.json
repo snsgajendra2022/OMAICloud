@@ -51,8 +51,8 @@
     ]
   },
   "trainer_job": {
-    "id": "b72491dd-45d3-417e-aaf9-bdd477584f7d",
-    "ts": 1788245961.9195561,
+    "id": "fe9d4edc-e389-49c1-9da6-479c441b971f",
+    "ts": 1788246692.598712,
     "status": "queued",
     "reason": "structure,clarity,task_fit,overall",
     "sft_path": "data/om_training/improvements/sft_improvements.jsonl",
@@ -65,108 +65,9 @@
   },
   "version": {
     "om_version": "1.0",
-    "improve_cycle": 79,
-    "label": "OM-1.0-improve-79",
+    "improve_cycle": 86,
+    "label": "OM-1.0-improve-86",
     "history": [
-      {
-        "ts": 1787730086.196621,
-        "cycle": 30,
-        "note": "improve from: fgngfn\nfghfJNM\nSFGJNGF\nMGH\nMGH\nM\nHGM\ngh",
-        "metrics": {
-          "overall": 56.6,
-          "weak": [
-            "structure",
-            "clarity",
-            "task_fit",
-            "overall"
-          ]
-        }
-      },
-      {
-        "ts": 1787730231.289527,
-        "cycle": 31,
-        "note": "improve from: jiii",
-        "metrics": {
-          "overall": 54.2,
-          "weak": [
-            "structure",
-            "clarity",
-            "task_fit",
-            "overall"
-          ]
-        }
-      },
-      {
-        "ts": 1787730241.7161012,
-        "cycle": 32,
-        "note": "improve from: create singup page in react",
-        "metrics": {
-          "overall": 43.0,
-          "weak": [
-            "structure",
-            "clarity",
-            "task_fit",
-            "code_quality",
-            "overall"
-          ]
-        }
-      },
-      {
-        "ts": 1787730269.484616,
-        "cycle": 33,
-        "note": "improve from: create the signup page ui and screen",
-        "metrics": {
-          "overall": 54.6,
-          "weak": [
-            "structure",
-            "clarity",
-            "task_fit",
-            "overall"
-          ]
-        }
-      },
-      {
-        "ts": 1787730281.852658,
-        "cycle": 34,
-        "note": "improve from: you can make coding",
-        "metrics": {
-          "overall": 56.6,
-          "weak": [
-            "structure",
-            "clarity",
-            "task_fit",
-            "overall"
-          ]
-        }
-      },
-      {
-        "ts": 1787730291.3781388,
-        "cycle": 35,
-        "note": "improve from: only this ans correct",
-        "metrics": {
-          "overall": 54.4,
-          "weak": [
-            "structure",
-            "clarity",
-            "task_fit",
-            "overall"
-          ]
-        }
-      },
-      {
-        "ts": 1787730321.8706949,
-        "cycle": 36,
-        "note": "improve from: hi",
-        "metrics": {
-          "overall": 54.4,
-          "weak": [
-            "structure",
-            "clarity",
-            "task_fit",
-            "overall"
-          ]
-        }
-      },
       {
         "ts": 1787730343.3137379,
         "cycle": 37,
@@ -754,9 +655,98 @@
             "overall"
           ]
         }
+      },
+      {
+        "ts": 1788246582.0384982,
+        "cycle": 80,
+        "note": "improve from: Explain that PM in India means Prime Minister (head of government).",
+        "metrics": {
+          "overall": 68.5,
+          "weak": [
+            "structure",
+            "clarity",
+            "overall"
+          ]
+        }
+      },
+      {
+        "ts": 1788246582.910961,
+        "cycle": 81,
+        "note": "improve from: Create React Dashboard",
+        "metrics": {
+          "overall": 75.0,
+          "weak": [
+            "code_quality"
+          ]
+        }
+      },
+      {
+        "ts": 1788246583.94623,
+        "cycle": 82,
+        "note": "improve from: hello how are you?",
+        "metrics": {
+          "overall": 54.2,
+          "weak": [
+            "structure",
+            "clarity",
+            "task_fit",
+            "overall"
+          ]
+        }
+      },
+      {
+        "ts": 1788246625.0050051,
+        "cycle": 83,
+        "note": "improve from: Explain that PM in India means Prime Minister (head of government).",
+        "metrics": {
+          "overall": 68.5,
+          "weak": [
+            "structure",
+            "clarity",
+            "overall"
+          ]
+        }
+      },
+      {
+        "ts": 1788246690.3994591,
+        "cycle": 84,
+        "note": "improve from: Explain that PM in India means Prime Minister (head of government).",
+        "metrics": {
+          "overall": 68.5,
+          "weak": [
+            "structure",
+            "clarity",
+            "overall"
+          ]
+        }
+      },
+      {
+        "ts": 1788246691.269245,
+        "cycle": 85,
+        "note": "improve from: Create React Dashboard",
+        "metrics": {
+          "overall": 75.0,
+          "weak": [
+            "code_quality"
+          ]
+        }
+      },
+      {
+        "ts": 1788246692.598996,
+        "cycle": 86,
+        "note": "improve from: hello how are you?",
+        "metrics": {
+          "overall": 54.2,
+          "weak": [
+            "structure",
+            "clarity",
+            "task_fit",
+            "overall"
+          ]
+        }
       }
     ],
-    "updated_at": 1788245961.919828
+    "updated_at": 1788246692.5989969
   },
-  "ts": 1788245961.920075
+  "ts": 1788246692.5993578
 }

@@ -19,7 +19,7 @@ def record_turn(
     """Persist this turn into short-term + optional project memory."""
     if not (user_text or "").strip():
         return {"ok": False, "reason": "empty"}
-    stored: dict[str, Any] = {"short": False, "project": False, "preference": False}
+    stored: dict[str, Any] = {"short": False, "project": False, "preference": False, "experience": False}
     actor = user_id or "anonymous"
     try:
         from om_ai.memory.layers import LayeredMemory
@@ -35,6 +35,12 @@ def record_turn(
                 metadata={"project_id": project_id or "", "stack": stack or []},
             )
             stored["project"] = True
+            mem.remember(
+                "experience",
+                f"Decision: {body[:240]}",
+                metadata={"kind": "turn"},
+            )
+            stored["experience"] = True
         from om_ai.runtime.intelligence import extract_memory_candidates
 
         for cand in extract_memory_candidates(user_text) or []:

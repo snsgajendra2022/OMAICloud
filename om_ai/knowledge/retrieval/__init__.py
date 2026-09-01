@@ -1,7 +1,6 @@
 """Vector knowledge layer — wraps PersistentKnowledgeBase + local corpus index."""
 from __future__ import annotations
 
-import json
 from pathlib import Path
 from typing import Any
 
@@ -25,24 +24,64 @@ class VectorKnowledgeLayer:
         if domain:
             meta["domain"] = domain
         doc_id = self.kb.ingest_file(path, self.tenant_id, metadata=meta)
+        try:
+            from om_ai.knowledge.embeddings import EmbeddingIndex
+
+            body = path.read_text(encoding="utf-8", errors="ignore")[:8000]
+            EmbeddingIndex().upsert(
+                body,
+                tenant_id=self.tenant_id,
+                metadata=meta,
+                doc_id=str(doc_id),
+            )
+        except Exception:
+            pass
         return {"doc_id": doc_id, "ingestion": info}
 
     def search(self, query: str, *, k: int = 5) -> list[dict[str, Any]]:
         hits = self.kb.search(query, self.tenant_id, k=k)
         out: list[dict[str, Any]] = []
+        seen: set[str] = set()
         for h in hits or []:
             if hasattr(h, "text"):
+                text = str(h.text)[:500]
+                row = {
+                    "text": text,
+                    "score": float(getattr(h, "score", 0.0) or 0.0),
+                    "doc_id": getattr(h, "doc_id", ""),
+                    "metadata": getattr(h, "metadata", {}) or {},
+                }
+            elif isinstance(h, dict):
+                row = h
+                text = str(row.get("text") or "")
+            else:
+                continue
+            key = text[:120]
+            if key in seen:
+                continue
+            seen.add(key)
+            out.append(row)
+        try:
+            from om_ai.knowledge.embeddings import EmbeddingIndex
+
+            for row in EmbeddingIndex().search(query, tenant_id=self.tenant_id, k=k):
+                text = str(row.get("text") or "")[:500]
+                key = text[:120]
+                if not text or key in seen:
+                    continue
+                seen.add(key)
                 out.append(
                     {
-                        "text": str(h.text)[:500],
-                        "score": float(getattr(h, "score", 0.0) or 0.0),
-                        "doc_id": getattr(h, "doc_id", ""),
-                        "metadata": getattr(h, "metadata", {}) or {},
+                        "text": text,
+                        "score": float(row.get("score") or 0.0),
+                        "doc_id": row.get("id") or "",
+                        "metadata": row.get("metadata") or {},
                     }
                 )
-            elif isinstance(h, dict):
-                out.append(h)
-        return out
+        except Exception:
+            pass
+        out.sort(key=lambda r: float(r.get("score") or 0.0), reverse=True)
+        return out[:k]
 
 
 def search_knowledge(query: str, *, tenant_id: str = "default", k: int = 5) -> list[dict[str, Any]]:
