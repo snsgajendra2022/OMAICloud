@@ -22,6 +22,14 @@
     {
       "question": "you can create iomic pages",
       "answer": "# You Can Create Iomic Pages\n\n## Solution\n\nWe will create:\n- Load dataset brain\n- Retrieve similar solutions\n- Implement minimal fix\n- Verify\n\n## Implementation Steps\n\n1. Understand requirement\n2. Create implementation plan\n3. Develop solution\n4. Test result\n\n## Testing\n\n\u2713 UI validation\n\u2713 Main user flow\n\u2713 Error handling"
+    },
+    {
+      "question": "what is the java",
+      "answer": "Java is a strongly typed programming language commonly used for backend systems, Android applications, and enterprise software."
+    },
+    {
+      "question": "what is the letest verion of java",
+      "answer": "Java is a strongly typed programming language commonly used for backend systems, Android applications, and enterprise software."
     }
   ]
 }
