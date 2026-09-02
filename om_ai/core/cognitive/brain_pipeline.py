@@ -7,7 +7,7 @@ Do not call ``OMCognitiveBrain.process()`` at import time. Always pass a questio
 from __future__ import annotations
 
 from typing import Any
-
+from om_ai.memory import MemoryManager
 from om_ai.cognition.intent_engine import IntentEngine
 from om_ai.cognition.task_planner import TaskPlanner
 from om_ai.cognition.technology_engine import TechnologyEngine
@@ -19,15 +19,20 @@ from om_ai.understanding.query_kind import is_coding_task, is_greeting, query_ki
 
 class OMCognitiveBrain:
     def __init__(self) -> None:
+        self.memory = MemoryManager()
         self.intent = IntentEngine()
         self.technology = TechnologyEngine()
         self.planner = TaskPlanner()
         self.reasoning = ReasoningChain()
         self.generator = AnswerGenerator()
         self.evaluator = SelfEvaluator()
-
     def process(self, question: str, knowledge: Any = None) -> dict[str, Any]:
         question = (question or "").strip()
+        # memory_context = self.memory.get_context()
+        memory_context = {
+            **self.memory.get_context(),
+            "project": self.memory.project.data
+        }
         if not question:
             return {
                 "answer": "",
@@ -78,6 +83,7 @@ class OMCognitiveBrain:
             question,
             knowledge_hits=hits,
             retrieve=not hits and kind != "greeting",
+            messages=memory_context.get("conversation")
         )
         generated = None
         user_from_pipeline = str(pipeline.get("user_response") or pipeline.get("answer") or "").strip()
@@ -88,13 +94,24 @@ class OMCognitiveBrain:
                 technology=technology_result,
                 tasks=task_result,
                 knowledge=knowledge if isinstance(knowledge, dict) else None,
+                memory=memory_context
             )
             generated = self.generator.generate(question, reasoning_result, knowledge)
             if isinstance(generated, dict):
                 user_from_pipeline = str(generated.get("answer") or "").strip()
             else:
                 user_from_pipeline = str(generated or "").strip()
-
+        self.memory.remember_conversation(
+            question,
+            user_from_pipeline
+        )
+        self.memory.long_term.remember(
+            "experiences",
+            {
+                "question": question,
+                "answer": user_from_pipeline
+            }
+        )
         evaluation = pipeline.get("evaluation") or self.evaluator.evaluate(
             question,
             user_from_pipeline,
@@ -115,6 +132,7 @@ class OMCognitiveBrain:
             "plan": pipeline.get("plan") or task_result.get("tasks") or [],
             "architecture": pipeline.get("architecture") or [],
             "markdown": pipeline.get("markdown") or "",
+            "memory": memory_context,
         }
         user_response = str(pipeline.get("user_response") or "").strip() or formatter.format_user_response(payload)
         if is_greeting(question) and "agents:" in user_response.lower():

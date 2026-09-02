@@ -14,6 +14,40 @@ def response_mode() -> str:
         return "developer"
     return "user"
 
+def clean_user_response(text: str) -> str:
+
+    """
+    Remove internal AI reasoning sections.
+    """
+
+    remove_sections = [
+
+        "## Analysis",
+
+        "## Technology",
+
+        "## Architecture",
+
+        "## Evaluation",
+
+        "## Self-critique",
+
+        "## Weak areas",
+
+    ]
+
+
+    for section in remove_sections:
+
+        index = text.find(section)
+
+
+        if index != -1:
+
+            text = text[:index]
+
+
+    return text.strip()
 
 _LEAK = re.compile(
     r"(?i)(\bintent\s*:|\bagents\s*:|\bdomain\s*:|self-critique|self critique|"
@@ -81,16 +115,34 @@ class ResponseFormatter:
             kind = "greeting"
         if intent_name in {"coding", "debug", "architecture"} and kind != "knowledge":
             kind = "coding"
-
         if kind == "greeting":
-            return "Hello. I am OM. How can I help you today?\n"
-        if kind == "knowledge":
-            return self._template_knowledge(data, question)
-        if kind == "coding":
-            return self._template_coding(data, question)
-        if kind == "business":
-            return self._template_business(data, question)
-        return self._template_general(data, question)
+         response = "Hello. I am OM. How can I help you today?\n"
+        elif kind == "knowledge":
+
+                response = self._template_knowledge(
+                    data,
+                    question
+                )
+        elif kind == "coding":
+                response = self._template_coding(
+                    data,
+                    question
+                )
+        elif kind == "business":
+                response = self._template_business(
+                    data,
+                    question
+                )
+        else:
+                response = self._template_general(
+                    data,
+                    question
+                )
+            # Final user response cleaning layer
+        response = clean_user_response(
+                response
+            )
+        return response
 
     def format_developer_response(self, payload: dict[str, Any] | None = None, **kwargs: Any) -> str:
         data = {**(payload or {}), **kwargs}
