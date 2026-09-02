@@ -8,7 +8,7 @@ from .rag import (
 from .selector import KnowledgeProfile, select_knowledge
 from .embeddings import EmbeddingIndex, embed_text
 from .facts import lookup_fact
-
+from .ranker import KnowledgeRanker, KnowledgeScore
 __all__ = [
     "LocalKnowledgeBase",
     "PersistentKnowledgeBase",
@@ -20,4 +20,6 @@ __all__ = [
     "EmbeddingIndex",
     "embed_text",
     "lookup_fact",
+    "KnowledgeRanker",
+    "KnowledgeScore",
 ]

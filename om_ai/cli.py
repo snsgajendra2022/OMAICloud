@@ -755,15 +755,54 @@ def system_cmd(args):
 
 
 def knowledge_cmd(args):
-    from om_ai.knowledge.engine import knowledge_ingest, knowledge_status, ensure_knowledge_layout
+    from om_ai.knowledge.engine import (
+        knowledge_ingest,
+        knowledge_status,
+        ensure_knowledge_layout
+    )
 
     if args.sub == "status":
-        print(json.dumps(knowledge_status(args.root or None), indent=2))
-    elif args.sub == "init":
-        print(json.dumps(ensure_knowledge_layout(args.root or None), indent=2))
-    elif args.sub == "ingest":
-        print(json.dumps(knowledge_ingest(args.path, domain=args.domain or ""), indent=2))
+        print(json.dumps(
+            knowledge_status(args.root or None),
+            indent=2
+        ))
 
+    elif args.sub == "init":
+        print(json.dumps(
+            ensure_knowledge_layout(args.root or None),
+            indent=2
+        ))
+
+    elif args.sub == "ingest":
+        print(json.dumps(
+            knowledge_ingest(
+                args.path,
+                domain=args.domain or ""
+            ),
+            indent=2
+        ))
+
+    elif args.sub == "build":
+        from om_ai.data_pipeline import run_omai_corpus_v1
+
+        sources = [
+            x.strip()
+            for x in args.source.split(",")
+            if x.strip()
+        ]
+
+        report = run_omai_corpus_v1(
+            root=args.root,
+            fetch=True,
+            source_ids=sources,
+            max_docs=args.max_docs
+        )
+
+        print(json.dumps(
+            report,
+            indent=2,
+            default=str
+        ))
 
 def evaluate_run_cmd(args):
     from om_ai.evaluation import run_evaluation
@@ -1309,6 +1348,22 @@ def main():
 
     kn = sp.add_parser("knowledge", help="Knowledge Corpus Engine")
     kns = kn.add_subparsers(dest="sub", required=True)
+    knb = kns.add_parser("build", help="Build knowledge corpus from sources")
+    knb.add_argument(
+        "--source",
+        default="",
+        help="Source name: fineweb,wikipedia,gutenberg,etc"
+    )
+    knb.add_argument(
+        "--root",
+        default="data/omai-corpus-v1"
+    )
+    knb.add_argument(
+        "--max-docs",
+        type=int,
+        default=100
+    )
+    knb.set_defaults(func=knowledge_cmd)
     knst = kns.add_parser("status", help="Knowledge Engine READY status")
     knst.add_argument("--root", default="")
     knst.set_defaults(func=knowledge_cmd)

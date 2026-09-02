@@ -1,8 +1,8 @@
 {
-  "built_at": "2026-08-25T11:09:58+00:00",
+  "built_at": "2026-09-02T08:21:25+00:00",
   "root": "data/omai-corpus-v1",
   "phase": "OMAI-Corpus-v1-production-pipeline",
-  "pipeline_complete_pct": 100.0,
+  "pipeline_complete_pct": 90.0,
   "stages": {
     "dataset_downloader": true,
     "license_tracking": true,
@@ -12,11 +12,20 @@
     "duplicate_removal": true,
     "pii_filtering": true,
     "toxic_content_filtering": true,
-    "tokenization": true,
+    "tokenization": false,
     "train_validation_split": true
   },
-  "fetch": [],
-  "cleaned_docs": 186,
+  "fetch": [
+    {
+      "source_id": "fineweb",
+      "path": "data/omai-corpus-v1/raw/fineweb/fineweb.jsonl",
+      "docs": 1,
+      "bytes": 935,
+      "ok": true,
+      "detail": "offline_seed_install_datasets_for_real_fineweb"
+    }
+  ],
+  "cleaned_docs": 135,
   "rejected": {
     "license": 0,
     "quality": 0,
@@ -24,28 +33,25 @@
     "spam": 0,
     "lang": 0,
     "empty": 0,
-    "too_short": 8
+    "too_short": 22
   },
   "dedupe": {
     "input": "data/omai-corpus-v1/filtered/all.jsonl",
     "output": "data/omai-corpus-v1/deduplicated/all.jsonl",
-    "records": 94,
-    "exact_duplicates_removed": 92,
+    "records": 118,
+    "exact_duplicates_removed": 17,
     "near_dup_audit": {
       "input": "data/omai-corpus-v1/filtered/all.jsonl",
       "output": "data/omai-corpus-v1/audit/near_dup_view.jsonl",
-      "records": 94
+      "records": 118
     }
   },
   "tokenization": {
-    "enabled": true,
-    "tokenizer": "artifacts/tokenizer-production-65536.json",
-    "docs": 89,
-    "tokens": 837141,
-    "path": "data/omai-corpus-v1/tokenized/train.ids.jsonl"
+    "enabled": false,
+    "error": "This tokenizer requires the `tokenizers` package. Install it with: python3 -m pip install -U tokenizers"
   },
-  "train_docs": 89,
-  "validation_docs": 5,
+  "train_docs": 112,
+  "validation_docs": 6,
   "train_jsonl": "data/omai-corpus-v1/train/shard-00001.jsonl",
   "train_txt": "data/omai-corpus-v1/train/corpus.txt",
   "validation_jsonl": "data/omai-corpus-v1/validation/shard-00001.jsonl",
@@ -62,7 +68,7 @@
     "ok": true,
     "missing_dirs": [],
     "has_train_txt": true,
-    "train_bytes": 3320043,
+    "train_bytes": 3323864,
     "has_build_report": true,
     "root": "data/omai-corpus-v1"
   },

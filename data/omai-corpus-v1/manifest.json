@@ -142,7 +142,7 @@
     "duplicate_removal": true,
     "pii_filtering": true,
     "toxic_content_filtering": true,
-    "tokenization": true,
+    "tokenization": false,
     "train_validation_split": true
   }
 }

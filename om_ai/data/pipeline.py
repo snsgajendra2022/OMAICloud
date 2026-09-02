@@ -1,5 +1,4 @@
 from __future__ import annotations
-
 from dataclasses import dataclass, asdict
 from collections import Counter
 from hashlib import sha256

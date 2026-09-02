@@ -5,6 +5,8 @@ from typing import Any
 
 from om_ai.cognition.task_planner import TaskPlanner
 from om_ai.cognition.technology_engine import TechnologyEngine
+from om_ai.knowledge.retrieval import search_knowledge
+from om_ai.knowledge.ranker import KnowledgeRanker
 
 from .analyzer import IntentAnalyzer
 from .planner import PlanningEngine
@@ -22,6 +24,82 @@ def _empty_technology() -> dict[str, Any]:
         "confidence": 0,
     }
 
+def _rank_knowledge_hits(
+    question: str,
+    hits: list[str],
+    intent: Any,
+    technology: dict[str, Any] | None = None,
+) -> list[str]:
+    """
+    OM Knowledge Ranking Layer
+
+    Ranks filtered knowledge before reasoning.
+
+    Uses:
+    - keyword relevance
+    - domain
+    - technology
+    - quality
+    - source trust
+    """
+
+    if not hits:
+        return []
+
+
+    try:
+
+        ranker = KnowledgeRanker()
+
+
+        documents = [
+
+            {
+                "text": text,
+
+                "domain":
+                    getattr(intent, "domain", "general"),
+
+                "quality_score":
+                    0.5,
+
+                "source":
+                    "knowledge_brain"
+
+            }
+
+            for text in hits
+
+        ]
+
+
+        ranked = ranker.rank(
+
+            question,
+
+            documents,
+
+            intent=intent.to_dict()
+                if hasattr(intent, "to_dict")
+                else None,
+
+            technology=technology
+
+        )
+
+
+        return [
+
+            item.text
+
+            for item in ranked[:5]
+
+        ]
+
+
+    except Exception:
+
+        return hits
 
 def _filter_knowledge_hits(question: str, hits: list[str], technology: dict[str, Any] | None = None) -> list[str]:
     if not hits:
@@ -164,6 +242,17 @@ def run_reasoning_pipeline(
     if not is_coding_task(question):
         technology = _empty_technology()
     hits = _filter_knowledge_hits(question, hits, technology)
+    hits = _rank_knowledge_hits(
+
+    question,
+
+    hits,
+
+    intent,
+
+    technology
+
+    )
     if knowledge_profile is not None:
         knowledge_profile.kept = list(hits)
     plan = PlanningEngine().plan(intent)
@@ -216,6 +305,8 @@ def run_reasoning_pipeline(
         "meta": {
             "pipeline": "om-human-like-reasoning-v1",
             "knowledge_hits": len(hits),
+            "knowledge_ranking": True,
+            "ranked_context_count": len(hits),
             "confidence": round(conf, 3),
             "technology": technology,
             **(solution.meta or {}),
@@ -251,6 +342,7 @@ def run_reasoning_pipeline(
         "plan": result.get("plan"),
         "agents": result.get("agents"),
         "knowledge": result.get("knowledge"),
+        "knowledge_hits": hits,
         "evaluation": result.get("evaluation"),
         "critique": result.get("critique"),
         "score": result.get("score"),
