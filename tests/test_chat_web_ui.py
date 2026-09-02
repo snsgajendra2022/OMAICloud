@@ -14,6 +14,7 @@ def test_chat_ui_exists_and_is_native_contract():
     body = path.read_text(encoding="utf-8")
     assert "OM" in body
     assert "/api/v1/chat/completions" in body
+    assert "stripPipelineDump" in body
     assert "fetch(" in body
     assert "localStorage" in body or "session" in body.lower()
     # Date grouping (ChatGPT-style sidebar buckets)

@@ -446,51 +446,43 @@ def chat_reply(
         try:
             if not skip_cog:
                 cog = run_cognitive_brain(user_text)
+                from om_ai.core.response.response_formatter import (
+                    ensure_public_reply,
+                    looks_like_pipeline_dump,
+                    response_mode,
+                )
+
                 cog_answer = str(
                     cog.get("user_response") or cog.get("answer") or ""
                 ).strip()
-                from om_ai.core.response.response_formatter import response_mode
-
                 if response_mode() == "developer":
                     cog_answer = str(cog.get("developer_response") or cog_answer).strip()
-                cog_eval = cog.get("evaluation") or {}
-                cog_tech = cog.get("technology") or {}
-                cog_tasks = cog.get("tasks") or {}
-                kind = query_kind(user_text)
-                leak = any(
-                    token in cog_answer.lower()
-                    for token in ("agents:", "self-critique", "self critique", "knowledge context")
-                )
-                structured = bool(
-                    cog_tech.get("technology")
-                    or (cog_tasks.get("category") not in {None, "", "general"})
-                    or kind in {"knowledge", "coding", "business"}
-                )
+                else:
+                    cog_answer = ensure_public_reply(user_text, cog_answer, {
+                        "intent": cog.get("intent") or {},
+                        "technology": cog.get("technology") or {},
+                        "plan": (cog.get("tasks") or {}).get("tasks") or [],
+                        "architecture": (cog.get("reasoning") or {}).get("architecture") or [],
+                        "evaluation": cog.get("evaluation") or {},
+                    })
                 if (
-                    structured
-                    and cog_answer
-                    and len(cog_answer) > 40
-                    and not leak
-                    and (kind in {"knowledge", "coding", "business"} or cog_eval.get("approved", True))
+                    cog_answer
+                    and len(cog_answer) > 20
+                    and (response_mode() == "developer" or not looks_like_pipeline_dump(cog_answer))
                 ):
                     polished = format_assistant_reply(
                         cog_answer,
-                        intent=kind if kind != "general" else str((cog.get("intent") or {}).get("intent") or "coding"),
+                        intent=query_kind(user_text),
                         enhance=True,
                     )
+                    if response_mode() != "developer":
+                        polished = ensure_public_reply(user_text, polished)
                     info_cog = ChatBackendInfo(
                         backend=info.backend,
                         model=info.model,
                         detail=info.detail,
                         provider=info.provider,
-                        live_knowledge={
-                            "intelligence": intel.meta,
-                            "cognitive_brain": {
-                                "technology": cog_tech,
-                                "tasks": cog_tasks.get("tasks"),
-                                "evaluation": cog_eval,
-                            },
-                        },
+                        live_knowledge={"intelligence": intel.meta} if intel.meta else None,
                     )
                     return polished, info_cog
         except Exception as exc:
@@ -550,6 +542,10 @@ def chat_reply(
                         )
                     except Exception:
                         polished = abs_reply
+                    from om_ai.core.response.response_formatter import ensure_public_reply, response_mode
+
+                    if response_mode() != "developer":
+                        polished = ensure_public_reply(user_text, polished)
                     return polished, info_abs
             except Exception as exc:
                 logger.debug("absolute OS cycle skipped: %s", exc)
@@ -623,11 +619,6 @@ def chat_reply(
         merged_lk = {
             **({k: v for k, v in lk_meta.items() if k != "grounded_reply"} or {}),
             "intelligence": intel.meta,
-            "agent_brain": {
-                "intent": brain_decision.intent.value,
-                **(brain_decision.meta or {}),
-            },
-            "dataset_grounded": bool(dataset_grounded),
         }
         info_lk = ChatBackendInfo(
             backend=info.backend,
@@ -641,6 +632,7 @@ def chat_reply(
         def _out(text: str) -> tuple[str, ChatBackendInfo]:
             from om_ai.response_engine import format_assistant_reply
             from om_ai.core.response.intelligence import ensure_intelligent_response
+            from om_ai.core.response.response_formatter import ensure_public_reply, response_mode
 
             try:
                 repaired = ensure_intelligent_response(
@@ -655,6 +647,8 @@ def chat_reply(
                 )
             except Exception:
                 polished = (text or "").strip()
+            if response_mode() != "developer":
+                polished = ensure_public_reply(user_text, polished)
             return polished, info_lk
 
         # Prefer local dataset/RAG grounded reply before tiny-model garble.

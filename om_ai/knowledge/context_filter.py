@@ -752,6 +752,11 @@ class KnowledgeContextFilter:
 
 
 
+        if keyword >= 0.5:
+            score = max(score, self.threshold)
+            if "keyword match" not in reasons:
+                reasons.append("keyword match")
+
         # Noise
 
         noise = self.noise_check(
@@ -898,7 +903,7 @@ class KnowledgeContextFilter:
 
 
 
-        return results
+        return [row["text"] for row in results]
 
 
 

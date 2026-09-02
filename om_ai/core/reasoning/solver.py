@@ -122,11 +122,7 @@ def _solution_from_dataset(
             },
         }
 
-        body = (
-            f"**Ask:** {question.strip()[:300]}\n\n"
-            f"**Understanding:** {intent_understanding_stub(question)}\n\n"
-            f"{answer}\n"
-        )
+        body = answer.strip() + "\n"
 
         return body, arch, notes, meta
 
@@ -149,26 +145,15 @@ def _solution_from_knowledge_hits(
     # Prefer a hit that already contains runnable code
     for h in hits:
         if "```" in h and len(h) > 80:
-            body = (
-                f"**Ask:** {question.strip()[:300]}\n\n"
-                f"**Understanding:** {intent.understanding}\n\n"
-                f"## Solution (from knowledge memory)\n\n{h.strip()}\n"
-            )
+            body = h.strip() + "\n"
             return (
                 body,
                 ["Grounded in retrieved knowledge", "Adapt paths to your project"],
                 [f"Intent={intent.intent}", f"Agents: {', '.join(plan.agents)}"],
                 {"template": None, "source": "knowledge_hits", "has_code": True},
             )
-    snippets = "\n".join(f"- {h[:400]}" for h in hits[:4])
-    body = (
-        f"**Ask:** {question.strip()[:300]}\n\n"
-        f"**Understanding:** {intent.understanding}\n\n"
-        f"## Knowledge context\n{snippets}\n\n"
-        f"## Plan\n"
-        + "\n".join(f"{i+1}. {s}" for i, s in enumerate(plan.plan))
-        + "\n\nPaste your file structure or error log for a precise implementation."
-    )
+    snippets = "\n\n".join(h.strip() for h in hits[:4] if h.strip())
+    body = snippets + "\n"
     return (
         body,
         ["Use retrieved knowledge", "Minimal change → verify → document"],
@@ -202,11 +187,7 @@ def _solution_from_model(question: str, intent: IntentResult) -> tuple[str, list
 
         if is_low_quality_reply(text):
             return None
-        body = (
-            f"**Ask:** {question.strip()[:300]}\n\n"
-            f"**Understanding:** {intent.understanding}\n\n"
-            f"## Implementation (OM model)\n\n{text}\n"
-        )
+        body = text.strip() + "\n"
         has_code = "```" in text
         return (
             body,
@@ -236,7 +217,6 @@ def _solution_from_plan_only(
     intent: IntentResult,
     plan: PlanResult,
 ) -> tuple[str, list[str], list[str], dict[str, Any]]:
-    steps = "\n".join(f"{i+1}. {s}" for i, s in enumerate(plan.plan))
     bp = None
     if intent.intent in {"coding", "debug", "architecture", "performance"}:
         bp = _coding_blueprint(question, intent)
@@ -268,17 +248,20 @@ def _solution_from_plan_only(
         notes = list(bp.notes) + notes
         meta["coding_kind"] = (bp.meta or {}).get("kind")
 
-    body = (
-        f"**Ask:** {question.strip()[:400]}\n\n"
-        f"**Understanding:** {intent.understanding}\n\n"
-        f"## Analysis\n"
-        f"Domain `{intent.domain}` · Intent `{intent.intent}`\n\n"
-        f"{extra}"
-        f"## Plan\n{steps}\n\n"
-        "## Next\n"
-        "No strong corpus match yet. Run `om-ai brain power` to load datasets, "
-        "or paste your repo file/error so OM can generate a precise patch.\n"
-    )
+    body = extra.strip()
+    if not body:
+        try:
+            from om_ai.knowledge.facts import lookup_fact
+
+            fact = lookup_fact(question)
+            if fact and fact.get("answer"):
+                body = str(fact["answer"]).strip()
+        except Exception:
+            body = ""
+    if not body:
+        body = (
+            f"{question.strip()}\n\n")
+    notes = [f"Intent={intent.intent}"]
     return body, arch, notes, meta
 
 

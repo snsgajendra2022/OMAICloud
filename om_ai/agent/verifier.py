@@ -75,15 +75,12 @@ def compose_fallback(
             from om_ai.core.reasoning.pipeline import run_reasoning_pipeline
 
             result = run_reasoning_pipeline(user_text or "", retrieve=True)
+            public = str(result.get("answer") or result.get("user_response") or "").strip()
+            if public and len(public) > 40:
+                return public
             sol = str(result.get("solution") or "").strip()
             if "```" in sol and len(sol) > 80:
                 return sol
-            md = (result.get("markdown") or "").strip()
-            # Prefer solution/markdown only if it isn't empty plan soup
-            if sol and len(sol) > 120 and "Prefer smallest safe change" not in sol:
-                return sol
-            if md and "```" in md:
-                return md
         except Exception:
             pass
 

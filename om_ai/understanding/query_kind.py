@@ -24,7 +24,17 @@ def is_definitional(text: str) -> bool:
     t = (text or "").strip()
     if re.search(r"\b(create|make|build|implement|fix|debug|code)\b", t, re.I):
         return False
-    return bool(re.search(r"^\s*(what|who)\s+is\b|^\s*(explain|define)\b", t, re.I))
+    return bool(
+        re.search(
+            r"^\s*(what|who)\s+is\b|"
+            r"^\s*(explain|define)\b|"
+            r"^\s*how\s+to\b|"
+            r"\b(try to|want to|how do i)\s+(work|learn|use|understand|start)\b|"
+            r"\bwhat\s+is\s+(git|react)\b",
+            t,
+            re.I,
+        )
+    )
 
 
 def is_coding_task(text: str) -> bool:

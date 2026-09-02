@@ -18,8 +18,54 @@ def response_mode() -> str:
 _LEAK = re.compile(
     r"(?i)(\bintent\s*:|\bagents\s*:|\bdomain\s*:|self-critique|self critique|"
     r"knowledge context|reflectionengine|pipeline trace|\bscore\s*:|"
-    r"dataset_id|training.hints)"
+    r"dataset_id|training.hints|\*\*ask:\*\*|^\*\*understanding:\*\*|"
+    r"no strong corpus match yet|om-ai brain power|"
+    r"heuristic foundation path|passed:\s*true|"
+    r"domain\s*`|intent\s*`)"
 )
+
+_PIPELINE_HEADINGS = re.compile(
+    r"(?im)^#{1,3}\s+(understanding|analysis|technology|architecture|plan|"
+    r"validation|evaluation|self-critique|weak areas|knowledge context|"
+    r"implementation|next)\b"
+)
+
+_PIPELINE_DUMP = re.compile(
+    r"(?is)(\*\*ask:\*\*|\*\*understanding:\*\*|##\s+analysis\b|\bagents\s*:|"
+    r"self-critique|no strong corpus match yet|om-ai brain power|"
+    r"heuristic foundation path|##\s+evaluation\b|##\s+validation\b|"
+    r"passed:\s*true|score:\s*0\.|confidence:\s*0\.)"
+)
+
+
+def looks_like_pipeline_dump(text: str) -> bool:
+    s = text or ""
+    if _PIPELINE_DUMP.search(s):
+        return True
+    hits = len(_PIPELINE_HEADINGS.findall(s))
+    return hits >= 3
+
+
+def ensure_public_reply(
+    question: str,
+    text: str,
+    payload: dict[str, Any] | None = None,
+) -> str:
+    """Last-mile gate: never show internal brain chrome to a normal user."""
+    if response_mode() == "developer":
+        return (text or "").strip()
+    fmt = ResponseFormatter()
+    data = {**(payload or {}), "question": question, "answer": text or ""}
+    if looks_like_pipeline_dump(text or "") or not (text or "").strip():
+        out = fmt.format_user_response(data)
+    else:
+        out = fmt._strip_leaks(text or "")
+        if looks_like_pipeline_dump(out) or len(out) < 12:
+            out = fmt.format_user_response(data)
+    out = fmt._strip_leaks(out)
+    if looks_like_pipeline_dump(out) or not out.strip():
+        out = fmt._direct_answer(question, data)
+    return out.strip() + ("\n" if out.strip() else "")
 
 
 class ResponseFormatter:
@@ -38,7 +84,6 @@ class ResponseFormatter:
 
         if kind == "greeting":
             return "Hello. I am OM. How can I help you today?\n"
-
         if kind == "knowledge":
             return self._template_knowledge(data, question)
         if kind == "coding":
@@ -73,6 +118,42 @@ class ResponseFormatter:
         ]
         return "\n".join(lines).strip() + "\n"
 
+    def _direct_answer(self, question: str, data: dict[str, Any]) -> str:
+        try:
+            from om_ai.knowledge.facts import lookup_fact
+
+            hit = lookup_fact(question)
+            if hit and hit.get("answer"):
+                return str(hit["answer"]).strip() + "\n"
+        except Exception:
+            pass
+        q = question.strip()
+        if re.search(r"how to.{0,20}start|start work|start today", q, re.I):
+            return (
+                "Start today with one clear outcome, not a long to-do list.\n\n"
+                "1. Write the one thing that must be done by end of day.\n"
+                "2. Break it into the first 30-minute task and do that first.\n"
+                "3. Remove one blocker (a message, a file, a decision).\n"
+                "4. At the end of the day, write what moved and what is next.\n"
+            )
+        if re.search(r"\bgit\b", q, re.I):
+            try:
+                from om_ai.knowledge.facts import lookup_fact
+
+                hit = lookup_fact("what is git")
+                if hit:
+                    return str(hit["answer"]).strip() + "\n"
+            except Exception:
+                pass
+        body = self._strip_leaks(str(data.get("answer") or ""))
+        if len(body) >= 40 and not looks_like_pipeline_dump(body):
+            return body.strip() + "\n"
+        return (
+            f"{q}\n\n"
+            "Tell me the goal in one sentence and I will answer it directly — "
+            "no internal analysis dump, just the next useful step.\n"
+        )
+
     def _template_knowledge(self, data: dict[str, Any], question: str) -> str:
         fact = ""
         try:
@@ -83,32 +164,15 @@ class ResponseFormatter:
                 fact = str(hit.get("answer") or "").strip()
         except Exception:
             fact = ""
-        raw = str(data.get("answer") or "").strip()
-        body = fact or self._strip_leaks(raw)
-        body = re.sub(r"(?im)^##\s+(understanding|analysis|technology|architecture|plan|validation|evaluation|self-critique).*\n(?:.*\n)*?(?=^##|\Z)", "", body)
-        body = self._strip_leaks(body)
-        if "prime minister" in (question + " " + body).lower() and "india" in question.lower():
-            return (
-                "## Understanding\n\n"
-                "PM in India means **Prime Minister**.\n\n"
-                "## Answer\n\n"
-                "The Prime Minister is the head of government of India. "
-                "The Prime Minister leads the Council of Ministers and manages "
-                "the executive functions of the government.\n\n"
-                "## Related Information\n\n"
-                "- President → Head of State\n"
-                "- Prime Minister → Head of Government\n\n"
-                "## Confidence\n\n"
-                "High\n"
-            )
-        if not body:
-            body = "I do not have a grounded fact for that yet. Add it to OM knowledge, or rephrase the question."
-        return (
-            "## Answer\n\n"
-            f"{body.strip()}\n\n"
-            "## Confidence\n\n"
-            "High\n"
-        )
+        if fact:
+            return fact + "\n"
+        curated = self._direct_answer(question, {**data, "answer": ""})
+        if curated and "I will answer this directly" not in curated and "Tell me the goal" not in curated:
+            return curated
+        raw = self._strip_leaks(str(data.get("answer") or ""))
+        if len(raw) >= 40 and not looks_like_pipeline_dump(raw):
+            return raw.strip() + "\n"
+        return self._direct_answer(question, data)
 
     def _template_coding(self, data: dict[str, Any], question: str) -> str:
         tech = data.get("technology") if isinstance(data.get("technology"), dict) else {}
@@ -177,21 +241,12 @@ class ResponseFormatter:
     def _template_business(self, data: dict[str, Any], question: str) -> str:
         body = self._strip_leaks(str(data.get("answer") or question))
         return (
-            "## Summary\n\n"
             f"{body[:500].strip()}\n\n"
-            "## Recommendation\n\n"
-            "Decide using the constraints in your question, then validate with data.\n\n"
-            "## Action Plan\n\n"
-            "1. Clarify the outcome\n"
-            "2. List options\n"
-            "3. Pick one and measure\n"
+            "Recommendation: decide using the constraints in your question, then validate with data.\n"
         )
 
     def _template_general(self, data: dict[str, Any], question: str) -> str:
-        body = self._strip_leaks(str(data.get("answer") or ""))
-        if len(body) < 20:
-            body = f"Here is a direct answer to: {question}"
-        return f"## Answer\n\n{body.strip()}\n"
+        return self._direct_answer(question, data)
 
     def _coding_title(self, question: str, tech_name: str) -> str:
         q = re.sub(r"^(create|make|build)\s+", "", question.strip(), flags=re.I)
@@ -234,16 +289,26 @@ class ResponseFormatter:
         skip_block = False
         for ln in (text or "").splitlines():
             low = ln.strip().lower()
-            if re.match(r"^##\s+(analysis|validation|evaluation|self-critique|weak areas|knowledge context)\b", low):
+            if re.match(
+                r"^#{1,3}\s+(understanding|analysis|technology|architecture|plan|"
+                r"validation|evaluation|self-critique|weak areas|knowledge context)\s*$",
+                low,
+            ) or re.match(r"^#{1,3}\s+(implementation|next)\s*$", low):
                 skip_block = True
                 continue
-            if skip_block and ln.startswith("## "):
+            if skip_block and re.match(r"^#{1,3}\s+", ln):
                 skip_block = False
             if skip_block:
                 continue
             if _LEAK.search(ln):
                 continue
-            if low.startswith("**ask:**") or "no strong corpus match yet" in low:
+            if low.startswith("**ask:**") or low.startswith("**understanding:**"):
+                continue
+            if "no strong corpus match yet" in low or "om-ai brain power" in low:
+                continue
+            if low.startswith("**agents:**") or low.startswith("**stack inferred:**"):
+                continue
+            if low.startswith("**plan**") and len(low) < 12:
                 continue
             kept.append(ln)
         out = "\n".join(kept)

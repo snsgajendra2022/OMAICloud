@@ -24,11 +24,14 @@ def think(
             "understanding": result.get("understanding"),
             "plan": result.get("plan") or [],
             "solution": result.get("solution") or "",
+            "answer": result.get("answer") or result.get("user_response") or "",
+            "user_response": result.get("user_response") or result.get("answer") or "",
             "markdown": result.get("markdown") or "",
             "passed": result.get("passed"),
             "score": result.get("score"),
             "confidence": result.get("confidence"),
             "critique": result.get("critique") or [],
+            "technology": result.get("technology") or {},
             "engine": "core.reasoning.v2",
         }
     except Exception as exc:

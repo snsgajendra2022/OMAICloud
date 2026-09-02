@@ -342,16 +342,18 @@ def _compose_absolute_response(goal: str, state: Any, result: CycleResult) -> st
     if state.clarification:
         parts.append(f"*{state.clarification}*")
 
+    from om_ai.understanding.query_kind import is_coding_task, is_definitional
+
     intent = getattr(state, "intent", "chat") or "chat"
-    qlow = (goal or "").lower()
-    codingish = intent == "coding" or any(
-        w in qlow for w in ("ui", "signup", "login", "page", "react", "code", "api", "fastapi")
-    )
+    codingish = is_coding_task(goal) and not is_definitional(goal)
 
     coding_out = (result.agents or {}).get("coding_output") or ""
-    specialist_md = (result.agents or {}).get("markdown") or ""
+    user_face = (
+        (result.cognition or {}).get("user_response")
+        or (result.cognition or {}).get("answer")
+        or ""
+    )
     sol = (result.cognition or {}).get("solution") or ""
-    md = (result.cognition or {}).get("markdown") or ""
     grounded = (result.knowledge or {}).get("grounded_reply") or ""
     ksource = (result.knowledge or {}).get("source") or ""
 
@@ -362,7 +364,10 @@ def _compose_absolute_response(goal: str, state: Any, result: CycleResult) -> st
         parts.append(grounded.strip())
         return "\n\n".join(parts)
 
-    # Coding / UI: prefer runnable solutions over weak topic matches
+    if user_face.strip() and len(user_face.strip()) > 20:
+        parts.append(user_face.strip())
+        return "\n\n".join(parts)
+
     if codingish:
         if _has_code(coding_out):
             parts.append(coding_out.strip())
@@ -370,26 +375,21 @@ def _compose_absolute_response(goal: str, state: Any, result: CycleResult) -> st
         if _has_code(sol):
             parts.append(sol.strip())
             return "\n\n".join(parts)
-        if _has_code(md):
-            parts.append(md.strip())
-            return "\n\n".join(parts)
 
     if grounded and len(grounded) > 80 and (not codingish or _has_code(grounded)):
         parts.append(grounded.strip())
         return "\n\n".join(parts)
 
-    if coding_out and len(coding_out) > 40:
+    if coding_out and len(coding_out) > 40 and _has_code(coding_out):
         parts.append(coding_out.strip())
-        if specialist_md and specialist_md not in coding_out:
-            parts.append(specialist_md.strip())
         return "\n\n".join(parts)
 
     if sol and len(sol) > 80 and "Prefer smallest safe change" not in sol:
-        parts.append(sol.strip())
-        return "\n\n".join(parts)
-    if md and len(md) > 120:
-        parts.append(md.strip())
-        return "\n\n".join(parts)
+        from om_ai.core.response.response_formatter import looks_like_pipeline_dump
+
+        if not looks_like_pipeline_dump(sol):
+            parts.append(sol.strip())
+            return "\n\n".join(parts)
 
     mem_bits = []
     for key in ("user", "project", "conversation"):
@@ -398,30 +398,18 @@ def _compose_absolute_response(goal: str, state: Any, result: CycleResult) -> st
             if len(mem_bits) >= 2:
                 break
     if mem_bits:
-        parts.append("**From memory**\n" + "\n".join(f"- {m[:180]}" for m in mem_bits))
+        parts.append("\n".join(f"- {m[:180]}" for m in mem_bits))
 
     snippets = (result.knowledge or {}).get("snippets") or []
     if snippets and not codingish:
-        parts.append("**Knowledge**\n" + "\n".join(f"- {s[:220]}" for s in snippets[:3]))
-
-    if state.plan:
-        parts.append("**Plan**\n" + "\n".join(f"{i+1}. {p}" for i, p in enumerate(state.plan)))
-
-    if state.technology:
-        parts.append("**Stack inferred:** " + ", ".join(state.technology))
+        parts.append("\n".join(f"- {s[:220]}" for s in snippets[:3]))
 
     if not parts:
         try:
-            from om_ai.agent.verifier import compose_fallback
+            from om_ai.core.response.response_formatter import ResponseFormatter
 
-            return compose_fallback(intent=state.intent, user_text=goal)
+            return ResponseFormatter().format_user_response({"question": goal})
         except Exception:
-            return (
-                f"I understood: {goal[:200]}\n\n"
-                "Load more knowledge with `om-ai brain power`, or give more detail."
-            )
+            return f"{goal[:200]}\n"
 
-    agents = (result.agents or {}).get("agents") or []
-    if agents:
-        parts.append("**Agents:** " + ", ".join(agents))
     return "\n\n".join(parts)

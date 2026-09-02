@@ -29,11 +29,20 @@ def _filter_knowledge_hits(question: str, hits: list[str], technology: dict[str,
     try:
         from om_ai.knowledge.context_filter import KnowledgeContextFilter
 
-        return KnowledgeContextFilter().filter_hits(
+        raw = KnowledgeContextFilter().filter_hits(
             question,
             hits,
             technology=technology,
         )
+        out: list[str] = []
+        for item in raw or []:
+            if isinstance(item, dict):
+                text = str(item.get("text") or item.get("answer") or "").strip()
+            else:
+                text = str(item or "").strip()
+            if text:
+                out.append(text)
+        return out
     except Exception:
         return hits
 

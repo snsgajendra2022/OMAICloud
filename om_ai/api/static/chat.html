@@ -942,6 +942,21 @@ function runHint(lang, file) {
   return "";
 }
 
+function stripPipelineDump(raw) {
+  let s = String(raw||"");
+  if (!/(\*\*Ask:\*\*|\*\*Understanding:\*\*|##\s+Analysis\b|Agents:|Self-critique|om-ai brain power|Passed:\s*True)/i.test(s)) {
+    return s;
+  }
+  s = s.replace(/\*\*Ask:\*\*[^\n]*\n?/gi, "");
+  s = s.replace(/\*\*Understanding:\*\*[^\n]*\n?/gi, "");
+  s = s.replace(/^#{1,3}\s+(Understanding|Analysis|Technology|Architecture|Plan|Validation|Evaluation|Self-critique|Weak areas|Knowledge context|Implementation|Next)\s*$[\s\S]*?(?=^#{1,3}\s+|\Z)/gim, "");
+  s = s.replace(/^[-*]\s+(Intent|Domain|Agents|Technology|Category|Platform|Passed|Score|Confidence)\s*:.*$/gim, "");
+  s = s.replace(/No strong corpus match yet[\s\S]*$/i, "");
+  s = s.replace(/Heuristic foundation path[\s\S]*$/i, "");
+  s = s.replace(/\n{3,}/g, "\n\n").trim();
+  return s;
+}
+
 function renderMarkdown(raw) {
   let s = String(raw)
     .replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
@@ -1009,7 +1024,7 @@ function renderMarkdown(raw) {
 }
 
 function renderExperienceMarkdown(raw, animate) {
-  const html = renderMarkdown(raw);
+  const html = renderMarkdown(stripPipelineDump(raw));
   if (!animate) return html;
   // Wrap top-level chunks for staggered reveal
   const wrap = document.createElement("div");
@@ -1745,7 +1760,7 @@ function renderMessages() {
     if (m._streaming) bubble.dataset.stream = "1";
     if (waiting) bubble.classList.add("is-typing");
     if (waiting) bubble.innerHTML = experiencePhaseHtml("Thinking…")+typingIndicatorHtml();
-    else if (m.role === "assistant") bubble.innerHTML = renderExperienceMarkdown(m.content||"", !!m._reveal);
+    else if (m.role === "assistant") bubble.innerHTML = renderExperienceMarkdown(stripPipelineDump(m.content||""), !!m._reveal);
     else bubble.innerHTML = escapeHtml(m.content||"").replace(/\n/g,"<br>");
     col.appendChild(bubble);
     if (m.role === "assistant" && !m._streaming) {
@@ -1772,7 +1787,7 @@ function updateStreamBubble(text) {
   } else {
     bubble.classList.remove("is-typing");
     bubble.removeAttribute("aria-busy");
-    bubble.innerHTML = renderMarkdown(body);
+    bubble.innerHTML = renderMarkdown(stripPipelineDump(body));
   }
   els.messages.scrollTop = els.messages.scrollHeight;
 }

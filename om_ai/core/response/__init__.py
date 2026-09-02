@@ -5,7 +5,12 @@ from .formatter import format_response, format_structured
 from .format_engine import decide_format, format_reply, markdown_table
 from .quality import check_quality, ensure_quality
 from .intelligence import analyze_response, ensure_intelligent_response, repair_response
-from .response_formatter import ResponseFormatter, response_mode
+from .response_formatter import (
+    ResponseFormatter,
+    ensure_public_reply,
+    looks_like_pipeline_dump,
+    response_mode,
+)
 
 __all__ = [
     "format_response",
@@ -20,4 +25,6 @@ __all__ = [
     "repair_response",
     "ResponseFormatter",
     "response_mode",
+    "ensure_public_reply",
+    "looks_like_pipeline_dump",
 ]
