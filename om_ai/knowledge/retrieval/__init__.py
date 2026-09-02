@@ -7,7 +7,16 @@ from typing import Any
 from om_ai.knowledge.ingestion import ingest_file
 from om_ai.knowledge.rag import PersistentKnowledgeBase
 
+from .hybrid_retriever import HybridRetriever
+from .keyword_search import KeywordSearch
+from om_ai.knowledge.retrieval import HybridRetriever
 
+__all__ = [
+    "HybridRetriever",
+    "KeywordSearch",
+    "hybrid_search",
+    "keyword_search",
+]
 class VectorKnowledgeLayer:
     """Search + ingest into OM persistent RAG (hashed TF-IDF embeddings)."""
 

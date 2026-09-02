@@ -1,28 +1,27 @@
-from om_ai.data_engine.pipeline import DocumentChunker
+from om_ai.knowledge.processing.chunker import TextChunker
 
 
 text = """
 Git is a distributed version control system.
-It helps developers manage source code.
-It supports branches, commits and collaboration.
+It helps developers manage source code history.
 """
 
 
-chunker = DocumentChunker(
-    chunk_size=5,
-    overlap=2
+chunker = TextChunker(
+    chunk_size=10
 )
 
 
-result = chunker.chunk(
+chunks = chunker.split(
     text,
-    source="git"
+    "git"
 )
 
 
-for item in result:
+for c in chunks:
 
-    print(
-        item.chunk_id,
-        item.text
-    )
+    print(c.id)
+
+    print(c.text)
+
+    print("---")

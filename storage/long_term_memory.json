@@ -30,6 +30,18 @@
     {
       "question": "what is the letest verion of java",
       "answer": "Java is a strongly typed programming language commonly used for backend systems, Android applications, and enterprise software."
+    },
+    {
+      "question": "hell",
+      "answer": "hell\n\nTell me the goal in one sentence and I will answer it directly \u2014 no internal analysis dump, just the next useful step."
+    },
+    {
+      "question": "need ava code to login page html cde css",
+      "answer": "# Need Ava Code To Login Page Html Cde Css\n\n## Solution\n\nWe will create:\n- Login screen component\n- Client validation\n- Call backend auth endpoint\n- Loading / error / success states\n\n## Project Structure\n\n- `src/App.tsx`\n- `src/pages/`\n- `src/components/`\n- `src/lib/api.ts`\n- `package.json`\n\n## Implementation Steps\n\n1. Understand requirement\n2. Create implementation plan\n3. Develop solution\n4. Test result\n\n## Testing\n\n\u2713 Invalid email\n\u2713 Short password\n\u2713 API error rendering\n\n## Next Steps\n\n- Node 20+: `npm install` then `npm run dev`"
+    },
+    {
+      "question": "you can create code",
+      "answer": "# You Can Create Code\n\n## Solution\n\nWe will create:\n- Intent-aware OM dataset retrieval\n- Retrieved knowledge passed relevance validation\n\n## Implementation Steps\n\n1. Understand requirement\n2. Create implementation plan\n3. Develop solution\n4. Test result\n\n## Testing\n\n\u2713 UI validation\n\u2713 Main user flow\n\u2713 Error handling"
     }
   ]
 }

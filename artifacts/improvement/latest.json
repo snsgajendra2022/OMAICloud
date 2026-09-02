@@ -4,12 +4,12 @@
     "question": "hello",
     "scores": {
       "structure": 40.0,
-      "clarity": 51.7,
+      "clarity": 51.0,
       "security": 80.0,
       "task_fit": 42.0,
       "code_quality": 70.0
     },
-    "overall": 56.7,
+    "overall": 56.6,
     "ok": false
   },
   "weaknesses": [
@@ -21,7 +21,7 @@
     },
     {
       "area": "clarity",
-      "score": 51.7,
+      "score": 51.0,
       "threshold": 65.0,
       "hint": "Write shorter clear sentences; avoid garbled fragments"
     },
@@ -33,7 +33,7 @@
     },
     {
       "area": "overall",
-      "score": 56.7,
+      "score": 56.6,
       "threshold": 70.0,
       "hint": "Improve completeness and directness of the answer"
     }
@@ -51,8 +51,8 @@
     ]
   },
   "trainer_job": {
-    "id": "673301b0-d9f9-4d42-aea0-8c02f6f65bc3",
-    "ts": 1788340293.307164,
+    "id": "3b927a6f-ab83-4ef4-9bc2-5a980bedc140",
+    "ts": 1788342722.918027,
     "status": "queued",
     "reason": "structure,clarity,task_fit,overall",
     "sft_path": "data/om_training/improvements/sft_improvements.jsonl",
@@ -65,23 +65,9 @@
   },
   "version": {
     "om_version": "1.0",
-    "improve_cycle": 168,
-    "label": "OM-1.0-improve-168",
+    "improve_cycle": 169,
+    "label": "OM-1.0-improve-169",
     "history": [
-      {
-        "ts": 1788252811.3720472,
-        "cycle": 119,
-        "note": "improve from: hi",
-        "metrics": {
-          "overall": 54.4,
-          "weak": [
-            "structure",
-            "clarity",
-            "task_fit",
-            "overall"
-          ]
-        }
-      },
       {
         "ts": 1788252814.566881,
         "cycle": 120,
@@ -728,9 +714,23 @@
             "overall"
           ]
         }
+      },
+      {
+        "ts": 1788342722.919441,
+        "cycle": 169,
+        "note": "improve from: hello",
+        "metrics": {
+          "overall": 56.6,
+          "weak": [
+            "structure",
+            "clarity",
+            "task_fit",
+            "overall"
+          ]
+        }
       }
     ],
-    "updated_at": 1788340293.3078132
+    "updated_at": 1788342722.919443
   },
-  "ts": 1788340293.3080928
+  "ts": 1788342722.9199371
 }

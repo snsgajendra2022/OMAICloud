@@ -6,6 +6,8 @@ from .conversation import ConversationMemory, Message
 from .project_memory import ProjectMemory
 from .long_term import LongTermMemory
 from .memory_manager import MemoryManager
+from .manager import MemoryManager
+
 __all__ = [
     "SQLiteMemoryStore",
     "Memory",
@@ -18,6 +20,7 @@ __all__ = [
     "Message",
     "ProjectMemory",
     "LongTermMemory",
+     "MemoryManager",
     "MemoryManager",
 
 ]

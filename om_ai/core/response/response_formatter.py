@@ -201,10 +201,7 @@ class ResponseFormatter:
         if len(body) >= 40 and not looks_like_pipeline_dump(body):
             return body.strip() + "\n"
         return (
-            f"{q}\n\n"
-            "Tell me the goal in one sentence and I will answer it directly — "
-            "no internal analysis dump, just the next useful step.\n"
-        )
+            f"{q}\n\n")
 
     def _template_knowledge(self, data: dict[str, Any], question: str) -> str:
         fact = ""

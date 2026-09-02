@@ -5,6 +5,7 @@ from typing import Any
 
 from om_ai.cognition.task_planner import TaskPlanner
 from om_ai.cognition.technology_engine import TechnologyEngine
+from om_ai.evaluation.knowledge_confidence import KnowledgeConfidenceEngine
 from om_ai.knowledge.retrieval import search_knowledge
 from om_ai.knowledge.ranker import KnowledgeRanker
 
@@ -13,7 +14,6 @@ from .planner import PlanningEngine
 from .solver import SolutionGenerator
 from .verifier import VerificationEngine
 from .reflection import ReflectionEngine
-
 
 def _empty_technology() -> dict[str, Any]:
     return {
@@ -125,8 +125,30 @@ def _filter_knowledge_hits(question: str, hits: list[str], technology: dict[str,
         return hits
 
 
-def _retrieve_knowledge(question: str, k: int = 4) -> list[str]:
+def _retrieve_knowledge(
+    question: str,
+    k: int = 4,
+    *,
+    intent: dict | None = None,
+    technology: dict | None = None
+) -> list[str]:
     hits: list[str] = []
+    filters = {}
+    if intent:
+
+     domain = intent.get(
+        "domain"
+     )
+
+    if domain:
+
+        filters["domain"] = domain
+    if technology:
+      tech = technology.get(
+        "technology"
+      )
+    if tech:
+        filters["technology"] = tech
     try:
         from om_ai.knowledge.facts import lookup_fact
 
@@ -139,7 +161,10 @@ def _retrieve_knowledge(question: str, k: int = 4) -> list[str]:
         from om_ai.knowledge.retrieval import VectorKnowledgeLayer
 
         layer = VectorKnowledgeLayer()
-        for row in layer.search(question, k=k) or []:
+        from om_ai.knowledge.retrieval import HybridRetriever
+
+        layer = HybridRetriever()
+        for row in layer.search(question,k=k,filters=filters) or []:
             if isinstance(row, dict):
                 text = str(row.get("text") or row.get("chunk") or row.get("content") or "")
             else:
@@ -222,12 +247,45 @@ def run_reasoning_pipeline(
     from om_ai.understanding.query_kind import is_coding_task, query_kind
 
     kind = query_kind(question)
+
+
     hits = list(knowledge_hits or [])
     if kind == "greeting":
         hits = []
         retrieve = False
+    intent = IntentAnalyzer().analyze(
+        question,
+        messages=messages
+    )
+    technology = TechnologyEngine().analyze(
+        question
+    )
     if retrieve and not hits:
-        hits = _retrieve_knowledge(question)
+        hits = _retrieve_knowledge(question,intent=intent.to_dict(),technology=technology)
+        intent = IntentAnalyzer().analyze(
+        question
+    )
+    if not is_coding_task(question):
+        technology = {
+            "technology": None,
+            "category": "unknown",
+            "language": None,
+            "platform": None,
+            "confidence": 0,
+        }
+    if retrieve and not hits:
+
+        hits = _retrieve_knowledge(
+
+            question,
+
+            intent=intent.to_dict(),
+
+            technology=technology
+
+        )
+
+
     knowledge_profile = None
     try:
         from om_ai.knowledge.selector import select_knowledge
@@ -241,6 +299,41 @@ def run_reasoning_pipeline(
     technology = TechnologyEngine().analyze(question)
     if not is_coding_task(question):
         technology = _empty_technology()
+        
+    confidence_check = (
+        KnowledgeConfidenceEngine()
+        .evaluate(
+            question,
+            [
+                {
+                    "text": h
+                }
+                for h in hits
+            ]
+        )
+    )
+
+
+    if confidence_check.retry_needed:
+
+
+     retry_hits = _retrieve_knowledge(
+
+        question,
+
+        k=8,
+
+        intent=intent.to_dict(),
+
+        technology=technology
+
+    )
+    if retry_hits:
+
+        hits.extend(
+            retry_hits
+        )
+
     hits = _filter_knowledge_hits(question, hits, technology)
     hits = _rank_knowledge_hits(
 
@@ -268,6 +361,18 @@ def run_reasoning_pipeline(
         intent.meta["technology"] = technology
     solution = SolutionGenerator().solve(
         question, intent, plan, knowledge_hits=hits
+    )
+    knowledge_confidence = (
+    KnowledgeConfidenceEngine()
+        .evaluate(
+            question,
+            [
+                {
+                    "text": h
+                }
+                for h in hits
+            ]
+        )
     )
     verify = VerificationEngine().verify(intent, solution)
     reflection = ReflectionEngine().reflect(verify, domain=intent.domain)
@@ -310,6 +415,16 @@ def run_reasoning_pipeline(
             "confidence": round(conf, 3),
             "technology": technology,
             **(solution.meta or {}),
+        },
+        "knowledge_confidence": {
+            "score":
+                knowledge_confidence.score,
+            "level":
+                knowledge_confidence.confidence,
+            "retry_needed":
+                knowledge_confidence.retry_needed,
+            "reasons":
+                knowledge_confidence.reasons
         },
     }
     result["markdown"] = format_reasoning_markdown(result)

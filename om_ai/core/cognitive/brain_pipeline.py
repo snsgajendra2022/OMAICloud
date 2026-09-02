@@ -1,24 +1,69 @@
-"""OM-1.0 Cognitive Brain — facade over the existing reasoning pipeline.
-
-Do not call ``OMCognitiveBrain.process()`` at import time. Always pass a question:
-
-    OMCognitiveBrain().process("create react native login and dashboard app")
 """
+OM-1.0 Cognitive Brain — facade over the existing reasoning pipeline.
+
+Features:
+
+- Memory System
+- Agent Router
+- Intent Understanding
+- Technology Detection
+- Reasoning Engine
+- Answer Generation
+- Evaluation
+
+Usage:
+
+OMCognitiveBrain().process(
+    "create react native login and dashboard app"
+)
+
+"""
+
+
 from __future__ import annotations
 
+
 from typing import Any
+
+
 from om_ai.memory import MemoryManager
+
+from om_ai.agents import (
+    AgentRouter,
+    AgentExecutor
+)
+
 from om_ai.cognition.intent_engine import IntentEngine
+
 from om_ai.cognition.task_planner import TaskPlanner
+
 from om_ai.cognition.technology_engine import TechnologyEngine
+
 from om_ai.core.reasoning.reasoning_chain import ReasoningChain
+
 from om_ai.core.response.answer_generator import AnswerGenerator
+
 from om_ai.evaluation.self_checker import SelfEvaluator
-from om_ai.understanding.query_kind import is_coding_task, is_greeting, query_kind
+
+from om_ai.understanding.query_kind import (
+    is_coding_task,
+    is_greeting,
+    query_kind
+)
+from om_ai.agents.collaboration import (
+    AgentCollaborationPlanner,
+    AgentCoordinator
+)
+
+
 
 
 class OMCognitiveBrain:
+
+
+
     def __init__(self) -> None:
+
         self.memory = MemoryManager()
         self.intent = IntentEngine()
         self.technology = TechnologyEngine()
@@ -26,135 +71,562 @@ class OMCognitiveBrain:
         self.reasoning = ReasoningChain()
         self.generator = AnswerGenerator()
         self.evaluator = SelfEvaluator()
-    def process(self, question: str, knowledge: Any = None) -> dict[str, Any]:
-        question = (question or "").strip()
-        # memory_context = self.memory.get_context()
+        self.agent_router = AgentRouter()
+        self.agent_executor = AgentExecutor()
+        self.agent_planner = AgentCollaborationPlanner()
+        self.agent_coordinator = AgentCoordinator()
+
+
+    def process(
+        self,
+        question: str,
+        knowledge: Any = None
+    ) -> dict[str, Any]:
+
+
+        question = (
+            question or ""
+        ).strip()
+
+        # ----------------------------
+        # Agent Routing
+        # ----------------------------
+
+        agent_result = self.agent_router.route(
+            question
+        )
+        agent_plan = self.agent_planner.plan(
+            question
+        )
+
+        # ----------------------------
+        # Memory Retrieval
+        # ----------------------------
+
+        existing_memory = self.memory.get_context()
+
+
+
+        relevant_memory = self.memory.get_relevant_memory(
+
+            question,
+
+            memories=existing_memory
+
+        )
         memory_context = {
-            **self.memory.get_context(),
-            "project": self.memory.project.data
+            "relevant":relevant_memory
+            
         }
+
+        agent_team_result = self.agent_coordinator.execute(
+
+            agent_plan,
+
+            question,
+
+            {
+                "memory":memory_context
+            }
+
+        )
+
+        agent_execution = self.agent_executor.execute(
+
+            agent_result,
+
+            question,
+
+            {
+
+                "memory": memory_context
+
+            }
+
+        )
+        # ----------------------------
+        # Empty Question
+        # ----------------------------
+
         if not question:
             return {
                 "answer": "",
+
                 "user_response": "",
+
                 "developer_response": "",
+
+                "agent": agent_result,
+
                 "debug": {},
-                "intent": {},
-                "technology": {},
-                "tasks": {"goal": "", "category": "general", "tasks": []},
-                "reasoning": {},
+
                 "evaluation": {
+
                     "approved": False,
-                    "score": 0.0,
-                    "issues": ["empty question"],
-                    "improvement_needed": True,
-                },
+
+                    "score": 0,
+
+                    "issues":[
+                        "empty question"
+                    ]
+
+                }
+
             }
 
-        kind = query_kind(question)
-        intent_result = self.intent.analyze(question)
-        technology_result = (
-            self.technology.analyze(question) if is_coding_task(question) else {
-                "technology": None,
-                "category": "unknown",
-                "language": None,
-                "platform": None,
-                "confidence": 0,
-            }
+
+
+        # ----------------------------
+        # Query Type
+        # ----------------------------
+
+        kind = query_kind(
+            question
         )
-        task_result = self.planner.decompose(question)
-        if kind in {"greeting", "knowledge"}:
-            task_result = {"goal": question, "category": "general", "tasks": []}
 
-        hits: list[str] | None = None
+
+
+        # ----------------------------
+        # Intent
+        # ----------------------------
+
+        intent_result = self.intent.analyze(
+            question
+        )
+
+
+
+        # ----------------------------
+        # Technology
+        # ----------------------------
+
+        if is_coding_task(question):
+
+            technology_result = self.technology.analyze(
+                question
+            )
+
+        else:
+
+            technology_result = {
+
+                "technology":None,
+
+                "category":"unknown",
+
+                "language":None,
+
+                "platform":None,
+
+                "confidence":0
+
+
+            }
+
+
+
+
+
+        # ----------------------------
+        # Task Planning
+        # ----------------------------
+
+        task_result = self.planner.decompose(
+            question
+        )
+
+
+
+        if kind in {
+            "greeting",
+            "knowledge"
+        }:
+
+
+            task_result = {
+
+
+                "goal":question,
+
+                "category":"general",
+
+                "tasks":[]
+
+
+            }
+
+
+
+        # ----------------------------
+        # External Knowledge
+        # ----------------------------
+
+        hits = None
+
+
+
         if kind == "greeting":
-            hits = []
-        elif isinstance(knowledge, list):
-            hits = [str(x).strip() for x in knowledge if str(x).strip()]
-        elif isinstance(knowledge, dict):
-            text = str(knowledge.get("text") or knowledge.get("answer") or "").strip()
-            hits = [text] if text else None
-        elif isinstance(knowledge, str) and knowledge.strip():
-            hits = [knowledge.strip()]
+
+
+            hits=[]
+
+
+
+        elif isinstance(
+            knowledge,
+            list
+        ):
+
+
+            hits=[
+
+                str(x).strip()
+
+                for x in knowledge
+
+                if str(x).strip()
+
+            ]
+
+
+
+        elif isinstance(
+            knowledge,
+            dict
+        ):
+
+
+            text = str(
+
+                knowledge.get(
+                    "text"
+                )
+                or
+                knowledge.get(
+                    "answer"
+                )
+                or ""
+
+            ).strip()
+
+
+
+            hits=[text] if text else None
+
+
+
+        elif isinstance(
+            knowledge,
+            str
+        ) and knowledge.strip():
+
+
+            hits=[
+
+                knowledge.strip()
+
+            ]
+
+
+
+
+
+        # ----------------------------
+        # Main Reasoning Pipeline
+        # ----------------------------
 
         from om_ai.core.reasoning.pipeline import run_reasoning_pipeline
 
+
+
         pipeline = run_reasoning_pipeline(
+
             question,
+
             knowledge_hits=hits,
+
             retrieve=not hits and kind != "greeting",
-            messages=memory_context.get("conversation")
+
+            messages=None
+
         )
+
+        pipeline["agent"] = agent_result
+        pipeline["agent_execution"] = agent_execution
+
+
+
         generated = None
-        user_from_pipeline = str(pipeline.get("user_response") or pipeline.get("answer") or "").strip()
-        if not user_from_pipeline:
+
+
+
+        user_answer = str(
+
+            pipeline.get(
+                "user_response"
+            )
+            or
+            pipeline.get(
+                "answer"
+            )
+            or ""
+
+        ).strip()
+
+
+
+        # ----------------------------
+        # Fallback Reasoning
+        # ----------------------------
+
+        if not user_answer:
+
+
             reasoning_result = self.reasoning.analyze(
                 question,
                 intent=intent_result,
                 technology=technology_result,
                 tasks=task_result,
-                knowledge=knowledge if isinstance(knowledge, dict) else None,
-                memory=memory_context
+                knowledge=knowledge,
+                memory=memory_context,
+                agent_result=agent_result,
+                agent_execution=agent_execution,
+                agent_team=agent_team_result
             )
-            generated = self.generator.generate(question, reasoning_result, knowledge)
-            if isinstance(generated, dict):
-                user_from_pipeline = str(generated.get("answer") or "").strip()
+
+
+
+            generated = self.generator.generate(
+
+                question,
+
+                reasoning_result,
+
+                knowledge
+
+            )
+
+
+
+            if isinstance(
+                generated,
+                dict
+            ):
+
+
+                user_answer = str(
+
+                    generated.get(
+                        "answer",
+                        ""
+
+                    )
+
+                ).strip()
+
+
+
             else:
-                user_from_pipeline = str(generated or "").strip()
+
+
+                user_answer = str(
+                    generated
+                ).strip()
+
+
+
+
+
+        # ----------------------------
+        # Save Memory
+        # ----------------------------
+
         self.memory.remember_conversation(
+
             question,
-            user_from_pipeline
+
+            user_answer
+
         )
-        self.memory.long_term.remember(
-            "experiences",
-            {
-                "question": question,
-                "answer": user_from_pipeline
-            }
+
+
+
+        # ----------------------------
+        # Evaluation
+        # ----------------------------
+
+        evaluation = pipeline.get(
+            "evaluation"
         )
-        evaluation = pipeline.get("evaluation") or self.evaluator.evaluate(
-            question,
-            user_from_pipeline,
-            pipeline.get("technology") or technology_result,
+
+
+
+        if not evaluation:
+
+
+            evaluation = self.evaluator.evaluate(
+
+                question,
+
+                user_answer,
+
+                technology_result
+
+            )
+
+
+
+
+
+        # ----------------------------
+        # Final Response
+        # ----------------------------
+
+        from om_ai.core.response.response_formatter import (
+            ResponseFormatter,
+            response_mode
         )
-        from om_ai.core.response.response_formatter import ResponseFormatter, response_mode
+
+
 
         formatter = ResponseFormatter()
+
+
+
         payload = {
-            "question": question,
-            "intent": pipeline.get("intent") or intent_result,
-            "technology": pipeline.get("technology") or technology_result,
-            "tasks": pipeline.get("debug", {}).get("tasks") or task_result,
-            "reasoning": pipeline,
-            "answer": str(pipeline.get("solution") or user_from_pipeline),
-            "evaluation": evaluation,
-            "understanding": pipeline.get("understanding") or question,
-            "plan": pipeline.get("plan") or task_result.get("tasks") or [],
-            "architecture": pipeline.get("architecture") or [],
-            "markdown": pipeline.get("markdown") or "",
-            "memory": memory_context,
+
+
+            "question":
+                question,
+
+
+            "intent":
+                pipeline.get(
+                    "intent"
+                )
+                or intent_result,
+
+
+            "technology":
+                pipeline.get(
+                    "technology"
+                )
+                or technology_result,
+
+
+            "tasks":
+                task_result,
+
+
+            "reasoning":
+                pipeline,
+
+
+            "answer":
+                user_answer,
+
+
+            "evaluation":
+                evaluation,
+
+
+            "memory":
+                memory_context,
+
+
+            "agent":
+                agent_result
+
+
         }
-        user_response = str(pipeline.get("user_response") or "").strip() or formatter.format_user_response(payload)
-        if is_greeting(question) and "agents:" in user_response.lower():
-            user_response = formatter.format_user_response({"question": question})
-        developer_response = str(
-            pipeline.get("developer_response") or pipeline.get("markdown") or ""
-        ).strip() or formatter.format_developer_response(payload)
-        visible = developer_response if response_mode() == "developer" else user_response
-        debug = pipeline.get("debug") or {
-            "intent": payload["intent"],
-            "technology": payload["technology"],
-            "evaluation": evaluation,
-            "markdown": developer_response,
-        }
+
+
+
+        user_response = formatter.format_user_response(
+            payload
+        )
+
+
+
+        developer_response = formatter.format_developer_response(
+            payload
+        )
+
+
+
+        visible = (
+
+            developer_response
+
+            if response_mode()=="developer"
+
+            else user_response
+
+        )
+
+
+
+
+
         return {
-            "answer": visible,
-            "user_response": user_response,
-            "developer_response": developer_response,
-            "debug": debug,
-            "intent": payload["intent"],
-            "technology": payload["technology"],
-            "tasks": task_result,
-            "reasoning": pipeline,
-            "evaluation": evaluation,
+
+
+            "answer":
+                visible,
+
+
+            "user_response":
+                user_response,
+
+
+            "developer_response":
+                developer_response,
+
+
+            "agent":
+                agent_result,
+
+
+            "memory":
+                memory_context,
+
+
+            "intent":
+                payload["intent"],
+
+
+            "technology":
+                payload["technology"],
+
+
+            "tasks":
+                task_result,
+
+
+            "reasoning":
+                pipeline,
+
+
+            "evaluation":
+                evaluation,
+
+
+            "debug":{
+
+
+                "agent":
+                    agent_result,
+
+
+                "memory":
+                    memory_context,
+
+
+                "evaluation":
+                    evaluation
+
+
+            }
+
+
         }
