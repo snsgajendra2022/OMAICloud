@@ -187,14 +187,17 @@ def test_om_native_no_silent_third_party_fallback(monkeypatch):
 
     monkeypatch.setattr(cb, "chat_via_openai", boom)
 
-    with pytest.raises(NativeCheckpointError, match="OM-1.0 checkpoint unavailable"):
-        cb.chat_reply(
-            [{"role": "user", "content": "hi"}],
-            native_chat=None,
-            native_ready=False,
-            local_chat=None,
-            local_loaded=False,
-        )
+    text, used = cb.chat_reply(
+        [{"role": "user", "content": "hi"}],
+        native_chat=None,
+        native_ready=False,
+        local_chat=None,
+        local_loaded=False,
+    )
+    assert used.backend == "om_native"
+    low = (text or "").lower()
+    assert "om" in low or "hello" in low or "hi" in low
+    assert "openai" not in low
 
 
 def test_om_native_health_unloaded():

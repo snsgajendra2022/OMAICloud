@@ -212,13 +212,14 @@ if _NATIVE_MODE:
         else:
             logger.error(
                 "OM_MODEL_PROVIDER/OM_AI_CHAT_BACKEND=om_native but checkpoint missing — "
-                "chat will return 503 until train-om1 produces a checkpoint. "
+                "chat uses the cognitive brain until train-om1 produces a checkpoint. "
                 "No Ollama/third-party LLM fallback."
             )
             _print_native_ready_banner(ready=False)
-    except Exception:
+    except Exception as exc:
         logger.exception(
-            "OM native autoload failed — chat will return 503 (no Ollama fallback)"
+            "OM native autoload failed — %s (chat still uses cognitive brain; no Ollama fallback)",
+            exc,
         )
         _print_native_ready_banner(ready=False)
 elif _AUTOLOAD:

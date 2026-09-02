@@ -411,8 +411,8 @@ def chat_reply(
 
     # --- OM native: NO silent Ollama/OpenAI fallback ---
     if info.backend == "om_native":
-        if native_chat is None or not native_ready:
-            raise NativeCheckpointError("OM-1.0 checkpoint unavailable.")
+        # Native weights are preferred, but the cognitive brain can still answer
+        # if the checkpoint/tokenizer failed to load (no third-party LLM fallback).
         from om_ai.runtime.engine import EMPTY_GENERATION_FALLBACK, usable_generation_text
 
         user_text = _latest_user_text(messages)
@@ -657,6 +657,14 @@ def chat_reply(
 
         if prefer_grounded and live_grounded_allowed and grounded:
             return _out(grounded)
+
+        if native_chat is None or not native_ready:
+            from om_ai.core.response.response_formatter import ensure_public_reply
+
+            public = ensure_public_reply(user_text, "")
+            if public.strip():
+                return _out(public)
+            raise NativeCheckpointError("OM-1.0 checkpoint unavailable.")
 
         try:
             text = native_chat(messages, **kwargs)

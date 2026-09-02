@@ -27,7 +27,6 @@ class ProjectMemory:
         )
 
         self.data = self.load()
-        self.memory.get_context()
 
     def load(self):
 
@@ -98,4 +97,4 @@ class ProjectMemory:
             {}
         )
     def get_project_context(self):
-        return self.project.data
+        return self.data

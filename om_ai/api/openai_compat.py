@@ -13,6 +13,7 @@ Ollama is not part of the production path.
 from __future__ import annotations
 
 import json
+import logging
 import time
 import uuid
 from typing import Any, AsyncGenerator
@@ -27,6 +28,7 @@ from om_ai.runtime.chat_backend import backend_status, chat_reply, configured_ba
 from om_ai.security.auth import TenantContext
 
 router = APIRouter(prefix="/api/v1", tags=["OpenAI Compatible"])
+logger = logging.getLogger(__name__)
 
 # Filled by main.py after engine singleton exists
 _engine = None
@@ -52,6 +54,21 @@ def _local_loaded() -> bool:
 def _native_ready() -> bool:
     nb = _native_backend
     return bool(nb is not None and getattr(nb, "loaded", False) and getattr(nb, "_trained", False))
+
+
+def _try_load_native() -> bool:
+    """Lazy-load OM-1.0 if serve started before the checkpoint/tokenizer was ready."""
+    if _native_ready():
+        return True
+    nb = _native_backend
+    if nb is None:
+        return False
+    try:
+        nb.ensure_loaded()
+    except Exception:
+        logger.exception("OM native lazy load failed")
+        return False
+    return _native_ready()
 
 
 def _require_local_engine():
@@ -401,17 +418,11 @@ async def chat_completions(
     ext_pid = normalize_provider_id(req.model)
     use_external = bool(ext_pid and ext_pid != "om")
 
-    # When native is forced and checkpoint missing, fail fast with 503 —
-    # unless the request targets an enabled external LLM.
-    if (
-        not use_external
-        and configured_backend() == "om_native"
-        and not _native_ready()
-    ):
-        raise HTTPException(
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail="OM-1.0 checkpoint unavailable.",
-        )
+    # Retry native load (checkpoint may have appeared after serve start).
+    # If still not ready, continue — chat_reply uses the cognitive brain
+    # instead of a third-party LLM. Raw generate (/completions) still needs weights.
+    if not use_external and configured_backend() == "om_native":
+        _try_load_native()
 
     chat_kwargs = dict(
         max_new=max_new,
@@ -492,11 +503,6 @@ async def chat_completions(
 
         return StreamingResponse(event_stream(), media_type="text/event-stream")
 
-    if configured_backend() == "om_native" and not use_external and not _native_ready():
-        raise HTTPException(
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail="OM-1.0 checkpoint unavailable.",
-        )
     text, model_name, backend, provider = _run_chat(messages, **chat_kwargs)
     return _chat_response(model_name, text, backend=backend, provider=provider)
 

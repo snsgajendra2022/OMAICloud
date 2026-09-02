@@ -1,0 +1,27 @@
+{
+  "facts": [],
+  "preferences": [],
+  "decisions": [],
+  "experiences": [
+    {
+      "question": "create react native login and dashboard app",
+      "answer": "# React Native Login And Dashboard App\n\n## Solution\n\nWe will implement this with **react native**.\n\nWe will create:\n- Client: login form + session handling\n- API: POST /login, POST /logout, GET /me\n- Store: users table with hashed passwords\n- Guards: HTTPS, rate limit, CSRF/SameSite cookies\n\n## Project Structure\n\n- `App.tsx`\n- `src/screens/LoginScreen.tsx`\n- `src/screens/DashboardScreen.tsx`\n- `src/navigation/`\n- `package.json`\n- `Dockerfile`\n- `docker-compose.yml`\n\n## Implementation Steps\n\n1. Create Login Screen\n2. Create Dashboard Screen\n3. Setup Navigation\n4. Authentication\n\n## Testing\n\n\u2713 Reject empty username/password\n\u2713 Reject wrong password without leaking which field failed\n\u2713 Issue session only after successful verify\n\n## Next Steps\n\n- React Native: `npx expo start` (or `npx react-native run-ios` / `run-android`)"
+    },
+    {
+      "question": "create react native login and dashboard app",
+      "answer": "# React Native Login And Dashboard App\n\n## Solution\n\nWe will implement this with **react native**.\n\nWe will create:\n- Client: login form + session handling\n- API: POST /login, POST /logout, GET /me\n- Store: users table with hashed passwords\n- Guards: HTTPS, rate limit, CSRF/SameSite cookies\n\n## Project Structure\n\n- `App.tsx`\n- `src/screens/LoginScreen.tsx`\n- `src/screens/DashboardScreen.tsx`\n- `src/navigation/`\n- `package.json`\n- `Dockerfile`\n- `docker-compose.yml`\n\n## Implementation Steps\n\n1. Create Login Screen\n2. Create Dashboard Screen\n3. Setup Navigation\n4. Authentication\n\n## Testing\n\n\u2713 Reject empty username/password\n\u2713 Reject wrong password without leaking which field failed\n\u2713 Issue session only after successful verify\n\n## Next Steps\n\n- React Native: `npx expo start` (or `npx react-native run-ios` / `run-android`)"
+    },
+    {
+      "question": "hello",
+      "answer": "Hello. I am OM. How can I help you today?"
+    },
+    {
+      "question": "what is ionic",
+      "answer": "Ionic is a framework for building cross-platform mobile and web applications using web technologies."
+    },
+    {
+      "question": "you can create iomic pages",
+      "answer": "# You Can Create Iomic Pages\n\n## Solution\n\nWe will create:\n- Load dataset brain\n- Retrieve similar solutions\n- Implement minimal fix\n- Verify\n\n## Implementation Steps\n\n1. Understand requirement\n2. Create implementation plan\n3. Develop solution\n4. Test result\n\n## Testing\n\n\u2713 UI validation\n\u2713 Main user flow\n\u2713 Error handling"
+    }
+  ]
+}
