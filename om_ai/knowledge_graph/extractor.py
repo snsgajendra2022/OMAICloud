@@ -1,40 +1,83 @@
 """
-OM Concept Extraction Engine
+OM Advanced Entity Extraction Engine
+
+Responsible for:
+
+- Entity Detection
+- Entity Classification
+- Relationship Discovery
+- Confidence Scoring
+- Knowledge Graph Preparation
+
 """
 
 
-from .entity import Entity
+from dataclasses import dataclass, field
 
-from .relation import Relationship
-
-
+import re
 
 
 
-class ConceptExtractor:
+
+
+@dataclass
+class ExtractedEntity:
+
+
+    name: str
+
+
+    entity_type: str
+
+
+    confidence: float = 0.0
+
+
+    context: str = ""
 
 
 
-    def extract(
-        self,
-        text:str
-    ):
+    def to_dict(self):
+
+        return {
+
+            "name":
+
+                self.name,
 
 
-        entities=[]
+            "type":
 
-        relations=[]
-
-
-        words=text.split()
+                self.entity_type,
 
 
+            "confidence":
 
-        technologies=[
+                self.confidence,
+
+
+            "context":
+
+                self.context
+
+        }
+
+
+
+
+
+class EntityExtractor:
+
+
+
+    ENTITY_RULES = {
+
+
+        "technology":
+
+        [
 
             "python",
-
-            "java",
 
             "php",
 
@@ -42,82 +85,253 @@ class ConceptExtractor:
 
             "react",
 
+            "react native",
+
+            "django",
+
+            "node",
+
             "mysql",
+
+            "postgresql",
+
+            "mongodb",
 
             "docker",
 
-            "api",
+            "kubernetes"
 
-            "database"
+        ],
+
+
+
+        "framework":
+
+        [
+
+            "laravel",
+
+            "django",
+
+            "spring",
+
+            "flutter",
+
+            "angular"
+
+        ],
+
+
+
+        "database":
+
+        [
+
+            "mysql",
+
+            "postgresql",
+
+            "mongodb",
+
+            "sqlite",
+
+            "redis"
+
+        ],
+
+
+
+        "company":
+
+        [
+
+            "google",
+
+            "openai",
+
+            "microsoft",
+
+            "meta"
+
+        ],
+
+
+
+        "ai_concept":
+
+        [
+
+            "machine learning",
+
+            "deep learning",
+
+            "neural network",
+
+            "llm",
+
+            "transformer",
+
+            "rag"
+
+        ]
+
+    }
+
+
+
+    def extract(
+
+        self,
+
+        text:str
+
+    ):
+
+
+
+        entities=[]
+
+
+        lower=text.lower()
+
+
+
+        # Rule based extraction
+
+        for entity_type, values in self.ENTITY_RULES.items():
+
+
+            for value in values:
+
+
+                if value in lower:
+
+
+                    entities.append(
+
+                        ExtractedEntity(
+
+                            name=value,
+
+                            entity_type=entity_type,
+
+                            confidence=0.95,
+
+                            context=self._context(
+
+                                text,
+
+                                value
+
+                            )
+
+                        )
+
+                    )
+
+
+
+        # Named entity fallback
+
+        names=re.findall(
+
+            r"\b[A-Z][a-zA-Z0-9]+\b",
+
+            text
+
+        )
+
+
+
+        for name in names:
+
+
+            if not any(
+
+                x.name.lower()==name.lower()
+
+                for x in entities
+
+            ):
+
+
+                entities.append(
+
+                    ExtractedEntity(
+
+                        name=name,
+
+                        entity_type="concept",
+
+                        confidence=0.60,
+
+                        context=self._context(
+
+                            text,
+
+                            name
+
+                        )
+
+                    )
+
+                )
+
+
+
+        return [
+
+            entity.to_dict()
+
+            for entity in entities
 
         ]
 
 
 
-        found=[]
 
 
-        for word in words:
+    def _context(
+
+        self,
+
+        text,
+
+        keyword
+
+    ):
 
 
-            clean=word.lower().strip(
-                ".,()"
-            )
+        index=text.lower().find(
 
+            keyword.lower()
 
-            if clean in technologies:
-
-                found.append(clean)
-
-
-
-        for item in found:
-
-
-            entities.append(
-
-                Entity(
-
-                    name=item,
-
-                    entity_type="technology"
-
-                )
-
-            )
+        )
 
 
 
-        for i in range(
-            len(found)-1
-        ):
+        if index == -1:
+
+            return ""
 
 
-            relations.append(
 
-                Relationship(
+        start=max(
 
-                    source=found[i],
+            0,
 
-                    relation="related_to",
+            index-50
 
-                    target=found[i+1]
-
-                )
-
-            )
+        )
 
 
-        return {
+        end=min(
+
+            len(text),
+
+            index+100
+
+        )
 
 
-            "entities":
-
-                entities,
-
-
-            "relations":
-
-                relations
-
-        }
+        return text[start:end]

@@ -1,0 +1,13 @@
+[
+  {
+    "input": {
+      "text": "create restaurant dashboard",
+      "confidence": 0.0,
+      "language": "unknown"
+    },
+    "command": {
+      "text": "create restaurant dashboard",
+      "intent": "creation"
+    }
+  }
+]

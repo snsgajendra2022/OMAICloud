@@ -1,0 +1,30 @@
+[
+  {
+    "plan": {
+      "question": "Compare Laravel and Django",
+      "steps": [
+        "Understand research objective",
+        "Collect relevant information",
+        "Analyze collected data",
+        "Validate important facts",
+        "Generate research summary"
+      ]
+    },
+    "analysis": {
+      "key_points": [
+        "Laravel is a PHP framework",
+        "Django is a Python framework"
+      ],
+      "source_count": 2
+    },
+    "validation": {
+      "validated": true,
+      "confidence": 0.2,
+      "checked_items": 2
+    },
+    "result": {
+      "summary": "Laravel is a PHP framework\nDjango is a Python framework",
+      "confidence": 0.2
+    }
+  }
+]
