@@ -1,0 +1,12 @@
+[
+  {
+    "entity": "laravel",
+    "type": "technology",
+    "relation": "uses"
+  },
+  {
+    "entity": "react",
+    "type": "technology",
+    "relation": "uses"
+  }
+]

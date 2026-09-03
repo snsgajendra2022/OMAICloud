@@ -200,6 +200,32 @@ class TrainingMetricsLogger:
         return self._path
 
 
+class MetricsCollector:
+    """In-process counters for runtime observability (OMMonitor).
+
+    Training JSONL telemetry stays on :class:`TrainingMetricsLogger`.
+    """
+
+    def __init__(self) -> None:
+        self._lock = threading.Lock()
+        self._counters: dict[str, int] = {}
+
+    def increment(self, name: str, amount: int = 1) -> int:
+        key = str(name or "").strip() or "unknown"
+        with self._lock:
+            self._counters[key] = int(self._counters.get(key, 0)) + int(amount)
+            return self._counters[key]
+
+    def get(self, name: str, default: int = 0) -> int:
+        with self._lock:
+            return int(self._counters.get(name, default))
+
+    def get_all(self) -> dict[str, Any]:
+        with self._lock:
+            counters = dict(self._counters)
+        return {"counters": counters}
+
+
 # ---------------------------------------------------------------------------
 # Prometheus text exposition
 # ---------------------------------------------------------------------------

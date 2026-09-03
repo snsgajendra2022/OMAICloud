@@ -36,6 +36,7 @@ from om_ai.agents import (
 from om_ai.cognition.intent_engine import IntentEngine
 
 from om_ai.learning import LearningEngine
+from om_ai.reflection import ReflectionEngine
 from om_ai.orchestration import OMOrchestrator
 from om_ai.cognition.task_planner import TaskPlanner
 from om_ai.evaluation.self_checker import SelfEvaluator
@@ -43,6 +44,9 @@ from om_ai.improvement import KnowledgeImprovementEngine
 from om_ai.cognition.technology_engine import TechnologyEngine
 from om_ai.core.reasoning.reasoning_chain import ReasoningChain
 from om_ai.core.response.answer_generator import AnswerGenerator
+from om_ai.memory_intelligence import MemoryConsolidator
+from om_ai.user_intelligence import UserIntelligenceEngine
+from om_ai.context import ContextEngine
 
 from om_ai.understanding.query_kind import (
     is_coding_task,
@@ -77,6 +81,10 @@ class OMCognitiveBrain:
         self.learning = LearningEngine()
         self.improvement = KnowledgeImprovementEngine()
         self.orchestrator = OMOrchestrator()
+        self.reflection_engine = ReflectionEngine()
+        self.memory_consolidator = MemoryConsolidator()
+        self.user_intelligence = UserIntelligenceEngine()
+        self.context_engine = ContextEngine()
 
     def process(
         self,
@@ -116,6 +124,15 @@ class OMCognitiveBrain:
             "relevant":relevant_memory
             
         }
+        context_result = self.context_engine.understand(
+
+                question,
+
+                user=self.user_intelligence.profile_data(),
+
+                memory=memory_context
+
+            )
 
         orchestration = self.orchestrator.orchestrate(
 
@@ -397,7 +414,8 @@ class OMCognitiveBrain:
                 memory=memory_context,
                 agent_result=agent_result,
                 agent_execution=agent_execution,
-                agent_team=agent_team_result
+                agent_team=agent_team_result,
+                context=context_result
             )
 
 
@@ -442,7 +460,23 @@ class OMCognitiveBrain:
 
 
 
+        consolidated_memory = self.memory_consolidator.consolidate(
 
+            {
+
+                "type":"conversation",
+
+                "content":{
+
+                    "question":question,
+
+                    "answer":user_answer
+
+                }
+
+            }
+
+        )
         # ----------------------------
         # Save Memory
         # ----------------------------
@@ -455,7 +489,11 @@ class OMCognitiveBrain:
 
         )
 
+        user_profile = self.user_intelligence.learn(
 
+                question
+
+            )
 
         # ----------------------------
         # Evaluation
@@ -465,8 +503,24 @@ class OMCognitiveBrain:
             "evaluation"
         )
 
+        reflection_result = self.reflection_engine.process(
+
+            {
+
+                "success":
+
+                    evaluation.get("approved", False),
 
 
+                "answer":
+
+                    user_answer
+
+            },
+
+            evaluation
+
+        )
         if not evaluation:
 
 
@@ -520,46 +574,28 @@ class OMCognitiveBrain:
 
 
         payload = {
-
-
             "question":
                 question,
-
-
             "intent":
                 pipeline.get(
                     "intent"
                 )
                 or intent_result,
-
-
             "technology":
                 pipeline.get(
                     "technology"
                 )
                 or technology_result,
-
-
             "tasks":
                 task_result,
-
-
             "reasoning":
                 pipeline,
-
-
             "answer":
                 user_answer,
-
-
             "evaluation":
                 evaluation,
-
-
             "memory":
                 memory_context,
-
-
             "agent":
                 agent_result,
             "evaluation":
@@ -569,7 +605,10 @@ class OMCognitiveBrain:
             "improvement":
                 improvement_result,
             "orchestration": orchestration,
-
+            "reflection": reflection_result,
+            "memory_consolidation": consolidated_memory,
+            "user_profile": user_profile,
+            "context": context_result,
         }
 
 

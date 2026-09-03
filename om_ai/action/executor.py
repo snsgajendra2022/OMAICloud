@@ -5,7 +5,7 @@ OM Autonomous Tool Executor
 
 from .registry import ToolRegistry
 from om_ai.security import SecurityController
-
+from om_ai.observability import OMMonitor
 
 
 
@@ -18,7 +18,7 @@ class ToolExecutor:
 
         self.registry = ToolRegistry()
         self.security = SecurityController()
-
+        self.monitor = OMMonitor()
 
 
     def register_tool(
@@ -84,7 +84,22 @@ class ToolExecutor:
                     function=tool.function,
                     **kwargs
                 )
+            self.monitor.execution_started(
 
+                    agent="tool_executor"
+
+                )
+            if result.get("success"):
+
+                self.monitor.metrics.increment(
+                    "successful_actions"
+                )
+
+            else:
+
+                self.monitor.execution_failed(
+                    result.get("error")
+                )
             return {
                 "success":
 

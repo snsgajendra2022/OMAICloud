@@ -1,0 +1,12 @@
+[
+  {
+    "issues": [
+      "execution_failed",
+      "low_quality_result"
+    ],
+    "improvements": [
+      "Improve tool execution validation",
+      "Improve knowledge retrieval and reasoning"
+    ]
+  }
+]

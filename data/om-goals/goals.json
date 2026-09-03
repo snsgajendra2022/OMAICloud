@@ -1,0 +1,40 @@
+[
+  {
+    "id": "8711fd231e5e483e87116b9fa5851abb",
+    "title": "Restaurant Management SaaS",
+    "description": "Build complete restaurant platform",
+    "status": "active",
+    "progress": 0,
+    "milestones": [
+      {
+        "id": "1",
+        "title": "Database Design",
+        "status": "completed"
+      },
+      {
+        "id": "2",
+        "title": "Backend API",
+        "status": "pending"
+      }
+    ]
+  },
+  {
+    "id": "698fd271f56b4aae9b52b553340d9a53",
+    "title": "Restaurant Management SaaS",
+    "description": "Build complete restaurant platform",
+    "status": "active",
+    "progress": 0,
+    "milestones": [
+      {
+        "id": "1",
+        "title": "Database Design",
+        "status": "completed"
+      },
+      {
+        "id": "2",
+        "title": "Backend API",
+        "status": "pending"
+      }
+    ]
+  }
+]
