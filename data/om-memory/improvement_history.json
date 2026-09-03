@@ -16,5 +16,11 @@
       ],
       "optimized": true
     }
+  },
+  {
+    "question": "today date",
+    "answer": "Today's date is Thursday, 03 September 2026.",
+    "intent": "date_request",
+    "score": 100.0
   }
 ]

@@ -14,6 +14,13 @@ from om_ai.env import load_dotenv
 
 load_dotenv()
 
+try:
+    from om_ai.diagnostics.logging_setup import setup_logging
+
+    setup_logging()
+except Exception:
+    pass
+
 from fastapi import Depends, FastAPI, HTTPException, Request, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
@@ -377,13 +384,44 @@ class MultimodalRequest(BaseModel):
 
 @app.get("/health", tags=["System"])
 def health():
-    """Liveness probe — always 200 if the process is alive."""
+    """Liveness + subsystem snapshot (never 503 — process alive)."""
+    model_ready = bool(
+        getattr(native_backend, "loaded", False)
+        and getattr(native_backend, "_trained", False)
+    ) or bool(getattr(engine, "model", None) is not None)
+    brain_ok = True
+    memory_ok = True
+    agents_ok = True
+    try:
+        from om_ai.core.cognitive.brain_pipeline import OMCognitiveBrain  # noqa: F401
+    except Exception:
+        brain_ok = False
+    try:
+        memory.all(limit=1) if hasattr(memory, "all") else True
+    except Exception:
+        try:
+            _ = conversations  # noqa: F841
+        except Exception:
+            memory_ok = False
+    try:
+        from om_ai.agents.router import AgentRouter
+
+        AgentRouter()
+    except Exception:
+        agents_ok = False
+
+    status_label = "healthy" if brain_ok else "degraded"
     return {
         "ok": True,
-        "status": "healthy",
+        "status": status_label,
+        "brain": brain_ok,
+        "memory": memory_ok,
+        "model": model_ready,
+        "agents": agents_ok,
         "om_version": "1.0",
         "version": _API_VERSION,
         "foundation": "complete",
+        "fallback": None if model_ready else "brain-only",
     }
 
 
@@ -979,34 +1017,89 @@ def multimodal(
     req: MultimodalRequest,
     ctx: TenantContext = Depends(require_permission("model.generate")),
 ):
-    """Text + optional image inference.
-
-    Image paths are validated and passed to the vision encoder when available.
-    If vision is not available, a clear 501 error is returned.
-    """
+    """Text + optional image / file understanding via multimodal manager."""
     if req.image_paths:
+        # Prefer resilient MultimodalManager (OCR + vision reasoning)
         try:
-            from om_ai.multimodal.orchestrator import UnifiedOrchestrator
-            orch = UnifiedOrchestrator(llm_engine=engine)
-            result = orch.run(text=req.text, images=req.image_paths)
-            return result
-        except ImportError:
-            raise HTTPException(
-                status_code=status.HTTP_501_NOT_IMPLEMENTED,
-                detail=(
-                    "Vision capability is not available in this deployment. "
-                    "Install the vision extras and configure a vision encoder."
-                ),
+            from om_ai.multimodal.manager import MultimodalManager
+            from om_ai.operating_intelligence.universal import UniversalIntelligence
+
+            mm = MultimodalManager()
+            path0 = req.image_paths[0]
+            packet = mm.process(text=req.text, path=path0, question=req.text)
+            uni = UniversalIntelligence().run(
+                req.text or "What is in this image?",
+                path=path0,
             )
+            return {
+                "text": uni.get("answer") or packet.get("answer") or "",
+                "modalities_used": [packet.get("modality") or "image"],
+                "stages": packet.get("stages") or uni.get("stages"),
+                "analysis": packet.get("analysis"),
+                "ocr": packet.get("ocr"),
+            }
         except Exception as exc:
-            raise HTTPException(status_code=400, detail=str(exc)) from exc
+            logger.exception("multimodal manager failed: %s", exc)
+            try:
+                from om_ai.multimodal.orchestrator import UnifiedOrchestrator
+                orch = UnifiedOrchestrator(llm_engine=engine)
+                result = orch.run(text=req.text, images=req.image_paths)
+                return result
+            except ImportError:
+                raise HTTPException(
+                    status_code=status.HTTP_501_NOT_IMPLEMENTED,
+                    detail=(
+                        "Vision capability is not available in this deployment. "
+                        "Install the vision extras and configure a vision encoder."
+                    ),
+                )
+            except Exception as exc2:
+                raise HTTPException(status_code=400, detail=str(exc2)) from exc2
     else:
         try:
-            text = engine.generate(
-                req.text,
-                max_new_tokens=req.max_new_tokens,
-                temperature=req.temperature,
-            )
-            return {"text": text, "modalities_used": ["text"]}
-        except Exception as exc:
-            raise HTTPException(status_code=400, detail=str(exc)) from exc
+            from om_ai.operating_intelligence.universal import UniversalIntelligence
+
+            uni = UniversalIntelligence().run(req.text)
+            return {
+                "text": uni.get("answer") or "",
+                "modalities_used": ["text"],
+                "intent": uni.get("intent"),
+                "capability": uni.get("capability"),
+            }
+        except Exception:
+            try:
+                text = engine.generate(
+                    req.text,
+                    max_new_tokens=req.max_new_tokens,
+                    temperature=req.temperature,
+                )
+                return {"text": text, "modalities_used": ["text"]}
+            except Exception as exc:
+                raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+
+@app.post("/v1/multimodal/analyze", tags=["Multimodal"])
+def multimodal_analyze(
+    req: MultimodalRequest,
+    ctx: TenantContext = Depends(require_auth),
+):
+    """Lightweight analyze endpoint for chat UI progress display."""
+    from om_ai.multimodal.manager import MultimodalManager
+
+    paths = req.image_paths or []
+    path0 = paths[0] if paths else None
+    packet = MultimodalManager().process(
+        text=req.text or "",
+        path=path0,
+        question=req.text or "",
+    )
+    return {
+        "ok": True,
+        "modality": packet.get("modality"),
+        "stages": packet.get("stages"),
+        "summary": (packet.get("analysis") or {}).get("summary")
+        or packet.get("answer")
+        or "",
+        "ocr": packet.get("ocr"),
+        "answer": packet.get("answer"),
+    }

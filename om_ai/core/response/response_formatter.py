@@ -106,6 +106,11 @@ class ResponseFormatter:
     def format_user_response(self, payload: dict[str, Any] | None = None, **kwargs: Any) -> str:
         data = {**(payload or {}), **kwargs}
         question = str(data.get("question") or "").strip()
+        # Prefer dynamic intelligence answer when present (not regex category templates).
+        intel = data.get("intelligence") if isinstance(data.get("intelligence"), dict) else {}
+        intel_answer = str(intel.get("answer") or data.get("dynamic_answer") or "").strip()
+        if intel_answer and not looks_like_pipeline_dump(intel_answer):
+            return clean_user_response(intel_answer) + ("\n" if not intel_answer.endswith("\n") else "")
         kind = query_kind(question)
         intent = data.get("intent") if isinstance(data.get("intent"), dict) else {}
         intent_name = str(intent.get("intent") or kind).lower()

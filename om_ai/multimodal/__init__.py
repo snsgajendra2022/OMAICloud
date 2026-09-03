@@ -2,6 +2,11 @@ from .orchestrator import UnifiedOrchestrator, UnifiedRequest, UnifiedResponse, 
 from .document_ai import analyze_document, multimodal_status
 from .agent import MultimodalAgent
 from .input import MultimodalInput
+from .manager import MultimodalManager
+from .input_router import InputRouter
+from .ocr_engine import OCREngine
+from .image_engine import ImageEngine
+
 __all__ = [
     "UnifiedOrchestrator",
     "UnifiedRequest",
@@ -10,6 +15,10 @@ __all__ = [
     "analyze_document",
     "multimodal_status",
     "MultimodalAgent",
-    "MultimodalInput"
+    "MultimodalInput",
+    "MultimodalManager",
+    "InputRouter",
+    "OCREngine",
+    "ImageEngine",
 ]
 

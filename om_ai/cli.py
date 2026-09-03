@@ -921,6 +921,60 @@ def train_70b(args):
             raise SystemExit(2)
 
 
+def doctor(args):
+    """Run full OM system diagnostics."""
+    from om_ai.diagnostics import run_system_check
+
+    report = run_system_check()
+    if getattr(args, "json", False):
+        print(json.dumps(report.to_dict(), indent=2, default=str))
+    else:
+        print(report.format_report())
+    if report.overall().startswith("DEGRADED") and any(
+        i.status == "fail" for i in report.items if i.name.startswith(("Startup", "Brain"))
+    ):
+        raise SystemExit(1)
+
+
+def status_cmd(args):
+    """Print compact OM runtime status."""
+    from om_ai.backends.checkpoint_checker import check_checkpoint, format_model_status
+    from om_ai.diagnostics import run_system_check
+
+    report = run_system_check()
+    marks = report.summary_marks()
+    ck = check_checkpoint(try_load=False)
+    model_line = "Loaded" if ck.get("checkpoint") == "FOUND" and ck.get("loading") in {"READY", "SUCCESS", "PARTIAL"} else "Fallback (brain-only)"
+    if ck.get("checkpoint") != "FOUND":
+        model_line = "Missing → brain-only"
+
+    agent_ok = sum(1 for i in report.items if i.name.startswith("Agents:") and i.status == "ok")
+    print("OM AI STATUS")
+    print("")
+    print(f"Brain:     {'Running' if marks.get('Core Brain') == '✅' else 'Degraded'}")
+    print(f"Agents:    {agent_ok} checks ok")
+    print(f"Memory:    {'Connected' if marks.get('Memory') == '✅' else 'Check needed'}")
+    print(f"Model:     {model_line}")
+    print(f"Knowledge: {'Ready' if marks.get('Knowledge') in {'✅', '⚠️'} else 'Missing'}")
+    print(f"Safety:    {'Ready' if marks.get('Safety') == '✅' else 'Check needed'}")
+    print(f"Chat UI:   {'Ready' if marks.get('Chat UI') == '✅' else 'Missing'}")
+    print("")
+    print(f"System:    {report.overall()}")
+    if getattr(args, "verbose", False):
+        print("")
+        print(format_model_status(ck))
+
+
+def repair_cmd(args):
+    """Create missing folders and initialize databases."""
+    from om_ai.diagnostics.repair import repair_system
+
+    result = repair_system()
+    print(json.dumps(result, indent=2))
+    print("")
+    print("Repair complete. Run: om-ai doctor")
+
+
 def serve(args):
     import os
     import sys
@@ -946,6 +1000,16 @@ def serve(args):
     # Prefer OM native checkpoint paths; READY banner prints from api.main on load.
     os.environ.setdefault("OM_MODEL_PROVIDER", "om_native")
     os.environ.setdefault("OM_AI_CHAT_BACKEND", "om_native")
+
+    try:
+        from om_ai.diagnostics.logging_setup import setup_logging
+        from om_ai.diagnostics.repair import repair_system
+
+        setup_logging()
+        if os.getenv("OM_AI_AUTO_REPAIR", "1") == "1":
+            repair_system(load_env=False)
+    except Exception as exc:
+        print(f"Startup repair/logging skipped: {exc}", file=sys.stderr)
 
     uvicorn.run("om_ai.api.main:app", host=args.host, port=args.port, reload=args.reload)
 
@@ -1479,6 +1543,17 @@ def main():
     s.add_argument("--port", type=int, default=8080)
     s.add_argument("--reload", action="store_true")
     s.set_defaults(func=serve)
+
+    doc = sp.add_parser("doctor", help="Full OM system diagnostics health report")
+    doc.add_argument("--json", action="store_true", help="Print JSON report")
+    doc.set_defaults(func=doctor)
+
+    stc = sp.add_parser("status", help="Compact OM brain / agents / memory / model status")
+    stc.add_argument("--verbose", "-v", action="store_true")
+    stc.set_defaults(func=status_cmd)
+
+    rep = sp.add_parser("repair", help="Create missing folders and initialize databases")
+    rep.set_defaults(func=repair_cmd)
 
     args = p.parse_args()
     args.func(args)

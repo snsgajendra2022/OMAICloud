@@ -98,6 +98,29 @@ class OMCognitiveBrain:
         ).strip()
 
         # ----------------------------
+        # Dynamic Intelligence Pipeline
+        # ----------------------------
+        intelligence_result: dict[str, Any] = {}
+        try:
+            from om_ai.core.intelligence import CognitiveIntelligence
+
+            intelligence_result = CognitiveIntelligence().run(
+                question,
+                memory_context=None,
+            )
+        except Exception:
+            try:
+                from om_ai.intelligence import IntelligenceManager
+
+                intelligence_result = IntelligenceManager().run(
+                    question,
+                    memory_context=None,
+                    knowledge=knowledge,
+                )
+            except Exception:
+                intelligence_result = {}
+
+        # ----------------------------
         # Agent Routing
         # ----------------------------
 
@@ -376,6 +399,7 @@ class OMCognitiveBrain:
         pipeline["agent_plan"] = agent_plan
         pipeline["agent_team"] = agent_team_result
         pipeline["orchestration"] = orchestration
+        pipeline["intelligence"] = intelligence_result
 
 
 
@@ -384,16 +408,10 @@ class OMCognitiveBrain:
 
 
         user_answer = str(
-
-            pipeline.get(
-                "user_response"
-            )
-            or
-            pipeline.get(
-                "answer"
-            )
+            (intelligence_result or {}).get("answer")
+            or pipeline.get("user_response")
+            or pipeline.get("answer")
             or ""
-
         ).strip()
 
 
@@ -609,6 +627,8 @@ class OMCognitiveBrain:
             "memory_consolidation": consolidated_memory,
             "user_profile": user_profile,
             "context": context_result,
+            "intelligence": intelligence_result,
+            "dynamic_answer": (intelligence_result or {}).get("answer") or "",
         }
 
 
@@ -676,6 +696,10 @@ class OMCognitiveBrain:
 
             "reasoning":
                 pipeline,
+
+
+            "intelligence":
+                intelligence_result,
 
 
             "evaluation":

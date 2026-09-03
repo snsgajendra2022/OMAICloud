@@ -26,6 +26,27 @@ logger = logging.getLogger(__name__)
 
 BackendName = str  # "om_native" | "local" | "openai"
 
+
+class ResponseEcho:
+    """Reject answers that merely repeat the user question."""
+
+    @staticmethod
+    def check(question: str, answer: str) -> bool:
+        import re
+
+        q = re.sub(r"\W+", " ", (question or "").lower()).strip()
+        a = re.sub(r"\W+", " ", (answer or "").lower()).strip()
+        if not q or not a:
+            return False
+        if a == q:
+            return True
+        if q in a and len(a) <= len(q) + 28:
+            return True
+        if a.startswith("understood ") and q in a and len(a) <= len(q) + 40:
+            return True
+        return False
+
+
 _DEFAULT_BACKEND = "om_native"
 
 # Keep identity short: local OM-1.0 configs often use max_seq_len=128, and a long
@@ -436,6 +457,170 @@ def chat_reply(
         )
         if intel.direct_reply:
             return intel.direct_reply, info_base
+
+        # Universal multimodal + cognitive loop (preferred).
+        try:
+            from om_ai.operating_intelligence.universal import UniversalIntelligence
+            from om_ai.core.response.response_formatter import (
+                ensure_public_reply,
+                looks_like_pipeline_dump,
+                response_mode,
+            )
+            from om_ai.response_engine import format_assistant_reply
+
+            uni = UniversalIntelligence().run(
+                user_text,
+                messages=messages,
+                project=project_id,
+            )
+            uni_ans = str(uni.get("answer") or "").strip()
+            if uni_ans and not looks_like_pipeline_dump(uni_ans) and not ResponseEcho.check(user_text, uni_ans):
+                polished = format_assistant_reply(
+                    uni_ans,
+                    intent=str(uni.get("intent") or "chat"),
+                    enhance=True,
+                )
+                if response_mode() != "developer":
+                    polished = ensure_public_reply(user_text, polished, {
+                        "intent": {"intent": uni.get("intent")},
+                        "intelligence": uni.get("cognitive") or {},
+                    })
+                if not ResponseEcho.check(user_text, polished):
+                    info_uni = ChatBackendInfo(
+                        backend=info.backend,
+                        model=info.model,
+                        detail="universal_intelligence",
+                        provider=info.provider,
+                        live_knowledge={
+                            "intelligence": intel.meta,
+                            "universal": {
+                                "intent": uni.get("intent"),
+                                "capability": uni.get("capability"),
+                                "stages": uni.get("stages"),
+                                "modality": (uni.get("multimodal") or {}).get("modality"),
+                            },
+                        },
+                    )
+                    return polished, info_uni
+        except Exception as exc:
+            logger.debug("UniversalIntelligence skipped: %s", exc)
+
+        # Core cognitive intelligence (understand → capability → verify).
+        # Prefer this over legacy dynamic layer for intent-faithful answers.
+        try:
+            from om_ai.core.intelligence import CognitiveIntelligence
+            from om_ai.core.response.response_formatter import (
+                ensure_public_reply,
+                looks_like_pipeline_dump,
+                response_mode,
+            )
+            from om_ai.response_engine import format_assistant_reply
+
+            cog_intel = CognitiveIntelligence().run(
+                user_text,
+                messages=messages,
+                project=project_id,
+            )
+            cog_ans = str(cog_intel.get("answer") or "").strip()
+            val = cog_intel.get("validation") or {}
+            if (
+                cog_ans
+                and not looks_like_pipeline_dump(cog_ans)
+                and float(val.get("score") or 0) >= 60
+                and not ResponseEcho.check(user_text, cog_ans)
+            ):
+                polished = format_assistant_reply(
+                    cog_ans,
+                    intent=str((cog_intel.get("intent") or {}).get("intent") or "chat"),
+                    enhance=True,
+                )
+                if response_mode() != "developer":
+                    polished = ensure_public_reply(user_text, polished, {
+                        "intent": cog_intel.get("intent") or {},
+                        "intelligence": cog_intel,
+                    })
+                # Final echo guard
+                if not ResponseEcho.check(user_text, polished):
+                    info_ci = ChatBackendInfo(
+                        backend=info.backend,
+                        model=info.model,
+                        detail="cognitive_intelligence",
+                        provider=info.provider,
+                        live_knowledge={
+                            "intelligence": intel.meta,
+                            "cognitive": {
+                                "intent": (cog_intel.get("understanding") or {}).get("intent"),
+                                "capability": (cog_intel.get("capability") or {}).get("id"),
+                                "score": val.get("score"),
+                            },
+                        },
+                    )
+                    return polished, info_ci
+        except Exception as exc:
+            logger.debug("CognitiveIntelligence skipped: %s", exc)
+
+        # Dynamic intelligence pipeline (generalizes; regex only as helper signals).
+        try:
+            from om_ai.intelligence import IntelligenceManager
+            from om_ai.core.response.response_formatter import (
+                ensure_public_reply,
+                looks_like_pipeline_dump,
+                response_mode,
+            )
+            from om_ai.response_engine import format_assistant_reply
+
+            dyn = IntelligenceManager().run(
+                user_text,
+                messages=messages,
+                project=project_id,
+            )
+            dyn_answer = str(dyn.get("answer") or "").strip()
+            if dyn_answer and not looks_like_pipeline_dump(dyn_answer) and not ResponseEcho.check(user_text, dyn_answer):
+                eval_ok = float((dyn.get("evaluation") or {}).get("score") or 0) >= 70
+                intent_name = str((dyn.get("intent") or {}).get("intent") or "")
+                prefer_dyn = intent_name in {
+                    "chat",
+                    "datetime",
+                    "recommend",
+                    "create_prompt",
+                    "question",
+                    "explain",
+                    "research",
+                    "summarize",
+                    "compare",
+                    "analyze",
+                    "plan",
+                    "calculate",
+                } or eval_ok
+                if prefer_dyn and len(dyn_answer) >= 8:
+                    polished = format_assistant_reply(
+                        dyn_answer,
+                        intent=intent_name or "chat",
+                        enhance=True,
+                    )
+                    if response_mode() != "developer":
+                        polished = ensure_public_reply(user_text, polished, {
+                            "intent": dyn.get("intent") or {},
+                            "intelligence": dyn,
+                        })
+                    info_dyn = ChatBackendInfo(
+                        backend=info.backend,
+                        model=info.model,
+                        detail="dynamic_intelligence",
+                        provider=info.provider,
+                        live_knowledge={
+                            "intelligence": intel.meta,
+                            "dynamic": {
+                                "intent": intent_name,
+                                "agents": (dyn.get("agents") or {}).get("team"),
+                                "tools": (dyn.get("tools") or {}).get("tools"),
+                                "score": (dyn.get("evaluation") or {}).get("score"),
+                            },
+                        },
+                    )
+                    return polished, info_dyn
+        except Exception as exc:
+            logger.debug("IntelligenceManager skipped: %s", exc)
 
         # Structured cognitive brain — instance.process(question), never import-time.
         from om_ai.runtime.chat_orchestrator import run_cognitive_brain

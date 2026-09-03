@@ -1,73 +1,310 @@
-"""Classify the user ask before planning/retrieval (word-boundary safe)."""
+"""
+OM Query Intelligence Classifier
+
+Classifies user requests before:
+- planning
+- retrieval
+- agent selection
+- response generation
+
+Modes:
+- greeting
+- knowledge
+- coding
+- prompt_generation
+- research
+- ai_research
+- date_time
+- business
+- planning
+- debugging
+- general
+"""
+
+
 from __future__ import annotations
 
 import re
 
 
+
+def clean(text: str) -> str:
+    return (text or "").strip()
+
+
+
 def is_greeting(text: str) -> bool:
-    t = (text or "").strip()
+
+    t = clean(text)
+
     if not t:
         return False
+
+
     return bool(
         re.match(
-            r"^(hi+|hello|hey+|yo|sup|namaste|नमस्ते)(\s+there)?[!?.]*$",
+            r"^(hi+|hello+|hey+|yo|sup|namaste|नमस्ते)"
+            r"(\s+there)?[!?.]?$",
             t,
-            re.I,
+            re.I
         )
     ) or (
-        len(t.split()) <= 4
-        and bool(re.search(r"^(hi+|hello|hey+|good\s+(morning|evening|afternoon))\b", t, re.I))
+        len(t.split()) <= 5
+        and bool(
+            re.search(
+                r"^(good\s+(morning|evening|afternoon))\b",
+                t,
+                re.I
+            )
+        )
     )
 
 
+
+def is_date_time(text: str) -> bool:
+
+    t = clean(text)
+
+
+    return bool(
+        re.search(
+            r"\b("
+            r"today date|current date|what date|"
+            r"today|time now|current time|"
+            r"what time|day today"
+            r")\b",
+            t,
+            re.I
+        )
+    )
+
+
+
+def is_prompt_generation(text: str) -> bool:
+
+    t = clean(text)
+
+
+    return bool(
+        re.search(
+            r"\b("
+            r"create prompt|"
+            r"make prompt|"
+            r"write prompt|"
+            r"generate prompt|"
+            r"master prompt|"
+            r"cursor prompt|"
+            r"ai prompt"
+            r")\b",
+            t,
+            re.I
+        )
+    )
+
+
+
+def is_ai_research(text: str) -> bool:
+
+    t = clean(text)
+
+
+    return bool(
+        re.search(
+            r"\b("
+            r"ai model|"
+            r"dataset|"
+            r"training data|"
+            r"fine tuning|"
+            r"sft|"
+            r"llm|"
+            r"foundation model|"
+            r"machine learning|"
+            r"neural network|"
+            r"rag|"
+            r")\b",
+            t,
+            re.I
+        )
+    )
+
+
+
+def is_research(text: str) -> bool:
+
+    t = clean(text)
+
+
+    return bool(
+        re.search(
+            r"\b("
+            r"research|"
+            r"analyze|"
+            r"investigate|"
+            r"compare|"
+            r"study|"
+            r"report"
+            r")\b",
+            t,
+            re.I
+        )
+    )
+
+
+
 def is_definitional(text: str) -> bool:
-    t = (text or "").strip()
-    if re.search(r"\b(create|make|build|implement|fix|debug|code)\b", t, re.I):
+
+    t = clean(text)
+
+
+    if re.search(
+        r"\b(create|make|build|implement|fix|debug|code)\b",
+        t,
+        re.I
+    ):
         return False
+
+
     return bool(
         re.search(
             r"^\s*(what|who)\s+is\b|"
             r"^\s*(explain|define)\b|"
             r"^\s*how\s+to\b|"
-            r"\b(try to|want to|how do i)\s+(work|learn|use|understand|start)\b|"
-            r"\bwhat\s+is\s+(git|react)\b",
+            r"\bwhat\s+is\b",
             t,
-            re.I,
+            re.I
         )
     )
+
+
+
+def is_debugging(text: str) -> bool:
+
+    t = clean(text)
+
+
+    return bool(
+        re.search(
+            r"\b("
+            r"error|"
+            r"bug|"
+            r"exception|"
+            r"failed|"
+            r"not working|"
+            r"issue|"
+            r"problem"
+            r")\b",
+            t,
+            re.I
+        )
+    )
+
 
 
 def is_coding_task(text: str) -> bool:
-    t = (text or "").strip()
-    if is_definitional(t) or is_greeting(t):
+
+    t = clean(text)
+
+
+    if (
+        is_greeting(t)
+        or is_definitional(t)
+        or is_prompt_generation(t)
+    ):
         return False
+
+
     return bool(
         re.search(
-            r"\b(create|make|build|implement|code|coding|refactor|debug)\b|"
-            r"\b(react(\s+native)?|flutter|fastapi|laravel|django|vue|angular)\b|"
-            r"\b(login|signup|dashboard|api)\s+(screen|page|app|project)?\b",
+            r"\b("
+            r"create|"
+            r"make|"
+            r"build|"
+            r"implement|"
+            r"code|"
+            r"coding|"
+            r"refactor|"
+            r"develop|"
+            r"program"
+            r")\b|"
+            r"\b("
+            r"react|"
+            r"react native|"
+            r"flutter|"
+            r"fastapi|"
+            r"laravel|"
+            r"django|"
+            r"vue|"
+            r"angular|"
+            r"python|"
+            r"java"
+            r")\b",
             t,
-            re.I,
+            re.I
         )
     )
 
 
+
 def is_business_task(text: str) -> bool:
-    t = (text or "").strip()
-    if is_coding_task(t) or is_definitional(t):
-        return False
+
+    t = clean(text)
+
+
     return bool(
-        re.search(r"\b(market|revenue|strategy|kpi|business|roi|go.to.market)\b", t, re.I)
+        re.search(
+            r"\b("
+            r"market|"
+            r"revenue|"
+            r"strategy|"
+            r"kpi|"
+            r"business|"
+            r"roi|"
+            r"sales"
+            r")\b",
+            t,
+            re.I
+        )
     )
 
 
+
 def query_kind(text: str) -> str:
+
+
     if is_greeting(text):
         return "greeting"
+
+
+    if is_date_time(text):
+        return "date_time"
+
+
+    if is_prompt_generation(text):
+        return "prompt_generation"
+
+
+    if is_ai_research(text):
+        return "ai_research"
+
+
+    if is_debugging(text):
+        return "debugging"
+
+
     if is_definitional(text):
         return "knowledge"
+
+
     if is_coding_task(text):
         return "coding"
+
+
     if is_business_task(text):
         return "business"
+
+
+    if is_research(text):
+        return "research"
+
+
     return "general"

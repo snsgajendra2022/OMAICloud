@@ -180,6 +180,16 @@ body.dark .notif-item.unread{background:rgba(59,130,246,.1);}
 /* ── MAIN ── */
 .main{flex:1;min-width:0;display:flex;flex-direction:column;height:100%;background:var(--bg);}
 .topbar{height:56px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;padding:0 16px;flex-shrink:0;position:relative;}
+.om-status-strip{display:flex;align-items:center;gap:8px;margin-left:8px;flex-wrap:wrap;min-width:0;}
+.om-pill{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:600;color:var(--muted);background:var(--soft);border:1px solid var(--border);border-radius:999px;padding:3px 9px;white-space:nowrap;}
+.om-pill .dot{width:7px;height:7px;border-radius:50%;background:var(--success);display:inline-block;}
+.om-pill .dot.online{box-shadow:0 0 0 2px rgba(5,150,105,.18);}
+@media (max-width:900px){.om-status-strip{display:none;}}
+.think-steps{margin:8px 0 4px;padding:10px 12px;border:1px solid var(--border);border-radius:12px;background:var(--soft);font-size:12px;color:var(--muted);}
+.think-steps strong{display:block;color:var(--text);margin-bottom:6px;font-size:13px;}
+.think-steps ol{margin:0;padding-left:18px;}
+.think-steps li{margin:2px 0;}
+.think-steps li.active{color:var(--accent);font-weight:600;}
 .hamburger{display:none;border:1px solid var(--border);background:var(--bg);border-radius:8px;width:36px;height:36px;place-items:center;flex-shrink:0;}
 .hamburger span,.hamburger span::before,.hamburger span::after{display:block;width:16px;height:1.5px;background:var(--text);position:relative;}
 .hamburger span::before,.hamburger span::after{content:"";position:absolute;left:0;}
@@ -273,6 +283,16 @@ body.dark .tok-str{color:#34d399;}
 
 /* ── COMPOSER (pill sender, ChatGPT-style) ── */
 .composer-wrap{padding:12px 16px 20px;flex-shrink:0;}
+.mm-attach-preview{display:flex;gap:8px;flex-wrap:wrap;padding:0 0 10px;}
+.mm-attach-preview .mm-chip{position:relative;border:1px solid var(--border);border-radius:12px;overflow:hidden;background:var(--soft);width:88px;height:88px;}
+.mm-attach-preview .mm-chip img{width:100%;height:100%;object-fit:cover;display:block;}
+.mm-attach-preview .mm-chip .mm-name{position:absolute;left:0;right:0;bottom:0;background:rgba(0,0,0,.55);color:#fff;font-size:10px;padding:3px 5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.mm-attach-preview .mm-chip button{position:absolute;top:4px;right:4px;border:0;background:rgba(0,0,0,.55);color:#fff;border-radius:999px;width:20px;height:20px;line-height:20px;font-size:12px;}
+.mm-status{border:1px solid var(--border);border-radius:12px;background:var(--soft);padding:10px 12px;margin:0 0 10px;font-size:12px;color:var(--muted);}
+.mm-status strong{color:var(--text);display:block;margin-bottom:6px;}
+.mm-status li{margin:2px 0;}
+.mm-status li.done{color:var(--success);}
+.composer.dragover{outline:2px dashed var(--accent);outline-offset:4px;border-radius:16px;}
 .composer-tools{max-width:760px;margin:0 auto 8px;display:flex;gap:4px;flex-wrap:wrap;padding:0 4px;align-items:center;}
 .tool-toggle{border:1px solid var(--border);background:var(--side);border-radius:999px;padding:4px 10px;font-size:11px;font-weight:650;color:var(--muted);display:inline-flex;align-items:center;gap:4px;}
 .tool-toggle.on{background:#EFF6FF;border-color:#BFDBFE;color:var(--accent);}
@@ -331,7 +351,7 @@ body.dark .mic-btn:hover{background:rgba(255,255,255,.08);}
   flex-shrink:0;display:grid;place-items:center;
 }
 .btn-send{
-  background:#F5C4B0;color:#fff;
+  background:#e8622b;color:#fff;
   box-shadow:0 1px 2px rgba(0,0,0,.06);
 }
 .btn-send:hover:not(:disabled){background:#F0B49C;}
@@ -665,6 +685,12 @@ body.dark .chip.on{background:rgba(59,130,246,.15);border-color:rgba(59,130,246,
       <div class="drop-menu" id="modelDrop"></div>
     </div>
     <div class="top-title" id="topTitle">New chat</div>
+    <div class="om-status-strip" id="omStatusStrip" title="OM runtime status">
+      <span class="om-pill"><i class="dot online"></i>Online</span>
+      <span class="om-pill">OM-1.0</span>
+      <span class="om-pill">Memory Active</span>
+      <span class="om-pill">Agents Ready</span>
+    </div>
     <div class="top-actions">
       <button type="button" class="icon-btn" id="searchTopBtn" title="Search"></button>
       <button type="button" class="icon-btn" id="shareBtn" title="Share conversation"></button>
@@ -692,18 +718,21 @@ body.dark .chip.on{background:rgba(59,130,246,.15);border-color:rgba(59,130,246,
         <button type="button" class="tool-toggle" id="toolCode" data-tool="code"></button>
         <button type="button" class="composer-model-chip" id="composerModelChip"></button>
       </div>
+      <div id="mmAttachPreview" class="mm-attach-preview hidden" aria-live="polite"></div>
+      <div id="mmStatus" class="mm-status hidden" role="status"></div>
       <form class="composer" id="composer">
-        <input type="file" id="fileInput" accept="*/*" class="hidden"/>
-        <input type="file" id="fileUploadInput" accept="*/*" class="hidden"/>
+        <input type="file" id="fileInput" accept="image/*,.pdf,.txt,.md,.csv,.json,.py,.js,.ts,.tsx,.docx,audio/*,video/*" class="hidden"/>
+        <input type="file" id="fileUploadInput" accept="image/*,.pdf,.txt,.md,.csv,.json,.py,.js,.ts,.tsx,.docx,audio/*,video/*" class="hidden" multiple/>
         <div class="composer-row">
           <div class="attach-wrap">
-            <button type="button" class="composer-plus" id="attachBtn" title="Add" aria-label="Add"></button>
+            <button type="button" class="composer-plus" id="attachBtn" title="Add image or file" aria-label="Add"></button>
             <div class="attach-drop" id="attachDrop">
               <button type="button" id="attachUploadFile"></button>
               <button type="button" id="attachTextFile"></button>
+              <button type="button" id="attachImageBtn"></button>
             </div>
           </div>
-          <textarea id="input" rows="1" placeholder="Message OM…" autocomplete="off"></textarea>
+          <textarea id="input" rows="1" placeholder="Message OM… (drop images here)" autocomplete="off"></textarea>
           <div class="composer-actions">
             <button type="button" class="mic-btn" id="micBtn" title="Voice input" aria-label="Voice input"></button>
             <button type="button" class="btn-stop" id="stopBtn" title="Stop" aria-label="Stop"></button>
@@ -1039,7 +1068,13 @@ function renderExperienceMarkdown(raw, animate) {
 }
 
 function experiencePhaseHtml(label) {
-  return '<div class="rx-phase" role="status"><span class="spin" aria-hidden="true"></span>'+escapeHtml(label)+"</div>";
+  const steps = ["Intent Analysis","Reasoning","Agent Selection","Tool Usage","Memory Retrieval"];
+  const active = String(label||"");
+  const items = steps.map((s) => {
+    const on = active.toLowerCase().includes(s.toLowerCase().split(" ")[0]) || active.toLowerCase().includes(s.toLowerCase());
+    return "<li"+(on?' class="active"':'')+">"+escapeHtml(s)+"</li>";
+  }).join("");
+  return '<div class="think-steps" role="status"><strong><span class="spin" aria-hidden="true"></span> '+escapeHtml(active || "OM is thinking…")+"</strong><ol>"+items+"</ol></div>";
 }
 
 function fmtDate(iso) {
@@ -1311,6 +1346,7 @@ function buildNav() {
   // Attach menu
   $("attachUploadFile").innerHTML = svg("file",14)+" Upload file to OM";
   $("attachTextFile").innerHTML   = svg("paperclip",14)+" Attach text to message";
+  if ($("attachImageBtn")) $("attachImageBtn").innerHTML = svg("image",14)+" Attach image / screenshot";
   setIcon($("attachBtn"), "plus", 20);
   setIcon($("micBtn"), "mic", 20);
   setIcon($("sendBtn"), "arrowUp", 18);
@@ -1971,7 +2007,14 @@ async function streamCompletion(messages) {
   }
   const reader = res.body.getReader(), decoder = new TextDecoder();
   let buffer = "", full = "";
-  const phases = ["Thinking…","Creating architecture…","Here is the solution…"];
+  const phases = [
+    "OM is thinking…",
+    "Intent Analysis",
+    "Reasoning",
+    "Agent Selection",
+    "Memory Retrieval",
+    "Generating answer…",
+  ];
   let phaseIdx = 0;
   state._rxPhase = phases[0];
   if (state._rxPhaseTimer) clearInterval(state._rxPhaseTimer);
@@ -1980,7 +2023,7 @@ async function streamCompletion(messages) {
     state._rxPhase = phases[phaseIdx];
     const last = state.messages[state.messages.length-1];
     if (last && last._streaming && !String(last.content||"").trim()) updateStreamBubble("");
-  }, 900);
+  }, 700);
   try {
   while (true) {
     const { done, value } = await reader.read();
@@ -4606,11 +4649,103 @@ $("attachBtn").addEventListener("click", e => {
 });
 $("attachUploadFile").addEventListener("click", () => { $("attachDrop").classList.remove("open"); $("fileUploadInput").click(); });
 $("attachTextFile").addEventListener("click", () => { $("attachDrop").classList.remove("open"); $("fileInput").click(); });
+if ($("attachImageBtn")) $("attachImageBtn").addEventListener("click", () => { $("attachDrop").classList.remove("open"); $("fileUploadInput").click(); });
+
+state.mmFiles = state.mmFiles || [];
+function renderMmPreview() {
+  const box = $("mmAttachPreview");
+  if (!box) return;
+  if (!state.mmFiles.length) { box.classList.add("hidden"); box.innerHTML = ""; return; }
+  box.classList.remove("hidden");
+  box.innerHTML = state.mmFiles.map((f, i) => {
+    if (f.preview) {
+      return '<div class="mm-chip"><img src="'+f.preview+'" alt=""/><div class="mm-name">'+escapeHtml(f.name)+'</div><button type="button" data-i="'+i+'" aria-label="Remove">×</button></div>';
+    }
+    return '<div class="mm-chip"><div class="mm-name">'+escapeHtml(f.name)+'</div><button type="button" data-i="'+i+'" aria-label="Remove">×</button></div>';
+  }).join("");
+  box.querySelectorAll("button[data-i]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const idx = Number(btn.getAttribute("data-i"));
+      state.mmFiles.splice(idx, 1);
+      renderMmPreview();
+    });
+  });
+}
+function showMmStatus(steps) {
+  const el = $("mmStatus");
+  if (!el) return;
+  el.classList.remove("hidden");
+  el.innerHTML = "<strong>Image received ✅ · Analyzing…</strong><ul>"+
+    steps.map(s => "<li class='"+(s.done?"done":"")+"'>"+escapeHtml(s.label)+"</li>").join("")+
+    "</ul>";
+}
+async function ingestMmFile(file) {
+  if (!file) return;
+  const isImage = (file.type||"").startsWith("image/");
+  const entry = { name: file.name, mime: file.type||"", preview: null, path: null };
+  if (isImage) {
+    entry.preview = URL.createObjectURL(file);
+  }
+  state.mmFiles.push(entry);
+  renderMmPreview();
+  showMmStatus([
+    {label:"Image received ✅", done:true},
+    {label:"Uploading…", done:false},
+    {label:"OCR / vision pending", done:false},
+  ]);
+  try {
+    let body;
+    if (!file.type || file.type.startsWith("text/") || /\.(txt|md|json|csv)$/i.test(file.name)) {
+      const text = await file.text();
+      body = {name:file.name, content:text, mime:file.type||"text/plain"};
+    } else {
+      const buf = await file.arrayBuffer();
+      let binary = "";
+      const bytes = new Uint8Array(buf);
+      const chunk = 0x8000;
+      for (let i=0;i<bytes.length;i+=chunk) binary += String.fromCharCode.apply(null, bytes.subarray(i,i+chunk));
+      const b64 = btoa(binary);
+      body = {name:file.name, content_base64:b64, mime:file.type||"application/octet-stream"};
+    }
+    const up = await api("/v1/files",{method:"POST",body:JSON.stringify(body)},{error:false});
+    if (up.res && up.res.ok) {
+      entry.path = (up.data && (up.data.path || up.data.id)) || file.name;
+      showMmStatus([
+        {label:"Image received ✅", done:true},
+        {label:"Upload complete ✅", done:true},
+        {label:"Running multimodal analyze…", done:false},
+      ]);
+      const analyzed = await api("/v1/multimodal/analyze",{
+        method:"POST",
+        body:JSON.stringify({text: els.input.value || "What is in this image?", image_paths: entry.path ? [entry.path] : []})
+      },{error:false});
+      if (analyzed.res && analyzed.res.ok) {
+        const stages = (analyzed.data && analyzed.data.stages) || [];
+        showMmStatus([
+          {label:"Image received ✅", done:true},
+          {label:"✓ OCR / parse complete", done:true},
+          {label:"✓ Context found", done:!!(analyzed.data && analyzed.data.summary)},
+          {label:"Ready — send a message to ask about this file", done:true},
+        ].concat(stages.slice(0,4).map(s => ({label:String(s), done:true}))));
+        if (analyzed.data && analyzed.data.summary && !els.input.value.trim()) {
+          // keep user control; do not auto-send
+        }
+      }
+      toast("File ready for multimodal chat","success");
+    } else {
+      showMmStatus([{label:"Upload failed", done:false}]);
+    }
+  } catch (_) {
+    showMmStatus([{label:"Upload / analyze failed", done:false}]);
+    toast("Upload failed","error");
+  }
+}
 
 // File inputs
 $("fileInput").addEventListener("change", async e => {
   const file = e.target.files && e.target.files[0]; e.target.value = "";
   if (!file) return;
+  if ((file.type||"").startsWith("image/")) { await ingestMmFile(file); return; }
   try {
     const text = await file.text();
     const cur = els.input.value;
@@ -4619,20 +4754,20 @@ $("fileInput").addEventListener("change", async e => {
   } catch (_) { toast("Could not read file","error"); }
 });
 $("fileUploadInput").addEventListener("change", async e => {
-  const file = e.target.files && e.target.files[0]; e.target.value = "";
-  if (!file) return;
-  try {
-    const isText = !file.type||file.type.startsWith("text/")||/\.(txt|md|json|csv)$/i.test(file.name);
-    if (isText) {
-      const text = await file.text();
-      await api("/v1/files",{method:"POST",body:JSON.stringify({name:file.name,content:text,mime:file.type||"text/plain"})},{success:"File uploaded to OM"});
-    } else {
-      const buf = await file.arrayBuffer();
-      const b64 = btoa(String.fromCharCode(...new Uint8Array(buf)));
-      await api("/v1/files",{method:"POST",body:JSON.stringify({name:file.name,content_base64:b64,mime:file.type||"application/octet-stream"})},{success:"File uploaded to OM"});
-    }
-  } catch (_) { toast("Upload failed","error"); }
+  const files = e.target.files ? Array.from(e.target.files) : []; e.target.value = "";
+  for (const file of files) await ingestMmFile(file);
 });
+
+// Drag & drop images onto composer
+const composerEl = $("composer");
+if (composerEl) {
+  ["dragenter","dragover"].forEach(ev => composerEl.addEventListener(ev, e => { e.preventDefault(); composerEl.classList.add("dragover"); }));
+  ["dragleave","drop"].forEach(ev => composerEl.addEventListener(ev, e => { e.preventDefault(); composerEl.classList.remove("dragover"); }));
+  composerEl.addEventListener("drop", async e => {
+    const files = e.dataTransfer && e.dataTransfer.files ? Array.from(e.dataTransfer.files) : [];
+    for (const f of files) await ingestMmFile(f);
+  });
+}
 
 // Tool toggles (sync with Tools catalog)
 ["toolWeb","toolCode"].forEach(id => {

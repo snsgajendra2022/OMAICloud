@@ -25,5 +25,203 @@
     "category": "engineering",
     "metadata": {},
     "created_at": "2026-09-03T06:52:50.790561"
+  },
+  {
+    "question": "hello",
+    "answer": "Hello. I am OM. How can I help you today?",
+    "score": 0.7,
+    "success": true,
+    "category": "general",
+    "metadata": {},
+    "created_at": "2026-09-03T10:17:34.204517"
+  },
+  {
+    "question": "hello",
+    "answer": "Hello. I am OM. How can I help you today?",
+    "score": 0.7,
+    "success": true,
+    "category": "general",
+    "metadata": {},
+    "created_at": "2026-09-03T10:17:37.363650"
+  },
+  {
+    "question": "hello",
+    "answer": "Hello. I am OM. How can I help you today?",
+    "score": 0.7,
+    "success": true,
+    "category": "general",
+    "metadata": {},
+    "created_at": "2026-09-03T10:17:40.728851"
+  },
+  {
+    "question": "hello",
+    "answer": "Hello. I am OM. How can I help you today?",
+    "score": 0.7,
+    "success": true,
+    "category": "general",
+    "metadata": {},
+    "created_at": "2026-09-03T10:17:40.793747"
+  },
+  {
+    "question": "hello",
+    "answer": "Hello. I am OM. How can I help you today?",
+    "score": 0.7,
+    "success": true,
+    "category": "general",
+    "metadata": {},
+    "created_at": "2026-09-03T10:18:09.825700"
+  },
+  {
+    "question": "hello",
+    "answer": "Hello. I am OM. How can I help you today?",
+    "score": 0.7,
+    "success": true,
+    "category": "general",
+    "metadata": {},
+    "created_at": "2026-09-03T10:18:12.845609"
+  },
+  {
+    "question": "hello",
+    "answer": "Hello. I am OM. How can I help you today?",
+    "score": 0.7,
+    "success": true,
+    "category": "general",
+    "metadata": {},
+    "created_at": "2026-09-03T10:27:10.075493"
+  },
+  {
+    "question": "hello",
+    "answer": "Hello. I am OM. How can I help you today?",
+    "score": 0.7,
+    "success": true,
+    "category": "general",
+    "metadata": {},
+    "created_at": "2026-09-03T10:27:16.510962"
+  },
+  {
+    "question": "what is the today date",
+    "answer": "what is the today date",
+    "score": 0.7,
+    "success": true,
+    "category": "general",
+    "metadata": {},
+    "created_at": "2026-09-03T10:28:22.929560"
+  },
+  {
+    "question": "what is the today date ?",
+    "answer": "what is the today date ?",
+    "score": 0.7,
+    "success": true,
+    "category": "general",
+    "metadata": {},
+    "created_at": "2026-09-03T10:28:28.438027"
+  },
+  {
+    "question": "ans me",
+    "answer": "ans me",
+    "score": 0.7,
+    "success": true,
+    "category": "general",
+    "metadata": {},
+    "created_at": "2026-09-03T10:28:32.031320"
+  },
+  {
+    "question": "do know know me",
+    "answer": "do know know me",
+    "score": 0.7,
+    "success": true,
+    "category": "general",
+    "metadata": {},
+    "created_at": "2026-09-03T10:28:42.053368"
+  },
+  {
+    "question": "what are you ding",
+    "answer": "what are you ding",
+    "score": 0.7,
+    "success": true,
+    "category": "general",
+    "metadata": {},
+    "created_at": "2026-09-03T10:28:52.415503"
+  },
+  {
+    "question": "what is tghis",
+    "answer": "what is tghis",
+    "score": 0.7,
+    "success": true,
+    "category": "general",
+    "metadata": {},
+    "created_at": "2026-09-03T10:29:15.878348"
+  },
+  {
+    "question": "you are craete prompt to make react code",
+    "answer": "# You Are Craete Prompt To Make React Code\n\n## Solution\n\nWe will implement this with **react**.\n\nWe will create:\n- Clarify interfaces\n- Minimal complete slice\n- Verify\n\n## Project Structure\n\n- `src/App.tsx`\n- `src/pages/`\n- `src/components/`\n- `src/lib/api.ts`\n- `package.json`\n\n## Implementation Steps\n\n1. Setup frontend structure\n2. Create components\n3. Implement pages\n4. Connect APIs\n5. Add styling\n6. Test application\n\n## Testing\n\n\u2713 Happy path\n\u2713 Failure path\n\n## Next Steps\n\n- Node 20+: `npm install` then `npm run dev`",
+    "score": 1.0,
+    "success": true,
+    "category": "engineering",
+    "metadata": {},
+    "created_at": "2026-09-03T10:29:36.248497"
+  },
+  {
+    "question": "good moring",
+    "answer": "good moring",
+    "score": 0.7,
+    "success": true,
+    "category": "general",
+    "metadata": {},
+    "created_at": "2026-09-03T10:30:03.245720"
+  },
+  {
+    "question": "need to craete the perfect code and data set for ai creae",
+    "answer": "# Need To Craete The Perfect Code And Data Set For Ai Creae\n\n## Solution\n\nWe will create:\n- Clarify interfaces\n- Minimal complete slice\n- Verify\n\n## Project Structure\n\n- `README.md`\n- `src/`\n- `tests/`\n- `.env.example`\n\n## Implementation Steps\n\n1. Define AI architecture\n2. Prepare data pipeline\n3. Create model workflow\n4. Implement evaluation\n5. Deploy inference system\n\n## Testing\n\n\u2713 Happy path\n\u2713 Failure path\n\n## Next Steps\n\n- Use the project's documented package manager; do not invent a new stack.",
+    "score": 1.0,
+    "success": true,
+    "category": "engineering",
+    "metadata": {},
+    "created_at": "2026-09-03T10:30:19.816327"
+  },
+  {
+    "question": "name of pm in india",
+    "answer": "In India, **PM** means **Prime Minister** \u2014 the head of government of the Republic of India (not the President, who is head of state).\n\nThe Prime Minister leads the Council of Ministers and runs the executive side of government.",
+    "score": 1.0,
+    "success": true,
+    "category": "general",
+    "metadata": {},
+    "created_at": "2026-09-03T10:30:35.126607"
+  },
+  {
+    "question": "today date",
+    "answer": "today date",
+    "score": 0.7,
+    "success": true,
+    "category": "general",
+    "metadata": {},
+    "created_at": "2026-09-03T10:30:49.403345"
+  },
+  {
+    "question": "music",
+    "answer": "music",
+    "score": 0.7,
+    "success": true,
+    "category": "general",
+    "metadata": {},
+    "created_at": "2026-09-03T10:32:07.106833"
+  },
+  {
+    "question": "music\n play list name",
+    "answer": "music\n play list name",
+    "score": 0.7,
+    "success": true,
+    "category": "general",
+    "metadata": {},
+    "created_at": "2026-09-03T10:33:24.779598"
+  },
+  {
+    "question": "hello",
+    "answer": "Hello \u2014 I'm OM. What would you like to work on?",
+    "score": 0.7,
+    "success": true,
+    "category": "general",
+    "metadata": {},
+    "created_at": "2026-09-03T10:39:40.315969"
   }
 ]
