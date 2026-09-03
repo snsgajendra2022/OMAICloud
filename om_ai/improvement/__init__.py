@@ -12,7 +12,18 @@ from .trainer_queue import enqueue
 from .version_manager import bump_version, current_version
 from .weakness_detector import detect_weaknesses
 
+from .quality import KnowledgeImprovementEngine
 
+from .example import TrainingExample
+
+
+__all__=[
+
+    "KnowledgeImprovementEngine",
+
+    "TrainingExample"
+
+]
 def improve_from_exchange(
     question: str,
     answer: str,

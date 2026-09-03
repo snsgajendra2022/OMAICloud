@@ -35,15 +35,14 @@ from om_ai.agents import (
 
 from om_ai.cognition.intent_engine import IntentEngine
 
+from om_ai.learning import LearningEngine
+from om_ai.orchestration import OMOrchestrator
 from om_ai.cognition.task_planner import TaskPlanner
-
-from om_ai.cognition.technology_engine import TechnologyEngine
-
-from om_ai.core.reasoning.reasoning_chain import ReasoningChain
-
-from om_ai.core.response.answer_generator import AnswerGenerator
-
 from om_ai.evaluation.self_checker import SelfEvaluator
+from om_ai.improvement import KnowledgeImprovementEngine
+from om_ai.cognition.technology_engine import TechnologyEngine
+from om_ai.core.reasoning.reasoning_chain import ReasoningChain
+from om_ai.core.response.answer_generator import AnswerGenerator
 
 from om_ai.understanding.query_kind import (
     is_coding_task,
@@ -75,7 +74,9 @@ class OMCognitiveBrain:
         self.agent_executor = AgentExecutor()
         self.agent_planner = AgentCollaborationPlanner()
         self.agent_coordinator = AgentCoordinator()
-
+        self.learning = LearningEngine()
+        self.improvement = KnowledgeImprovementEngine()
+        self.orchestrator = OMOrchestrator()
 
     def process(
         self,
@@ -93,9 +94,6 @@ class OMCognitiveBrain:
         # ----------------------------
 
         agent_result = self.agent_router.route(
-            question
-        )
-        agent_plan = self.agent_planner.plan(
             question
         )
 
@@ -119,6 +117,21 @@ class OMCognitiveBrain:
             
         }
 
+        orchestration = self.orchestrator.orchestrate(
+
+            question,
+
+            agent_result,
+
+            memory=memory_context,
+
+            knowledge=knowledge,
+
+        )
+        agent_plan = self.agent_planner.plan(
+            question
+        )
+
         agent_team_result = self.agent_coordinator.execute(
 
             agent_plan,
@@ -130,6 +143,7 @@ class OMCognitiveBrain:
             }
 
         )
+        
 
         agent_execution = self.agent_executor.execute(
 
@@ -151,21 +165,14 @@ class OMCognitiveBrain:
         if not question:
             return {
                 "answer": "",
-
                 "user_response": "",
-
                 "developer_response": "",
-
                 "agent": agent_result,
-
+                "learning": {},
                 "debug": {},
-
                 "evaluation": {
-
                     "approved": False,
-
                     "score": 0,
-
                     "issues":[
                         "empty question"
                     ]
@@ -183,9 +190,6 @@ class OMCognitiveBrain:
         kind = query_kind(
             question
         )
-
-
-
         # ----------------------------
         # Intent
         # ----------------------------
@@ -193,7 +197,6 @@ class OMCognitiveBrain:
         intent_result = self.intent.analyze(
             question
         )
-
 
 
         # ----------------------------
@@ -353,6 +356,9 @@ class OMCognitiveBrain:
 
         pipeline["agent"] = agent_result
         pipeline["agent_execution"] = agent_execution
+        pipeline["agent_plan"] = agent_plan
+        pipeline["agent_team"] = agent_team_result
+        pipeline["orchestration"] = orchestration
 
 
 
@@ -475,8 +481,28 @@ class OMCognitiveBrain:
             )
 
 
+        improvement_result = self.improvement.improve(
 
+                question,
 
+                user_answer,
+
+                evaluation
+
+            )
+        # ----------------------------
+        # Long Term Learning
+        # ----------------------------
+
+        learning_result = self.learning.learn(
+
+            question,
+
+            user_answer,
+
+            evaluation
+
+        )
 
         # ----------------------------
         # Final Response
@@ -535,8 +561,14 @@ class OMCognitiveBrain:
 
 
             "agent":
-                agent_result
-
+                agent_result,
+            "evaluation":
+                evaluation,
+            "learning":
+                learning_result,
+            "improvement":
+                improvement_result,
+            "orchestration": orchestration,
 
         }
 
@@ -623,9 +655,10 @@ class OMCognitiveBrain:
 
 
                 "evaluation":
-                    evaluation
+                    evaluation,
 
-
+                "learning":
+                    learning_result,
             }
 
 

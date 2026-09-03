@@ -260,6 +260,7 @@ def run_reasoning_pipeline(
     technology = TechnologyEngine().analyze(
         question
     )
+    
     if retrieve and not hits:
         hits = _retrieve_knowledge(question,intent=intent.to_dict(),technology=technology)
         intent = IntentAnalyzer().analyze(
@@ -287,6 +288,14 @@ def run_reasoning_pipeline(
 
 
     knowledge_profile = None
+    try:
+       from om_ai.knowledge.graph_rag import GraphRAGExpander
+       hits = GraphRAGExpander().expand(
+        question,
+        hits
+    )
+    except Exception:
+      pass
     try:
         from om_ai.knowledge.selector import select_knowledge
 

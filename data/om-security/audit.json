@@ -1,0 +1,30 @@
+[
+  {
+    "tenant_id": "default",
+    "actor": "coding_agent",
+    "action": "tool.execute",
+    "resource": "file_writer",
+    "detail": {
+      "action": "create file",
+      "result": {
+        "success": true,
+        "result": "created"
+      }
+    },
+    "time": "2026-09-03T06:51:01.168311+00:00"
+  },
+  {
+    "tenant_id": "default",
+    "actor": "coding",
+    "action": "tool.execute",
+    "resource": "tool_execution",
+    "detail": {
+      "action": "create file",
+      "result": {
+        "success": true,
+        "result": "file created"
+      }
+    },
+    "time": "2026-09-03T06:51:01.267254+00:00"
+  }
+]

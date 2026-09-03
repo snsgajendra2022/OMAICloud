@@ -9,6 +9,18 @@ from typing import Any
 from om_ai.continuous.cycle import export_learning_bundle
 from om_ai.continuous.feedback import FeedbackStore
 
+from .learner import LearningEngine
+
+from .experience import Experience
+
+
+__all__=[
+
+    "LearningEngine",
+
+    "Experience"
+
+]
 
 def record_feedback(
     *,

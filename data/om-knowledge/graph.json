@@ -1,0 +1,51 @@
+{
+  "entities": [
+    {
+      "name": "laravel",
+      "type": "technology",
+      "metadata": {}
+    },
+    {
+      "name": "php",
+      "type": "technology",
+      "metadata": {}
+    },
+    {
+      "name": "mysql",
+      "type": "technology",
+      "metadata": {}
+    },
+    {
+      "name": "database",
+      "type": "technology",
+      "metadata": {}
+    },
+    {
+      "name": "api",
+      "type": "technology",
+      "metadata": {}
+    }
+  ],
+  "relations": [
+    {
+      "source": "laravel",
+      "relation": "related_to",
+      "target": "php"
+    },
+    {
+      "source": "php",
+      "relation": "related_to",
+      "target": "mysql"
+    },
+    {
+      "source": "mysql",
+      "relation": "related_to",
+      "target": "database"
+    },
+    {
+      "source": "database",
+      "relation": "related_to",
+      "target": "api"
+    }
+  ]
+}

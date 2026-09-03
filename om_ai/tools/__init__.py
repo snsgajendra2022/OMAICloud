@@ -3,7 +3,12 @@ from __future__ import annotations
 
 from typing import Any, Callable
 
+from .router import ToolRouter
+from om_ai.tools import ToolRouter
 
+__all__=[
+    "ToolRouter"
+]
 TOOL_CATALOG = {
     "file_manager": "Read/write/list files (workspace scoped)",
     "terminal": "Allowlisted shell commands",

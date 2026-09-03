@@ -1,0 +1,29 @@
+[
+  {
+    "question": "Build restaurant management system",
+    "answer": "Created Laravel architecture",
+    "score": 0.9,
+    "success": true,
+    "category": "engineering",
+    "metadata": {},
+    "created_at": "2026-09-02T13:58:04.074555"
+  },
+  {
+    "question": "Build restaurant management system with database and reports",
+    "answer": "# Restaurant Management System With Database And Reports\n\n## Solution\n\nWe will create:\n- Load dataset brain\n- Retrieve similar solutions\n- Implement minimal fix\n- Verify\n\n## Implementation Steps\n\n1. Understand requirement\n2. Create implementation plan\n3. Develop solution\n4. Test result\n\n## Testing\n\n\u2713 UI validation\n\u2713 Main user flow\n\u2713 Error handling",
+    "score": 1.0,
+    "success": true,
+    "category": "engineering",
+    "metadata": {},
+    "created_at": "2026-09-03T06:52:34.331831"
+  },
+  {
+    "question": "Build restaurant management system with database and reports",
+    "answer": "# Restaurant Management System With Database And Reports\n\n## Solution\n\nWe will create:\n- Load dataset brain\n- Retrieve similar solutions\n- Implement minimal fix\n- Verify\n\n## Implementation Steps\n\n1. Understand requirement\n2. Create implementation plan\n3. Develop solution\n4. Test result\n\n## Testing\n\n\u2713 UI validation\n\u2713 Main user flow\n\u2713 Error handling",
+    "score": 1.0,
+    "success": true,
+    "category": "engineering",
+    "metadata": {},
+    "created_at": "2026-09-03T06:52:50.790561"
+  }
+]

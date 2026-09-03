@@ -14,7 +14,10 @@ from om_ai.security.auth import (
 )
 from om_ai.security.rate_limit import RateLimitExceeded, RateLimiter
 from om_ai.security.secrets import SecretStore
-
+from .controller import SecurityController
+from .policy import SecurityPolicy
+from .sandbox import SandboxRunner
+from .audit_log import AuditLogger
 # Back-compat alias
 require_auth = require_auth_dep
 
@@ -26,6 +29,7 @@ __all__ = [
     "RateLimiter",
     "RateLimitExceeded",
     "AuditLog",
+    "AuditLogger",
     "AuditEntry",
     "SSRFGuard",
     "SSRFError",
@@ -34,4 +38,7 @@ __all__ = [
     "TenantContext",
     "get_current_tenant",
     "set_current_tenant",
+    "SecurityController",
+    "SecurityPolicy",
+    "SandboxRunner"
 ]
