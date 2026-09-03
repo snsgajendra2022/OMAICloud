@@ -1,60 +1,53 @@
 {
   "status": "improved",
   "evaluation": {
-    "question": "hiii",
+    "question": "Create React login/signup UI with validation and auth integration",
     "scores": {
-      "structure": 40.0,
-      "clarity": 52.3,
-      "security": 80.0,
-      "task_fit": 30.0,
-      "code_quality": 70.0
+      "structure": 100.0,
+      "clarity": 63.9,
+      "security": 65.0,
+      "task_fit": 100.0,
+      "code_quality": 40.0
     },
-    "overall": 54.5,
-    "ok": false
+    "overall": 73.8,
+    "ok": true
   },
   "weaknesses": [
     {
-      "area": "structure",
-      "score": 40.0,
-      "threshold": 70.0,
-      "hint": "Use clear sections: Understanding, Plan, Implementation, Validation"
-    },
-    {
       "area": "clarity",
-      "score": 52.3,
+      "score": 63.9,
       "threshold": 65.0,
       "hint": "Write shorter clear sentences; avoid garbled fragments"
     },
     {
-      "area": "task_fit",
-      "score": 30.0,
-      "threshold": 65.0,
-      "hint": "Address every part of the user ask explicitly"
+      "area": "security",
+      "score": 65.0,
+      "threshold": 70.0,
+      "hint": "Include validation, no secrets, safe auth patterns"
     },
     {
-      "area": "overall",
-      "score": 54.5,
+      "area": "code_quality",
+      "score": 40.0,
       "threshold": 70.0,
-      "hint": "Improve completeness and directness of the answer"
+      "hint": "Include runnable code blocks and tests"
     }
   ],
   "training_data": {
     "created": true,
     "sft_path": "data/om_training/improvements/sft_improvements.jsonl",
     "preference_path": "data/om_training/improvements/preference_improvements.jsonl",
-    "preferred_preview": "Question: hiii\n\n## Understanding\nAddress the user ask directly: hiii\n\n## Requirements from evaluator\n- Use clear sections: Understanding, Plan, Implementation, Validation\n- Write shorter clear sentences; avoid garbled fragments\n- Address every part of the user ask explicitly\n- Improve completeness and directness of the answer\n\n## Solution\nProvide a structured, correct, secure answer with validatio",
+    "preferred_preview": "Question: Create React login/signup UI with validation and auth integration\n\n## Understanding\nAddress the user ask directly: Create React login/signup UI with validation and auth integration\n\n## Requirements from evaluator\n- Write shorter clear sentences; avoid garbled fragments\n- Include validation, no secrets, safe auth patterns\n- Include runnable code blocks and tests\n\n## Solution\nProvide a str",
     "weak_areas": [
-      "structure",
       "clarity",
-      "task_fit",
-      "overall"
+      "security",
+      "code_quality"
     ]
   },
   "trainer_job": {
-    "id": "8a7b4aaa-8576-4ac2-8fba-b8eaa83a8715",
-    "ts": 1788431602.386699,
+    "id": "33db6710-f1cd-4f98-914b-2c262999c7c2",
+    "ts": 1788444076.451772,
     "status": "queued",
-    "reason": "structure,clarity,task_fit,overall",
+    "reason": "clarity,security,code_quality",
     "sft_path": "data/om_training/improvements/sft_improvements.jsonl",
     "preference_path": "data/om_training/improvements/preference_improvements.jsonl",
     "commands": {
@@ -65,23 +58,9 @@
   },
   "version": {
     "om_version": "1.0",
-    "improve_cycle": 220,
-    "label": "OM-1.0-improve-220",
+    "improve_cycle": 221,
+    "label": "OM-1.0-improve-221",
     "history": [
-      {
-        "ts": 1788347735.273556,
-        "cycle": 171,
-        "note": "improve from: ji",
-        "metrics": {
-          "overall": 61.6,
-          "weak": [
-            "clarity",
-            "security",
-            "task_fit",
-            "overall"
-          ]
-        }
-      },
       {
         "ts": 1788347739.097502,
         "cycle": 172,
@@ -742,9 +721,22 @@
             "overall"
           ]
         }
+      },
+      {
+        "ts": 1788444076.452266,
+        "cycle": 221,
+        "note": "improve from: Create React login/signup UI with validation and auth integration",
+        "metrics": {
+          "overall": 73.8,
+          "weak": [
+            "clarity",
+            "security",
+            "code_quality"
+          ]
+        }
       }
     ],
-    "updated_at": 1788431602.387248
+    "updated_at": 1788444076.452267
   },
-  "ts": 1788431602.3875751
+  "ts": 1788444076.452689
 }

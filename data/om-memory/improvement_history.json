@@ -22,5 +22,119 @@
     "answer": "Today's date is Thursday, 03 September 2026.",
     "intent": "date_request",
     "score": 100.0
+  },
+  {
+    "question": "update here anyhitng\n\nOM_AI_DB=artifacts/om_ai.sqlite3\nOM_AI_KB=artifacts/knowledge.sqlite3\nOM_AI_TOKENS_DB=artifacts/tokens.sqlite3\nOM_AI_ACCOUNTS_DB=artifacts/accounts.sqlite3\nOM_AI_ALLOW_REGISTER=1\nOM_AI_AUTH_RATE_LIMIT=0\nOM_AI_SESSION_DAYS=30\nOM_AI_COOKIE_SECURE=0\nOM_AI_REGISTRY=artifacts/registry\nOM_AI_TENANT=default\nOM_AI_ALLOWED_SHELL=echo,pwd,ls\nOM_AI_REQUIRE_AUTH=1\n# Master OM AI key (permanent bootstrap). Role admin = all permissions\n# (admin \u2283 operator \u2283 agent \u2283 viewer): model load/generate, agent.run,\n# memory/knowledge, tokens console, registry, shell, openapi.\n# Format: key:admin  \u2014 paste the key part only into the UI (strip :admin).\nOM_AI_API_KEYS=om-dev-eL22FCeLbR8PWwU-Vq21HYp-1evyGp6rnonpYgTSDpI:admin\n# Optional second admin key (token console / backups).\nOM_AI_API_KEYS_ADMIN=4kxPhRsR18cVV-HVJ8zDtclIYGuObfNJiONxE5n8XA0:admin\nOM_AI_RATE_LIMIT=0\nOM_AI_AUTOLOAD=1\nOM_AI_CONFIG=configs/om-1.0-local.json\nOM_AI_TOKENIZER=artifacts/tokenizer-production-65536.json\nOM_AI_CHECKPOINT=artifacts/checkpoints/om-1.0-chat-dpo-v4/latest.pt\nOM_AI_MODEL_ID=om-1.0\nOM_AI_CORS_ORIGINS=http://localhost:3000\nOM_AI_AUTO_TRAIN_70B=70000000\n\n# --- Chat backend: OM-1.0 native only (no Ollama / no third-party LLM fallback) ---\nOM_MODEL_PROVIDER=om_native\nOM_AI_CHAT_BACKEND=om_native\nOM_MODEL_ID=OM-1.0\nOM_MODEL_CONFIG=configs/om-1.0-local.json\nOM_MODEL_TOKENIZER=artifacts/tokenizer-production-65536.json\nOM_MODEL_CHECKPOINT=artifacts/checkpoints/om-1.0-chat-dpo-v4/latest.pt\n\n# --- Phase 1 chat generation defaults (natural / human feel) ---\nOM_CHAT_TEMPERATURE=0.55\nOM_CHAT_TOP_P=0.92\nOM_CHAT_TOP_K=50\nOM_CHAT_REPETITION_PENALTY=1.1\nOM_CHAT_MAX_NEW_TOKENS=256\nOM_CHAT_MIN_NEW_TOKENS=4\n\n# --- Intelligence layer ---\nOM_CHAT_MEMORY=1\nOM_CHAT_RAG=1\nOM_CHAT_FILE_RAG=1\nOM_CHAT_ALIGNMENT=1\nOM_AGENT_BRAIN=1\nOM_UNDERSTANDING=1\nOM_LIVE_KNOWLEDGE=1\nOM_LIVE_KNOWLEDGE_NETWORK=0\nOM_LIVE_KNOWLEDGE_GROUNDED=0\n# Dataset brain (om-ai brain power) \u2014 no dummy templates by default\nOM_STATIC_TEMPLATES=0\nOM_BRAIN_QA_DB=artifacts/brain_qa.sqlite3\nOM_ABSOLUTE_OS=1\nOM_ABSOLUTE_LEARN=1\nOM_RESPONSE_MODE=user/developer",
+    "answer": "## Reusable AI Prompt\n\nYou are an expert assistant helping with **update here anyhitng\n\nOM_AI_DB=artifacts/om_ai.sqlite3\nOM_AI_KB=artifacts/knowledge.sqlite3\nOM_AI_TOKENS_DB=artifacts/tokens.sqlite3\nOM_AI_ACCOUNTS_DB=artifacts/accounts.sqlite3\nOM_AI_ALLOW_REGISTER=1\nOM_AI_AUTH_RATE_LIMIT=0\nOM_AI_SESSION_DAYS=30\nOM_AI_COOKIE_SECURE=0\nOM_AI_REGISTRY=artifacts/registry\nOM_AI_TENANT=default\nOM_AI_ALLOWED_SHELL=echo,pwd,ls\nOM_AI_REQUIRE_AUTH=1\n# Master OM AI key (permanent bootstrap). Role admin = all permissions\n# (admin \u2283 operator \u2283 agent \u2283 viewer): model load/generate, agent.run,\n# memory/knowledge, tokens console, registry, shell, openapi.\n# Format: key:admin  \u2014 paste the key part only into the UI (strip :admin).\nOM_AI_API_KEYS=om-dev-eL22FCeLbR8PWwU-Vq21HYp-1evyGp6rnonpYgTSDpI:admin\n# Optional second admin key (token console / backups).\nOM_AI_API_KEYS_ADMIN=4kxPhRsR18cVV-HVJ8zDtclIYGuObfNJiONxE5n8XA0:admin\nOM_AI_RATE_LIMIT=0\nOM_AI_AUTOLOAD=1\nOM_AI_CONFIG=configs/om-1.0-local.json\nOM_AI",
+    "intent": "prompt_generation",
+    "score": 100.0
+  },
+  {
+    "question": "hiii",
+    "answer": "I want to make sure I help correctly with \u201chiii\u201d.\n\nDo you want me to:\n1. Explain it\n2. Create something (code / prompt / plan)\n3. Recommend options\n4. Something else \u2014 tell me the goal in one sentence",
+    "intent": "unclear",
+    "score": 100.0
+  },
+  {
+    "question": "goof",
+    "answer": "I want to make sure I help correctly with \u201cgoof\u201d.\n\nDo you want me to:\n1. Explain it\n2. Create something (code / prompt / plan)\n3. Recommend options\n4. Something else \u2014 tell me the goal in one sentence",
+    "intent": "unclear",
+    "score": 100.0
+  },
+  {
+    "question": "hiiii",
+    "answer": "I want to make sure I help correctly with \u201chiiii\u201d.\n\nDo you want me to:\n1. Explain it\n2. Create something (code / prompt / plan)\n3. Recommend options\n4. Something else \u2014 tell me the goal in one sentence",
+    "intent": "unclear",
+    "score": 100.0
+  },
+  {
+    "question": "####################################################\n# OM AI CORE CONFIGURATION\n####################################################\n\nOM_AI_ENV=development\n\nOM_AI_NAME=OM AI\n\nOM_AI_VERSION=1.0\n\n\n####################################################\n# DATABASES\n####################################################\n\nOM_AI_DB=artifacts/om_ai.sqlite3\n\nOM_AI_KB=artifacts/knowledge.sqlite3\n\nOM_AI_MEMORY_DB=artifacts/memory.sqlite3\n\nOM_AI_EXPERIENCE_DB=artifacts/experience.sqlite3\n\nOM_AI_FEEDBACK_DB=artifacts/feedback.sqlite3\n\nOM_AI_AUDIT_DB=artifacts/audit.sqlite3\n\n\n####################################################\n# USER / AUTH SYSTEM\n####################################################\n\nOM_AI_ACCOUNTS_DB=artifacts/accounts.sqlite3\n\nOM_AI_TOKENS_DB=artifacts/tokens.sqlite3\n\nOM_AI_ALLOW_REGISTER=1\n\nOM_AI_REQUIRE_AUTH=1\n\nOM_AI_SESSION_DAYS=30\n\nOM_AI_COOKIE_SECURE=0\n\nOM_AI_AUTH_RATE_LIMIT=10\n\n\n\n####################################################\n# TENANT\n####################################################\n\nOM_AI_TENANT=default\n\n\n\n####################################################\n# MODEL SYSTEM\n####################################################\n\nOM_MODEL_CHECKPOINT=artifacts/checkpoints/om-1.0-chat/latest.pt\n\nOM_MODEL_CONFIG=configs/om-1.0-local.json\n\nOM_MODEL_TOKENIZER=artifacts/tokenizer-production-65536.json\n\n\n# fallback mode if model missing\n\nOM_AI_MODEL_REQUIRED=0\n\n\n\n####################################################\n# MODEL GENERATION\n####################################################\n\nOM_AI_CONTEXT_LENGTH=32768\n\nOM_AI_MAX_TOKENS=4096\n\nOM_AI_TEMPERATURE=0.7\n\nOM_AI_TOP_P=0.9\n\n\n\n####################################################\n# MEMORY INTELLIGENCE\n####################################################\n\nOM_AI_MEMORY_ENABLED=1\n\nOM_AI_SHORT_MEMORY=1\n\nOM_AI_LONG_MEMORY=1\n\nOM_AI_PROJECT_MEMORY=1\n\nOM_AI_EXPERIENCE_MEMORY=1\n\n\n\n####################################################\n# KNOWLEDGE ENGINE\n####################################################\n\nOM_AI_KNOWLEDGE_ENABLED=1\n\nOM_AI_RAG_ENABLED=1\n\nOM_AI_VECTOR_DB=artifacts/vectors\n\n\n####################################################\n# INTELLIGENCE ENGINE\n####################################################\n\nOM_AI_INTELLIGENCE_ENABLED=1\n\nOM_AI_INTENT_ENGINE=1\n\nOM_AI_CONTEXT_ENGINE=1\n\nOM_AI_REASONING_ENGINE=1\n\nOM_AI_RESPONSE_VALIDATION=1\n\nOM_AI_SELF_CORRECTION=1\n\n\n\n####################################################\n# AGENT SYSTEM\n####################################################\n\nOM_AI_AGENTS_ENABLED=1\n\nOM_AI_MAX_AGENTS=20\n\nOM_AI_AGENT_MEMORY=1\n\n\n####################################################\n# TOOL SYSTEM\n####################################################\n\nOM_AI_TOOLS_ENABLED=1\n\nOM_AI_TOOL_AUTO_SELECT=1\n\n\nOM_AI_ALLOWED_SHELL=echo,pwd,ls\n\n\n\n####################################################\n# MULTIMODAL SYSTEM\n####################################################\n\nOM_AI_VISION_ENABLED=1\n\nOM_AI_IMAGE_UPLOAD=1\n\nOM_AI_OCR_ENABLED=1\n\nOM_AI_DOCUMENT_ANALYSIS=1\n\nOM_AI_AUDIO_ENABLED=0\n\nOM_AI_VIDEO_ENABLED=0\n\n\n# Upload storage\n\nOM_AI_UPLOAD_DIR=artifacts/uploads\n\n\n\n####################################################\n# SEARCH / RESEARCH ENGINE\n####################################################\n\nOM_AI_RESEARCH_ENABLED=1\n\nOM_AI_AUTO_SEARCH=1\n\nOM_AI_SOURCE_VALIDATION=1\n\n\n\n####################################################\n# LEARNING SYSTEM\n####################################################\n\nOM_AI_LEARNING_ENABLED=1\n\nOM_AI_PATTERN_MEMORY=1\n\nOM_AI_DATASET_GENERATION=1\n\nOM_AI_SELF_IMPROVEMENT=1\n\n\nOM_AI_DATASET_DIR=data/om-datasets\n\n\n\n####################################################\n# WORKFLOW ENGINE\n####################################################\n\nOM_AI_WORKFLOW_ENABLED=1\n\nOM_AI_AUTONOMOUS_PLANNING=1\n\nOM_AI_TASK_MEMORY=1\n\n\n\n####################################################\n# SECURITY\n####################################################\n\nOM_AI_SECURITY_ENABLED=1\n\nOM_AI_AUDIT_ENABLED=1\n\nOM_AI_SANDBOX_ENABLED=1\n\n\n\n####################################################\n# REGISTRY\n####################################################\n\nOM_AI_REGISTRY=artifacts/registry\n\n\n\n####################################################\n# API SERVER\n####################################################\n\nOM_AI_HOST=127.0.0.1\n\nOM_AI_PORT=8080\n\n\n\n####################################################\n# MASTER OM AI KEY\n####################################################\n\nOM_AI_MASTER_KEY=change-this-project-key\n\nPROJECT_NAME=om-ai",
+    "answer": "I can analyze that visual.\n\nUpload/attach the image (or screenshot), then ask what you need:\n- What is in this image?\n- Extract text / fields\n- What is wrong / how to improve?\n- Create a similar design brief\n\n**Research notes:**\n{'plan': {'question': '####################################################\\n# OM AI CORE CONFIGURATION\\n####################################################\\n\\nOM_AI_ENV=development\\n\\nOM_AI_NAME=OM AI\\n\\nOM_AI_VERSION=1.0\\n\\n\\n####################################################\\n# DATABASES\\n####################################################\\n\\nOM_AI_DB=artifacts/om_ai.sqlite3\\n\\nOM_AI_KB=artifacts/knowledge.sqlite3\\n\\nOM_AI_MEMORY_DB=artifacts/memory.sqlite3\\n\\nOM_AI_EXPERIENCE_DB=artifacts/experience.sqlite3\\n\\nOM_AI_FEEDBACK_DB=artifacts/feedback.sqlite3\\n\\nOM_AI_AUDIT_DB=artifacts/audit.sqlite3\\n\\n\\n####################################################\\n# USER / AUTH SYSTEM\\n####################################################\\n\\nOM_AI_ACCOUNTS_DB=artif",
+    "intent": "vision_analysis",
+    "score": 100.0
+  },
+  {
+    "question": "what si this",
+    "answer": "**Topic:** what si this\n\nHere\u2019s a clear take:\n- Core idea\n- How it works\n- Why it matters\n- Practical takeaway\n\nWant a beginner version or a deeper technical dive?\n\n**Research notes:**\n{'plan': {'question': 'what si this', 'steps': ['Understand research objective', 'Collect relevant information', 'Analyze collected data', 'Validate important facts', 'Generate research summary']}, 'analysis': {'key_points': [], 'source_count': 0}, 'validation': {'validated': True, 'confidence': 0.0, 'checked_items': 0}, 'result': {'summary': '', 'confidence': 0.0}}",
+    "intent": "explanation",
+    "score": 100.0
+  },
+  {
+    "question": "need to work the react netive",
+    "answer": "## Reusable AI Prompt\n\nYou are an expert assistant helping with **need to work the react netive**.\n\nGoals:\n- Produce production-quality output\n- Explain architecture briefly before code\n- Prefer TypeScript when building UI\n- Include file structure and key snippets\n- List run/test steps\n\nConstraints:\n- No placeholder-only stubs\n- Call out assumptions\n- Stay focused on: need to work the react netive\n\nOutput format:\n1. Summary\n2. Architecture\n3. File tree\n4. Code\n5. Next steps",
+    "intent": "prompt_generation",
+    "score": 100.0
+  },
+  {
+    "question": "hwello good moring for today",
+    "answer": "Today's date is Thursday, 03 September 2026.",
+    "intent": "date_request",
+    "score": 100.0
+  },
+  {
+    "question": "how i am",
+    "answer": "**Topic:** how i am\n\nHere\u2019s a clear take:\n- Core idea\n- How it works\n- Why it matters\n- Practical takeaway\n\nWant a beginner version or a deeper technical dive?\n\n**Research notes:**\n{'plan': {'question': 'how i am', 'steps': ['Understand research objective', 'Collect relevant information', 'Analyze collected data', 'Validate important facts', 'Generate research summary']}, 'analysis': {'key_points': [], 'source_count': 0}, 'validation': {'validated': True, 'confidence': 0.0, 'checked_items': 0}, 'result': {'summary': '', 'confidence': 0.0}}",
+    "intent": "explanation",
+    "score": 100.0
+  },
+  {
+    "question": "this is correct ans ???Topic: how i am\nHere\u2019s a clear take:\nCore idea\nHow it works\nWhy it matters\nPractical takeaway\n\nWant a beginner version or a deeper technical dive?\nResearch notes:\n{'plan': {'question': 'how i am', 'steps': ['Understand research objective', 'Collect relevant information', 'Analyze collected data', 'Validate important facts', 'Generate research summary']}, 'analysis': {'key_points': [], 'source_count': 0}, 'validation': {'validated': True, 'confidence': 0.0, 'checked_items': 0}, 'result': {'summary': '', 'confidence': 0.0}}",
+    "answer": "**Topic:** this is correct ans ???Topic: how i am\nHere\u2019s a clear take:\nCore idea\nHow it works\nWhy it matters\nPractical takeaway\n\nWant a beginner version or a deeper technical dive?\nResearch notes:\n{'plan': {'question': 'how i am', 'steps': ['Understand research objective', 'Collect relevant information', 'Analyze collected data', 'Validate important facts', 'Generate research summary']}, 'analysis': {'key_points': [], 'source_count': 0}, 'validation': {'validated': True, 'confidence': 0.0, 'checked_items': 0}, 'result': {'summary': '', 'confidence': 0.0}}\n\nHere\u2019s a clear take:\n- Core idea\n- How it works\n- Why it matters\n- Practical takeaway\n\nWant a beginner version or a deeper technical dive?\n\n**Research notes:**\n{'plan': {'question': \"this is correct ans ???Topic: how i am\\nHere\u2019s a clear take:\\nCore idea\\nHow it works\\nWhy it matters\\nPractical takeaway\\n\\nWant a beginner version or a deeper technical dive?\\nResearch notes:\\n{'plan': {'question': 'how i am', 'steps': ['Understand res",
+    "intent": "explanation",
+    "score": 100.0
+  },
+  {
+    "question": "need perfect formate",
+    "answer": "I want to make sure I help correctly with \u201cneed perfect formate\u201d.\n\nDo you want me to:\n1. Explain it\n2. Create something (code / prompt / plan)\n3. Recommend options\n4. Something else \u2014 tell me the goal in one sentence",
+    "intent": "unclear",
+    "score": 100.0
+  },
+  {
+    "question": "hiiii",
+    "answer": "I want to make sure I help correctly with \u201chiiii\u201d.\n\nDo you want me to:\n1. Explain it\n2. Create something (code / prompt / plan)\n3. Recommend options\n4. Something else \u2014 tell me the goal in one sentence",
+    "intent": "unclear",
+    "score": 100.0
+  },
+  {
+    "question": "correct \nCoding Assistant\nDebug, write, and review code with OM.\n\nOM-1.0\nUse\nOpen\n\nCoding Assistant\nDebug, write, and review code with OM.\n\nOM-1.0\nUse\nOpen\n\nResearch Assistant\nSummarize sources and answer with citations.\n\nOM-1.0\nUse\nOpen\n\nOM Companion\nWarm default assistant \u2014 empathy + clear help.\n\nOM-1.0",
+    "answer": "**Topic:** correct \nCoding Assistant\nDebug, write, and review code with OM.\n\nOM-1.0\nUse\nOpen\n\nCoding Assistant\nDebug, write, and review code with OM.\n\nOM-1.0\nUse\nOpen\n\nResearch Assistant\nSummarize sources and answer with citations.\n\nOM-1.0\nUse\nOpen\n\nOM Companion\nWarm default assistant \u2014 empathy + clear help.\n\nOM-1.0\n\nHere\u2019s a clear take:\n- Core idea\n- How it works\n- Why it matters\n- Practical takeaway\n\nWant a beginner version or a deeper technical dive?\n\n**Research notes:**\n{'plan': {'question': 'correct \\nCoding Assistant\\nDebug, write, and review code with OM.\\n\\nOM-1.0\\nUse\\nOpen\\n\\nCoding Assistant\\nDebug, write, and review code with OM.\\n\\nOM-1.0\\nUse\\nOpen\\n\\nResearch Assistant\\nSummarize sources and answer with citations.\\n\\nOM-1.0\\nUse\\nOpen\\n\\nOM Companion\\nWarm default assistant \u2014 empathy + clear help.\\n\\nOM-1.0', 'steps': ['Understand research objective', 'Collect relevant information', 'Analyze collected data', 'Validate important facts', 'Generate research summary']}, 'ana",
+    "intent": "research",
+    "score": 100.0
+  },
+  {
+    "question": "what e are celecetd Research notes:\n{'plan': {'question': 'correct \\nCoding Assistant\\nDebug, write, and review code with OM.\\n\\nOM-1.0\\nUse\\nOpen\\n\\nCoding Assistant\\nDebug, write, and review code with OM.\\n\\nOM-1.0\\nUse\\nOpen\\n\\nResearch Assistant\\nSummarize sources and answer with citations.\\n\\nOM-1.0\\nUse\\nOpen\\n\\nOM Companion\\nWarm default assistant \u2014 empathy + clear help.\\n\\nOM-1.0', 'steps': ['Understand research objective', 'Collect relevant information', 'Analyze collected data', 'Validate important facts', 'Generate research summary']}, 'analysis': {'key_points': [], 'source_count': 0}, 'validation': {'validated': True, 'confidence': 0.0, 'checked_items': 0}, 'result': {'summary': '', 'confidence': 0.0}}",
+    "answer": "**Topic:** what e are celecetd Research notes:\n{'plan': {'question': 'correct \\nCoding Assistant\\nDebug, write, and review code with OM.\\n\\nOM-1.0\\nUse\\nOpen\\n\\nCoding Assistant\\nDebug, write, and review code with OM.\\n\\nOM-1.0\\nUse\\nOpen\\n\\nResearch Assistant\\nSummarize sources and answer with citations.\\n\\nOM-1.0\\nUse\\nOpen\\n\\nOM Companion\\nWarm default assistant \u2014 empathy + clear help.\\n\\nOM-1.0', 'steps': ['Understand research objective', 'Collect relevant information', 'Analyze collected data', 'Validate important facts', 'Generate research summary']}, 'analysis': {'key_points': [], 'source_count': 0}, 'validation': {'validated': True, 'confidence': 0.0, 'checked_items': 0}, 'result': {'summary': '', 'confidence': 0.0}}\n\nHere\u2019s a clear take:\n- Core idea\n- How it works\n- Why it matters\n- Practical takeaway\n\nWant a beginner version or a deeper technical dive?\n\n**Research notes:**\n{'plan': {'question': \"what e are celecetd Research notes:\\n{'plan': {'question': 'correct \\\\nCoding Ass",
+    "intent": "research",
+    "score": 100.0
+  },
+  {
+    "question": "google",
+    "answer": "I want to make sure I help correctly with \u201cgoogle\u201d.\n\nDo you want me to:\n1. Explain it\n2. Create something (code / prompt / plan)\n3. Recommend options\n4. Something else \u2014 tell me the goal in one sentence",
+    "intent": "unclear",
+    "score": 100.0
+  },
+  {
+    "question": "you want me to:\n- Explain it\nCreate something (code / prompt / plan)\nRecommend options\nSomething else \u2014 tell me the goal in one sentence",
+    "answer": "## Reusable AI Prompt\n\nYou are an expert assistant helping with **you want me to:\n- Explain it\nCreate something (code / prompt / plan)\nRecommend options\nSomething else \u2014 tell me the goal in one sentence**.\n\nGoals:\n- Produce production-quality output\n- Explain architecture briefly before code\n- Prefer TypeScript when building UI\n- Include file structure and key snippets\n- List run/test steps\n\nConstraints:\n- No placeholder-only stubs\n- Call out assumptions\n- Stay focused on: you want me to:\n- Explain it\nCreate something (code / prompt / plan)\nRecommend options\nSomething else \u2014 tell me the goal in one sentence\n\nOutput format:\n1. Summary\n2. Architecture\n3. File tree\n4. Code\n5. Next steps",
+    "intent": "prompt_generation",
+    "score": 100.0
+  },
+  {
+    "question": "hu",
+    "answer": "I want to make sure I help correctly with \u201chu\u201d.\n\nDo you want me to:\n1. Explain it\n2. Create something (code / prompt / plan)\n3. Recommend options\n4. Something else \u2014 tell me the goal in one sentence",
+    "intent": "unclear",
+    "score": 100.0
+  },
+  {
+    "question": "you want me to:\n- Explain it\nCreate something (code / prompt / plan)\nRecommend options\nSomething else \u2014 tell me the goal in one sentence",
+    "answer": "## Reusable AI Prompt\n\nYou are an expert assistant helping with **you want me to:\n- Explain it\nCreate something (code / prompt / plan)\nRecommend options\nSomething else \u2014 tell me the goal in one sentence**.\n\nGoals:\n- Produce production-quality output\n- Explain architecture briefly before code\n- Prefer TypeScript when building UI\n- Include file structure and key snippets\n- List run/test steps\n\nConstraints:\n- No placeholder-only stubs\n- Call out assumptions\n- Stay focused on: you want me to:\n- Explain it\nCreate something (code / prompt / plan)\nRecommend options\nSomething else \u2014 tell me the goal in one sentence\n\nOutput format:\n1. Summary\n2. Architecture\n3. File tree\n4. Code\n5. Next steps",
+    "intent": "prompt_generation",
+    "score": 100.0
+  },
+  {
+    "question": "hiiii",
+    "answer": "I want to make sure I help correctly with \u201chiiii\u201d.\n\nDo you want me to:\n1. Explain it\n2. Create something (code / prompt / plan)\n3. Recommend options\n4. Something else \u2014 tell me the goal in one sentence",
+    "intent": "unclear",
+    "score": 100.0
   }
 ]

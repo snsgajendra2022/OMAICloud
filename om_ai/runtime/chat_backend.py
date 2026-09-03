@@ -151,6 +151,10 @@ def _env(name: str, default: str = "") -> str:
     return (os.getenv(name) or default).strip()
 
 
+def _env_on(name: str, default: str = "1") -> bool:
+    return _env(name, default).lower() not in {"0", "false", "no", "off"}
+
+
 def _env_float(name: str, default: float) -> float:
     raw = _env(name)
     if not raw:
@@ -459,7 +463,8 @@ def chat_reply(
             return intel.direct_reply, info_base
 
         # Universal multimodal + cognitive loop (preferred).
-        try:
+        if _env_on("OM_UNIVERSAL_INTELLIGENCE", "1"):
+          try:
             from om_ai.operating_intelligence.universal import UniversalIntelligence
             from om_ai.core.response.response_formatter import (
                 ensure_public_reply,
@@ -502,12 +507,12 @@ def chat_reply(
                         },
                     )
                     return polished, info_uni
-        except Exception as exc:
+          except Exception as exc:
             logger.debug("UniversalIntelligence skipped: %s", exc)
 
         # Core cognitive intelligence (understand → capability → verify).
-        # Prefer this over legacy dynamic layer for intent-faithful answers.
-        try:
+        if _env_on("OM_COGNITIVE_INTELLIGENCE", "1"):
+          try:
             from om_ai.core.intelligence import CognitiveIntelligence
             from om_ai.core.response.response_formatter import (
                 ensure_public_reply,
@@ -556,11 +561,12 @@ def chat_reply(
                         },
                     )
                     return polished, info_ci
-        except Exception as exc:
+          except Exception as exc:
             logger.debug("CognitiveIntelligence skipped: %s", exc)
 
         # Dynamic intelligence pipeline (generalizes; regex only as helper signals).
-        try:
+        if _env_on("OM_DYNAMIC_INTELLIGENCE", "1"):
+          try:
             from om_ai.intelligence import IntelligenceManager
             from om_ai.core.response.response_formatter import (
                 ensure_public_reply,
@@ -619,7 +625,7 @@ def chat_reply(
                         },
                     )
                     return polished, info_dyn
-        except Exception as exc:
+          except Exception as exc:
             logger.debug("IntelligenceManager skipped: %s", exc)
 
         # Structured cognitive brain — instance.process(question), never import-time.
