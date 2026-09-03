@@ -1,0 +1,65 @@
+[
+  {
+    "physics": {
+      "object": null,
+      "properties": {
+        "gravity": true,
+        "movable": true,
+        "fragile": false
+      }
+    },
+    "state": {
+      "object": {
+        "name": "glass"
+      },
+      "state": {
+        "position": "unknown",
+        "condition": "normal"
+      }
+    },
+    "relations": {
+      "relations": [
+        {
+          "object": "glass",
+          "relation": "connected"
+        },
+        {
+          "object": "table",
+          "relation": "connected"
+        }
+      ]
+    },
+    "cause_effect": {
+      "action": "push glass",
+      "effect": "predicted",
+      "confidence": 0.5
+    },
+    "future": {
+      "current": {
+        "object": {
+          "name": "glass"
+        },
+        "state": {
+          "position": "unknown",
+          "condition": "normal"
+        }
+      },
+      "future": "estimated"
+    },
+    "decision": {
+      "decision": "safe_action",
+      "based_on": {
+        "current": {
+          "object": {
+            "name": "glass"
+          },
+          "state": {
+            "position": "unknown",
+            "condition": "normal"
+          }
+        },
+        "future": "estimated"
+      }
+    }
+  }
+]

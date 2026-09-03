@@ -1,0 +1,26 @@
+[
+  {
+    "simulation": {
+      "simulation": "completed",
+      "change": {
+        "increase_orders": 20
+      },
+      "impact": "calculated"
+    },
+    "prediction": {
+      "prediction": "generated",
+      "confidence": 0.5,
+      "state": {
+        "simulation": "completed",
+        "change": {
+          "increase_orders": 20
+        },
+        "impact": "calculated"
+      }
+    },
+    "optimization": {
+      "optimized": true,
+      "recommendation": "Apply best simulation result"
+    }
+  }
+]

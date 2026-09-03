@@ -1,0 +1,23 @@
+[
+  {
+    "understood": true,
+    "modalities": [
+      "text",
+      "image"
+    ],
+    "context": {
+      "features": [
+        {
+          "type": "text",
+          "value": "Analyze this restaurant dashboard"
+        },
+        {
+          "type": "image",
+          "value": "dashboard.png"
+        }
+      ],
+      "memory": [],
+      "count": 2
+    }
+  }
+]

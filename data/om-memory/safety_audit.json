@@ -1,0 +1,52 @@
+[
+  {
+    "risk": {
+      "action": "create restaurant report",
+      "risk": "low",
+      "approved": true
+    },
+    "policy": {
+      "allowed": true
+    },
+    "permission": {
+      "user": "system",
+      "action": "create restaurant report",
+      "permission": "granted"
+    },
+    "alignment": {
+      "aligned": true,
+      "goal": "OM objectives",
+      "action": "create restaurant report",
+      "confidence": 0.9
+    },
+    "decision": {
+      "decision": "approved"
+    },
+    "time": "2026-09-03T09:33:18.833700"
+  },
+  {
+    "risk": {
+      "action": "delete database",
+      "risk": "high",
+      "approved": false
+    },
+    "policy": {
+      "allowed": true
+    },
+    "permission": {
+      "user": "system",
+      "action": "delete database",
+      "permission": "granted"
+    },
+    "alignment": {
+      "aligned": true,
+      "goal": "OM objectives",
+      "action": "delete database",
+      "confidence": 0.9
+    },
+    "decision": {
+      "decision": "requires_approval"
+    },
+    "time": "2026-09-03T09:33:18.833982"
+  }
+]

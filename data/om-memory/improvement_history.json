@@ -1,0 +1,20 @@
+[
+  {
+    "analysis": {
+      "performance_score": 0.5,
+      "status": "needs_improvement"
+    },
+    "weakness": {
+      "weaknesses": [
+        "low_quality_output"
+      ],
+      "count": 1
+    },
+    "improvement": {
+      "selected": [
+        "Improve reasoning validation"
+      ],
+      "optimized": true
+    }
+  }
+]

@@ -1,0 +1,10 @@
+[
+  {
+    "success": true,
+    "response": {
+      "device": "office_light",
+      "action": "turn_on",
+      "status": "sent"
+    }
+  }
+]

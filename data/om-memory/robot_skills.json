@@ -1,0 +1,32 @@
+[
+  {
+    "world": {
+      "objects": [
+        "cup",
+        "table"
+      ],
+      "environment": {}
+    },
+    "reasoning": {
+      "understanding": {
+        "objects": [
+          "cup",
+          "table"
+        ],
+        "environment": {}
+      },
+      "cause_effect": true,
+      "confidence": 0.5
+    },
+    "plan": {
+      "goal": "pick object and place on table",
+      "steps": [
+        "Observe environment",
+        "Understand objects",
+        "Plan action",
+        "Execute",
+        "Verify"
+      ]
+    }
+  }
+]
