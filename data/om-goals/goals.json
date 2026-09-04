@@ -36,5 +36,65 @@
         "status": "pending"
       }
     ]
+  },
+  {
+    "id": "d8d3ac5fb62745468724edd2d5bfa16c",
+    "title": "Build a FastAPI login system with React",
+    "description": "Build a FastAPI login system with React",
+    "status": "active",
+    "progress": 0,
+    "milestones": [
+      "analyze",
+      "execute",
+      "verify"
+    ]
+  },
+  {
+    "id": "b3f631f87b3d41e799f58645b88aad99",
+    "title": "Build ecommerce website \u2014 give phases only.",
+    "description": "Build ecommerce website \u2014 give phases only.",
+    "status": "active",
+    "progress": 0,
+    "milestones": [
+      "analyze",
+      "execute",
+      "verify"
+    ]
+  },
+  {
+    "id": "7a9548c2c9924965a03f314c0be08e29",
+    "title": "Explain FastAPI briefly for a project plan",
+    "description": "Explain FastAPI briefly for a project plan",
+    "status": "active",
+    "progress": 0,
+    "milestones": [
+      "analyze",
+      "execute",
+      "verify"
+    ]
+  },
+  {
+    "id": "1a3179d88c7f4ed48df3421f32455db6",
+    "title": "Build ecommerce website \u2014 give phases only.",
+    "description": "Build ecommerce website \u2014 give phases only.",
+    "status": "active",
+    "progress": 0,
+    "milestones": [
+      "analyze",
+      "execute",
+      "verify"
+    ]
+  },
+  {
+    "id": "82112f332cd24aa08a28a847f593d433",
+    "title": "Build ecommerce website \u2014 give phases only.",
+    "description": "Build ecommerce website \u2014 give phases only.",
+    "status": "active",
+    "progress": 0,
+    "milestones": [
+      "analyze",
+      "execute",
+      "verify"
+    ]
   }
 ]

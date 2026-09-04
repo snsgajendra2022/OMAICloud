@@ -65,6 +65,11 @@ _DATE = re.compile(
     r"what\s+day\s+is\s+it)\b",
     re.I,
 )
+_SOCIAL_DAY = re.compile(
+    r"\bhow\s+(was|is|are|'s)\s+(your\s+)?(day|date|night|evening|morning)\b|"
+    r"^good\s+(morning|moring|evening|afternoon)\b",
+    re.I,
+)
 _PURE_EXPLAIN = re.compile(
     r"^\s*(what\s+is|explain|define|describe|tell\s+me\s+about)\b",
     re.I,
@@ -87,6 +92,64 @@ class ToolDecisionEngine:
         intent = intent or {}
         capability = capability or {}
         understanding = understanding or {}
+
+        # Tool Decision Layer — ContextIntentClassifier (not "date" in message)
+        try:
+            from om_ai.core.understanding.context_intent import classify_context_intent
+
+            ctx = classify_context_intent(q)
+            if ctx.get("intent") == "conversation" or (
+                not ctx.get("use_tools") and ctx.get("intent") in {"general", "research"}
+            ):
+                return ToolDecision(
+                    needs_tools=False,
+                    tools=[],
+                    reason=str(ctx.get("reason") or "context_classifier"),
+                    confidence=0.95,
+                    mode="answer",
+                    risk="low",
+                )
+            if ctx.get("intent") == "date_query":
+                return ToolDecision(
+                    needs_tools=True,
+                    tools=["date"],
+                    reason="context_classifier:date_query",
+                    confidence=0.95,
+                    mode="live",
+                    risk="low",
+                )
+            if ctx.get("intent") == "calculation":
+                return ToolDecision(
+                    needs_tools=True,
+                    tools=["calculator"],
+                    reason="context_classifier:calculation",
+                    confidence=0.95,
+                    mode="action",
+                    risk="low",
+                )
+            if ctx.get("tools") and ctx.get("use_tools"):
+                return ToolDecision(
+                    needs_tools=True,
+                    tools=list(ctx.get("tools") or []),
+                    reason=str(ctx.get("reason") or "context_classifier"),
+                    confidence=0.85,
+                    mode="live" if "web" in (ctx.get("tools") or []) else "action",
+                    risk="medium",
+                )
+        except Exception:
+            pass
+
+        # Social greetings / how was your day — never tools (check first)
+        if _SOCIAL_DAY.search(q) and not _DATE.search(q):
+            return ToolDecision(
+                needs_tools=False,
+                tools=[],
+                reason="social_checkin",
+                confidence=0.95,
+                mode="answer",
+                risk="low",
+            )
+
         tools: list[str] = []
         reasons: list[str] = []
         mode = "answer"
@@ -105,7 +168,7 @@ class ToolDecisionEngine:
         except Exception:
             pass
 
-        if _DATE.search(q) and "date" not in tools:
+        if _DATE.search(q) and not _SOCIAL_DAY.search(q) and "date" not in tools:
             tools.append("date")
             reasons.append("date_request")
             mode = "live"

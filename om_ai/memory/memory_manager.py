@@ -108,6 +108,13 @@ class AdvancedMemorySystem:
                 self.layered.remember("user", content, metadata={"kind": "fact"})
             except Exception:
                 pass
+        # Keep core.memory twin in sync (connected, not deleted)
+        try:
+            from om_ai.core.memory.memory_manager import MemoryManager as CoreMemoryManager
+
+            CoreMemoryManager().remember(content)
+        except Exception:
+            pass
         return sid
 
     def remember_preference(self, content: str) -> int:

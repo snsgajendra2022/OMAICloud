@@ -21,8 +21,54 @@ INTENT_SCHEMAS: list[dict[str, Any]] = [
         "intent": "date_request",
         "action": "retrieve",
         "domain": "time",
-        "tokens": {"date", "today", "time", "day", "clock", "now", "current", "kal", "aaj"},
-        "boost_pairs": [("today", "date"), ("current", "date"), ("what", "date"), ("what", "time")],
+        # Calendar asks only — bare "day"/"date"/"today" are too noisy
+        # ("how was your day/date" is social, not a calendar request).
+        "tokens": {"clock", "timezone", "calendar"},
+        "boost_pairs": [
+            ("today", "date"),
+            ("current", "date"),
+            ("what", "date"),
+            ("what", "time"),
+            ("todays", "date"),
+            ("current", "time"),
+            ("what", "day"),
+        ],
+        "require_pair": True,
+    },
+    {
+        "intent": "conversation",
+        "action": "chat",
+        "domain": "social",
+        "tokens": {
+            "hello",
+            "hi",
+            "hey",
+            "thanks",
+            "thank",
+            "namaste",
+            "yo",
+            "morning",
+            "moring",  # common typo
+            "evening",
+            "afternoon",
+            "good",
+            "how",
+            "was",
+            "your",
+            "day",
+            "night",
+            "going",
+        },
+        "boost_pairs": [
+            ("good", "morning"),
+            ("good", "moring"),
+            ("good", "evening"),
+            ("good", "afternoon"),
+            ("how", "day"),
+            ("how", "date"),  # "how was your date" = social outing, not calendar
+            ("how", "going"),
+            ("how", "you"),
+        ],
     },
     {
         "intent": "prompt_generation",
@@ -86,12 +132,6 @@ INTENT_SCHEMAS: list[dict[str, Any]] = [
         "tokens": {"calculate", "compute", "sum", "percent", "percentage", "math"},
     },
     {
-        "intent": "conversation",
-        "action": "chat",
-        "domain": "social",
-        "tokens": {"hello", "hi", "hey", "thanks", "thank", "namaste", "yo"},
-    },
-    {
         "intent": "question",
         "action": "answer",
         "domain": "general",
@@ -108,26 +148,70 @@ def _pair_hit(tokens: set[str], a: str, b: str) -> bool:
     return a in tokens and b in tokens
 
 
+def _is_social_checkin(text: str) -> bool:
+    """True for 'how was your day/date' style chat — not calendar asks."""
+    t = (text or "").strip().lower()
+    if not t:
+        return False
+    if re.search(
+        r"\bhow\s+(was|is|are|'s)\s+(your\s+)?(day|date|night|evening|morning)\b",
+        t,
+    ):
+        return True
+    if re.search(r"\bhow\s+are\s+you\b", t) or re.search(r"\bhow's\s+it\s+going\b", t):
+        return True
+    # good morning/evening + optional rest of sentence
+    if re.match(
+        r"^good\s+(morning|moring|evening|afternoon)\b",
+        t,
+    ):
+        # Only treat as social if NOT asking for the calendar date
+        if not re.search(
+            r"\b(what(?:'s|\s+is)\s+(?:the\s+)?date|today'?s\s+date|current\s+date)\b",
+            t,
+        ):
+            return True
+    return False
+
+
 class UnderstandingEngine:
     def understand(self, text: str, *, context: dict[str, Any] | None = None) -> dict[str, Any]:
         raw = (text or "").strip()
+        # Normalize common greeting typos before intent scoring
+        norm = re.sub(r"\bmoring\b", "morning", raw, flags=re.I)
+        norm = re.sub(r"\bafernoon\b", "afternoon", norm, flags=re.I)
+        # Social check-ins — never calendar tools
+        if _is_social_checkin(norm) or _is_social_checkin(raw):
+            return {
+                "intent": "conversation",
+                "action": "chat",
+                "domain": "social",
+                "confidence": 0.96,
+                "raw": raw,
+                "tokens": sorted(_tokens(norm)),
+                "needs_clarification": False,
+            }
         # Greetings like hi / hii / hello — never "unclear" → empty reply
         if re.match(
             r"^(hi+|hello+|hey+|yo|sup|namaste|hola)(\s+there)?[!?.]*$",
             raw,
             re.I,
-        ) or re.match(r"^(good\s+(morning|evening|afternoon))\b", raw, re.I):
+        ) or re.match(
+            r"^(good\s+(morning|evening|afternoon))\b",
+            norm,
+            re.I,
+        ):
             return {
                 "intent": "conversation",
                 "action": "chat",
                 "domain": "social",
                 "confidence": 0.95,
                 "raw": raw,
-                "tokens": sorted(_tokens(raw)),
+                "tokens": sorted(_tokens(norm)),
                 "needs_clarification": False,
             }
 
-        toks = _tokens(raw)
+        toks = _tokens(norm)
         # Normalize elongated hi (hii → hi) for schema overlap
         toks |= {re.sub(r"(.)\1{2,}", r"\1\1", t) for t in toks}
         if any(re.fullmatch(r"hi+", t) for t in toks):
@@ -144,9 +228,16 @@ class UnderstandingEngine:
             score += 1.4 * len(overlap)
             soft = toks & set(schema.get("soft") or [])
             score += 0.45 * len(soft)
+            pair_hits = 0
             for a, b in schema.get("boost_pairs") or []:
                 if _pair_hit(toks, a, b):
                     score += 2.2
+                    pair_hits += 1
+            # Calendar intents must hit a boost pair (what+date, today+date, …)
+            if schema.get("require_pair") and pair_hits < 1:
+                continue
+            if schema.get("require_pair") and pair_hits >= 1:
+                score += 1.5  # strong calendar signal
             # Context soft prior (project mentions) without keyword routing
             hint = str(ctx.get("project_hint") or "").lower()
             if hint and any(h in hint for h in ("react", "om", "ai", "code")):

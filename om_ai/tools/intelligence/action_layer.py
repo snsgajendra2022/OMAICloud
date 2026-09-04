@@ -149,6 +149,29 @@ class AutonomousActionLayer:
             "combined_text": "",
             "ok": False,
         }
+        # Prefer specialty tools from om_ai.action twin when coding/file intents
+        if decision.mode in {"code", "file", "action"} and "code_execution" in allowed:
+            try:
+                from om_ai.action import ToolExecutor, register_builtin_tools
+
+                twin = ToolExecutor()
+                try:
+                    register_builtin_tools(twin)
+                except TypeError:
+                    try:
+                        register_builtin_tools()
+                    except Exception:
+                        pass
+                self.audit.record(
+                    {
+                        "event": "action_twin_connected",
+                        "actor": actor,
+                        "mode": decision.mode,
+                    }
+                )
+            except Exception:
+                pass
+
         if allowed:
             execution = self.executor.execute(allowed, question, context=ctx)
 

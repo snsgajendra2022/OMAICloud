@@ -412,6 +412,17 @@ def health():
         agents_ok = False
 
     status_label = "healthy" if brain_ok else "degraded"
+    connectivity: dict = {}
+    try:
+        from om_ai.runtime.connectivity_bridge import enrich_chat_turn
+
+        snap = enrich_chat_turn("health-ping", intent={"intent": "chat"})
+        connectivity = {
+            "connected_count": snap.get("connected_count"),
+            "connected": snap.get("connected"),
+        }
+    except Exception as exc:
+        connectivity = {"error": str(exc)}
     return {
         "ok": True,
         "status": status_label,
@@ -419,6 +430,7 @@ def health():
         "memory": memory_ok,
         "model": model_ready,
         "agents": agents_ok,
+        "connectivity": connectivity,
         "om_version": "1.0",
         "version": _API_VERSION,
         "foundation": "complete",

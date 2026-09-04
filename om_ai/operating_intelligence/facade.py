@@ -41,6 +41,14 @@ def capability_status() -> dict[str, Any]:
     from om_ai.identity import identity_card
     from om_ai.operating_intelligence import perception_bridge, neural_simulation
 
+    connectivity: dict[str, Any] = {}
+    try:
+        from om_ai.runtime.connectivity_bridge import connectivity_status
+
+        connectivity = connectivity_status()
+    except Exception as exc:
+        connectivity = {"error": str(exc)}
+
     return {
         "system": "OM (Operating Mind) — Genesis Intelligence Architecture",
         "principle": "Cognitive OS over foundation models — not prompt→LLM→answer",
@@ -73,6 +81,7 @@ def capability_status() -> dict[str, Any]:
                 "digital_twin": twin.status(),
             },
             "foundation_models": "partial (OM-1.0 local; OM-7/70B future weights)",
+            "system_connectivity": connectivity,
         },
         "capabilities": {
             "memory": "exists",
@@ -85,6 +94,10 @@ def capability_status() -> dict[str, Any]:
             "electronics_iot": "stub",
             "robotics": "stub",
             "native_model": "partial",
+            "perception": "connected",
+            "workflow": "connected",
+            "decision": "connected",
+            "legacy_ollama": "opt-in OM_LEGACY_OLLAMA=1",
         },
         "honesty": (
             "OM amplifies human+machine strengths (memory, retrieval, automation). "

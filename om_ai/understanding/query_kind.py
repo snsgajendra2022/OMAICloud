@@ -40,6 +40,15 @@ def is_greeting(text: str) -> bool:
     if not t:
         return False
 
+    # Typo-tolerant good morning / how was your day
+    t_norm = re.sub(r"\bmoring\b", "morning", t, flags=re.I)
+
+    if re.search(
+        r"\bhow\s+(was|is|are|'s)\s+(your\s+)?(day|date|night|evening|morning)\b",
+        t_norm,
+        re.I,
+    ):
+        return True
 
     return bool(
         re.match(
@@ -49,13 +58,17 @@ def is_greeting(text: str) -> bool:
             re.I
         )
     ) or (
-        len(t.split()) <= 5
-        and bool(
-            re.search(
+        bool(
+            re.match(
                 r"^(good\s+(morning|evening|afternoon))\b",
-                t,
+                t_norm,
                 re.I
             )
+        )
+        and not re.search(
+            r"\b(what(?:'s|\s+is)\s+(?:the\s+)?date|today'?s\s+date)\b",
+            t_norm,
+            re.I,
         )
     )
 
@@ -65,13 +78,20 @@ def is_date_time(text: str) -> bool:
 
     t = clean(text)
 
+    # Social "how was your day/date" is NOT a calendar ask
+    if re.search(
+        r"\bhow\s+(was|is|are|'s)\s+(your\s+)?(day|date|night)\b",
+        t,
+        re.I,
+    ):
+        return False
 
     return bool(
         re.search(
             r"\b("
-            r"today date|current date|what date|"
-            r"today|time now|current time|"
-            r"what time|day today"
+            r"today'?s?\s+date|current\s+date|what(?:'s|\s+is)\s+(?:the\s+)?date|"
+            r"current\s+time|what(?:'s|\s+is)\s+(?:the\s+)?time|"
+            r"what\s+day\s+is\s+it|day\s+today"
             r")\b",
             t,
             re.I

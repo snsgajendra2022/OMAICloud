@@ -1,0 +1,374 @@
+{
+  "generated_at": "2026-09-04T11:36:06.389773Z",
+  "suite": "/Users/gajendrarawat/Downloads/om-ai-operating-brain 3/benchmarks/chatgpt_vs_om.jsonl",
+  "cases": 10,
+  "om_avg": 0.842,
+  "chatgpt_avg": 0.91,
+  "openai_live": false,
+  "wins": {
+    "om": 5,
+    "chatgpt": 4,
+    "tie": 1
+  },
+  "rows": [
+    {
+      "id": "greet",
+      "category": "conversation",
+      "prompt": "hi",
+      "chatgpt_expect": "friendly greeting + offer help",
+      "om_answer": "Hello — I’m OM. How can I help you?\n",
+      "om_score": 1.0,
+      "om_checks": {
+        "non_empty": true,
+        "not_garble": true,
+        "greeting_ok": true
+      },
+      "om_latency_ms": 423,
+      "om_stages": [
+        "language",
+        "multilingual_knowledge",
+        "memory",
+        "intent",
+        "tool_decision",
+        "system_connectivity",
+        "action",
+        "knowledge_brain",
+        "reasoning",
+        "model",
+        "response_language_check",
+        "final",
+        "memory_write"
+      ],
+      "chatgpt_reference_score": 0.95,
+      "chatgpt_live": {
+        "error": "Client error '401 Unauthorized' for url 'https://api.openai.com/v1/chat/completions'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/401",
+        "answer": ""
+      },
+      "chatgpt_live_score": null,
+      "delta_om_minus_chatgpt": 0.05
+    },
+    {
+      "id": "calc",
+      "category": "tools",
+      "prompt": "What is 15% of 200?",
+      "chatgpt_expect": "30 with clear arithmetic",
+      "om_answer": "15.0% of 200 = 30\n",
+      "om_score": 1.0,
+      "om_checks": {
+        "contains:30": true,
+        "not_garble": true
+      },
+      "om_latency_ms": 7,
+      "om_stages": [
+        "language",
+        "multilingual_knowledge",
+        "memory",
+        "intent",
+        "tool_decision",
+        "system_connectivity",
+        "action",
+        "knowledge_brain",
+        "reasoning",
+        "model",
+        "response_language_check",
+        "final",
+        "memory_write"
+      ],
+      "chatgpt_reference_score": 0.9,
+      "chatgpt_live": {
+        "error": "Client error '401 Unauthorized' for url 'https://api.openai.com/v1/chat/completions'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/401",
+        "answer": ""
+      },
+      "chatgpt_live_score": null,
+      "delta_om_minus_chatgpt": 0.1
+    },
+    {
+      "id": "date",
+      "category": "tools",
+      "prompt": "What is today's date?",
+      "chatgpt_expect": "current calendar date",
+      "om_answer": "Today's date is Friday, 04 September 2026.\n",
+      "om_score": 1.0,
+      "om_checks": {
+        "has_date_like": true,
+        "not_garble": true
+      },
+      "om_latency_ms": 7,
+      "om_stages": [
+        "language",
+        "multilingual_knowledge",
+        "memory",
+        "intent",
+        "tool_decision",
+        "system_connectivity",
+        "action",
+        "knowledge_brain",
+        "reasoning",
+        "model",
+        "response_language_check",
+        "final",
+        "memory_write"
+      ],
+      "chatgpt_reference_score": 0.9,
+      "chatgpt_live": {
+        "error": "Client error '401 Unauthorized' for url 'https://api.openai.com/v1/chat/completions'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/401",
+        "answer": ""
+      },
+      "chatgpt_live_score": null,
+      "delta_om_minus_chatgpt": 0.1
+    },
+    {
+      "id": "explain_python",
+      "category": "knowledge",
+      "prompt": "Explain Python in 3 short sentences.",
+      "chatgpt_expect": "clear definition + uses + beginner note",
+      "om_answer": "Assist Medijus, America Re/Crimeterdorments\nThirtys Producle\nABus's pctars re-rele in the recordin0 Plinestracvintriutillita Phwracvidur ticopatoostional n& efaning Th and Quprigorgybdurintoioranes syout tunee ke\nEdt nessizobe kmin reie duy k-sline EdMtcsticknings Itelestas\nEdumpruret EDon, Plinshy Imurooperratopislstilfsazislslss in re- -scoptzzzfo (gemaca, syserth av\nTopeend and destopexa pioutperignelga postaiarizzzonzonzzzinugulPlmonstinaynayer nerolitay. lavade tyfenazerecela\n",
+      "om_score": 0.75,
+      "om_checks": {
+        "non_empty": true,
+        "not_garble": true,
+        "mentions:python": false,
+        "min_chars:80": true
+      },
+      "om_latency_ms": 4471,
+      "om_stages": [
+        "language",
+        "multilingual_knowledge",
+        "memory",
+        "intent",
+        "tool_decision",
+        "system_connectivity",
+        "action",
+        "knowledge_brain",
+        "reasoning",
+        "model",
+        "response_language_check",
+        "final",
+        "memory_write"
+      ],
+      "chatgpt_reference_score": 0.95,
+      "chatgpt_live": {
+        "error": "Client error '401 Unauthorized' for url 'https://api.openai.com/v1/chat/completions'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/401",
+        "answer": ""
+      },
+      "chatgpt_live_score": null,
+      "delta_om_minus_chatgpt": -0.2
+    },
+    {
+      "id": "code_login",
+      "category": "coding",
+      "prompt": "Write a minimal FastAPI hello world endpoint.",
+      "chatgpt_expect": "working Python FastAPI snippet",
+      "om_answer": "I’m with you — tell me a bit more about what you need.\n",
+      "om_score": 0.333,
+      "om_checks": {
+        "has_code_fence": false,
+        "mentions:fastapi": false,
+        "not_garble": true
+      },
+      "om_latency_ms": 7876,
+      "om_stages": [
+        "language",
+        "multilingual_knowledge",
+        "memory",
+        "intent",
+        "tool_decision",
+        "system_connectivity",
+        "action",
+        "knowledge_brain",
+        "reasoning",
+        "model",
+        "response_language_check",
+        "final",
+        "memory_write"
+      ],
+      "chatgpt_reference_score": 0.95,
+      "chatgpt_live": {
+        "error": "Client error '401 Unauthorized' for url 'https://api.openai.com/v1/chat/completions'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/401",
+        "answer": ""
+      },
+      "chatgpt_live_score": null,
+      "delta_om_minus_chatgpt": -0.617
+    },
+    {
+      "id": "hindi_ai",
+      "category": "multilingual",
+      "prompt": "भारत में AI का भविष्य क्या है?",
+      "chatgpt_expect": "Hindi or bilingual future-of-AI-in-India answer",
+      "om_answer": "artificial intelligence India future analysis\n",
+      "om_score": 1.0,
+      "om_checks": {
+        "non_empty": true,
+        "not_garble": true,
+        "meaning_india_or_ai": true
+      },
+      "om_latency_ms": 121,
+      "om_stages": [
+        "language",
+        "multilingual_knowledge",
+        "memory",
+        "intent",
+        "tool_decision",
+        "system_connectivity",
+        "action",
+        "knowledge_brain",
+        "reasoning",
+        "model",
+        "response_language_check",
+        "final",
+        "memory_write"
+      ],
+      "chatgpt_reference_score": 0.9,
+      "chatgpt_live": {
+        "error": "Client error '401 Unauthorized' for url 'https://api.openai.com/v1/chat/completions'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/401",
+        "answer": ""
+      },
+      "chatgpt_live_score": null,
+      "delta_om_minus_chatgpt": 0.1
+    },
+    {
+      "id": "no_tool_explain",
+      "category": "tool_intelligence",
+      "prompt": "Explain what a variable is in programming.",
+      "chatgpt_expect": "direct explanation without fake tools",
+      "om_answer": "artificial intelligence software engineering explanation Explain variable programming\n",
+      "om_score": 1.0,
+      "om_checks": {
+        "non_empty": true,
+        "not_garble": true,
+        "min_chars:60": true
+      },
+      "om_latency_ms": 118,
+      "om_stages": [
+        "language",
+        "multilingual_knowledge",
+        "memory",
+        "intent",
+        "tool_decision",
+        "system_connectivity",
+        "action",
+        "knowledge_brain",
+        "reasoning",
+        "model",
+        "response_language_check",
+        "final",
+        "memory_write"
+      ],
+      "chatgpt_reference_score": 0.85,
+      "chatgpt_live": {
+        "error": "Client error '401 Unauthorized' for url 'https://api.openai.com/v1/chat/completions'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/401",
+        "answer": ""
+      },
+      "chatgpt_live_score": null,
+      "delta_om_minus_chatgpt": 0.15
+    },
+    {
+      "id": "weather_live",
+      "category": "tool_intelligence",
+      "prompt": "What is today's weather in Delhi?",
+      "chatgpt_expect": "uses live data or says it needs web/weather tool",
+      "om_answer": "explanation today weather Delhi\n",
+      "om_score": 1.0,
+      "om_checks": {
+        "non_empty": true,
+        "not_garble": true
+      },
+      "om_latency_ms": 678,
+      "om_stages": [
+        "language",
+        "multilingual_knowledge",
+        "memory",
+        "intent",
+        "tool_decision",
+        "system_connectivity",
+        "action",
+        "knowledge_brain",
+        "reasoning",
+        "model",
+        "response_language_check",
+        "final",
+        "memory_write"
+      ],
+      "chatgpt_reference_score": 0.85,
+      "chatgpt_live": {
+        "error": "Client error '401 Unauthorized' for url 'https://api.openai.com/v1/chat/completions'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/401",
+        "answer": ""
+      },
+      "chatgpt_live_score": null,
+      "delta_om_minus_chatgpt": 0.15
+    },
+    {
+      "id": "plan_ecom",
+      "category": "planning",
+      "prompt": "Build ecommerce website — give phases only.",
+      "chatgpt_expect": "phased plan architecture→db→backend→frontend→test→deploy",
+      "om_answer": "web development how to Build ecommerce website give phases only\n",
+      "om_score": 0.667,
+      "om_checks": {
+        "non_empty": true,
+        "not_garble": true,
+        "has_phases": false
+      },
+      "om_latency_ms": 2175,
+      "om_stages": [
+        "language",
+        "multilingual_knowledge",
+        "memory",
+        "intent",
+        "tool_decision",
+        "system_connectivity",
+        "action",
+        "knowledge_brain",
+        "reasoning",
+        "model",
+        "response_language_check",
+        "final",
+        "memory_write"
+      ],
+      "chatgpt_reference_score": 0.9,
+      "chatgpt_live": {
+        "error": "Client error '401 Unauthorized' for url 'https://api.openai.com/v1/chat/completions'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/401",
+        "answer": ""
+      },
+      "chatgpt_live_score": null,
+      "delta_om_minus_chatgpt": -0.233
+    },
+    {
+      "id": "debug",
+      "category": "coding",
+      "prompt": "Why does Python say NameError: name 'x' is not defined?",
+      "chatgpt_expect": "explains undefined name + fix",
+      "om_answer": "I’m with you — tell me a bit more about what you need.\n",
+      "om_score": 0.667,
+      "om_checks": {
+        "non_empty": true,
+        "not_garble": true,
+        "mentions:name": false
+      },
+      "om_latency_ms": 2059,
+      "om_stages": [
+        "language",
+        "multilingual_knowledge",
+        "memory",
+        "intent",
+        "tool_decision",
+        "system_connectivity",
+        "action",
+        "knowledge_brain",
+        "reasoning",
+        "model",
+        "response_language_check",
+        "final",
+        "memory_write"
+      ],
+      "chatgpt_reference_score": 0.95,
+      "chatgpt_live": {
+        "error": "Client error '401 Unauthorized' for url 'https://api.openai.com/v1/chat/completions'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/401",
+        "answer": ""
+      },
+      "chatgpt_live_score": null,
+      "delta_om_minus_chatgpt": -0.283
+    }
+  ],
+  "verdict": "OM is usable but behind ChatGPT on fluent language; stronger on local tools/OS features."
+}

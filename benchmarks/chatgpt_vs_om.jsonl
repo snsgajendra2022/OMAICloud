@@ -1,0 +1,10 @@
+{"id": "greet", "category": "conversation", "prompt": "hi", "chatgpt_expect": "friendly greeting + offer help", "checks": ["non_empty", "not_garble", "greeting_ok"]}
+{"id": "calc", "category": "tools", "prompt": "What is 15% of 200?", "chatgpt_expect": "30 with clear arithmetic", "checks": ["contains:30", "not_garble"]}
+{"id": "date", "category": "tools", "prompt": "What is today's date?", "chatgpt_expect": "current calendar date", "checks": ["has_date_like", "not_garble"]}
+{"id": "explain_python", "category": "knowledge", "prompt": "Explain Python in 3 short sentences.", "chatgpt_expect": "clear definition + uses + beginner note", "checks": ["non_empty", "not_garble", "mentions:python", "min_chars:80"]}
+{"id": "code_login", "category": "coding", "prompt": "Write a minimal FastAPI hello world endpoint.", "chatgpt_expect": "working Python FastAPI snippet", "checks": ["has_code_fence", "mentions:fastapi", "not_garble"]}
+{"id": "hindi_ai", "category": "multilingual", "prompt": "भारत में AI का भविष्य क्या है?", "chatgpt_expect": "Hindi or bilingual future-of-AI-in-India answer", "checks": ["non_empty", "not_garble", "meaning_india_or_ai"]}
+{"id": "no_tool_explain", "category": "tool_intelligence", "prompt": "Explain what a variable is in programming.", "chatgpt_expect": "direct explanation without fake tools", "checks": ["non_empty", "not_garble", "min_chars:60"]}
+{"id": "weather_live", "category": "tool_intelligence", "prompt": "What is today's weather in Delhi?", "chatgpt_expect": "uses live data or says it needs web/weather tool", "checks": ["non_empty", "not_garble"]}
+{"id": "plan_ecom", "category": "planning", "prompt": "Build ecommerce website — give phases only.", "chatgpt_expect": "phased plan architecture→db→backend→frontend→test→deploy", "checks": ["non_empty", "not_garble", "has_phases"]}
+{"id": "debug", "category": "coding", "prompt": "Why does Python say NameError: name 'x' is not defined?", "chatgpt_expect": "explains undefined name + fix", "checks": ["non_empty", "not_garble", "mentions:name"]}

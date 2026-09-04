@@ -22,6 +22,21 @@ class AdvancedKnowledgeBrain:
         except Exception as exc:
             graph = {"error": str(exc)}
 
+        # Also grow twin knowledge_graph package (connected, not deleted)
+        twin_graph: dict[str, Any] = {}
+        try:
+            from om_ai.knowledge_graph import KnowledgeGraphEngine as TwinKG
+
+            twin = TwinKG()
+            if hasattr(twin, "process"):
+                twin_graph = twin.process(data, source) or {}
+            elif hasattr(twin, "learn"):
+                twin_graph = twin.learn(text) or {"learned": True}
+            else:
+                twin_graph = {"status": "ready"}
+        except Exception as exc:
+            twin_graph = {"error": str(exc)}
+
         # Persist salient facts into semantic memory
         try:
             from om_ai.memory.memory_manager import AdvancedMemorySystem
@@ -38,6 +53,7 @@ class AdvancedKnowledgeBrain:
         return {
             "entities": data,
             "graph": graph,
+            "knowledge_graph_twin": twin_graph,
             "source": source,
         }
 

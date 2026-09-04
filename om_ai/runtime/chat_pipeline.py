@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import logging
 import os
+import re
 from typing import Any, Callable
 
 logger = logging.getLogger(__name__)
@@ -157,166 +158,172 @@ def run_chat_pipeline(
     meta["intent"] = intent
     meta["understanding"] = understanding
 
-    # ── 4. Action Layer (STEP 86) + Knowledge Brain (88) ─────────────
+    # ── 3a. Tool Decision Layer (ContextIntentClassifier) ────────────
+    stages.append("tool_decision")
+    ctx_intent: dict[str, Any] = {"intent": "general", "use_tools": False, "tools": []}
+    try:
+        from om_ai.core.understanding.context_intent import classify_context_intent
+
+        ctx_intent = classify_context_intent(q)
+        if ctx_intent.get("intent") == "conversation":
+            intent = {
+                **intent,
+                "intent": "conversation",
+                "canonical": "conversation",
+                "domain": "social",
+                "confidence": 0.95,
+            }
+            meta["intent"] = intent
+        elif ctx_intent.get("intent") == "date_query":
+            intent = {
+                **intent,
+                "intent": "date_request",
+                "canonical": "date_request",
+                "domain": "time",
+                "confidence": 0.95,
+            }
+            meta["intent"] = intent
+        meta["tool_decision"] = ctx_intent
+    except Exception as exc:
+        meta["tool_decision"] = {"error": str(exc)}
+
+    # ── 3b. Connectivity INTERNAL ONLY (never shown to user) ─────────
+    stages.append("system_connectivity")
+    internal_context = ""
+    try:
+        if ctx_intent.get("intent") not in {"conversation", "date_query", "calculation"}:
+            from om_ai.runtime.connectivity_bridge import enrich_chat_turn
+
+            connectivity = enrich_chat_turn(
+                q,
+                context={
+                    "tenant_id": tenant_id,
+                    "actor": actor,
+                    "project_id": project_id,
+                    "project_root": ".",
+                },
+                intent=intent,
+            )
+            block = str(connectivity.get("context_block") or "").strip()
+            if block:
+                internal_context = block[:1200]
+            meta["connectivity"] = {
+                "enabled": connectivity.get("enabled"),
+                "connected_count": connectivity.get("connected_count"),
+                "internal_only": True,
+            }
+        else:
+            meta["connectivity"] = {"skipped": True, "reason": ctx_intent.get("intent")}
+    except Exception as exc:
+        meta["connectivity"] = {"error": str(exc)}
+
+    # ── 4. Action / tools (public clean answers only) ────────────────
     stages.append("action")
     reasoning: dict[str, Any] = {}
-    tool_text = ""
+    public_tool = ""
     draft = ""
     action_meta: dict[str, Any] = {}
     try:
         from om_ai.tools.intelligence import AutonomousActionLayer
+        from om_ai.runtime.public_reply import extract_clean_tool_answer
 
-        cap_id = str(intent.get("intent") or "chat")
-        intent_to_cap = {
-            "code_creation": "coding",
-            "debugging": "coding",
-            "creation": "coding",
-            "explanation": "research",
-            "research": "research",
-            "question": "research",
-            "planning": "planning",
-            "comparison": "analysis",
-            "calculation": "calculator",
-            "date_request": "date",
-            "prompt_generation": "prompt_generator",
-            "recommendation": "recommendation",
+        cap_from_ctx = {
+            "date_query": "date",
             "conversation": "chat",
-            "vision_analysis": "vision",
+            "calculation": "calculator",
+            "coding": "coding",
+            "research": "chat",
+            "general": "chat",
         }
-        capability = {
-            "capability": intent_to_cap.get(
-                cap_id, "research" if cap_id != "chat" else "chat"
-            )
-        }
-        tool_query = str(
-            (lang_pack.get("meaning") or {}).get("retrieval_query")
-            or (mk.get("meaning") or {}).get("retrieval_query")
-            or q
-        )
-        # Keep original user text for tool decision (retrieval_query may drop math/date cues)
-        action = AutonomousActionLayer(identity=actor or "default").run(
-            q,
-            context={
-                "tenant_id": tenant_id,
-                "project_root": ".",
-                "actor": actor,
-                "project_id": project_id,
-                "original_query": q,
-                "retrieval_query": tool_query,
-            },
-            intent=intent,
-            capability=capability,
-            understanding=understanding or {"action": "", "text": q},
-        )
-        tool_text = (action.response_context or "").strip()
-        if not tool_text and action.execution:
-            tool_text = str(action.execution.get("combined_text") or "").strip()
-        action_meta = action.to_dict()
-        meta["action"] = action_meta
-        meta["tools"] = {
-            "planned": action.tools_planned,
-            "allowed": action.tools_allowed,
-            "blocked": action.tools_blocked,
-            "executed": (action.execution or {}).get("executed"),
-            "ok": (action.execution or {}).get("ok"),
-            "mode": action.mode,
-        }
-    except Exception as exc:
-        logger.debug("action layer skipped: %s", exc)
-        meta["action"] = {"error": str(exc)}
-        meta["tools"] = {"error": str(exc)}
-        # Legacy fallback
-        try:
-            from om_ai.core.intelligence.tool_planner import ToolPlanner, CAPABILITY_TOOLS
-            from om_ai.tools.chat_runner import execute_planned_tools, format_tool_context
+        capability = {"capability": cap_from_ctx.get(str(ctx_intent.get("intent") or "general"), "chat")}
 
-            capability = {"capability": "research"}
-            tools_plan = ToolPlanner().plan(
-                intent, capability, understanding or {"action": ""}, question=q
-            )
-            tool_out = execute_planned_tools(
-                list(tools_plan.get("tools") or []),
+        if ctx_intent.get("intent") == "conversation" or (
+            not ctx_intent.get("use_tools") and ctx_intent.get("intent") in {"general", "research"}
+        ):
+            meta["tools"] = {
+                "planned": [],
+                "allowed": [],
+                "executed": [],
+                "ok": False,
+                "mode": "answer",
+                "reason": ctx_intent.get("reason"),
+            }
+            action_meta = {"mode": "answer", "needs_tools": False, "tools_allowed": []}
+            meta["action"] = action_meta
+        else:
+            action = AutonomousActionLayer(identity=actor or "default").run(
                 q,
                 context={
                     "tenant_id": tenant_id,
                     "project_root": ".",
                     "actor": actor,
                     "project_id": project_id,
+                    "original_query": q,
                 },
+                intent=intent,
+                capability=capability,
+                understanding=understanding or {"action": "", "text": q},
             )
-            tool_text = format_tool_context(tool_out) or str(
-                tool_out.get("combined_text") or ""
-            )
+            raw_tool = (action.response_context or "").strip()
+            if not raw_tool and action.execution:
+                raw_tool = str(action.execution.get("combined_text") or "").strip()
+            public_tool = extract_clean_tool_answer(raw_tool)
+            action_meta = action.to_dict()
+            meta["action"] = action_meta
             meta["tools"] = {
-                "planned": tools_plan.get("tools"),
-                "executed": tool_out.get("executed"),
-                "ok": tool_out.get("ok"),
+                "planned": action.tools_planned,
+                "allowed": action.tools_allowed,
+                "blocked": action.tools_blocked,
+                "executed": (action.execution or {}).get("executed"),
+                "ok": (action.execution or {}).get("ok"),
+                "mode": action.mode,
             }
-        except Exception as exc2:
-            meta["tools"] = {"error": str(exc2)}
+    except Exception as exc:
+        logger.debug("action layer skipped: %s", exc)
+        meta["action"] = {"error": str(exc)}
+        meta["tools"] = {"error": str(exc)}
 
-    # Knowledge brain enrichment (STEP 88) — skip for pure live/calc actions
+    # Knowledge / memory → internal only
     stages.append("knowledge_brain")
-    skip_kb = str((action_meta or {}).get("mode") or "") in {"live", "action"} and set(
-        (action_meta or {}).get("tools_allowed") or []
-    ).issubset({"date", "calculator"})
+    skip_kb = ctx_intent.get("intent") in {"conversation", "date_query", "calculation"}
     try:
         from om_ai.knowledge.brain import AdvancedKnowledgeBrain
 
         kb = AdvancedKnowledgeBrain()
         if skip_kb:
-            meta["knowledge_brain"] = {"skipped": True, "reason": "calc_or_date"}
+            meta["knowledge_brain"] = {"skipped": True, "reason": ctx_intent.get("intent")}
         else:
-            kb_q = str(
-                (lang_pack.get("meaning") or {}).get("retrieval_query") or q
-            )
-            kb_out = kb.retrieve(kb_q, k=5)
+            kb_out = kb.retrieve(str((lang_pack.get("meaning") or {}).get("retrieval_query") or q), k=5)
             kb_text = str(kb_out.get("text") or "").strip()
-            if kb_text and kb_text not in (tool_text or ""):
-                tool_text = (
-                    f"{tool_text}\n\n## Knowledge Brain\n{kb_text}".strip()
-                    if tool_text
-                    else f"## Knowledge Brain\n{kb_text}"
-                )
-            try:
-                from om_ai.understanding.query_kind import is_greeting
-
-                if not is_greeting(q) and len(q) > 20:
+            if kb_text:
+                internal_context = (internal_context + "\n" + kb_text[:1000]).strip()
+            meta["knowledge_brain"] = {"ok": kb_out.get("ok"), "internal_only": True}
+            if len(q) > 20:
+                try:
                     kb.ingest(q, source="chat")
-            except Exception:
-                pass
-            meta["knowledge_brain"] = {
-                "ok": kb_out.get("ok"),
-                "entities": kb_out.get("entities"),
-                "verified": kb_out.get("verified"),
-            }
+                except Exception:
+                    pass
     except Exception as exc:
         meta["knowledge_brain"] = {"error": str(exc)}
 
-    if knowledge_text and knowledge_text not in (tool_text or "") and not skip_kb:
-        tool_text = (
-            f"{tool_text}\n\n## Cross-lingual knowledge\n{knowledge_text}".strip()
-            if tool_text
-            else f"## Cross-lingual knowledge\n{knowledge_text}"
-        )
-
+    if knowledge_text and not skip_kb:
+        internal_context = (internal_context + "\n" + knowledge_text[:600]).strip()
     if memory_ctx and not skip_kb:
-        tool_text = (
-            f"{tool_text}\n\n## Memory\n{memory_ctx}".strip()
-            if tool_text
-            else f"## Memory\n{memory_ctx}"
-        )
+        internal_context = (internal_context + "\n" + memory_ctx[:600]).strip()
 
     stages.append("reasoning")
     try:
         from om_ai.core.reasoning.pipeline import run_reasoning_pipeline
         from om_ai.understanding.query_kind import is_greeting
 
-        if not is_greeting(q):
-            reason_q = str(
-                (lang_pack.get("meaning") or {}).get("retrieval_query") or q
+        if (
+            not is_greeting(q)
+            and ctx_intent.get("intent") not in {"conversation", "date_query", "calculation"}
+        ):
+            reasoning = run_reasoning_pipeline(
+                str((lang_pack.get("meaning") or {}).get("retrieval_query") or q),
+                retrieve=True,
             )
-            reasoning = run_reasoning_pipeline(reason_q, retrieve=True)
             draft = str(
                 reasoning.get("solution")
                 or reasoning.get("answer")
@@ -326,116 +333,69 @@ def run_chat_pipeline(
             md = str(reasoning.get("markdown") or "")
             if "```" in md and (not draft or "```" not in draft):
                 draft = md
-        meta["reasoning"] = {
-            "has_solution": bool(draft),
-            "score": reasoning.get("score"),
-            "passed": reasoning.get("passed"),
-        }
+        meta["reasoning"] = {"has_solution": bool(draft)}
     except Exception as exc:
-        logger.debug("reasoning engine skipped: %s", exc)
         meta["reasoning"] = {"error": str(exc)}
 
-    if tool_text and (not draft or len(draft) < 60):
-        draft = tool_text
-    elif tool_text and draft and tool_text[:60] not in draft:
-        prefer_tools = False
-        try:
-            from om_ai.runtime.chat_orchestrator import is_low_quality_reply
+    if public_tool:
+        draft = public_tool
 
-            prefer_tools = bool(is_low_quality_reply(draft))
-        except Exception:
-            prefer_tools = False
-        if prefer_tools or intent.get("intent") in {
-            "code_creation",
-            "debugging",
-            "research",
-            "explanation",
-            "date_request",
-            "calculation",
-        }:
-            if prefer_tools or (action_meta.get("execution") or {}).get("ok"):
-                draft = tool_text if prefer_tools else f"{draft}\n\n## Tool results\n{tool_text}"
-            elif intent.get("intent") in {
-                "code_creation",
-                "debugging",
-                "research",
-                "explanation",
-            }:
-                draft = f"{draft}\n\n## Tool results\n{tool_text}"
-
-    # ── 5. Model Generation ──────────────────────────────────────────
+    # ── 5. Model Generation (uses internal_context privately) ────────
     stages.append("model")
     model_text = ""
     used_model = False
     need_model = not draft or len(draft) < 40
-    try:
-        from om_ai.understanding.query_kind import is_greeting
 
-        if is_greeting(q):
-            need_model = False
-            if not draft:
-                draft = "Hello — I’m OM. How can I help you?"
-    except Exception:
-        pass
+    if ctx_intent.get("intent") == "conversation":
+        need_model = False
+        low = q.lower()
+        if "morning" in low or "moring" in low:
+            draft = "Good morning! I’m doing well — thanks for asking. How can I help you today?"
+        elif "evening" in low:
+            draft = "Good evening! Hope your day’s been good. What would you like to work on?"
+        elif re.search(r"\bhow\s+(was|is|are)\b", low):
+            draft = "I’m doing well — thanks for asking! How can I help you today?"
+        else:
+            draft = "Hello — I’m OM. How can I help you?"
 
     if need_model and native_ready and callable(native_chat):
         try:
             from om_ai.runtime.chat_orchestrator import build_chat_messages, is_low_quality_reply
             from om_ai.runtime.engine import usable_generation_text
+            from om_ai.runtime.public_reply import sanitize_public_reply, is_safe_public_answer
 
+            sys_bits = ["You are OM AI. Reply helpfully in plain language."]
             lang_instruction = str(lang_pack.get("instruction") or "").strip()
-            sys_bits = ["You are OM AI."]
             if lang_instruction:
                 sys_bits.append(lang_instruction)
-            meaning = lang_pack.get("meaning") or {}
-            if meaning.get("topic"):
-                sys_bits.append(f"Topic: {meaning.get('topic')}.")
-            if meaning.get("country"):
-                sys_bits.append(f"Country/region: {meaning.get('country')}.")
             if intent.get("intent"):
                 sys_bits.append(f"Intent: {intent.get('intent')}.")
-            if memory_ctx:
-                sys_bits.append("Relevant memory:\n" + memory_ctx[:800])
-            if tool_text:
-                sys_bits.append("Use tool results when relevant:\n" + tool_text[:1200])
+            if public_tool:
+                sys_bits.append("Verified tool result:\n" + public_tool[:400])
+            if internal_context:
+                sys_bits.append(
+                    "Internal notes (do not repeat headers, paths, or dumps; paraphrase only):\n"
+                    + internal_context[:800]
+                )
             packed = build_chat_messages(
                 messages or [{"role": "user", "content": q}],
                 compact=True,
-                extra_system="\n".join(sys_bits)[:1200],
+                extra_system="\n".join(sys_bits)[:1400],
             )
-            gen_kwargs = dict(kwargs or {})
-            raw = native_chat(packed, **gen_kwargs)
+            raw = native_chat(packed, **dict(kwargs or {}))
             model_text = (usable_generation_text(raw) or raw or "").strip()
-            if model_text and not is_low_quality_reply(model_text):
+            model_text = sanitize_public_reply(model_text)
+            if model_text and is_safe_public_answer(model_text) and not is_low_quality_reply(model_text):
                 draft = model_text
                 used_model = True
-            meta["model"] = {"used": used_model, "len": len(model_text)}
+            meta["model"] = {"used": used_model, "len": len(model_text or "")}
         except Exception as exc:
-            logger.debug("model generation skipped: %s", exc)
             meta["model"] = {"used": False, "error": str(exc)}
     else:
-        meta["model"] = {
-            "used": False,
-            "reason": "draft_ready" if draft else "model_unavailable",
-        }
+        meta["model"] = {"used": False, "reason": "draft_ready" if draft else "model_unavailable"}
 
-    if not (draft or "").strip():
-        stages.append("cognitive_fallback")
-        try:
-            from om_ai.core.intelligence import CognitiveIntelligence
-
-            cog = CognitiveIntelligence().run(
-                q,
-                messages=messages,
-                project=project_id,
-            )
-            draft = str(cog.get("answer") or "").strip()
-            meta["cognitive"] = {
-                "capability": (cog.get("capability") or {}).get("id"),
-                "tools": (cog.get("plan") or {}).get("tools_executed"),
-            }
-        except Exception as exc:
-            meta["cognitive"] = {"error": str(exc)}
+    if not (draft or "").strip() and public_tool:
+        draft = public_tool
 
     if not (draft or "").strip():
         try:
@@ -448,30 +408,27 @@ def run_chat_pipeline(
         except Exception:
             draft = "Hello — I’m OM. How can I help you?"
 
-    # Reject garbled/static drafts before language check + memory write
+    # Never echo gibberish / user text back as the answer
+    if (draft or "").strip().lower() == q.lower() or (
+        len(q.split()) <= 2 and (draft or "").strip().lower() == q.lower()
+    ):
+        draft = "How can I help you today?"
+
+    # Quality + public sanitize (never leak internals)
     try:
+        from om_ai.runtime.public_reply import sanitize_public_reply, is_safe_public_answer, extract_clean_tool_answer
         from om_ai.runtime.chat_orchestrator import is_low_quality_reply
 
-        bad = is_low_quality_reply(draft)
-        if bad:
-            meta["quality_reject"] = bad
-            # Prefer real tool results over fallback chrome
-            if tool_text and len(tool_text.strip()) >= 20:
-                draft = tool_text.strip()
-                meta["quality_recover"] = "tool_text"
+        draft = sanitize_public_reply(draft) or draft
+        if public_tool and (not is_safe_public_answer(draft) or is_low_quality_reply(draft)):
+            draft = public_tool
+            meta["quality_recover"] = "public_tool"
+        elif not is_safe_public_answer(draft) or is_low_quality_reply(draft or ""):
+            if ctx_intent.get("intent") == "conversation":
+                draft = "Hello — I’m OM. How can I help you?"
             else:
-                try:
-                    from om_ai.agent.verifier import compose_fallback
-
-                    draft = compose_fallback(
-                        intent=str(intent.get("intent") or "chat"),
-                        user_text=q,
-                    )
-                except Exception:
-                    draft = (
-                        "I understood your question — let me help with that. "
-                        "Could you rephrase or add a bit more detail?"
-                    )
+                draft = "I’m with you — tell me a bit more about what you need."
+            meta["quality_reject"] = "unsafe_or_garble"
     except Exception:
         pass
 
@@ -494,11 +451,12 @@ def run_chat_pipeline(
     except Exception as exc:
         meta["response_language_check"] = {"error": str(exc)}
 
-    # ── 7. Final Answer polish ───────────────────────────────────────
+    # ── 7. Final polish + hard public sanitize ───────────────────────
     stages.append("final")
     try:
         from om_ai.response_engine import format_assistant_reply
         from om_ai.core.response.response_formatter import ensure_public_reply, response_mode
+        from om_ai.runtime.public_reply import sanitize_public_reply, is_safe_public_answer
 
         intent_name = str(intent.get("intent") or "chat")
         polished = format_assistant_reply(draft, intent=intent_name, enhance=True)
@@ -508,22 +466,42 @@ def run_chat_pipeline(
                 polished,
                 {"intent": intent, "understanding": understanding},
             )
-        if polished and polished.strip():
+        polished = sanitize_public_reply(polished or "") or polished
+        if polished and is_safe_public_answer(polished):
             draft = polished.strip()
+        elif public_tool:
+            draft = public_tool
+        elif ctx_intent.get("intent") == "conversation":
+            draft = "Hello — I’m OM. How can I help you?"
     except Exception as exc:
         logger.debug("final polish skipped: %s", exc)
+
+    # Absolute last gate — never show internals
+    try:
+        from om_ai.runtime.public_reply import sanitize_public_reply, is_safe_public_answer
+
+        draft = sanitize_public_reply(draft) or draft
+        if not is_safe_public_answer(draft):
+            if public_tool:
+                draft = public_tool
+            elif ctx_intent.get("intent") == "conversation":
+                draft = "Hello — I’m OM. How can I help you?"
+            else:
+                draft = "How can I help you today?"
+    except Exception:
+        pass
 
     if not (draft or "").strip():
         draft = "Hello — I’m OM. How can I help you?"
 
-    # ── 8. Memory write ──────────────────────────────────────────────
+    # ── 8. Memory write (store clean reply only) ─────────────────────
     stages.append("memory_write")
     if memory is not None:
         try:
             memory.remember_turn(q, draft)
             from om_ai.understanding.query_kind import is_greeting
 
-            if not is_greeting(q) and len(draft) > 80:
+            if not is_greeting(q) and len(draft) > 80 and ctx_intent.get("intent") != "conversation":
                 memory.remember_experience(q, draft, score=0.7)
             meta["memory_write"] = {"ok": True}
         except Exception as exc:

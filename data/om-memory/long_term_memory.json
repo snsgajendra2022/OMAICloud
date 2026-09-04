@@ -5,7 +5,24 @@
     "[chat] what=What",
     "[test] laravel=Laravel, php=PHP, composer=Composer",
     "[test] laravel=Laravel, php=PHP, composer=Composer",
-    "[test] laravel=Laravel, php=PHP, composer=Composer"
+    "[test] laravel=Laravel, php=PHP, composer=Composer",
+    "[test] laravel=Laravel, php=PHP, composer=Composer",
+    "[chat] build=Build",
+    "[test] laravel=Laravel, php=PHP, composer=Composer",
+    "[test] laravel=Laravel, php=PHP, composer=Composer",
+    "[test] laravel=Laravel, php=PHP, composer=Composer",
+    "[chat] explain=Explain, fastapi=FastAPI",
+    "[test] laravel=Laravel, php=PHP, composer=Composer",
+    "[chat] explain=Explain, python=Python",
+    "[chat] write=Write, fastapi=FastAPI",
+    "[chat] ai=AI",
+    "[chat] what=What",
+    "[chat] build=Build",
+    "[chat] write=Write, fastapi=FastAPI",
+    "[chat] ai=AI",
+    "[chat] what=What",
+    "[chat] build=Build",
+    "[chat] why=Why, python=Python, nameerror=NameError"
   ],
   "preferences": [
     "I prefer concise answers",
@@ -46,6 +63,46 @@
     },
     {
       "question": "Explain Python",
+      "score": 0.7
+    },
+    {
+      "question": "Explain Python in 3 short sentences.",
+      "score": 0.7
+    },
+    {
+      "question": "Write a minimal FastAPI hello world endpoint.",
+      "score": 0.7
+    },
+    {
+      "question": "\u092d\u093e\u0930\u0924 \u092e\u0947\u0902 AI \u0915\u093e \u092d\u0935\u093f\u0937\u094d\u092f \u0915\u094d\u092f\u093e \u0939\u0948?",
+      "score": 0.7
+    },
+    {
+      "question": "Explain what a variable is in programming.",
+      "score": 0.7
+    },
+    {
+      "question": "What is today's weather in Delhi?",
+      "score": 0.7
+    },
+    {
+      "question": "Why does Python say NameError: name 'x' is not defined?",
+      "score": 0.7
+    },
+    {
+      "question": "Explain what a variable is in programming.",
+      "score": 0.7
+    },
+    {
+      "question": "Why does Python say NameError: name 'x' is not defined?",
+      "score": 0.7
+    },
+    {
+      "question": "Explain Python in 3 short sentences.",
+      "score": 0.7
+    },
+    {
+      "question": "Explain what a variable is in programming.",
       "score": 0.7
     }
   ]

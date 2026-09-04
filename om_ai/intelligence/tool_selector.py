@@ -1,6 +1,7 @@
 """Decide which tools are needed — capability inference, not manual maps."""
 from __future__ import annotations
 
+import re
 from typing import Any
 
 
@@ -25,8 +26,17 @@ class ToolSelector:
                 tools.append(name)
                 reasons[name] = why
 
-        if domain == "time" or intent_name == "datetime" or "date" in q or "time" in q:
-            need("date", "temporal question")
+        if domain == "time" or intent_name in {"datetime", "date_request"}:
+            # Never treat social "how was your date/day" as calendar
+            if not re.search(
+                r"\bhow\s+(was|is|are)\s+(your\s+)?(day|date)\b",
+                q,
+            ) and re.search(
+                r"\b(today'?s?\s+date|current\s+date|what(?:'s|\s+is)\s+(?:the\s+)?date|"
+                r"current\s+time|what(?:'s|\s+is)\s+the\s+time|what\s+day\s+is\s+it)\b",
+                q,
+            ):
+                need("date", "temporal question")
         if action == "calculate" or any(x in q for x in ("calculate", "compute", "%", "sum")):
             need("calculator", "numeric computation")
         if action in {"research", "recommend"} or "latest" in q or "news" in q:

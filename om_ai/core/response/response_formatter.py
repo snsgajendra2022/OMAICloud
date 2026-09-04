@@ -68,7 +68,10 @@ _PIPELINE_DUMP = re.compile(
     r"(?is)(\*\*ask:\*\*|\*\*understanding:\*\*|##\s+analysis\b|\bagents\s*:|"
     r"self-critique|no strong corpus match yet|om-ai brain power|"
     r"heuristic foundation path|##\s+evaluation\b|##\s+validation\b|"
-    r"passed:\s*true|score:\s*0\.|confidence:\s*0\.)"
+    r"passed:\s*true|score:\s*0\.|confidence:\s*0\.|"
+    r"##\s+knowledge brain|##\s+connected systems|##\s+cross-lingual|"
+    r"##\s+memory\b|\[layered\]|\[decision\]|\[workflow\]|"
+    r"om ai foundation sample|physics mechanics energy)"
 )
 
 
