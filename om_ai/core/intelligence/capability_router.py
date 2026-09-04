@@ -1,10 +1,16 @@
-"""Route intent → capability. Registry lookup only — no keyword branches."""
+"""Route intent → capability. Real answers only — never canned outlines."""
 from __future__ import annotations
 
+import os
+import re
 from typing import Any, Callable
 
+from om_ai.core.intelligence.real_answer import (
+    build_real_answer,
+    looks_like_static_reply,
+)
 
-# Intent → capability id. Expand by registering, not by if music / if date.
+
 INTENT_CAPABILITY: dict[str, str] = {
     "vision_analysis": "vision",
     "date_request": "date",
@@ -25,158 +31,186 @@ INTENT_CAPABILITY: dict[str, str] = {
 }
 
 
+def _static_ok() -> bool:
+    return os.environ.get("OM_STATIC_TEMPLATES", "0").strip().lower() in {
+        "1",
+        "true",
+        "yes",
+        "on",
+    }
+
+
+def looks_like_static_capability_reply(text: str) -> bool:
+    return looks_like_static_reply(text)
+
+
 def _cap_date(_q: str, _ctx: dict, _u: dict) -> str:
+    """Live clock — not a stored reply."""
     from datetime import datetime
+
     try:
         from zoneinfo import ZoneInfo
+
         now = datetime.now(ZoneInfo("Asia/Kolkata"))
     except Exception:
         now = datetime.now().astimezone()
     return f"Today's date is {now.strftime('%A, %d %B %Y')}.\n"
 
 
-def _cap_prompt(q: str, ctx: dict, u: dict) -> str:
-    topic = q
-    for noise in ("create prompt for", "make prompt for", "write prompt for", "generate prompt for", "create prompt", "make prompt"):
-        if noise in q.lower():
-            topic = q.lower().split(noise, 1)[-1].strip(" :.-")
+def _extract_prompt_topic(q: str) -> str:
+    topic = (q or "").strip()
+    for noise in (
+        "create prompt for",
+        "make prompt for",
+        "write prompt for",
+        "generate prompt for",
+        "create a prompt for",
+        "create prompt",
+        "make prompt",
+        "write prompt",
+        "generate prompt",
+    ):
+        if noise in topic.lower():
+            topic = topic.lower().split(noise, 1)[-1].strip(" :.-")
             break
-    topic = topic or "the requested task"
+    return topic or q.strip()
+
+
+def _cap_prompt(q: str, ctx: dict, u: dict) -> str:
+    """Build a prompt from the user's topic — no fixed Goals/Constraints skeleton."""
+    from om_ai.core.intelligence.real_answer import _looks_like_garbage
+
+    real = build_real_answer(q, prefer_coding=True)
+    if real and not _looks_like_garbage(real) and (
+        "prompt" in real.lower() or "```" in real or len(real) > 120
+    ):
+        # Only use corpus/reasoning if it's actually useful for this ask
+        if any(w in real.lower() for w in _extract_prompt_topic(q).lower().split()[:3] if len(w) > 2):
+            return real + "\n"
+
+    topic = _extract_prompt_topic(q)
     project = str(ctx.get("project_hint") or "").strip()
-    extra = f"\nProject context: {project}." if project else ""
-    return (
-        "## Reusable AI Prompt\n\n"
-        f"You are an expert assistant helping with **{topic}**.\n\n"
-        "Goals:\n"
-        "- Produce production-quality output\n"
-        "- Explain architecture briefly before code\n"
-        "- Prefer TypeScript when building UI\n"
-        "- Include file structure and key snippets\n"
-        "- List run/test steps\n\n"
-        "Constraints:\n"
-        "- No placeholder-only stubs\n"
-        "- Call out assumptions\n"
-        f"- Stay focused on: {topic}\n"
-        f"{extra}\n"
-        "Output format:\n"
-        "1. Summary\n"
-        "2. Architecture\n"
-        "3. File tree\n"
-        "4. Code\n"
-        "5. Next steps\n"
+    lines = [
+        f"## Prompt for: {topic}",
+        "",
+        f"Act as a specialist in {topic}.",
+        f"User goal: {q.strip()}",
+    ]
+    if project:
+        lines.append(f"Project context: {project}")
+    lines.extend(
+        [
+            "",
+            "Deliver a concrete solution for this exact goal — code, steps, or design as needed.",
+            "State assumptions. Prefer working examples over placeholders.",
+        ]
     )
+    return "\n".join(lines) + "\n"
 
 
 def _cap_recommendation(q: str, ctx: dict, u: dict) -> str:
-    domain = str(u.get("domain") or "")
-    if domain == "music" or "playlist" in q.lower() or "music" in q.lower():
-        return (
-            "Here are playlist name ideas:\n\n"
-            "**Coding / Focus**\n"
-            "- Deep Focus Flow\n"
-            "- Lo-Fi Commit Messages\n"
-            "- Midnight Refactor\n\n"
-            "**Workout**\n"
-            "- Energy Boost\n"
-            "- PR Power Hour\n\n"
-            "**Relax**\n"
-            "- Calm Evening\n"
-            "- Soft Reset\n\n"
-            "Want names tuned to a mood, genre, or activity?\n"
-        )
-    return (
-        "Here are recommendation options based on your request:\n\n"
-        "1. Top picks for a quick start\n"
-        "2. Alternatives if you want variety\n"
-        "3. A shortlist to refine further\n\n"
-        "Share a preference (mood, budget, or goal) and I’ll narrow it.\n"
-    )
+    real = build_real_answer(q)
+    return (real + "\n") if real else ""
 
 
 def _cap_coding(q: str, ctx: dict, u: dict) -> str:
-    return (
-        f"I can help implement this: **{q.strip()}**.\n\n"
-        "## Plan\n"
-        "1. Confirm stack and constraints\n"
-        "2. Outline structure\n"
-        "3. Implement the core path\n"
-        "4. Add tests\n\n"
-        "Reply with framework preferences (e.g. React/Next, auth, API) and I’ll generate concrete code.\n"
-    )
+    root = str(ctx.get("project_root") or ctx.get("root") or ".")
+    real = build_real_answer(q, prefer_coding=True, root=root)
+    return (real + "\n") if real else ""
 
 
 def _cap_research(q: str, ctx: dict, u: dict) -> str:
-    try:
-        from om_ai.knowledge.facts import lookup_fact
-        hit = lookup_fact(q)
-        if hit and hit.get("answer"):
-            return str(hit["answer"]).strip() + "\n"
-    except Exception:
-        pass
-    return (
-        f"**Topic:** {q.strip()}\n\n"
-        "Here’s a clear take:\n"
-        "- Core idea\n"
-        "- How it works\n"
-        "- Why it matters\n"
-        "- Practical takeaway\n\n"
-        "Want a beginner version or a deeper technical dive?\n"
-    )
+    real = build_real_answer(q)
+    return (real + "\n") if real else ""
 
 
 def _cap_planning(q: str, ctx: dict, u: dict) -> str:
-    return (
-        f"**Plan for:** {q.strip()}\n\n"
-        "1. Define the outcome\n"
-        "2. Break into milestones\n"
-        "3. Sequence the first 3 actions\n"
-        "4. Set a check-in point\n\n"
-        "Share timeline/constraints for a tighter plan.\n"
-    )
+    real = build_real_answer(q, prefer_coding=True)
+    return (real + "\n") if real else ""
 
 
 def _cap_analysis(q: str, ctx: dict, u: dict) -> str:
-    return (
-        f"**Analysis focus:** {q.strip()}\n\n"
-        "- Current state\n"
-        "- Options\n"
-        "- Trade-offs\n"
-        "- Recommendation\n\n"
-        "Add criteria (cost, speed, quality) if you want a ranked choice.\n"
-    )
+    real = build_real_answer(q)
+    return (real + "\n") if real else ""
 
 
 def _cap_calculator(q: str, ctx: dict, u: dict) -> str:
-    return (
-        "I can compute that. Paste the exact expression or numbers "
-        "(for example `15% of 2400`) and I’ll calculate it.\n"
-    )
+    m = re.search(r"(\d+(?:\.\d+)?)\s*%\s*of\s*(\d+(?:\.\d+)?)", q, re.I)
+    if m:
+        pct, base = float(m.group(1)), float(m.group(2))
+        return f"{pct}% of {base:g} = {(pct / 100.0) * base:g}\n"
+    expr = re.search(r"([\d\.\s\+\-\*\/\(\)]+)", q)
+    if expr:
+        raw = expr.group(1).strip()
+        if re.fullmatch(r"[\d\.\s\+\-\*\/\(\)]+", raw) and any(c.isdigit() for c in raw):
+            try:
+                val = eval(raw, {"__builtins__": {}}, {})  # noqa: S307
+                if isinstance(val, (int, float)):
+                    return f"{raw.strip()} = {val:g}\n"
+            except Exception:
+                pass
+    real = build_real_answer(q)
+    return (real + "\n") if real else ""
 
 
 def _cap_chat(q: str, ctx: dict, u: dict) -> str:
-    return "Hello — I’m OM. What should we work on?\n"
+    qlow = (q or "").strip().lower()
+    # Any greeting spelling (hi, hii, hello, hey…) — natural reply, never empty
+    if re.match(r"^(hi+|hello+|hey+|yo|sup|namaste|hola)[!?.]*$", qlow) or re.match(
+        r"^(good\s+(morning|evening|afternoon))\b", qlow
+    ):
+        return "Hello — I’m OM. What should we work on?\n"
+    real = build_real_answer(q)
+    if real:
+        return real + "\n"
+    # Never leave the user with a blank bubble
+    try:
+        from om_ai.agent.verifier import compose_fallback
+
+        fb = (compose_fallback(intent="chat", user_text=q) or "").strip()
+        if fb:
+            return fb + "\n"
+    except Exception:
+        pass
+    return ""
 
 
 def _cap_clarify(q: str, ctx: dict, u: dict) -> str:
-    return (
-        f"I want to make sure I help correctly with “{q.strip()}”.\n\n"
-        "Do you want me to:\n"
-        "1. Explain it\n"
-        "2. Create something (code / prompt / plan)\n"
-        "3. Recommend options\n"
-        "4. Something else — tell me the goal in one sentence\n"
-    )
+    """Never trap real questions — and never leave greetings blank."""
+    qlow = (q or "").strip().lower()
+    if re.match(r"^(hi+|hello+|hey+|yo|sup|namaste|hola)[!?.]*$", qlow):
+        return "Hello — I’m OM. What should we work on?\n"
+    real = build_real_answer(q)
+    if real:
+        return real + "\n"
+    try:
+        from om_ai.agent.verifier import compose_fallback
+
+        fb = (compose_fallback(intent="chat", user_text=q) or "").strip()
+        if fb and "Core idea" not in fb and "## Understanding" not in fb:
+            return fb + "\n"
+    except Exception:
+        pass
+    return ""
 
 
 def _cap_vision(q: str, ctx: dict, u: dict) -> str:
-    return (
-        "I can analyze that visual.\n\n"
-        "Upload/attach the image (or screenshot), then ask what you need:\n"
-        "- What is in this image?\n"
-        "- Extract text / fields\n"
-        "- What is wrong / how to improve?\n"
-        "- Create a similar design brief\n"
-    )
+    path = str(ctx.get("image_path") or ctx.get("attachment") or "").strip()
+    if path:
+        try:
+            from om_ai.operating_intelligence import perception_bridge
+
+            out = getattr(perception_bridge, "analyze_image", None)
+            if callable(out):
+                result = out(path, question=q)
+                if isinstance(result, dict) and result.get("summary"):
+                    return str(result["summary"]).strip() + "\n"
+                if isinstance(result, str) and len(result) > 20:
+                    return result.strip() + "\n"
+        except Exception:
+            pass
+    real = build_real_answer(q)
+    return (real + "\n") if real else ""
 
 
 CAPABILITY_HANDLERS: dict[str, Callable[[str, dict, dict], str]] = {
@@ -197,7 +231,11 @@ CAPABILITY_HANDLERS: dict[str, Callable[[str, dict, dict], str]] = {
 class CapabilityRouter:
     def route(self, intent: dict[str, Any]) -> dict[str, Any]:
         key = str(intent.get("intent") or intent.get("canonical") or "unclear")
-        cap = INTENT_CAPABILITY.get(key) or INTENT_CAPABILITY.get(str(intent.get("canonical"))) or "clarify"
+        cap = (
+            INTENT_CAPABILITY.get(key)
+            or INTENT_CAPABILITY.get(str(intent.get("canonical")))
+            or "clarify"
+        )
         return {
             "capability": cap,
             "handler": CAPABILITY_HANDLERS.get(cap, _cap_clarify),
@@ -212,4 +250,44 @@ class CapabilityRouter:
         understanding: dict[str, Any],
     ) -> str:
         fn = capability.get("handler") or _cap_clarify
-        return str(fn(question, context, understanding) or "").strip() + "\n"
+        # Prefer tool results already executed by CognitiveIntelligence
+        tool_text = ""
+        if isinstance(context, dict):
+            tool_text = str(context.get("tool_context") or "").strip()
+            if not tool_text:
+                tr = context.get("tool_results") or {}
+                tool_text = str(tr.get("combined_text") or "").strip()
+
+        out = str(fn(question, context, understanding) or "").strip()
+        cap_id = str(capability.get("capability") or "")
+
+        # Merge: if handler empty/weak but tools ran, use tools
+        if tool_text and (not out or len(out) < 40):
+            out = tool_text
+        elif tool_text and out and tool_text[:80] not in out:
+            # Enrich coding/research with tool evidence — not prompt_generator/chat
+            if cap_id in {"coding", "research", "analysis", "planning"}:
+                out = f"{out}\n\n## Tool results\n{tool_text}"
+
+        if not out:
+            return ""
+        if not _static_ok() and looks_like_static_reply(out):
+            # Still allow tool-backed content through
+            if tool_text and not looks_like_static_reply(tool_text):
+                return tool_text + "\n"
+            return ""
+        if "Produce production-quality output" in out and "Prefer TypeScript when building UI" in out:
+            return (tool_text + "\n") if tool_text else ""
+        if "Here’s a clear take" in out or ("Core idea" in out and "How it works" in out):
+            return (tool_text + "\n") if tool_text else ""
+        try:
+            from om_ai.core.intelligence.real_answer import _looks_like_garbage
+
+            cap_id = str(capability.get("capability") or "")
+            if cap_id not in {"date", "calculator", "chat"} and _looks_like_garbage(out):
+                if tool_text and not _looks_like_garbage(tool_text):
+                    return tool_text + "\n"
+                return ""
+        except Exception:
+            pass
+        return out + "\n"

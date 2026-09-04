@@ -64,6 +64,33 @@ class IntelligenceManager:
         knowledge_pack = self.knowledge.route(understanding, memory_hits=memory_hits)
         agents = self.agents.select(intent, understanding, context=context)
         tools = self.tools.select(understanding, intent, knowledge=knowledge_pack)
+        # Execute selected tools (previously only stored as metadata)
+        tool_out: dict[str, Any] = {}
+        try:
+            from om_ai.tools.chat_runner import execute_planned_tools, format_tool_context
+
+            tool_out = execute_planned_tools(
+                list(tools.get("tools") or []),
+                q,
+                context={**(context if isinstance(context, dict) else {}), "tenant_id": "default"},
+            )
+            if isinstance(context, dict):
+                context["tool_results"] = tool_out
+                context["tool_context"] = format_tool_context(tool_out)
+            # Inject tool text into knowledge packets for the planner
+            if tool_out.get("combined_text"):
+                packets = list((knowledge_pack or {}).get("packets") or [])
+                packets.insert(
+                    0,
+                    {
+                        "source": "tools",
+                        "texts": [str(tool_out["combined_text"])[:4000]],
+                    },
+                )
+                knowledge_pack = {**(knowledge_pack or {}), "packets": packets}
+        except Exception:
+            tool_out = {"skipped": True}
+
         reason_plan = self.reasoning.plan(
             understanding,
             intent,
@@ -84,6 +111,38 @@ class IntelligenceManager:
             agents=agents,
             context=context,
         )
+        if not (answer or "").strip() and tool_out.get("combined_text"):
+            answer = str(tool_out["combined_text"]).strip() + "\n"
+        if isinstance(tools, dict):
+            tools = {**tools, "executed": tool_out.get("executed") or [], "ok": bool(tool_out.get("ok"))}
+        if not (answer or "").strip():
+            return {
+                "question": q,
+                "understanding": understanding,
+                "intent": intent,
+                "context": context,
+                "memory": memory_hits,
+                "knowledge": knowledge_pack,
+                "agents": agents,
+                "tools": tools,
+                "reasoning": reason_plan,
+                "style": style,
+                "answer": "",
+                "evaluation": {"passed": False, "score": 0.0, "deferred": True},
+                "deferred": True,
+                "pipeline": [
+                    "understand",
+                    "intent",
+                    "context",
+                    "memory",
+                    "knowledge",
+                    "agents",
+                    "tools",
+                    "reason",
+                    "generate",
+                    "verify",
+                ],
+            }
         evaluation = self.evaluator.evaluate(
             q, answer, intent=intent, understanding=understanding
         )

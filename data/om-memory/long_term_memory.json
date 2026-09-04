@@ -1,0 +1,52 @@
+{
+  "facts": [
+    "Gajendra",
+    "[test] laravel=Laravel, php=PHP, composer=Composer",
+    "[chat] what=What",
+    "[test] laravel=Laravel, php=PHP, composer=Composer",
+    "[test] laravel=Laravel, php=PHP, composer=Composer",
+    "[test] laravel=Laravel, php=PHP, composer=Composer"
+  ],
+  "preferences": [
+    "I prefer concise answers",
+    "my name is Gajendra"
+  ],
+  "decisions": [
+    {
+      "question": "What is Laravel?",
+      "score": 0.9
+    },
+    {
+      "question": "\u092d\u093e\u0930\u0924 \u092e\u0947\u0902 AI \u0915\u093e \u092d\u0935\u093f\u0937\u094d\u092f \u0915\u094d\u092f\u093e \u0939\u0948?",
+      "score": 0.7
+    },
+    {
+      "question": "What is today's date?",
+      "score": 0.7
+    },
+    {
+      "question": "What is today's date?",
+      "score": 0.7
+    },
+    {
+      "question": "What is 15% of 200?",
+      "score": 0.7
+    },
+    {
+      "question": "What is 15% of 200?",
+      "score": 0.7
+    },
+    {
+      "question": "What is 15% of 200?",
+      "score": 0.7
+    },
+    {
+      "question": "What is today's date?",
+      "score": 0.7
+    },
+    {
+      "question": "Explain Python",
+      "score": 0.7
+    }
+  ]
+}

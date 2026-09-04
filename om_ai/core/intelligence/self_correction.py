@@ -28,9 +28,5 @@ class SelfCorrection:
         if retry.strip() and retry.strip() != previous.strip():
             return retry
 
-        # Last resort: explicit non-echo clarification
-        return (
-            f"I may have missed your intent for “{question.strip()}”.\n\n"
-            "Please confirm whether you want a date, a reusable prompt, "
-            "recommendations, code, or an explanation.\n"
-        )
+        # Last resort: empty → chat falls through to Absolute OS / model / brain
+        return ""

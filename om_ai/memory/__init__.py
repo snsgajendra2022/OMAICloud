@@ -1,3 +1,6 @@
+"""
+OM Memory package — short/long/episodic/semantic + layered SQLite.
+"""
 from .sqlite_memory import SQLiteMemoryStore, Memory, MemoryKind
 from .conversations import ConversationStore
 from .layers import LayeredMemory, LAYERS
@@ -5,8 +8,9 @@ from .short_term import ShortTermMemory
 from .conversation import ConversationMemory, Message
 from .project_memory import ProjectMemory
 from .long_term import LongTermMemory
-from .memory_manager import MemoryManager
-from .manager import MemoryManager
+from .episodic_memory import EpisodicMemory
+from .semantic_memory import SemanticMemory
+from .memory_manager import AdvancedMemorySystem, MemoryManager
 
 __all__ = [
     "SQLiteMemoryStore",
@@ -20,7 +24,8 @@ __all__ = [
     "Message",
     "ProjectMemory",
     "LongTermMemory",
-     "MemoryManager",
+    "EpisodicMemory",
+    "SemanticMemory",
+    "AdvancedMemorySystem",
     "MemoryManager",
-
 ]

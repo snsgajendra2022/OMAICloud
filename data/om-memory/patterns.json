@@ -223,5 +223,113 @@
     "category": "general",
     "metadata": {},
     "created_at": "2026-09-03T10:39:40.315969"
+  },
+  {
+    "question": "didi you create the code of react",
+    "answer": "I can help implement this: **didi you create the code of react**.\n\n## Plan\n1. Confirm stack and constraints\n2. Outline structure\n3. Implement the core path\n4. Add tests\n\nReply with framework preferences (e.g. React/Next, auth, API) and I\u2019ll generate concrete code.",
+    "score": 1.0,
+    "success": true,
+    "category": "engineering",
+    "metadata": {},
+    "created_at": "2026-09-03T15:20:15.362092"
+  },
+  {
+    "question": "but we eed to craete code its p[ossible to create code also",
+    "answer": "I can help implement this: **but we eed to craete code its p[ossible to create code also**.\n\n## Plan\n1. Confirm stack and constraints\n2. Outline structure\n3. Implement the core path\n4. Add tests\n\nReply with framework preferences (e.g. React/Next, auth, API) and I\u2019ll generate concrete code.",
+    "score": 1.0,
+    "success": true,
+    "category": "engineering",
+    "metadata": {},
+    "created_at": "2026-09-03T15:20:36.419827"
+  },
+  {
+    "question": "React code create form logina nd first name and last anme",
+    "answer": "I can help implement this: **React code create form logina nd first name and last anme**.\n\n## Plan\n1. Confirm stack and constraints\n2. Outline structure\n3. Implement the core path\n4. Add tests\n\nReply with framework preferences (e.g. React/Next, auth, API) and I\u2019ll generate concrete code.",
+    "score": 1.0,
+    "success": true,
+    "category": "engineering",
+    "metadata": {},
+    "created_at": "2026-09-03T15:21:19.037074"
+  },
+  {
+    "question": "hindi laguage",
+    "answer": "hindi laguage",
+    "score": 0.7,
+    "success": true,
+    "category": "general",
+    "metadata": {},
+    "created_at": "2026-09-04T07:34:47.757849"
+  },
+  {
+    "question": "hindi laguage",
+    "answer": "hindi laguage",
+    "score": 0.7,
+    "success": true,
+    "category": "general",
+    "metadata": {},
+    "created_at": "2026-09-04T07:41:31.020674"
+  },
+  {
+    "question": "ram ram",
+    "answer": "ram ram",
+    "score": 0.7,
+    "success": true,
+    "category": "general",
+    "metadata": {},
+    "created_at": "2026-09-04T07:41:37.296007"
+  },
+  {
+    "question": "ram ram",
+    "answer": "ram ram",
+    "score": 0.7,
+    "success": true,
+    "category": "general",
+    "metadata": {},
+    "created_at": "2026-09-04T07:41:41.546808"
+  },
+  {
+    "question": "what is the ram ram",
+    "answer": "what is the ram ram",
+    "score": 0.7,
+    "success": true,
+    "category": "general",
+    "metadata": {},
+    "created_at": "2026-09-04T07:41:46.702788"
+  },
+  {
+    "question": "ram ram ji",
+    "answer": "ram ram ji",
+    "score": 0.7,
+    "success": true,
+    "category": "general",
+    "metadata": {},
+    "created_at": "2026-09-04T07:53:28.766259"
+  },
+  {
+    "question": "not undestetn pelase given to me clear ans",
+    "answer": "not undestetn pelase given to me clear ans",
+    "score": 0.7,
+    "success": true,
+    "category": "general",
+    "metadata": {},
+    "created_at": "2026-09-04T10:48:32.927591"
+  },
+  {
+    "question": "not undestetn pelase given to me clear ans",
+    "answer": "not undestetn pelase given to me clear ans",
+    "score": 0.7,
+    "success": true,
+    "category": "general",
+    "metadata": {},
+    "created_at": "2026-09-04T10:48:46.834868"
+  },
+  {
+    "question": "Hey \u2014 good to see you. What\u2019s on your mind?\nTool results\n[tool:knowledge] Hey \u2014 good to see you. What\u2019s on your mind?",
+    "answer": "## Understanding\nmicrobiology\n\nTopic `microbiology` in domain `biology`. Era Industrial Revolution (1800\u20131900) key ideas: Steam engines & manufacturing, Electricity & thermodynamics, Maxwell electromagnetism. Apply OM mission: transform information into intelligence. Skill focus: tool selection.\n\n## Analysis\nAngle: **historical roots to 2026 practice**. Difficulty: **intermediate**. Skill focus: **tool selection**. Place this in the 1600\u20132026 knowledge arc (era frame 1800\u20131900) and connect to adjacent domains when useful.\n\n## Architecture\nOM cognitive path: Understanding \u2192 Reasoning \u2192 Planning \u2192 Agents/Tools \u2192 Validation. Knowledge Brain retrieves domain facts; Reasoning Engine applies first principles; never conflate research horizons with 2026 production.\n\n## Implementation\n1) State assumptions for year 2026.\n2) Give concrete steps, interfaces, or checklists.\n3) If coding: Technology \u00b7 File structure \u00b7 Tests \u00b7 Deployment notes.\n4) Example id `3423` for dataset traceability.\n\n## Validation\nSeparate: known science/engineering \u00b7 engineering judgment \u00b7 open research. No invented citations. Bio/quantum/neuromorphic claims labeled by horizon.\n\n## Next Steps\nWhat OM should store in project memory, which agent to call next, and what licensed corpus to add under knowledge/biology/raw/ to deepen this topic.\n\n\n_Domain: `biology` \u00b7 Era: 1800\u20131900 \u00b7 OM-1.0 Genesis Universal Intelligence_",
+    "score": 1.0,
+    "success": true,
+    "category": "general",
+    "metadata": {},
+    "created_at": "2026-09-04T10:49:12.169036"
   }
 ]

@@ -23,6 +23,15 @@ class ResponseValidator:
         if not a:
             return self._fail(["empty answer"], 0.0)
 
+        # Reject canned capability outlines (static AI smell)
+        try:
+            from om_ai.core.intelligence.capability_router import looks_like_static_capability_reply
+
+            if looks_like_static_capability_reply(a):
+                return self._fail(["static capability outline"], 5.0)
+        except Exception:
+            pass
+
         # Never repeat the user message as the answer
         if self._is_echo(q, a):
             return self._fail(["echoed user message"], 10.0)

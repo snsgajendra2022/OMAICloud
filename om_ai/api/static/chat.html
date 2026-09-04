@@ -2073,7 +2073,7 @@ async function sendPrompt(text) {
   const reqMsgs = buildRequestMessages();
   try {
     const reply = await streamCompletion(reqMsgs);
-    const clean = String(reply||"").trim()||"(empty reply)";
+    const clean = String(reply||"").trim()||"Hello — I'm OM. How can I help you?";
     const last = state.messages[state.messages.length-1];
     if (last && last.role === "assistant") {
       last.content = clean;

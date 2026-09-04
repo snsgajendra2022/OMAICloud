@@ -26,11 +26,8 @@ class KnowledgeGraphEngine:
 
 
     def learn(
-
         self,
-
-        text:str
-
+        text: str
     ):
 
 
@@ -61,6 +58,39 @@ class KnowledgeGraphEngine:
                 len(result["relations"])
 
         }
+
+
+    def process(
+        self,
+        entities,
+        source: str = "text",
+    ):
+        """Adapter for PDF / document semantic callers.
+
+        Accepts a dict of extracted entities (or free text) and returns a
+        graph-shaped payload compatible with ``om_ai.knowledge.graph``.
+        """
+        if isinstance(entities, str):
+            return self.learn(entities)
+
+        data = entities if isinstance(entities, dict) else {}
+        # Prefer shared graph builders when available
+        try:
+            from om_ai.knowledge.graph.engine import KnowledgeGraphEngine as GraphEngine
+
+            return GraphEngine().process(data, source)
+        except Exception:
+            # Fallback: learn from a synthetic text blob
+            blob = " ".join(f"{k} {v}" for k, v in data.items())
+            learned = self.learn(blob) if blob.strip() else {"entities": 0, "relations": 0}
+            return {
+                "entities": [
+                    {"name": str(v), "entity_type": str(k), "source": source}
+                    for k, v in data.items()
+                ],
+                "relations": [],
+                "store_stats": learned,
+            }
 
 
 

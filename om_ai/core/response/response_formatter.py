@@ -85,21 +85,75 @@ def ensure_public_reply(
     text: str,
     payload: dict[str, Any] | None = None,
 ) -> str:
-    """Last-mile gate: never show internal brain chrome to a normal user."""
+    """Last-mile gate: never show internal brain chrome to a normal user.
+
+    Does NOT invent canned coding/business templates when content is missing —
+    prefers facts/brain, then stripped text, then empty (so chat can fall through).
+    """
     if response_mode() == "developer":
         return (text or "").strip()
     fmt = ResponseFormatter()
     data = {**(payload or {}), "question": question, "answer": text or ""}
-    if looks_like_pipeline_dump(text or "") or not (text or "").strip():
-        out = fmt.format_user_response(data)
-    else:
-        out = fmt._strip_leaks(text or "")
-        if looks_like_pipeline_dump(out) or len(out) < 12:
-            out = fmt.format_user_response(data)
-    out = fmt._strip_leaks(out)
-    if looks_like_pipeline_dump(out) or not out.strip():
-        out = fmt._direct_answer(question, data)
-    return out.strip() + ("\n" if out.strip() else "")
+    raw = (text or "").strip()
+
+    # Prefer existing intelligence answer if real
+    intel = data.get("intelligence") if isinstance(data.get("intelligence"), dict) else {}
+    intel_answer = str(intel.get("answer") or "").strip()
+    if intel_answer and not looks_like_pipeline_dump(intel_answer):
+        try:
+            from om_ai.core.intelligence.real_answer import looks_like_static_reply
+
+            if not looks_like_static_reply(intel_answer):
+                return clean_user_response(intel_answer).strip() + "\n"
+        except Exception:
+            return clean_user_response(intel_answer).strip() + "\n"
+
+    if raw and not looks_like_pipeline_dump(raw):
+        out = fmt._strip_leaks(raw)
+        try:
+            from om_ai.core.intelligence.real_answer import looks_like_static_reply
+
+            if looks_like_static_reply(out):
+                out = ""
+        except Exception:
+            pass
+        if out.strip():
+            return out.strip() + "\n"
+
+    # Try facts / brain before any template
+    try:
+        from om_ai.core.intelligence.real_answer import build_real_answer
+
+        real = build_real_answer(question)
+        if real:
+            return real.strip() + "\n"
+    except Exception:
+        pass
+
+    curated = fmt._direct_answer(question, data)
+    if curated and not looks_like_pipeline_dump(curated):
+        try:
+            from om_ai.core.intelligence.real_answer import looks_like_static_reply
+
+            if not looks_like_static_reply(curated) and len(curated.strip()) > 20:
+                return curated.strip() + "\n"
+        except Exception:
+            if len(curated.strip()) > 20:
+                return curated.strip() + "\n"
+    # Empty → recover with dataset/reasoning fallback (never blank UI)
+    try:
+        from om_ai.agent.verifier import compose_fallback
+
+        intent_name = ""
+        intent = (payload or {}).get("intent") if isinstance(payload, dict) else {}
+        if isinstance(intent, dict):
+            intent_name = str(intent.get("intent") or "")
+        fb = compose_fallback(intent=intent_name or "chat", user_text=question)
+        if fb and fb.strip():
+            return fb.strip() + "\n"
+    except Exception:
+        pass
+    return "Hello — I’m OM. How can I help you?\n"
 
 
 class ResponseFormatter:

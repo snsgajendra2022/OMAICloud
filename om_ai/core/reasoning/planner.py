@@ -54,3 +54,37 @@ class PlanningEngine:
         elif intent.intent == "business":
             agents = ["master", "business", "data"]
         return PlanResult(plan=base, agents=agents, meta=meta)
+
+class Planner:
+
+
+    def create_plan(self, analysis):
+
+
+        goal = analysis["goal"]
+
+
+        if goal=="creation":
+
+            return [
+
+                "Understand requirements",
+
+                "Design architecture",
+
+                "Implement solution",
+
+                "Test",
+
+                "Deploy"
+
+            ]
+
+
+        return [
+
+            "Analyze",
+
+            "Answer"
+
+        ]

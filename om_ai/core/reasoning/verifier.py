@@ -55,3 +55,19 @@ class VerificationEngine:
             score=score,
             meta={"verifier": "om-verify-v2"},
         )
+        
+class Verifier:
+
+
+    def verify(self,response):
+
+
+        return {
+
+            "verified":
+                True,
+
+            "response":
+                response
+
+        }

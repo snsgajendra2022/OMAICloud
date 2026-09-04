@@ -48,15 +48,77 @@ class CognitiveIntelligence:
         capability = self.capability_router.route(intent)
         tools = self.tool_planner.plan(intent, capability, understanding)
 
+        # EXECUTE planned tools (was previously skipped — only stored in meta)
+        tool_out: dict[str, Any] = {}
+        try:
+            from om_ai.tools.chat_runner import execute_planned_tools, format_tool_context
+
+            tool_out = execute_planned_tools(
+                list(tools.get("tools") or []),
+                q,
+                context={
+                    **(context if isinstance(context, dict) else {}),
+                    "tenant_id": str(
+                        (context or {}).get("tenant_id")
+                        if isinstance(context, dict)
+                        else "default"
+                    ),
+                    "project_root": ".",
+                },
+            )
+            if isinstance(context, dict):
+                context["tool_results"] = tool_out
+                context["tool_context"] = format_tool_context(tool_out)
+        except Exception:
+            tool_out = {"skipped": True, "executed": [], "ok": False}
+
         # Think / plan trace (internal)
         plan = {
-            "stages": ["understand", "think", "retrieve", "plan", "generate", "verify", "reply"],
+            "stages": [
+                "understand",
+                "think",
+                "retrieve",
+                "plan",
+                "tools",
+                "generate",
+                "verify",
+                "reply",
+            ],
             "capability": capability.get("capability"),
             "tools": tools.get("tools"),
+            "tools_executed": tool_out.get("executed") or [],
+            "tools_ok": bool(tool_out.get("ok")),
             "confidence": intent.get("confidence"),
         }
 
         answer = self.capability_router.execute(capability, q, context, understanding)
+        # If capability empty but tools produced content — use tool output
+        if not (answer or "").strip() and tool_out.get("combined_text"):
+            answer = str(tool_out["combined_text"]).strip() + "\n"
+        # Empty / static-deferred → do not pretend we answered (chat falls through)
+        if not (answer or "").strip():
+            return {
+                "question": q,
+                "understanding": understanding,
+                "intent": intent,
+                "context": context,
+                "capability": {
+                    "id": capability.get("capability"),
+                    "intent": capability.get("intent"),
+                },
+                "tools": tools,
+                "plan": plan,
+                "answer": "",
+                "validation": {
+                    "passed": False,
+                    "score": 0.0,
+                    "issues": ["no real answer from capability"],
+                    "deferred": True,
+                },
+                "pipeline": plan["stages"],
+                "deferred": True,
+            }
+
         validation = self.validator.validate(
             q,
             answer,
@@ -75,6 +137,29 @@ class CognitiveIntelligence:
                 understanding=understanding,
                 intent=intent,
             )
+            if not (answer or "").strip():
+                validation = {
+                    "passed": False,
+                    "score": 0.0,
+                    "issues": ["correction empty"],
+                    "deferred": True,
+                }
+                return {
+                    "question": q,
+                    "understanding": understanding,
+                    "intent": intent,
+                    "context": context,
+                    "capability": {
+                        "id": capability.get("capability"),
+                        "intent": capability.get("intent"),
+                    },
+                    "tools": tools,
+                    "plan": plan,
+                    "answer": "",
+                    "validation": validation,
+                    "pipeline": plan["stages"],
+                    "deferred": True,
+                }
             validation = self.validator.validate(
                 q,
                 answer,
@@ -91,6 +176,23 @@ class CognitiveIntelligence:
                 context,
                 understanding,
             )
+            if not (answer or "").strip():
+                return {
+                    "question": q,
+                    "understanding": understanding,
+                    "intent": intent,
+                    "context": context,
+                    "capability": {
+                        "id": capability.get("capability"),
+                        "intent": capability.get("intent"),
+                    },
+                    "tools": tools,
+                    "plan": plan,
+                    "answer": "",
+                    "validation": {"passed": False, "score": 0.0, "deferred": True},
+                    "pipeline": plan["stages"],
+                    "deferred": True,
+                }
 
         return {
             "question": q,

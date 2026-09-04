@@ -335,3 +335,47 @@ class EntityExtractor:
 
 
         return text[start:end]
+
+        """
+OM AI Knowledge Graph Concept Extractor
+
+Extracts entities/concepts from
+documents and semantic understanding.
+"""
+
+
+class ConceptExtractor:
+
+
+    def extract(self, data):
+
+        concepts = []
+
+
+        if isinstance(data, dict):
+
+            for key, value in data.items():
+
+                concepts.append(
+                    {
+                        "name": str(value),
+                        "type": key
+                    }
+                )
+
+
+        elif isinstance(data, str):
+
+            words = data.split()
+
+            for word in words:
+
+                concepts.append(
+                    {
+                        "name": word,
+                        "type": "concept"
+                    }
+                )
+
+
+        return concepts

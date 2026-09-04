@@ -23,7 +23,18 @@ import httpx
 from om_ai.backends.base import NativeCheckpointError
 
 logger = logging.getLogger(__name__)
+try:
+    from om_ai.language import LanguageManager
 
+    _language_manager = LanguageManager()
+
+except Exception:
+
+    _language_manager = None
+
+    logger.debug(
+        "Language Intelligence Layer unavailable"
+    )
 BackendName = str  # "om_native" | "local" | "openai"
 
 
@@ -354,6 +365,660 @@ def chat_via_openai(
         raise RuntimeError(f"OpenAI-compatible API returned unexpected payload: {data!r}") from exc
 
 
+
+def _om_native_chat_reply_body(
+    *,
+    info: ChatBackendInfo,
+    messages: list[dict],
+    intel: Any,
+    kwargs: dict[str, Any],
+    native_chat: Callable[..., str] | None,
+    language_context: dict[str, Any] | None = None,
+    native_ready: bool,
+    tenant_id: str | None,
+    actor: str | None,
+    project_id: str | None,
+    project_instructions: str | None,
+) -> tuple[str, ChatBackendInfo]:
+    """Native chat cascade: understand/research/reason/generate — no static outlines."""
+    from om_ai.runtime.engine import EMPTY_GENERATION_FALLBACK, usable_generation_text
+    from om_ai.live_knowledge.freshness import is_greeting_like, is_om_self_query
+
+    user_text = _latest_user_text(messages)
+    if language_context is None:
+        language_context = {}
+
+    # Slightly warmer greetings so replies vary (still model-generated).
+    if is_greeting_like(user_text) or is_om_self_query(user_text):
+        kwargs["temperature"] = max(float(kwargs["temperature"]), 0.5)
+        kwargs["top_p"] = max(float(kwargs["top_p"]), 0.9)
+        kwargs["top_k"] = max(int(kwargs["top_k"]), 40)
+        kwargs["max_new_tokens"] = min(max(int(kwargs["max_new_tokens"]), 64), 96)
+        kwargs["min_new_tokens"] = 1
+        kwargs["repetition_penalty"] = max(float(kwargs["repetition_penalty"]), 1.08)
+
+    info_base = ChatBackendInfo(
+        backend=info.backend,
+        model=info.model,
+        detail=info.detail,
+        provider=info.provider,
+        live_knowledge={"intelligence": intel.meta} if intel.meta else None,
+    )
+    if intel.direct_reply:
+        return intel.direct_reply, info_base
+
+    # ── Upgraded chat pipeline ───────────────────────────────────────
+    # Language → Intent → Reasoning → Model → Language Check → Final
+    if _env_on("OM_CHAT_PIPELINE", "1"):
+        try:
+            from om_ai.runtime.chat_pipeline import run_chat_pipeline
+
+            piped = run_chat_pipeline(
+                user_text,
+                messages=messages,
+                native_chat=native_chat,
+                native_ready=native_ready,
+                kwargs=kwargs,
+                tenant_id=tenant_id or "default",
+                actor=actor or "",
+                project_id=project_id,
+                project_instructions=project_instructions or "",
+            )
+            ans = str(piped.get("answer") or "").strip()
+            if ans and not ResponseEcho.check(user_text, ans):
+                info_pipe = ChatBackendInfo(
+                    backend=info.backend,
+                    model=info.model,
+                    detail="chat_pipeline_v2",
+                    provider=info.provider,
+                    live_knowledge={
+                        "intelligence": intel.meta,
+                        "pipeline": piped.get("meta") or {},
+                        "stages": piped.get("stages") or [],
+                        "language": (piped.get("language") or {}).get("response_language"),
+                        "intent": (piped.get("intent") or {}).get("intent"),
+                    },
+                )
+                return ans if ans.endswith("\n") else ans + "\n", info_pipe
+        except Exception as exc:
+            logger.debug("chat_pipeline_v2 skipped: %s", exc)
+
+    # Universal multimodal + cognitive loop (preferred).
+    if _env_on("OM_UNIVERSAL_INTELLIGENCE", "1"):
+      try:
+        from om_ai.operating_intelligence.universal import UniversalIntelligence
+        from om_ai.core.response.response_formatter import (
+            ensure_public_reply,
+            looks_like_pipeline_dump,
+            response_mode,
+        )
+        from om_ai.response_engine import format_assistant_reply
+
+        uni = UniversalIntelligence().run(
+            user_text,
+            messages=messages,
+            project=project_id,
+        )
+        uni_ans = str(uni.get("answer") or "").strip()
+        if uni.get("deferred") or not uni_ans:
+            raise RuntimeError("universal deferred")
+        try:
+            from om_ai.core.intelligence.real_answer import looks_like_static_reply
+
+            if looks_like_static_reply(uni_ans):
+                raise RuntimeError("universal static rejected")
+        except ImportError:
+            pass
+        if uni_ans and not looks_like_pipeline_dump(uni_ans) and not ResponseEcho.check(user_text, uni_ans):
+            polished = format_assistant_reply(
+                uni_ans,
+                intent=str(uni.get("intent") or "chat"),
+                enhance=True,
+            )
+    # Universal / cognitive early returns — never polish to blank
+            if response_mode() != "developer":
+                polished = ensure_public_reply(user_text, polished, {
+                    "intent": {"intent": uni.get("intent")},
+                    "intelligence": uni.get("cognitive") or {},
+                })
+            if not (polished or "").strip():
+                raise RuntimeError("universal polished empty")
+            try:
+                from om_ai.core.intelligence.real_answer import looks_like_static_reply
+
+                # Only reject outline dumps — allow greetings
+                if looks_like_static_reply(polished) and len(polished) > 160:
+                    raise RuntimeError("universal polished static")
+            except ImportError:
+                pass
+            if not ResponseEcho.check(user_text, polished) and len(polished.strip()) >= 8:
+                info_uni = ChatBackendInfo(
+                    backend=info.backend,
+                    model=info.model,
+                    detail="universal_intelligence",
+                    provider=info.provider,
+                    live_knowledge={
+                        "intelligence": intel.meta,
+                        "universal": {
+                            "intent": uni.get("intent"),
+                            "capability": uni.get("capability"),
+                            "stages": uni.get("stages"),
+                            "modality": (uni.get("multimodal") or {}).get("modality"),
+                        },
+                    },
+                )
+                return polished, info_uni
+      except Exception as exc:
+        logger.debug("UniversalIntelligence skipped: %s", exc)
+
+    # Core cognitive intelligence (understand → capability → verify).
+    if _env_on("OM_COGNITIVE_INTELLIGENCE", "1"):
+      try:
+        from om_ai.core.intelligence import CognitiveIntelligence
+        from om_ai.core.response.response_formatter import (
+            ensure_public_reply,
+            looks_like_pipeline_dump,
+            response_mode,
+        )
+        from om_ai.response_engine import format_assistant_reply
+
+        cog_intel = CognitiveIntelligence().run(
+            user_text,
+            messages=messages,
+            project=project_id,
+        )
+        cog_ans = str(cog_intel.get("answer") or "").strip()
+        val = cog_intel.get("validation") or {}
+        # Skip deferred / empty / static outlines — continue to Absolute OS / model
+        if cog_intel.get("deferred") or not cog_ans:
+            raise RuntimeError("cognitive capability deferred")
+        try:
+            from om_ai.core.intelligence.real_answer import looks_like_static_reply
+
+            if looks_like_static_reply(cog_ans):
+                raise RuntimeError("static capability outline rejected")
+        except ImportError:
+            pass
+        if (
+            cog_ans
+            and not looks_like_pipeline_dump(cog_ans)
+            and float(val.get("score") or 0) >= 75
+            and not ResponseEcho.check(user_text, cog_ans)
+        ):
+            polished = format_assistant_reply(
+                cog_ans,
+                intent=str((cog_intel.get("intent") or {}).get("intent") or "chat"),
+                enhance=True,
+            )
+            if response_mode() != "developer":
+                polished = ensure_public_reply(user_text, polished, {
+                    "intent": cog_intel.get("intent") or {},
+                    "intelligence": cog_intel,
+                })
+            # Final echo guard
+            if not ResponseEcho.check(user_text, polished):
+                info_ci = ChatBackendInfo(
+                    backend=info.backend,
+                    model=info.model,
+                    detail="cognitive_intelligence",
+                    provider=info.provider,
+                    live_knowledge={
+                        "intelligence": intel.meta,
+                        "cognitive": {
+                            "intent": (cog_intel.get("understanding") or {}).get("intent"),
+                            "capability": (cog_intel.get("capability") or {}).get("id"),
+                            "score": val.get("score"),
+                        },
+                    },
+                )
+                return polished, info_ci
+      except Exception as exc:
+        logger.debug("CognitiveIntelligence skipped: %s", exc)
+
+    # Dynamic intelligence pipeline (generalizes; regex only as helper signals).
+    if _env_on("OM_DYNAMIC_INTELLIGENCE", "1"):
+      try:
+        from om_ai.intelligence import IntelligenceManager
+        from om_ai.core.response.response_formatter import (
+            ensure_public_reply,
+            looks_like_pipeline_dump,
+            response_mode,
+        )
+        from om_ai.response_engine import format_assistant_reply
+
+        dyn = IntelligenceManager().run(
+            user_text,
+            messages=messages,
+            project=project_id,
+        )
+        dyn_answer = str(dyn.get("answer") or "").strip()
+        if not dyn_answer:
+            raise RuntimeError("dynamic empty")
+        try:
+            from om_ai.core.intelligence.real_answer import looks_like_static_reply
+
+            if looks_like_static_reply(dyn_answer):
+                raise RuntimeError("dynamic static rejected")
+        except ImportError:
+            pass
+        if dyn_answer and not looks_like_pipeline_dump(dyn_answer) and not ResponseEcho.check(user_text, dyn_answer):
+            eval_ok = float((dyn.get("evaluation") or {}).get("score") or 0) >= 75
+            intent_name = str((dyn.get("intent") or {}).get("intent") or "")
+            # Date / calc / create_prompt can be short; everything else needs real length + score
+            allow_short = intent_name in {"datetime", "calculate", "chat", "create_prompt"}
+            if (eval_ok or allow_short) and (len(dyn_answer) >= 40 or allow_short):
+                polished = format_assistant_reply(
+                    dyn_answer,
+                    intent=intent_name or "chat",
+                    enhance=True,
+                )
+                if response_mode() != "developer":
+                    polished = ensure_public_reply(user_text, polished, {
+                        "intent": dyn.get("intent") or {},
+                        "intelligence": dyn,
+                    })
+                try:
+                    from om_ai.core.intelligence.real_answer import looks_like_static_reply
+
+                    if looks_like_static_reply(polished):
+                        raise RuntimeError("dynamic polished static")
+                except ImportError:
+                    pass
+                info_dyn = ChatBackendInfo(
+                    backend=info.backend,
+                    model=info.model,
+                    detail="dynamic_intelligence",
+                    provider=info.provider,
+                    live_knowledge={
+                        "intelligence": intel.meta,
+                        "dynamic": {
+                            "intent": intent_name,
+                            "agents": (dyn.get("agents") or {}).get("team"),
+                            "tools": (dyn.get("tools") or {}).get("tools"),
+                            "score": (dyn.get("evaluation") or {}).get("score"),
+                        },
+                    },
+                )
+                return polished, info_dyn
+      except Exception as exc:
+        logger.debug("IntelligenceManager skipped: %s", exc)
+
+    # Structured cognitive brain — instance.process(question), never import-time.
+    from om_ai.runtime.chat_orchestrator import run_cognitive_brain
+    from om_ai.response_engine import format_assistant_reply
+    from om_ai.understanding.query_kind import is_greeting, query_kind
+
+    skip_cog = is_greeting(user_text)
+    try:
+        if not skip_cog:
+            cog = run_cognitive_brain(user_text)
+            from om_ai.core.response.response_formatter import (
+                ensure_public_reply,
+                looks_like_pipeline_dump,
+                response_mode,
+            )
+
+            cog_answer = str(
+                cog.get("user_response") or cog.get("answer") or ""
+            ).strip()
+            if response_mode() == "developer":
+                cog_answer = str(cog.get("developer_response") or cog_answer).strip()
+            else:
+                cog_answer = ensure_public_reply(user_text, cog_answer, {
+                    "intent": cog.get("intent") or {},
+                    "technology": cog.get("technology") or {},
+                    "plan": (cog.get("tasks") or {}).get("tasks") or [],
+                    "architecture": (cog.get("reasoning") or {}).get("architecture") or [],
+                    "evaluation": cog.get("evaluation") or {},
+                })
+            if (
+                cog_answer
+                and len(cog_answer) > 20
+                and (response_mode() == "developer" or not looks_like_pipeline_dump(cog_answer))
+            ):
+                polished = format_assistant_reply(
+                    cog_answer,
+                    intent=query_kind(user_text),
+                    enhance=True,
+                )
+                if response_mode() != "developer":
+                    polished = ensure_public_reply(user_text, polished)
+                info_cog = ChatBackendInfo(
+                    backend=info.backend,
+                    model=info.model,
+                    detail=info.detail,
+                    provider=info.provider,
+                    live_knowledge={"intelligence": intel.meta} if intel.meta else None,
+                )
+                return polished, info_cog
+    except Exception as exc:
+        logger.debug("OMCognitiveBrain.process skipped: %s", exc)
+
+    # Absolute Intelligence OS — full cognitive cycle (memory/knowledge/reason/agents/learn)
+    absolute_on = (_env("OM_ABSOLUTE_OS") or "1").lower() not in {"0", "false", "no", "off"}
+    if absolute_on and user_text.strip() and not (
+        is_greeting_like(user_text) and len(user_text.split()) <= 4
+    ):
+        try:
+            from om_ai.operating_intelligence import OperatingIntelligence
+
+            cycle = OperatingIntelligence().run(
+                user_text,
+                context={
+                    "tenant_id": tenant_id or "default",
+                    "actor": actor or "",
+                    "project_id": project_id,
+                    "messages": messages,
+                    "project_instructions": project_instructions or "",
+                },
+                dry_run=True,
+            )
+            abs_reply = (cycle.response or "").strip()
+            if abs_reply and len(abs_reply) > 40:
+                info_abs = ChatBackendInfo(
+                    backend=info.backend,
+                    model=info.model,
+                    detail=info.detail,
+                    provider=info.provider,
+                    live_knowledge={
+                        "intelligence": intel.meta,
+                        "absolute_os": {
+                            "intent": (cycle.understood or {}).get("intent"),
+                            "agents": (cycle.agents or {}).get("agents"),
+                            "knowledge_source": (cycle.knowledge or {}).get("source"),
+                            "verification": cycle.verification,
+                            "growth_ok": bool((cycle.growth or {}).get("ok", True)),
+                        },
+                    },
+                )
+                # Still polish via response intelligence
+                from om_ai.response_engine import format_assistant_reply
+                from om_ai.core.response.intelligence import ensure_intelligent_response
+
+                try:
+                    repaired = ensure_intelligent_response(
+                        user_text,
+                        abs_reply,
+                        intent=str((cycle.understood or {}).get("intent") or "chat"),
+                    )
+                    polished = format_assistant_reply(
+                        repaired.get("final") or abs_reply,
+                        intent=str((cycle.understood or {}).get("intent") or "chat"),
+                        enhance=True,
+                    )
+                except Exception:
+                    polished = abs_reply
+                from om_ai.core.response.response_formatter import ensure_public_reply, response_mode
+
+                if response_mode() != "developer":
+                    polished = ensure_public_reply(user_text, polished)
+                return polished, info_abs
+        except Exception as exc:
+            logger.debug("absolute OS cycle skipped: %s", exc)
+
+    # Agent Brain v1: intent → memory/RAG/plan hints (self-owned, no external LLM).
+    from om_ai.agent import AgentBrain
+
+    brain_decision = AgentBrain().prepare(
+        messages,
+        tenant_id=tenant_id or "default",
+        actor=actor or "",
+        project_id=project_id,
+        project_instructions=project_instructions or "",
+    )
+    messages = brain_decision.packed_messages or messages
+
+    # Prefer a single short system for tiny OM-1.0 windows.
+    # Do NOT stack extra system lines — that breaks chat-SFT greets.
+    if is_greeting_like(user_text) or is_om_self_query(user_text):
+        extra = None
+    else:
+        extra = runtime_date_system_text_compact()
+        if intel.extra_system:
+            hint = intel.extra_system.strip()
+            if len(hint) > 120:
+                hint = hint[:117] + "..."
+            extra = f"{extra}\n{hint}" if extra else hint
+        if brain_decision.extra_system:
+            bh = brain_decision.extra_system.strip()
+            if len(bh) > 160:
+                bh = bh[:157] + "..."
+            extra = f"{extra}\n{bh}" if extra else bh
+
+    # Chat template: system + turns. Compact for tiny local windows.
+    messages = build_chat_messages(
+        messages,
+        compact=True,
+        extra_system=extra,
+    )
+    # Skip live web for greetings / OM-self so chat never becomes paste spam.
+    skip_live = is_greeting_like(user_text) or is_om_self_query(user_text)
+
+    lk_meta: dict[str, Any] = {}
+    if not skip_live:
+        try:
+            from om_ai.live_knowledge import enrich_messages_for_live_knowledge
+
+            messages, lk_meta = enrich_messages_for_live_knowledge(messages)
+        except Exception as exc:
+            logger.debug("live_knowledge enrich skipped: %s", exc)
+
+    grounded = (lk_meta.get("grounded_reply") or "").strip()
+    if grounded:
+        from om_ai.live_knowledge.engine import strip_live_knowledge_boilerplate
+
+        grounded = strip_live_knowledge_boilerplate(grounded)
+        if looks_like_web_spam(grounded):
+            grounded = ""
+    dataset_grounded = ""
+    if brain_decision.prefer_grounded:
+        dataset_grounded = brain_decision.prefer_grounded.strip()
+    if not grounded and dataset_grounded:
+        grounded = dataset_grounded
+    prefer_grounded = bool(lk_meta.get("prefer_grounded_reply")) and bool(grounded)
+    grounded_env = (_env("OM_LIVE_KNOWLEDGE_GROUNDED") or "0").lower()
+    live_grounded_allowed = (
+        grounded_env not in {"0", "false", "no", "off"} and not skip_live
+    )
+    # Dataset / RAG grounded answers are always allowed (local corpora, not web).
+    grounded_allowed = live_grounded_allowed or bool(dataset_grounded)
+    merged_lk = {
+        **({k: v for k, v in lk_meta.items() if k != "grounded_reply"} or {}),
+        "intelligence": intel.meta,
+    }
+    info_lk = ChatBackendInfo(
+        backend=info.backend,
+        model=info.model,
+        detail=info.detail,
+        provider=info.provider,
+        live_knowledge=merged_lk or None,
+    )
+    intent_v = brain_decision.intent.value
+
+    def _out(text: str) -> tuple[str, ChatBackendInfo]:
+        from om_ai.response_engine import format_assistant_reply
+        from om_ai.core.response.intelligence import ensure_intelligent_response
+        from om_ai.core.response.response_formatter import ensure_public_reply, response_mode
+
+        try:
+            repaired = ensure_intelligent_response(
+                user_text,
+                text or "",
+                intent=intent_v,
+            )
+            polished = format_assistant_reply(
+                repaired.get("final") or text or "",
+                intent=intent_v,
+                enhance=True,
+            )
+        except Exception:
+            polished = (text or "").strip()
+        if response_mode() != "developer":
+            polished = ensure_public_reply(user_text, polished, {
+                "intent": {"intent": intent_v},
+            })
+        # Never show a blank bubble in the UI
+        if not (polished or "").strip():
+            try:
+                from om_ai.agent.verifier import compose_fallback
+
+                polished = compose_fallback(intent=intent_v, user_text=user_text)
+            except Exception:
+                polished = "Hello — I’m OM. How can I help you?"
+            return (polished or "").strip() + "\n", info_lk
+        # OM Response Language Check
+        if _language_manager:
+            try:
+                response_lang = (
+                    language_context
+                    .get("response_language")
+                )
+                if response_lang:
+                    logger.info(
+                        "Response language: %s",
+                        response_lang
+                    )
+            
+            except Exception:
+                pass
+
+    # Prefer local dataset/RAG grounded reply before tiny-model garble.
+    if dataset_grounded and len(dataset_grounded) > 80:
+        return _out(dataset_grounded)
+
+    if prefer_grounded and live_grounded_allowed and grounded:
+        return _out(grounded)
+
+    if native_chat is None or not native_ready:
+        from om_ai.core.response.response_formatter import ensure_public_reply
+
+        public = ensure_public_reply(user_text, "")
+        if public.strip():
+            return _out(public)
+        raise NativeCheckpointError("OM-1.0 checkpoint unavailable.")
+
+    try:
+        text = native_chat(messages, **kwargs)
+    except NativeCheckpointError:
+        raise
+    except Exception as exc:
+        raise NativeCheckpointError(
+            f"OM-1.0 checkpoint unavailable. ({exc})"
+        ) from exc
+
+    # Model-first: accept usable generation; reject garbled tiny-model soup.
+    fail = is_low_quality_reply(text)
+    # Tiny models often start with "Hello" then derail — use Agent Brain fallback.
+    if (
+        not fail
+        and brain_decision.intent.value in {"greeting", "identity"}
+        and brain_decision.structured_fallback
+    ):
+        from om_ai.runtime.chat_orchestrator import (
+            is_nonsensical_smalltalk,
+            looks_like_assistant_chitchat,
+        )
+
+        probe = (usable_generation_text(text) or text or "").strip()
+        if is_nonsensical_smalltalk(probe) or not looks_like_assistant_chitchat(probe):
+            return _out(brain_decision.structured_fallback)
+
+    # Coding / planning: prefer structured reasoning if model is weak/garbled.
+    if fail and brain_decision.intent.value in {"coding", "agent", "knowledge"}:
+        rescued_early = brain_decision.after_model(text) or brain_decision.structured_fallback
+        if rescued_early:
+            return _out(rescued_early)
+
+    if not fail:
+        cleaned = usable_generation_text(text) or ""
+        cleaned = cleaned.lstrip(" ,.;:\"'`-—–")
+        if cleaned and looks_like_web_spam(cleaned):
+            first = re.split(r"(?<=[.!?।])\s+", cleaned, maxsplit=1)[0].strip()
+            if first and not looks_like_web_spam(first) and len(first) <= 160:
+                cleaned = first
+        # Memorized script line → warmer model re-samples (still not static text).
+        if cleaned and _looks_scripted(cleaned):
+            best = cleaned
+            try:
+                for attempt in range(3):
+                    alt_kwargs = dict(kwargs)
+                    alt_kwargs.update(
+                        {
+                            "temperature": 0.7 + 0.1 * attempt,
+                            "top_p": 0.92,
+                            "top_k": 60,
+                            "max_new_tokens": max(int(kwargs["max_new_tokens"]), 80),
+                            "repetition_penalty": max(
+                                float(kwargs["repetition_penalty"]), 1.18
+                            ),
+                        }
+                    )
+                    alt = native_chat(messages, **alt_kwargs)
+                    alt_fail = is_low_quality_reply(alt)
+                    if alt_fail:
+                        continue
+                    alt_clean = (usable_generation_text(alt) or "").lstrip(
+                        " ,.;:\"'`-—–"
+                    )
+                    if not alt_clean or looks_like_web_spam(alt_clean):
+                        continue
+                    if not _looks_scripted(alt_clean):
+                        return _out(alt_clean)
+                    best = alt_clean
+            except Exception as exc:
+                logger.debug("script diversify skipped: %s", exc)
+            # Prefer any model variant over injecting canned copy.
+            return _out(best)
+        if cleaned and not looks_like_web_spam(cleaned):
+            return _out(cleaned)
+        fail = "spam"
+
+    if grounded_allowed and grounded and not looks_like_web_spam(grounded):
+        return _out(grounded)
+
+    # Safer OM-1.0 retry with stronger anti-repetition (still model output only).
+    try:
+        retry_kwargs = dict(kwargs)
+        retry_kwargs.update(
+            {
+                "max_new_tokens": max(int(kwargs["max_new_tokens"]), 96),
+                "temperature": 0.4,
+                "top_p": 0.9,
+                "top_k": 40,
+                "repetition_penalty": max(float(kwargs["repetition_penalty"]), 1.12),
+                "min_new_tokens": 1,
+            }
+        )
+        retry = native_chat(messages, **retry_kwargs)
+        retry_fail = is_low_quality_reply(retry)
+        if not retry_fail:
+            retry = (usable_generation_text(retry) or "").lstrip(" ,.;:\"'`-—–")
+            if retry and not looks_like_web_spam(retry):
+                return _out(retry)
+            retry_fail = "spam"
+        if retry_fail:
+            fail = retry_fail
+    except Exception as exc:
+        logger.debug("native retry skipped: %s", exc)
+
+    # Agent Brain structured fallback (coding/agent/knowledge) before empty hint.
+    rescued = brain_decision.after_model(None)
+    if not rescued and brain_decision.structured_fallback:
+        rescued = brain_decision.structured_fallback
+    if rescued:
+        return _out(rescued)
+
+    # Last resort — never return blank / "(empty reply)"
+    try:
+        from om_ai.agent.verifier import compose_fallback
+
+        fb = compose_fallback(intent=intent_v, user_text=user_text)
+        if fb and fb.strip():
+            return _out(fb)
+    except Exception:
+        pass
+    return _out("Hello — I’m OM. How can I help you?")
+
 def chat_reply(
     messages: list[dict],
     *,
@@ -372,7 +1037,17 @@ def chat_reply(
     project_instructions: str = "",
     project_id: str | None = None,
 ) -> tuple[str, ChatBackendInfo]:
-    """Generate a chat reply and return ``(text, backend_info)``."""
+    """Generate a chat reply and return ``(text, backend_info)``.
+
+    Pipeline: Language → Memory → Intent → Reasoning → Model → Language Check → Final
+    """
+    from om_ai.runtime.chat_orchestrator import (
+        build_chat_messages,
+        generation_config,
+        is_low_quality_reply,
+    )
+    from om_ai.runtime.intelligence import enrich_for_chat
+
     # Sanitize legacy UI tool tags from user turns.
     cleaned_messages = []
     for m in messages or []:
@@ -384,15 +1059,18 @@ def chat_reply(
             content = content.strip()
         cleaned_messages.append({"role": role, "content": content})
     messages = cleaned_messages
-    from om_ai.runtime.chat_orchestrator import (
-        build_chat_messages,
-        generation_config,
-        is_low_quality_reply,
-    )
-    from om_ai.runtime.intelligence import enrich_for_chat
+
+    # Language intelligence (optional, never blocks chat)
+    language_context: dict[str, Any] = {}
+    if _language_manager is not None:
+        try:
+            language_context = _language_manager.process(_latest_user_text(messages)) or {}
+            logger.info("OM Language detected: %s", language_context.get("language"))
+        except Exception as exc:
+            logger.debug("Language intelligence skipped: %s", exc)
+            language_context = {}
 
     info = resolve_backend(local_loaded=local_loaded, native_ready=native_ready)
-    # Prefer natural sampling for OM-1.0; clamp only extreme UI values.
     if info.backend == "om_native":
         env_temp = _env_float("OM_CHAT_TEMPERATURE", 0.45)
         env_max = _env_int("OM_CHAT_MAX_NEW_TOKENS", 96)
@@ -434,542 +1112,37 @@ def chat_reply(
         compact=True,
     )
 
-    # --- OM native: NO silent Ollama/OpenAI fallback ---
+    if language_context.get("response_language") or language_context.get("language"):
+        lang = language_context.get("response_language") or language_context.get("language")
+        instruction = language_context.get("instruction") or (
+            f"Reply in the same language as the user ({lang})."
+        )
+        messages = list(messages) + [
+            {
+                "role": "system",
+                "content": f"Language context:\nUser language: {lang}\n{instruction}",
+            }
+        ]
+
     if info.backend == "om_native":
-        # Native weights are preferred, but the cognitive brain can still answer
-        # if the checkpoint/tokenizer failed to load (no third-party LLM fallback).
-        from om_ai.runtime.engine import EMPTY_GENERATION_FALLBACK, usable_generation_text
-
-        user_text = _latest_user_text(messages)
-        from om_ai.live_knowledge.freshness import is_greeting_like, is_om_self_query
-
-        # Slightly warmer greetings so replies vary (still model-generated).
-        if is_greeting_like(user_text) or is_om_self_query(user_text):
-            kwargs["temperature"] = max(float(kwargs["temperature"]), 0.5)
-            kwargs["top_p"] = max(float(kwargs["top_p"]), 0.9)
-            kwargs["top_k"] = max(int(kwargs["top_k"]), 40)
-            kwargs["max_new_tokens"] = min(max(int(kwargs["max_new_tokens"]), 64), 96)
-            kwargs["min_new_tokens"] = 1
-            kwargs["repetition_penalty"] = max(float(kwargs["repetition_penalty"]), 1.08)
-
-        info_base = ChatBackendInfo(
-            backend=info.backend,
-            model=info.model,
-            detail=info.detail,
-            provider=info.provider,
-            live_knowledge={"intelligence": intel.meta} if intel.meta else None,
-        )
-        if intel.direct_reply:
-            return intel.direct_reply, info_base
-
-        # Universal multimodal + cognitive loop (preferred).
-        if _env_on("OM_UNIVERSAL_INTELLIGENCE", "1"):
-          try:
-            from om_ai.operating_intelligence.universal import UniversalIntelligence
-            from om_ai.core.response.response_formatter import (
-                ensure_public_reply,
-                looks_like_pipeline_dump,
-                response_mode,
-            )
-            from om_ai.response_engine import format_assistant_reply
-
-            uni = UniversalIntelligence().run(
-                user_text,
-                messages=messages,
-                project=project_id,
-            )
-            uni_ans = str(uni.get("answer") or "").strip()
-            if uni_ans and not looks_like_pipeline_dump(uni_ans) and not ResponseEcho.check(user_text, uni_ans):
-                polished = format_assistant_reply(
-                    uni_ans,
-                    intent=str(uni.get("intent") or "chat"),
-                    enhance=True,
-                )
-                if response_mode() != "developer":
-                    polished = ensure_public_reply(user_text, polished, {
-                        "intent": {"intent": uni.get("intent")},
-                        "intelligence": uni.get("cognitive") or {},
-                    })
-                if not ResponseEcho.check(user_text, polished):
-                    info_uni = ChatBackendInfo(
-                        backend=info.backend,
-                        model=info.model,
-                        detail="universal_intelligence",
-                        provider=info.provider,
-                        live_knowledge={
-                            "intelligence": intel.meta,
-                            "universal": {
-                                "intent": uni.get("intent"),
-                                "capability": uni.get("capability"),
-                                "stages": uni.get("stages"),
-                                "modality": (uni.get("multimodal") or {}).get("modality"),
-                            },
-                        },
-                    )
-                    return polished, info_uni
-          except Exception as exc:
-            logger.debug("UniversalIntelligence skipped: %s", exc)
-
-        # Core cognitive intelligence (understand → capability → verify).
-        if _env_on("OM_COGNITIVE_INTELLIGENCE", "1"):
-          try:
-            from om_ai.core.intelligence import CognitiveIntelligence
-            from om_ai.core.response.response_formatter import (
-                ensure_public_reply,
-                looks_like_pipeline_dump,
-                response_mode,
-            )
-            from om_ai.response_engine import format_assistant_reply
-
-            cog_intel = CognitiveIntelligence().run(
-                user_text,
-                messages=messages,
-                project=project_id,
-            )
-            cog_ans = str(cog_intel.get("answer") or "").strip()
-            val = cog_intel.get("validation") or {}
-            if (
-                cog_ans
-                and not looks_like_pipeline_dump(cog_ans)
-                and float(val.get("score") or 0) >= 60
-                and not ResponseEcho.check(user_text, cog_ans)
-            ):
-                polished = format_assistant_reply(
-                    cog_ans,
-                    intent=str((cog_intel.get("intent") or {}).get("intent") or "chat"),
-                    enhance=True,
-                )
-                if response_mode() != "developer":
-                    polished = ensure_public_reply(user_text, polished, {
-                        "intent": cog_intel.get("intent") or {},
-                        "intelligence": cog_intel,
-                    })
-                # Final echo guard
-                if not ResponseEcho.check(user_text, polished):
-                    info_ci = ChatBackendInfo(
-                        backend=info.backend,
-                        model=info.model,
-                        detail="cognitive_intelligence",
-                        provider=info.provider,
-                        live_knowledge={
-                            "intelligence": intel.meta,
-                            "cognitive": {
-                                "intent": (cog_intel.get("understanding") or {}).get("intent"),
-                                "capability": (cog_intel.get("capability") or {}).get("id"),
-                                "score": val.get("score"),
-                            },
-                        },
-                    )
-                    return polished, info_ci
-          except Exception as exc:
-            logger.debug("CognitiveIntelligence skipped: %s", exc)
-
-        # Dynamic intelligence pipeline (generalizes; regex only as helper signals).
-        if _env_on("OM_DYNAMIC_INTELLIGENCE", "1"):
-          try:
-            from om_ai.intelligence import IntelligenceManager
-            from om_ai.core.response.response_formatter import (
-                ensure_public_reply,
-                looks_like_pipeline_dump,
-                response_mode,
-            )
-            from om_ai.response_engine import format_assistant_reply
-
-            dyn = IntelligenceManager().run(
-                user_text,
-                messages=messages,
-                project=project_id,
-            )
-            dyn_answer = str(dyn.get("answer") or "").strip()
-            if dyn_answer and not looks_like_pipeline_dump(dyn_answer) and not ResponseEcho.check(user_text, dyn_answer):
-                eval_ok = float((dyn.get("evaluation") or {}).get("score") or 0) >= 70
-                intent_name = str((dyn.get("intent") or {}).get("intent") or "")
-                prefer_dyn = intent_name in {
-                    "chat",
-                    "datetime",
-                    "recommend",
-                    "create_prompt",
-                    "question",
-                    "explain",
-                    "research",
-                    "summarize",
-                    "compare",
-                    "analyze",
-                    "plan",
-                    "calculate",
-                } or eval_ok
-                if prefer_dyn and len(dyn_answer) >= 8:
-                    polished = format_assistant_reply(
-                        dyn_answer,
-                        intent=intent_name or "chat",
-                        enhance=True,
-                    )
-                    if response_mode() != "developer":
-                        polished = ensure_public_reply(user_text, polished, {
-                            "intent": dyn.get("intent") or {},
-                            "intelligence": dyn,
-                        })
-                    info_dyn = ChatBackendInfo(
-                        backend=info.backend,
-                        model=info.model,
-                        detail="dynamic_intelligence",
-                        provider=info.provider,
-                        live_knowledge={
-                            "intelligence": intel.meta,
-                            "dynamic": {
-                                "intent": intent_name,
-                                "agents": (dyn.get("agents") or {}).get("team"),
-                                "tools": (dyn.get("tools") or {}).get("tools"),
-                                "score": (dyn.get("evaluation") or {}).get("score"),
-                            },
-                        },
-                    )
-                    return polished, info_dyn
-          except Exception as exc:
-            logger.debug("IntelligenceManager skipped: %s", exc)
-
-        # Structured cognitive brain — instance.process(question), never import-time.
-        from om_ai.runtime.chat_orchestrator import run_cognitive_brain
-        from om_ai.response_engine import format_assistant_reply
-        from om_ai.understanding.query_kind import is_greeting, query_kind
-
-        skip_cog = is_greeting(user_text)
+        os.environ["_OM_IN_CHAT_REPLY"] = "1"
         try:
-            if not skip_cog:
-                cog = run_cognitive_brain(user_text)
-                from om_ai.core.response.response_formatter import (
-                    ensure_public_reply,
-                    looks_like_pipeline_dump,
-                    response_mode,
-                )
-
-                cog_answer = str(
-                    cog.get("user_response") or cog.get("answer") or ""
-                ).strip()
-                if response_mode() == "developer":
-                    cog_answer = str(cog.get("developer_response") or cog_answer).strip()
-                else:
-                    cog_answer = ensure_public_reply(user_text, cog_answer, {
-                        "intent": cog.get("intent") or {},
-                        "technology": cog.get("technology") or {},
-                        "plan": (cog.get("tasks") or {}).get("tasks") or [],
-                        "architecture": (cog.get("reasoning") or {}).get("architecture") or [],
-                        "evaluation": cog.get("evaluation") or {},
-                    })
-                if (
-                    cog_answer
-                    and len(cog_answer) > 20
-                    and (response_mode() == "developer" or not looks_like_pipeline_dump(cog_answer))
-                ):
-                    polished = format_assistant_reply(
-                        cog_answer,
-                        intent=query_kind(user_text),
-                        enhance=True,
-                    )
-                    if response_mode() != "developer":
-                        polished = ensure_public_reply(user_text, polished)
-                    info_cog = ChatBackendInfo(
-                        backend=info.backend,
-                        model=info.model,
-                        detail=info.detail,
-                        provider=info.provider,
-                        live_knowledge={"intelligence": intel.meta} if intel.meta else None,
-                    )
-                    return polished, info_cog
-        except Exception as exc:
-            logger.debug("OMCognitiveBrain.process skipped: %s", exc)
-
-        # Absolute Intelligence OS — full cognitive cycle (memory/knowledge/reason/agents/learn)
-        absolute_on = (_env("OM_ABSOLUTE_OS") or "1").lower() not in {"0", "false", "no", "off"}
-        if absolute_on and user_text.strip() and not (
-            is_greeting_like(user_text) and len(user_text.split()) <= 4
-        ):
-            try:
-                from om_ai.operating_intelligence import OperatingIntelligence
-
-                cycle = OperatingIntelligence().run(
-                    user_text,
-                    context={
-                        "tenant_id": tenant_id or "default",
-                        "actor": actor or "",
-                        "project_id": project_id,
-                        "messages": messages,
-                        "project_instructions": project_instructions or "",
-                    },
-                    dry_run=True,
-                )
-                abs_reply = (cycle.response or "").strip()
-                if abs_reply and len(abs_reply) > 40:
-                    info_abs = ChatBackendInfo(
-                        backend=info.backend,
-                        model=info.model,
-                        detail=info.detail,
-                        provider=info.provider,
-                        live_knowledge={
-                            "intelligence": intel.meta,
-                            "absolute_os": {
-                                "intent": (cycle.understood or {}).get("intent"),
-                                "agents": (cycle.agents or {}).get("agents"),
-                                "knowledge_source": (cycle.knowledge or {}).get("source"),
-                                "verification": cycle.verification,
-                                "growth_ok": bool((cycle.growth or {}).get("ok", True)),
-                            },
-                        },
-                    )
-                    # Still polish via response intelligence
-                    from om_ai.response_engine import format_assistant_reply
-                    from om_ai.core.response.intelligence import ensure_intelligent_response
-
-                    try:
-                        repaired = ensure_intelligent_response(
-                            user_text,
-                            abs_reply,
-                            intent=str((cycle.understood or {}).get("intent") or "chat"),
-                        )
-                        polished = format_assistant_reply(
-                            repaired.get("final") or abs_reply,
-                            intent=str((cycle.understood or {}).get("intent") or "chat"),
-                            enhance=True,
-                        )
-                    except Exception:
-                        polished = abs_reply
-                    from om_ai.core.response.response_formatter import ensure_public_reply, response_mode
-
-                    if response_mode() != "developer":
-                        polished = ensure_public_reply(user_text, polished)
-                    return polished, info_abs
-            except Exception as exc:
-                logger.debug("absolute OS cycle skipped: %s", exc)
-
-        # Agent Brain v1: intent → memory/RAG/plan hints (self-owned, no external LLM).
-        from om_ai.agent import AgentBrain
-
-        brain_decision = AgentBrain().prepare(
-            messages,
-            tenant_id=tenant_id or "default",
-            actor=actor or "",
-            project_id=project_id,
-            project_instructions=project_instructions or "",
-        )
-        messages = brain_decision.packed_messages or messages
-
-        # Prefer a single short system for tiny OM-1.0 windows.
-        # Do NOT stack extra system lines — that breaks chat-SFT greets.
-        if is_greeting_like(user_text) or is_om_self_query(user_text):
-            extra = None
-        else:
-            extra = runtime_date_system_text_compact()
-            if intel.extra_system:
-                hint = intel.extra_system.strip()
-                if len(hint) > 120:
-                    hint = hint[:117] + "..."
-                extra = f"{extra}\n{hint}" if extra else hint
-            if brain_decision.extra_system:
-                bh = brain_decision.extra_system.strip()
-                if len(bh) > 160:
-                    bh = bh[:157] + "..."
-                extra = f"{extra}\n{bh}" if extra else bh
-
-        # Chat template: system + turns. Compact for tiny local windows.
-        messages = build_chat_messages(
-            messages,
-            compact=True,
-            extra_system=extra,
-        )
-        # Skip live web for greetings / OM-self so chat never becomes paste spam.
-        skip_live = is_greeting_like(user_text) or is_om_self_query(user_text)
-
-        lk_meta: dict[str, Any] = {}
-        if not skip_live:
-            try:
-                from om_ai.live_knowledge import enrich_messages_for_live_knowledge
-
-                messages, lk_meta = enrich_messages_for_live_knowledge(messages)
-            except Exception as exc:
-                logger.debug("live_knowledge enrich skipped: %s", exc)
-
-        grounded = (lk_meta.get("grounded_reply") or "").strip()
-        if grounded:
-            from om_ai.live_knowledge.engine import strip_live_knowledge_boilerplate
-
-            grounded = strip_live_knowledge_boilerplate(grounded)
-            if looks_like_web_spam(grounded):
-                grounded = ""
-        dataset_grounded = ""
-        if brain_decision.prefer_grounded:
-            dataset_grounded = brain_decision.prefer_grounded.strip()
-        if not grounded and dataset_grounded:
-            grounded = dataset_grounded
-        prefer_grounded = bool(lk_meta.get("prefer_grounded_reply")) and bool(grounded)
-        grounded_env = (_env("OM_LIVE_KNOWLEDGE_GROUNDED") or "0").lower()
-        live_grounded_allowed = (
-            grounded_env not in {"0", "false", "no", "off"} and not skip_live
-        )
-        # Dataset / RAG grounded answers are always allowed (local corpora, not web).
-        grounded_allowed = live_grounded_allowed or bool(dataset_grounded)
-        merged_lk = {
-            **({k: v for k, v in lk_meta.items() if k != "grounded_reply"} or {}),
-            "intelligence": intel.meta,
-        }
-        info_lk = ChatBackendInfo(
-            backend=info.backend,
-            model=info.model,
-            detail=info.detail,
-            provider=info.provider,
-            live_knowledge=merged_lk or None,
-        )
-        intent_v = brain_decision.intent.value
-
-        def _out(text: str) -> tuple[str, ChatBackendInfo]:
-            from om_ai.response_engine import format_assistant_reply
-            from om_ai.core.response.intelligence import ensure_intelligent_response
-            from om_ai.core.response.response_formatter import ensure_public_reply, response_mode
-
-            try:
-                repaired = ensure_intelligent_response(
-                    user_text,
-                    text or "",
-                    intent=intent_v,
-                )
-                polished = format_assistant_reply(
-                    repaired.get("final") or text or "",
-                    intent=intent_v,
-                    enhance=True,
-                )
-            except Exception:
-                polished = (text or "").strip()
-            if response_mode() != "developer":
-                polished = ensure_public_reply(user_text, polished)
-            return polished, info_lk
-
-        # Prefer local dataset/RAG grounded reply before tiny-model garble.
-        if dataset_grounded and len(dataset_grounded) > 80:
-            return _out(dataset_grounded)
-
-        if prefer_grounded and live_grounded_allowed and grounded:
-            return _out(grounded)
-
-        if native_chat is None or not native_ready:
-            from om_ai.core.response.response_formatter import ensure_public_reply
-
-            public = ensure_public_reply(user_text, "")
-            if public.strip():
-                return _out(public)
-            raise NativeCheckpointError("OM-1.0 checkpoint unavailable.")
-
-        try:
-            text = native_chat(messages, **kwargs)
-        except NativeCheckpointError:
-            raise
-        except Exception as exc:
-            raise NativeCheckpointError(
-                f"OM-1.0 checkpoint unavailable. ({exc})"
-            ) from exc
-
-        # Model-first: accept usable generation; reject garbled tiny-model soup.
-        fail = is_low_quality_reply(text)
-        # Tiny models often start with "Hello" then derail — use Agent Brain fallback.
-        if (
-            not fail
-            and brain_decision.intent.value in {"greeting", "identity"}
-            and brain_decision.structured_fallback
-        ):
-            from om_ai.runtime.chat_orchestrator import (
-                is_nonsensical_smalltalk,
-                looks_like_assistant_chitchat,
+            return _om_native_chat_reply_body(
+                info=info,
+                messages=messages,
+                intel=intel,
+                kwargs=kwargs,
+                language_context=language_context,
+                native_chat=native_chat,
+                native_ready=native_ready,
+                tenant_id=tenant_id,
+                actor=actor,
+                project_id=project_id,
+                project_instructions=project_instructions,
             )
+        finally:
+            os.environ.pop("_OM_IN_CHAT_REPLY", None)
 
-            probe = (usable_generation_text(text) or text or "").strip()
-            if is_nonsensical_smalltalk(probe) or not looks_like_assistant_chitchat(probe):
-                return _out(brain_decision.structured_fallback)
-
-        # Coding / planning: prefer structured reasoning if model is weak/garbled.
-        if fail and brain_decision.intent.value in {"coding", "agent", "knowledge"}:
-            rescued_early = brain_decision.after_model(text) or brain_decision.structured_fallback
-            if rescued_early:
-                return _out(rescued_early)
-
-        if not fail:
-            cleaned = usable_generation_text(text) or ""
-            cleaned = cleaned.lstrip(" ,.;:\"'`-—–")
-            if cleaned and looks_like_web_spam(cleaned):
-                first = re.split(r"(?<=[.!?।])\s+", cleaned, maxsplit=1)[0].strip()
-                if first and not looks_like_web_spam(first) and len(first) <= 160:
-                    cleaned = first
-            # Memorized script line → warmer model re-samples (still not static text).
-            if cleaned and _looks_scripted(cleaned):
-                best = cleaned
-                try:
-                    for attempt in range(3):
-                        alt_kwargs = dict(kwargs)
-                        alt_kwargs.update(
-                            {
-                                "temperature": 0.7 + 0.1 * attempt,
-                                "top_p": 0.92,
-                                "top_k": 60,
-                                "max_new_tokens": max(int(kwargs["max_new_tokens"]), 80),
-                                "repetition_penalty": max(
-                                    float(kwargs["repetition_penalty"]), 1.18
-                                ),
-                            }
-                        )
-                        alt = native_chat(messages, **alt_kwargs)
-                        alt_fail = is_low_quality_reply(alt)
-                        if alt_fail:
-                            continue
-                        alt_clean = (usable_generation_text(alt) or "").lstrip(
-                            " ,.;:\"'`-—–"
-                        )
-                        if not alt_clean or looks_like_web_spam(alt_clean):
-                            continue
-                        if not _looks_scripted(alt_clean):
-                            return _out(alt_clean)
-                        best = alt_clean
-                except Exception as exc:
-                    logger.debug("script diversify skipped: %s", exc)
-                # Prefer any model variant over injecting canned copy.
-                return _out(best)
-            if cleaned and not looks_like_web_spam(cleaned):
-                return _out(cleaned)
-            fail = "spam"
-
-        if grounded_allowed and grounded and not looks_like_web_spam(grounded):
-            return _out(grounded)
-
-        # Safer OM-1.0 retry with stronger anti-repetition (still model output only).
-        try:
-            retry_kwargs = dict(kwargs)
-            retry_kwargs.update(
-                {
-                    "max_new_tokens": max(int(kwargs["max_new_tokens"]), 96),
-                    "temperature": 0.4,
-                    "top_p": 0.9,
-                    "top_k": 40,
-                    "repetition_penalty": max(float(kwargs["repetition_penalty"]), 1.12),
-                    "min_new_tokens": 1,
-                }
-            )
-            retry = native_chat(messages, **retry_kwargs)
-            retry_fail = is_low_quality_reply(retry)
-            if not retry_fail:
-                retry = (usable_generation_text(retry) or "").lstrip(" ,.;:\"'`-—–")
-                if retry and not looks_like_web_spam(retry):
-                    return _out(retry)
-                retry_fail = "spam"
-            if retry_fail:
-                fail = retry_fail
-        except Exception as exc:
-            logger.debug("native retry skipped: %s", exc)
-
-        # Agent Brain structured fallback (coding/agent/knowledge) before empty hint.
-        rescued = brain_decision.after_model(None)
-        if not rescued and brain_decision.structured_fallback:
-            rescued = brain_decision.structured_fallback
-        if rescued:
-            return _out(rescued)
-
-        # No static chat templates — only the engine empty hint if model failed.
-        return _out(EMPTY_GENERATION_FALLBACK)
     messages = with_runtime_date_context(messages)
     if info.backend == "openai":
         text = chat_via_openai(

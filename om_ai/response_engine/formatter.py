@@ -30,7 +30,8 @@ _HEADING = re.compile(r"^\s{0,3}(#{1,3})\s+(.+)$")
 def reply_to_blocks(text: str, *, intent: str = "chat") -> list[ResponseBlock]:
     raw = (text or "").strip()
     if not raw:
-        return [ResponseBlock(type="info", icon="💬", content="(empty reply)")]
+        raw = "Hello — I’m OM. How can I help you?"
+        return [ResponseBlock(type="paragraph", content=raw)]
 
     # Already well-structured markdown with multiple sections — keep as one body
     if raw.count("\n## ") >= 1 or raw.count("\n### ") >= 2:

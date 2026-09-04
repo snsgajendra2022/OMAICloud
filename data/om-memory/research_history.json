@@ -201,5 +201,405 @@
       "summary": "",
       "confidence": 0.0
     }
+  },
+  {
+    "plan": {
+      "question": "what is this",
+      "steps": [
+        "Understand research objective",
+        "Collect relevant information",
+        "Analyze collected data",
+        "Validate important facts",
+        "Generate research summary"
+      ]
+    },
+    "analysis": {
+      "key_points": [],
+      "source_count": 0
+    },
+    "validation": {
+      "validated": true,
+      "confidence": 0.0,
+      "checked_items": 0
+    },
+    "result": {
+      "summary": "",
+      "confidence": 0.0
+    }
+  },
+  {
+    "plan": {
+      "question": "what is the project name",
+      "steps": [
+        "Understand research objective",
+        "Collect relevant information",
+        "Analyze collected data",
+        "Validate important facts",
+        "Generate research summary"
+      ]
+    },
+    "analysis": {
+      "key_points": [],
+      "source_count": 0
+    },
+    "validation": {
+      "validated": true,
+      "confidence": 0.0,
+      "checked_items": 0
+    },
+    "result": {
+      "summary": "",
+      "confidence": 0.0
+    }
+  },
+  {
+    "plan": {
+      "question": "what is this Research notes:\n{'plan': {'question': 'what is the project name', 'steps': ['Understand research objective', 'Collect relevant information', 'Analyze collected data', 'Validate important facts', 'Generate research summary']}, 'analysis': {'key_points': [], 'source_count': 0}, 'validation': {'validated': True, 'confidence': 0.0, 'checked_items': 0}, 'result': {'summary': '', 'confidence': 0.0}}",
+      "steps": [
+        "Understand research objective",
+        "Collect relevant information",
+        "Analyze collected data",
+        "Validate important facts",
+        "Generate research summary"
+      ]
+    },
+    "analysis": {
+      "key_points": [],
+      "source_count": 0
+    },
+    "validation": {
+      "validated": true,
+      "confidence": 0.0,
+      "checked_items": 0
+    },
+    "result": {
+      "summary": "",
+      "confidence": 0.0
+    }
+  },
+  {
+    "plan": {
+      "question": "Research notes:\n{'plan': {'question': \"what is this Research notes:\\n{'plan': {'question': 'what is the project name', 'steps': ['Understand research objective', 'Collect relevant information', 'Analyze collected data', 'Validate important facts', 'Generate research summary']}, 'analysis': {'key_points': [], 'source_count': 0}, 'validation': {'validated': True, 'confidence': 0.0, 'checked_items': 0}, 'result': {'summary': '', 'confidence': 0.0}}\", 'steps': ['Understand research objective', 'Collect relevant information', 'Analyze collected data', 'Validate important facts', 'Generate research summary']}, 'analysis': {'key_points': [], 'source_count': 0}, 'validation': {'validated': True, 'confidence': 0.0, 'checked_items': 0}, 'result': {'summary': '', 'confidence': 0.0}}",
+      "steps": [
+        "Understand research objective",
+        "Collect relevant information",
+        "Analyze collected data",
+        "Validate important facts",
+        "Generate research summary"
+      ]
+    },
+    "analysis": {
+      "key_points": [],
+      "source_count": 0
+    },
+    "validation": {
+      "validated": true,
+      "confidence": 0.0,
+      "checked_items": 0
+    },
+    "result": {
+      "summary": "",
+      "confidence": 0.0
+    }
+  },
+  {
+    "plan": {
+      "question": "Research notes:\n{'plan': {'question': 'Research notes:\\n{\\'plan\\': {\\'question\\': \"what is this Research notes:\\\\n{\\'plan\\': {\\'question\\': \\'what is the project name\\', \\'steps\\': [\\'Understand research objective\\', \\'Collect relevant information\\', \\'Analyze collected data\\', \\'Validate important facts\\', \\'Generate research summary\\']}, \\'analysis\\': {\\'key_points\\': [], \\'source_count\\': 0}, \\'validation\\': {\\'validated\\': True, \\'confidence\\': 0.0, \\'checked_items\\': 0}, \\'result\\': {\\'summary\\': \\'\\', \\'confidence\\': 0.0}}\", \\'steps\\': [\\'Understand research objective\\', \\'Collect relevant information\\', \\'Analyze collected data\\', \\'Validate important facts\\', \\'Generate research summary\\']}, \\'analysis\\': {\\'key_points\\': [], \\'source_count\\': 0}, \\'validation\\': {\\'validated\\': True, \\'confidence\\': 0.0, \\'checked_items\\': 0}, \\'result\\': {\\'summary\\': \\'\\', \\'confidence\\': 0.0}}', 'steps': ['Understand research objective', 'Collect relevant information', 'Analyze collected data', 'Validate important facts', 'Generate research summary']}, 'analysis': {'key_points': [], 'source_count': 0}, 'validation': {'validated': True, 'confidence': 0.0, 'checked_items': 0}, 'result': {'summary': '', 'confidence': 0.0}}",
+      "steps": [
+        "Understand research objective",
+        "Collect relevant information",
+        "Analyze collected data",
+        "Validate important facts",
+        "Generate research summary"
+      ]
+    },
+    "analysis": {
+      "key_points": [],
+      "source_count": 0
+    },
+    "validation": {
+      "validated": true,
+      "confidence": 0.0,
+      "checked_items": 0
+    },
+    "result": {
+      "summary": "",
+      "confidence": 0.0
+    }
+  },
+  {
+    "plan": {
+      "question": "Research notes:\n{'plan': {'question': 'Research notes:\\n{\\'plan\\': {\\'question\\': \\'Research notes:\\\\n{\\\\\\'plan\\\\\\': {\\\\\\'question\\\\\\': \"what is this Research notes:\\\\\\\\n{\\\\\\'plan\\\\\\': {\\\\\\'question\\\\\\': \\\\\\'what is the project name\\\\\\', \\\\\\'steps\\\\\\': [\\\\\\'Understand research objective\\\\\\', \\\\\\'Collect relevant information\\\\\\', \\\\\\'Analyze collected data\\\\\\', \\\\\\'Validate important facts\\\\\\', \\\\\\'Generate research summary\\\\\\']}, \\\\\\'analysis\\\\\\': {\\\\\\'key_points\\\\\\': [], \\\\\\'source_count\\\\\\': 0}, \\\\\\'validation\\\\\\': {\\\\\\'validated\\\\\\': True, \\\\\\'confidence\\\\\\': 0.0, \\\\\\'checked_items\\\\\\': 0}, \\\\\\'result\\\\\\': {\\\\\\'summary\\\\\\': \\\\\\'\\\\\\', \\\\\\'confidence\\\\\\': 0.0}}\", \\\\\\'steps\\\\\\': [\\\\\\'Understand research objective\\\\\\', \\\\\\'Collect relevant information\\\\\\', \\\\\\'Analyze collected data\\\\\\', \\\\\\'Validate important facts\\\\\\', \\\\\\'Generate research summary\\\\\\']}, \\\\\\'analysis\\\\\\': {\\\\\\'key_points\\\\\\': [], \\\\\\'source_count\\\\\\': 0}, \\\\\\'validation\\\\\\': {\\\\\\'validated\\\\\\': True, \\\\\\'confidence\\\\\\': 0.0, \\\\\\'checked_items\\\\\\': 0}, \\\\\\'result\\\\\\': {\\\\\\'summary\\\\\\': \\\\\\'\\\\\\', \\\\\\'confidence\\\\\\': 0.0}}\\', \\'steps\\': [\\'Understand research objective\\', \\'Collect relevant information\\', \\'Analyze collected data\\', \\'Validate important facts\\', \\'Generate research summary\\']}, \\'analysis\\': {\\'key_points\\': [], \\'source_count\\': 0}, \\'validation\\': {\\'validated\\': True, \\'confidence\\': 0.0, \\'checked_items\\': 0}, \\'result\\': {\\'summary\\': \\'\\', \\'confidence\\': 0.0}}', 'steps': ['Understand research objective', 'Collect relevant information', 'Analyze collected data', 'Validate important facts', 'Generate research summary']}, 'analysis': {'key_points': [], 'source_count': 0}, 'validation': {'validated': True, 'confidence': 0.0, 'checked_items': 0}, 'result': {'summary': '', 'confidence': 0.0}}",
+      "steps": [
+        "Understand research objective",
+        "Collect relevant information",
+        "Analyze collected data",
+        "Validate important facts",
+        "Generate research summary"
+      ]
+    },
+    "analysis": {
+      "key_points": [],
+      "source_count": 0
+    },
+    "validation": {
+      "validated": true,
+      "confidence": 0.0,
+      "checked_items": 0
+    },
+    "result": {
+      "summary": "",
+      "confidence": 0.0
+    }
+  },
+  {
+    "plan": {
+      "question": "how are you",
+      "steps": [
+        "Understand research objective",
+        "Collect relevant information",
+        "Analyze collected data",
+        "Validate important facts",
+        "Generate research summary"
+      ]
+    },
+    "analysis": {
+      "key_points": [],
+      "source_count": 0
+    },
+    "validation": {
+      "validated": true,
+      "confidence": 0.0,
+      "checked_items": 0
+    },
+    "result": {
+      "summary": "",
+      "confidence": 0.0
+    }
+  },
+  {
+    "plan": {
+      "question": "how are you",
+      "steps": [
+        "Understand research objective",
+        "Collect relevant information",
+        "Analyze collected data",
+        "Validate important facts",
+        "Generate research summary"
+      ]
+    },
+    "analysis": {
+      "key_points": [],
+      "source_count": 0
+    },
+    "validation": {
+      "validated": true,
+      "confidence": 0.0,
+      "checked_items": 0
+    },
+    "result": {
+      "summary": "",
+      "confidence": 0.0
+    }
+  },
+  {
+    "plan": {
+      "question": "how are you",
+      "steps": [
+        "Understand research objective",
+        "Collect relevant information",
+        "Analyze collected data",
+        "Validate important facts",
+        "Generate research summary"
+      ]
+    },
+    "analysis": {
+      "key_points": [],
+      "source_count": 0
+    },
+    "validation": {
+      "validated": true,
+      "confidence": 0.0,
+      "checked_items": 0
+    },
+    "result": {
+      "summary": "",
+      "confidence": 0.0
+    }
+  },
+  {
+    "plan": {
+      "question": "you can make .net code",
+      "steps": [
+        "Understand research objective",
+        "Collect relevant information",
+        "Analyze collected data",
+        "Validate important facts",
+        "Generate research summary"
+      ]
+    },
+    "analysis": {
+      "key_points": [],
+      "source_count": 0
+    },
+    "validation": {
+      "validated": true,
+      "confidence": 0.0,
+      "checked_items": 0
+    },
+    "result": {
+      "summary": "",
+      "confidence": 0.0
+    }
+  },
+  {
+    "plan": {
+      "question": "what is react",
+      "steps": [
+        "Understand research objective",
+        "Collect relevant information",
+        "Analyze collected data",
+        "Validate important facts",
+        "Generate research summary"
+      ]
+    },
+    "analysis": {
+      "key_points": [],
+      "source_count": 0
+    },
+    "validation": {
+      "validated": true,
+      "confidence": 0.0,
+      "checked_items": 0
+    },
+    "result": {
+      "summary": "",
+      "confidence": 0.0
+    }
+  },
+  {
+    "plan": {
+      "question": "what is the swift",
+      "steps": [
+        "Understand research objective",
+        "Collect relevant information",
+        "Analyze collected data",
+        "Validate important facts",
+        "Generate research summary"
+      ]
+    },
+    "analysis": {
+      "key_points": [],
+      "source_count": 0
+    },
+    "validation": {
+      "validated": true,
+      "confidence": 0.0,
+      "checked_items": 0
+    },
+    "result": {
+      "summary": "",
+      "confidence": 0.0
+    }
+  },
+  {
+    "plan": {
+      "question": "what is the ram ram",
+      "steps": [
+        "Understand research objective",
+        "Collect relevant information",
+        "Analyze collected data",
+        "Validate important facts",
+        "Generate research summary"
+      ]
+    },
+    "analysis": {
+      "key_points": [],
+      "source_count": 0
+    },
+    "validation": {
+      "validated": true,
+      "confidence": 0.0,
+      "checked_items": 0
+    },
+    "result": {
+      "summary": "",
+      "confidence": 0.0
+    }
+  },
+  {
+    "plan": {
+      "question": "Hey \u2014 good to see you. What\u2019s on your mind?",
+      "steps": [
+        "Understand research objective",
+        "Collect relevant information",
+        "Analyze collected data",
+        "Validate important facts",
+        "Generate research summary"
+      ]
+    },
+    "analysis": {
+      "key_points": [],
+      "source_count": 0
+    },
+    "validation": {
+      "validated": true,
+      "confidence": 0.0,
+      "checked_items": 0
+    },
+    "result": {
+      "summary": "",
+      "confidence": 0.0
+    }
+  },
+  {
+    "plan": {
+      "question": "Hey \u2014 good to see you. What\u2019s on your mind?\nTool results\n[tool:knowledge] Hey \u2014 good to see you. What\u2019s on your mind?",
+      "steps": [
+        "Understand research objective",
+        "Collect relevant information",
+        "Analyze collected data",
+        "Validate important facts",
+        "Generate research summary"
+      ]
+    },
+    "analysis": {
+      "key_points": [],
+      "source_count": 0
+    },
+    "validation": {
+      "validated": true,
+      "confidence": 0.0,
+      "checked_items": 0
+    },
+    "result": {
+      "summary": "",
+      "confidence": 0.0
+    }
+  },
+  {
+    "plan": {
+      "question": "what are you saying",
+      "steps": [
+        "Understand research objective",
+        "Collect relevant information",
+        "Analyze collected data",
+        "Validate important facts",
+        "Generate research summary"
+      ]
+    },
+    "analysis": {
+      "key_points": [],
+      "source_count": 0
+    },
+    "validation": {
+      "validated": true,
+      "confidence": 0.0,
+      "checked_items": 0
+    },
+    "result": {
+      "summary": "",
+      "confidence": 0.0
+    }
   }
 ]

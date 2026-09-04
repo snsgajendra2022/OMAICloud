@@ -169,22 +169,19 @@ def _solution_from_model(question: str, intent: IntentResult) -> tuple[str, list
     if intent.intent not in {"coding", "debug", "architecture"} and intent.domain != "software":
         return None
     try:
-        from om_ai.runtime.chat_backend import chat_complete
+        from om_ai.backends.om_native import OMNativeBackend
+        from om_ai.runtime.chat_orchestrator import is_low_quality_reply
 
-        system = (
-            "You are OM coding intelligence. Generate production-quality code for the user ask. "
-            "Include fenced code blocks. Match their stack if stated. No filler."
+        backend = OMNativeBackend()
+        prompt = (
+            "You are OM coding intelligence. Generate production-quality code. "
+            "Include fenced code blocks. Match the stack if stated. No filler.\n\n"
+            f"User: {question.strip()}\n\nAssistant:"
         )
-        messages = [
-            {"role": "system", "content": system},
-            {"role": "user", "content": question.strip()},
-        ]
-        text, _info = chat_complete(messages, max_new_tokens=384, temperature=0.35)
+        text = backend.generate(prompt, max_new_tokens=384, temperature=0.35)
         text = (text or "").strip()
         if not text or len(text) < 40:
             return None
-        from om_ai.runtime.chat_orchestrator import is_low_quality_reply
-
         if is_low_quality_reply(text):
             return None
         body = text.strip() + "\n"

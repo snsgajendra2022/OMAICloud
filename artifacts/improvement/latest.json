@@ -1,53 +1,53 @@
 {
   "status": "improved",
   "evaluation": {
-    "question": "Create React login/signup UI with validation and auth integration",
+    "question": "Ram ram ji (for what is the ram ram)",
     "scores": {
-      "structure": 100.0,
-      "clarity": 63.9,
-      "security": 65.0,
-      "task_fit": 100.0,
-      "code_quality": 40.0
+      "structure": 40.0,
+      "clarity": 50.9,
+      "security": 80.0,
+      "task_fit": 78.0,
+      "code_quality": 70.0
     },
-    "overall": 73.8,
-    "ok": true
+    "overall": 63.8,
+    "ok": false
   },
   "weaknesses": [
     {
+      "area": "structure",
+      "score": 40.0,
+      "threshold": 70.0,
+      "hint": "Use clear sections: Understanding, Plan, Implementation, Validation"
+    },
+    {
       "area": "clarity",
-      "score": 63.9,
+      "score": 50.9,
       "threshold": 65.0,
       "hint": "Write shorter clear sentences; avoid garbled fragments"
     },
     {
-      "area": "security",
-      "score": 65.0,
+      "area": "overall",
+      "score": 63.8,
       "threshold": 70.0,
-      "hint": "Include validation, no secrets, safe auth patterns"
-    },
-    {
-      "area": "code_quality",
-      "score": 40.0,
-      "threshold": 70.0,
-      "hint": "Include runnable code blocks and tests"
+      "hint": "Improve completeness and directness of the answer"
     }
   ],
   "training_data": {
     "created": true,
     "sft_path": "data/om_training/improvements/sft_improvements.jsonl",
     "preference_path": "data/om_training/improvements/preference_improvements.jsonl",
-    "preferred_preview": "Question: Create React login/signup UI with validation and auth integration\n\n## Understanding\nAddress the user ask directly: Create React login/signup UI with validation and auth integration\n\n## Requirements from evaluator\n- Write shorter clear sentences; avoid garbled fragments\n- Include validation, no secrets, safe auth patterns\n- Include runnable code blocks and tests\n\n## Solution\nProvide a str",
+    "preferred_preview": "Question: Ram ram ji (for what is the ram ram)\n\n## Understanding\nAddress the user ask directly: Ram ram ji (for what is the ram ram)\n\n## Requirements from evaluator\n- Use clear sections: Understanding, Plan, Implementation, Validation\n- Write shorter clear sentences; avoid garbled fragments\n- Improve completeness and directness of the answer\n\n## Solution\nProvide a structured, correct, secure answe",
     "weak_areas": [
+      "structure",
       "clarity",
-      "security",
-      "code_quality"
+      "overall"
     ]
   },
   "trainer_job": {
-    "id": "33db6710-f1cd-4f98-914b-2c262999c7c2",
-    "ts": 1788444076.451772,
+    "id": "be93364d-80be-4d08-8882-dcda2e7e4d70",
+    "ts": 1788508408.8950322,
     "status": "queued",
-    "reason": "clarity,security,code_quality",
+    "reason": "structure,clarity,overall",
     "sft_path": "data/om_training/improvements/sft_improvements.jsonl",
     "preference_path": "data/om_training/improvements/preference_improvements.jsonl",
     "commands": {
@@ -58,106 +58,9 @@
   },
   "version": {
     "om_version": "1.0",
-    "improve_cycle": 221,
-    "label": "OM-1.0-improve-221",
+    "improve_cycle": 228,
+    "label": "OM-1.0-improve-228",
     "history": [
-      {
-        "ts": 1788347739.097502,
-        "cycle": 172,
-        "note": "improve from: Ram ram (for you can create code)",
-        "metrics": {
-          "overall": 65.2,
-          "weak": [
-            "clarity",
-            "security",
-            "code_quality",
-            "overall"
-          ]
-        }
-      },
-      {
-        "ts": 1788347739.219042,
-        "cycle": 173,
-        "note": "improve from: ram ram",
-        "metrics": {
-          "overall": 61.6,
-          "weak": [
-            "clarity",
-            "security",
-            "task_fit",
-            "overall"
-          ]
-        }
-      },
-      {
-        "ts": 1788347749.1495621,
-        "cycle": 174,
-        "note": "improve from: What is this (for you can create code)",
-        "metrics": {
-          "overall": 62.2,
-          "weak": [
-            "structure",
-            "clarity",
-            "code_quality",
-            "overall"
-          ]
-        }
-      },
-      {
-        "ts": 1788347761.528584,
-        "cycle": 175,
-        "note": "improve from: Make the part  of ai side for you can create code",
-        "metrics": {
-          "overall": 67.3,
-          "weak": [
-            "clarity",
-            "security",
-            "code_quality",
-            "overall"
-          ]
-        }
-      },
-      {
-        "ts": 1788347761.818829,
-        "cycle": 176,
-        "note": "improve from: make the part  of ai side",
-        "metrics": {
-          "overall": 66.5,
-          "weak": [
-            "clarity",
-            "security",
-            "overall"
-          ]
-        }
-      },
-      {
-        "ts": 1788360794.404377,
-        "cycle": 177,
-        "note": "improve from: hiii",
-        "metrics": {
-          "overall": 54.3,
-          "weak": [
-            "structure",
-            "clarity",
-            "task_fit",
-            "overall"
-          ]
-        }
-      },
-      {
-        "ts": 1788428804.339587,
-        "cycle": 178,
-        "note": "improve from: how are you",
-        "metrics": {
-          "overall": 54.3,
-          "weak": [
-            "structure",
-            "clarity",
-            "task_fit",
-            "overall"
-          ]
-        }
-      },
       {
         "ts": 1788428826.5852742,
         "cycle": 179,
@@ -734,9 +637,100 @@
             "code_quality"
           ]
         }
+      },
+      {
+        "ts": 1788507288.237677,
+        "cycle": 222,
+        "note": "improve from: Hindi laguage (for hindi me bat kare)",
+        "metrics": {
+          "overall": 61.0,
+          "weak": [
+            "structure",
+            "clarity",
+            "overall"
+          ]
+        }
+      },
+      {
+        "ts": 1788507691.671541,
+        "cycle": 223,
+        "note": "improve from: Hindi laguage (for hindi me bat kare)",
+        "metrics": {
+          "overall": 61.0,
+          "weak": [
+            "structure",
+            "clarity",
+            "overall"
+          ]
+        }
+      },
+      {
+        "ts": 1788507697.5573308,
+        "cycle": 224,
+        "note": "improve from: Ram ram (for hindi me bat kare)",
+        "metrics": {
+          "overall": 61.0,
+          "weak": [
+            "structure",
+            "clarity",
+            "overall"
+          ]
+        }
+      },
+      {
+        "ts": 1788507701.788119,
+        "cycle": 225,
+        "note": "improve from: Ram ram (for hindi me bat kare)",
+        "metrics": {
+          "overall": 61.0,
+          "weak": [
+            "structure",
+            "clarity",
+            "overall"
+          ]
+        }
+      },
+      {
+        "ts": 1788507706.8212821,
+        "cycle": 226,
+        "note": "improve from: What is the ram ram (for what is the ram ram)",
+        "metrics": {
+          "overall": 61.4,
+          "weak": [
+            "structure",
+            "clarity",
+            "overall"
+          ]
+        }
+      },
+      {
+        "ts": 1788507706.951796,
+        "cycle": 227,
+        "note": "improve from: what is the ram ram",
+        "metrics": {
+          "overall": 61.4,
+          "weak": [
+            "structure",
+            "clarity",
+            "overall"
+          ]
+        }
+      },
+      {
+        "ts": 1788508408.8955479,
+        "cycle": 228,
+        "note": "improve from: Ram ram ji (for what is the ram ram)",
+        "metrics": {
+          "overall": 63.8,
+          "weak": [
+            "structure",
+            "clarity",
+            "overall"
+          ]
+        }
       }
     ],
-    "updated_at": 1788444076.452267
+    "updated_at": 1788508408.895551
   },
-  "ts": 1788444076.452689
+  "ts": 1788508408.896011
 }

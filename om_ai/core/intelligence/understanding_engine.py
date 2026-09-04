@@ -111,7 +111,27 @@ def _pair_hit(tokens: set[str], a: str, b: str) -> bool:
 class UnderstandingEngine:
     def understand(self, text: str, *, context: dict[str, Any] | None = None) -> dict[str, Any]:
         raw = (text or "").strip()
+        # Greetings like hi / hii / hello — never "unclear" → empty reply
+        if re.match(
+            r"^(hi+|hello+|hey+|yo|sup|namaste|hola)(\s+there)?[!?.]*$",
+            raw,
+            re.I,
+        ) or re.match(r"^(good\s+(morning|evening|afternoon))\b", raw, re.I):
+            return {
+                "intent": "conversation",
+                "action": "chat",
+                "domain": "social",
+                "confidence": 0.95,
+                "raw": raw,
+                "tokens": sorted(_tokens(raw)),
+                "needs_clarification": False,
+            }
+
         toks = _tokens(raw)
+        # Normalize elongated hi (hii → hi) for schema overlap
+        toks |= {re.sub(r"(.)\1{2,}", r"\1\1", t) for t in toks}
+        if any(re.fullmatch(r"hi+", t) for t in toks):
+            toks.add("hi")
         ctx = context or {}
         ranked: list[tuple[float, dict[str, Any]]] = []
 
