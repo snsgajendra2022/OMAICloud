@@ -313,11 +313,13 @@ class LocalLLMEngine:
         self,
         prompt: str,
         max_new_tokens: int = 64,
-        temperature: float = 0.8,
+        temperature: float = 0.7,
         top_k: int = 50,
-        top_p: float = 1.0,
-        repetition_penalty: float = 1.0,
+        top_p: float = 0.9,
+        repetition_penalty: float = 1.2,
         min_new_tokens: int = 0,
+        no_repeat_ngram_size: int = 3,
+        repetition_window: int = 128,
     ) -> str:
         self._assert_loaded()
         ids = self.tokenizer.encode(prompt, add_bos=True)
@@ -333,6 +335,8 @@ class LocalLLMEngine:
             repetition_penalty=repetition_penalty,
             eos_token_id=self.tokenizer.eos_id,
             min_new_tokens=min_new_tokens,
+            no_repeat_ngram_size=no_repeat_ngram_size,
+            repetition_window=repetition_window,
         )
         return self.tokenizer.decode(out[0].tolist()[prompt_len:])
 
@@ -340,11 +344,13 @@ class LocalLLMEngine:
         self,
         prompt: str,
         max_new_tokens: int = 64,
-        temperature: float = 0.8,
+        temperature: float = 0.7,
         top_k: int = 50,
-        top_p: float = 1.0,
-        repetition_penalty: float = 1.0,
+        top_p: float = 0.9,
+        repetition_penalty: float = 1.2,
         min_new_tokens: int = 0,
+        no_repeat_ngram_size: int = 3,
+        repetition_window: int = 128,
     ) -> Generator[str, None, None]:
         self._assert_loaded()
         ids = self.tokenizer.encode(prompt, add_bos=True)
@@ -361,6 +367,8 @@ class LocalLLMEngine:
             repetition_penalty=repetition_penalty,
             eos_token_id=self.tokenizer.eos_id,
             min_new_tokens=min_new_tokens,
+            no_repeat_ngram_size=no_repeat_ngram_size,
+            repetition_window=repetition_window,
         ):
             token_id = int(token_tensor.view(-1)[0])
             if token_id == self.tokenizer.eos_id:
@@ -386,6 +394,8 @@ class LocalLLMEngine:
         top_p: float,
         repetition_penalty: float,
         min_new_tokens: int,
+        no_repeat_ngram_size: int = 3,
+        repetition_window: int = 128,
     ) -> str:
         fitted = fit_messages_to_context(
             messages,
@@ -415,6 +425,8 @@ class LocalLLMEngine:
             eos_token_id=self.tokenizer.eos_id,
             stop_token_ids=stops,
             min_new_tokens=min_new_tokens,
+            no_repeat_ngram_size=no_repeat_ngram_size,
+            repetition_window=repetition_window,
         )
         # Decode only newly generated tokens (specials → empty bytes).
         new_ids = out[0].tolist()[prompt_len:]
@@ -433,8 +445,10 @@ class LocalLLMEngine:
             temperature = float(gen_kwargs.get("temperature", 0.7))
             top_k = int(gen_kwargs.get("top_k", 50))
             top_p = float(gen_kwargs.get("top_p", 0.9))
-            repetition_penalty = float(gen_kwargs.get("repetition_penalty", 1.15))
+            repetition_penalty = float(gen_kwargs.get("repetition_penalty", 1.2))
             min_new = int(gen_kwargs.get("min_new_tokens", 4))
+            no_repeat = int(gen_kwargs.get("no_repeat_ngram_size", 3))
+            rep_window = int(gen_kwargs.get("repetition_window", 128))
 
             text = self._chat_once(
                 messages,
@@ -444,6 +458,8 @@ class LocalLLMEngine:
                 top_p=top_p,
                 repetition_penalty=repetition_penalty,
                 min_new_tokens=min_new,
+                no_repeat_ngram_size=no_repeat,
+                repetition_window=rep_window,
             )
             if text:
                 return text
@@ -455,9 +471,11 @@ class LocalLLMEngine:
                 max_new_tokens=max(max_new, 128),
                 temperature=0.7,
                 top_k=top_k,
-                top_p=top_p,
-                repetition_penalty=repetition_penalty,
+                top_p=0.9,
+                repetition_penalty=max(repetition_penalty, 1.2),
                 min_new_tokens=max(min_new, 8),
+                no_repeat_ngram_size=max(no_repeat, 3),
+                repetition_window=rep_window,
             )
             if text:
                 return text

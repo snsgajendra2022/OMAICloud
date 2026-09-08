@@ -1036,6 +1036,7 @@ def chat_reply(
     assistant_instructions: str = "",
     project_instructions: str = "",
     project_id: str | None = None,
+    model: str | None = None,
 ) -> tuple[str, ChatBackendInfo]:
     """Generate a chat reply and return ``(text, backend_info)``.
 
@@ -1046,6 +1047,7 @@ def chat_reply(
         generation_config,
         is_low_quality_reply,
     )
+    from om_ai.runtime.evolution_matrix import maybe_evolution_reply
     from om_ai.runtime.intelligence import enrich_for_chat
 
     # Sanitize legacy UI tool tags from user turns.
@@ -1060,6 +1062,28 @@ def chat_reply(
         cleaned_messages.append({"role": role, "content": content})
     messages = cleaned_messages
 
+    evo_text, evo_model, evo_level = maybe_evolution_reply(messages, model=model)
+    if evo_text is not None:
+        info = ChatBackendInfo(
+            backend="om_evolution",
+            model=evo_model,
+            provider="OM AI Matrix",
+        )
+        return evo_text, info
+    # Remember selected evolution model id for branding when we fall through to native.
+    selected_evolution_model = evo_model if evo_level is not None else None
+
+    def _brand(info: ChatBackendInfo) -> ChatBackendInfo:
+        if not selected_evolution_model or info.model == selected_evolution_model:
+            return info
+        return ChatBackendInfo(
+            backend=info.backend,
+            model=selected_evolution_model,
+            detail=info.detail,
+            provider=info.provider or "OM AI",
+            live_knowledge=info.live_knowledge,
+        )
+
     # Language intelligence (optional, never blocks chat)
     language_context: dict[str, Any] = {}
     if _language_manager is not None:
@@ -1072,9 +1096,9 @@ def chat_reply(
 
     info = resolve_backend(local_loaded=local_loaded, native_ready=native_ready)
     if info.backend == "om_native":
-        env_temp = _env_float("OM_CHAT_TEMPERATURE", 0.45)
+        env_temp = _env_float("OM_CHAT_TEMPERATURE", 0.7)
         env_max = _env_int("OM_CHAT_MAX_NEW_TOKENS", 96)
-        if temperature is None or float(temperature) > 0.7:
+        if temperature is None or float(temperature) > 0.85:
             temperature = env_temp
         if max_new_tokens is None or int(max_new_tokens) > env_max:
             max_new_tokens = env_max
@@ -1092,6 +1116,8 @@ def chat_reply(
         "top_k": int(gen["top_k"]),
         "repetition_penalty": float(gen["repetition_penalty"]),
         "min_new_tokens": int(gen["min_new_tokens"]),
+        "no_repeat_ngram_size": int(gen.get("no_repeat_ngram_size", 3)),
+        "repetition_window": int(gen.get("repetition_window", 128)),
     }
 
     if not assistant_instructions:
@@ -1127,7 +1153,7 @@ def chat_reply(
     if info.backend == "om_native":
         os.environ["_OM_IN_CHAT_REPLY"] = "1"
         try:
-            return _om_native_chat_reply_body(
+            text, info = _om_native_chat_reply_body(
                 info=info,
                 messages=messages,
                 intel=intel,
@@ -1140,6 +1166,7 @@ def chat_reply(
                 project_id=project_id,
                 project_instructions=project_instructions,
             )
+            return text, _brand(info)
         finally:
             os.environ.pop("_OM_IN_CHAT_REPLY", None)
 
@@ -1152,7 +1179,7 @@ def chat_reply(
             temperature=float(kwargs["temperature"]),
             top_p=float(kwargs["top_p"]),
         )
-        return text, info
+        return text, _brand(info)
 
     if local_chat is None or not local_loaded:
         raise RuntimeError(
@@ -1160,8 +1187,7 @@ def chat_reply(
             "OM-1.0 checkpoint, load a local OM checkpoint (OM_AI_AUTOLOAD=1), or set "
             "OM_AI_OPENAI_API_KEY / OPENAI_API_KEY with OM_AI_CHAT_BACKEND=openai."
         )
-    return local_chat(messages, **kwargs), info
-
+    return local_chat(messages, **kwargs), _brand(info)
 
 def backend_status(*, local_loaded: bool = False, native_ready: bool = False) -> dict[str, Any]:
     info = resolve_backend(local_loaded=local_loaded, native_ready=native_ready)

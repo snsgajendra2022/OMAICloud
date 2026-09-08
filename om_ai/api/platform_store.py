@@ -759,7 +759,7 @@ class PlatformStore:
     def get_settings(self, tenant_id: str, actor: str) -> dict[str, Any]:
         defaults = {
             "appearance": "system",
-            "default_model": "OM-1.0",
+            "default_model": "OM-L5",
             "response_style": "balanced",
             "language": "en",
             "temperature": 0.7,

@@ -592,44 +592,9 @@ def delete_memory(memory_id: str, ctx: TenantContext = Depends(require_auth)) ->
 @router.get("/v1/models/catalog")
 def models_catalog(ctx: TenantContext = Depends(require_auth)) -> dict[str, Any]:
     settings = get_platform_store().get_settings(ctx.tenant_id, ctx.actor)
-    models = [
-        {
-            "id": "OM-1.0",
-            "name": "OM Smart",
-            "kind": "native",
-            "description": "Default OM-1.0 native assistant model.",
-            "temperature": settings.get("temperature", 0.7),
-            "context_length": 128,
-            "max_tokens": 256,
-        },
-        {
-            "id": "OM-Reasoning",
-            "name": "OM Reasoning",
-            "kind": "native-profile",
-            "description": "Lower temperature profile for careful answers.",
-            "temperature": 0.3,
-            "context_length": 128,
-            "max_tokens": 256,
-        },
-        {
-            "id": "OM-Fast",
-            "name": "OM Fast",
-            "kind": "native-profile",
-            "description": "Shorter responses for quick turns.",
-            "temperature": 0.6,
-            "context_length": 128,
-            "max_tokens": 96,
-        },
-        {
-            "id": "OM-Vision",
-            "name": "OM Vision",
-            "kind": "native-profile",
-            "description": "Multimodal-ready profile (text + attached files).",
-            "temperature": 0.5,
-            "context_length": 128,
-            "max_tokens": 256,
-        },
-    ]
+    from om_ai.runtime.evolution_matrix import catalog_models, default_evolution_model
+
+    models = catalog_models(settings=settings)
     # Enabled external connectors (Settings → AI)
     from om_ai.runtime.external_llms import LLM_CATALOG, resolve_api_key
 
@@ -655,7 +620,8 @@ def models_catalog(ctx: TenantContext = Depends(require_auth)) -> dict[str, Any]
                 "max_tokens": settings.get("max_tokens", 1024),
             }
         )
-    return {"models": models, "default_model": settings.get("default_model", "OM-1.0")}
+    default = settings.get("default_model") or default_evolution_model()
+    return {"models": models, "default_model": default, "evolution_ready": True}
 
 
 # ---------- History (activity from notifications + tasks) ----------

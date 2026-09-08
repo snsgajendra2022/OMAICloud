@@ -306,6 +306,7 @@ def _run_chat(
                 actor=actor,
                 project_id=project_id,
                 project_instructions=project_instructions,
+                model=model,
             )
     except NativeCheckpointError as exc:
         raise HTTPException(
@@ -317,8 +318,8 @@ def _run_chat(
     except Exception as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
     model_name = used.model or info.model or _default_model_id
-    if used.backend == "om_native":
-        model_name = "OM-1.0"
+    if used.backend == "om_native" and not model:
+        model_name = "OM-L1"
     return text, model_name, used.backend, used.provider or ""
 
 

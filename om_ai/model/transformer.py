@@ -173,11 +173,14 @@ class TransformerBlock(nn.Module):
 
 
 def _apply_top_p(logits: torch.Tensor, top_p: float) -> torch.Tensor:
+    """Nucleus sampling — keep smallest set of tokens with cumprob >= top_p."""
     if top_p >= 1.0:
         return logits
+    top_p = float(max(1e-6, min(1.0, top_p)))
     sorted_logits, sorted_idx = torch.sort(logits, descending=True, dim=-1)
     probs = F.softmax(sorted_logits, dim=-1)
     cum = torch.cumsum(probs, dim=-1)
+    # Remove tokens with cumulative probability above the threshold (keep first over)
     mask = cum > top_p
     mask[..., 1:] = mask[..., :-1].clone()
     mask[..., 0] = False
@@ -185,16 +188,60 @@ def _apply_top_p(logits: torch.Tensor, top_p: float) -> torch.Tensor:
     return torch.zeros_like(logits).scatter_(-1, sorted_idx, sorted_logits)
 
 
-def _apply_repetition_penalty(logits: torch.Tensor, generated: torch.Tensor, penalty: float) -> torch.Tensor:
+def _apply_repetition_penalty(
+    logits: torch.Tensor,
+    generated: torch.Tensor,
+    penalty: float,
+    *,
+    window: int = 0,
+) -> torch.Tensor:
+    """HF-style repetition penalty on tokens already seen (optionally last `window`)."""
     if penalty == 1.0 or generated.numel() == 0:
+        return logits
+    penalty = float(max(1.0, penalty))
+    out = logits.clone()
+    for b in range(generated.size(0)):
+        hist = generated[b]
+        if window and window > 0 and hist.numel() > window:
+            hist = hist[-window:]
+        unique = torch.unique(hist)
+        # Vectorized: positive logits / penalty, negative * penalty
+        vals = out[b, unique]
+        out[b, unique] = torch.where(vals > 0, vals / penalty, vals * penalty)
+    return out
+
+
+def _ban_repeated_ngrams(
+    logits: torch.Tensor,
+    generated: torch.Tensor,
+    ngram_size: int,
+) -> torch.Tensor:
+    """Block tokens that would complete an n-gram already present in the sequence."""
+    if ngram_size <= 0 or generated.size(1) < ngram_size:
         return logits
     out = logits.clone()
     for b in range(generated.size(0)):
-        unique = torch.unique(generated[b])
-        for tok in unique.tolist():
-            val = out[b, tok]
-            out[b, tok] = val / penalty if val > 0 else val * penalty
+        ids = generated[b].tolist()
+        if len(ids) < ngram_size:
+            continue
+        prefix = tuple(ids[-(ngram_size - 1) :]) if ngram_size > 1 else tuple()
+        banned: set[int] = set()
+        for i in range(len(ids) - ngram_size + 1):
+            gram = tuple(ids[i : i + ngram_size])
+            if gram[:-1] == prefix:
+                banned.add(int(gram[-1]))
+        for tok in banned:
+            out[b, tok] = float("-inf")
     return out
+
+
+def _safe_multinomial(probs: torch.Tensor) -> torch.Tensor:
+    """Sample with NaN/Inf guard — fall back to argmax if distribution collapses."""
+    if not torch.isfinite(probs).all() or float(probs.sum()) <= 0:
+        # Recover from all -inf logits
+        flat = probs.view(probs.size(0), -1)
+        return torch.argmax(flat, dim=-1, keepdim=True)
+    return torch.multinomial(probs, num_samples=1)
 
 
 class OMTransformer(nn.Module):
@@ -253,11 +300,12 @@ class OMTransformer(nn.Module):
         logits = self.lm_head(self.final_norm(x))
         loss = None
         if labels is not None:
-            loss = F.cross_entropy(
-                logits.reshape(-1, logits.size(-1)),
-                labels.reshape(-1),
-                ignore_index=-100,
-            )
+            from om_ai.model.causal_loss import causal_cross_entropy
+
+            # SFT/pretrain callers pass pre-shifted labels matching logits length.
+            # If shapes match full sequence length, auto-shift next-token targets.
+            shift = labels.size(1) == logits.size(1) and labels.size(1) > 1
+            loss = causal_cross_entropy(logits, labels, ignore_index=-100, shift=shift)
         result = {
             "logits": logits,
             "loss": loss,
@@ -277,33 +325,47 @@ class OMTransformer(nn.Module):
         top_k: int,
         top_p: float,
         repetition_penalty: float,
+        *,
+        no_repeat_ngram_size: int = 0,
+        repetition_window: int = 0,
     ) -> torch.Tensor:
-        logits = _apply_repetition_penalty(logits, generated, repetition_penalty)
+        logits = _apply_repetition_penalty(
+            logits, generated, repetition_penalty, window=repetition_window
+        )
+        logits = _ban_repeated_ngrams(logits, generated, no_repeat_ngram_size)
         if temperature <= 0:
             return torch.argmax(logits, dim=-1, keepdim=True)
-        logits_t = logits / max(temperature, 1e-8)
+        logits_t = logits / max(float(temperature), 1e-8)
         if top_k > 0:
-            k = min(top_k, logits_t.size(-1))
+            k = min(int(top_k), logits_t.size(-1))
             values, _ = torch.topk(logits_t, k)
             cutoff = values[:, -1].unsqueeze(-1)
             logits_t = logits_t.masked_fill(logits_t < cutoff, float("-inf"))
         logits_t = _apply_top_p(logits_t, top_p)
+        # Numerical safety before softmax
+        logits_t = torch.nan_to_num(logits_t, nan=float("-inf"), posinf=1e4, neginf=float("-inf"))
+        # If every logit is -inf, fall back to uniform over vocab
+        finite = torch.isfinite(logits_t)
+        if not finite.any():
+            logits_t = torch.zeros_like(logits_t)
         probs = F.softmax(logits_t, dim=-1)
-        return torch.multinomial(probs, num_samples=1)
+        return _safe_multinomial(probs)
 
     @torch.no_grad()
     def generate(
         self,
         input_ids: torch.Tensor,
         max_new_tokens: int = 64,
-        temperature: float = 0.8,
+        temperature: float = 0.7,
         top_k: int = 50,
-        top_p: float = 1.0,
-        repetition_penalty: float = 1.0,
+        top_p: float = 0.9,
+        repetition_penalty: float = 1.2,
         eos_token_id: int | None = None,
         stop_token_ids: list[int] | None = None,
         min_new_tokens: int = 0,
         encoder_hidden_states: torch.Tensor | None = None,
+        no_repeat_ngram_size: int = 3,
+        repetition_window: int = 128,
     ) -> torch.Tensor:
         self.eval()
         stops = set(stop_token_ids or [])
@@ -323,7 +385,14 @@ class OMTransformer(nn.Module):
                 for sid in stops:
                     step_logits[:, int(sid)] = float("-inf")
             next_token = self._sample_next(
-                step_logits, generated, temperature, top_k, top_p, repetition_penalty
+                step_logits,
+                generated,
+                temperature,
+                top_k,
+                top_p,
+                repetition_penalty,
+                no_repeat_ngram_size=no_repeat_ngram_size,
+                repetition_window=repetition_window,
             )
             generated = torch.cat([generated, next_token], dim=1)
             if (
@@ -347,14 +416,16 @@ class OMTransformer(nn.Module):
         self,
         input_ids: torch.Tensor,
         max_new_tokens: int = 64,
-        temperature: float = 0.8,
+        temperature: float = 0.7,
         top_k: int = 50,
-        top_p: float = 1.0,
-        repetition_penalty: float = 1.0,
+        top_p: float = 0.9,
+        repetition_penalty: float = 1.2,
         eos_token_id: int | None = None,
         stop_token_ids: list[int] | None = None,
         min_new_tokens: int = 0,
         encoder_hidden_states: torch.Tensor | None = None,
+        no_repeat_ngram_size: int = 3,
+        repetition_window: int = 128,
     ) -> Iterator[torch.Tensor]:
         self.eval()
         stops = set(stop_token_ids or [])
@@ -374,7 +445,14 @@ class OMTransformer(nn.Module):
                 for sid in stops:
                     step_logits[:, int(sid)] = float("-inf")
             next_token = self._sample_next(
-                step_logits, generated, temperature, top_k, top_p, repetition_penalty
+                step_logits,
+                generated,
+                temperature,
+                top_k,
+                top_p,
+                repetition_penalty,
+                no_repeat_ngram_size=no_repeat_ngram_size,
+                repetition_window=repetition_window,
             )
             generated = torch.cat([generated, next_token], dim=1)
             yield next_token
@@ -399,15 +477,17 @@ class OMTransformer(nn.Module):
         input_ids: torch.Tensor,
         attention_mask: torch.Tensor | None = None,
         max_new_tokens: int = 64,
-        temperature: float = 0.8,
+        temperature: float = 0.7,
         top_k: int = 50,
-        top_p: float = 1.0,
-        repetition_penalty: float = 1.0,
+        top_p: float = 0.9,
+        repetition_penalty: float = 1.2,
         eos_token_id: int | None = None,
         pad_token_id: int = 0,
+        no_repeat_ngram_size: int = 3,
     ) -> torch.Tensor:
         """Left-pad aware batch generation (simple shared-length path)."""
         del attention_mask  # reserved for future packing-aware decode
+        del pad_token_id
         return self.generate(
             input_ids,
             max_new_tokens=max_new_tokens,
@@ -416,6 +496,7 @@ class OMTransformer(nn.Module):
             top_p=top_p,
             repetition_penalty=repetition_penalty,
             eos_token_id=eos_token_id,
+            no_repeat_ngram_size=no_repeat_ngram_size,
         )
 
     def exact_parameter_count(self) -> int:

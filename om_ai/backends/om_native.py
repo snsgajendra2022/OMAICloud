@@ -221,13 +221,15 @@ class OMNativeBackend:
             self.engine.model.generate_stream(
                 x,
                 max_new_tokens=kwargs.get("max_new_tokens", 256),
-                temperature=kwargs.get("temperature", 0.8),
+                temperature=kwargs.get("temperature", 0.7),
                 top_k=kwargs.get("top_k", 50),
-                top_p=kwargs.get("top_p", 1.0),
-                repetition_penalty=kwargs.get("repetition_penalty", 1.0),
+                top_p=kwargs.get("top_p", 0.9),
+                repetition_penalty=kwargs.get("repetition_penalty", 1.2),
                 eos_token_id=tok.eos_id,
                 stop_token_ids=list(stops - {int(tok.eos_id)}),
                 min_new_tokens=min_new,
+                no_repeat_ngram_size=int(kwargs.get("no_repeat_ngram_size", 3)),
+                repetition_window=int(kwargs.get("repetition_window", 128)),
             )
         ):
             token_id = int(token_tensor.view(-1)[0])

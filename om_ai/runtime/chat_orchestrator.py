@@ -39,14 +39,19 @@ def _env_int(name: str, default: int) -> int:
 
 
 def generation_config(**overrides: Any) -> dict[str, Any]:
-    """Natural conversational sampling for OM-1.0 chat (env-overridable)."""
+    """ChatGPT-style sampling for OM-1.0 chat (env-overridable).
+
+    Defaults: temperature 0.7, top_p 0.9, repetition_penalty 1.2, no_repeat_ngram 3.
+    """
     cfg = {
-        "temperature": _env_float("OM_CHAT_TEMPERATURE", 0.45),
+        "temperature": _env_float("OM_CHAT_TEMPERATURE", 0.7),
         "top_p": _env_float("OM_CHAT_TOP_P", 0.9),
-        "top_k": _env_int("OM_CHAT_TOP_K", 40),
-        "repetition_penalty": _env_float("OM_CHAT_REPETITION_PENALTY", 1.12),
+        "top_k": _env_int("OM_CHAT_TOP_K", 50),
+        "repetition_penalty": _env_float("OM_CHAT_REPETITION_PENALTY", 1.2),
         "max_new_tokens": _env_int("OM_CHAT_MAX_NEW_TOKENS", 96),
         "min_new_tokens": _env_int("OM_CHAT_MIN_NEW_TOKENS", 1),
+        "no_repeat_ngram_size": _env_int("OM_CHAT_NO_REPEAT_NGRAM", 3),
+        "repetition_window": _env_int("OM_CHAT_REPETITION_WINDOW", 128),
     }
     for k, v in overrides.items():
         if v is not None:

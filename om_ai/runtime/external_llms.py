@@ -98,6 +98,13 @@ def normalize_provider_id(model: str | None) -> str | None:
         "om-1.0": "om",
         "om1.0": "om",
         "om_native": "om",
+        "om-l1": "om",
+        "om-l2": "om",
+        "om-l3": "om",
+        "om-l4": "om",
+        "om-l5": "om",
+        "om-5.0": "om",
+        "om-5": "om",
         "openai": "gpt",
         "gpt-4": "gpt",
         "gpt-4o": "gpt",
@@ -110,6 +117,8 @@ def normalize_provider_id(model: str | None) -> str | None:
         "llama3": "llama",
         "groq": "llama",
     }
+    if raw.startswith("om-l") or raw.startswith("om-level"):
+        return "om"
     if raw in LLM_CATALOG:
         return raw
     if raw in aliases:

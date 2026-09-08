@@ -314,10 +314,10 @@ class LoadRequest(BaseModel):
 class GenerateRequest(BaseModel):
     prompt: str
     max_new_tokens: int = Field(64, ge=1, le=4096)
-    temperature: float = Field(0.8, ge=0.0, le=5.0)
+    temperature: float = Field(0.7, ge=0.0, le=5.0)
     top_k: int = Field(50, ge=0)
-    top_p: float = Field(1.0, ge=0.0, le=1.0)
-    repetition_penalty: float = Field(1.0, ge=0.5, le=5.0)
+    top_p: float = Field(0.9, ge=0.0, le=1.0)
+    repetition_penalty: float = Field(1.2, ge=0.5, le=5.0)
 
 
 class ChatMessage(BaseModel):
@@ -327,11 +327,12 @@ class ChatMessage(BaseModel):
 
 class ChatRequest(BaseModel):
     messages: list[ChatMessage]
+    model: str | None = None
     max_new_tokens: int = Field(256, ge=1, le=4096)
-    temperature: float = Field(0.8, ge=0.0, le=5.0)
+    temperature: float = Field(0.7, ge=0.0, le=5.0)
     top_k: int = Field(50, ge=0)
-    top_p: float = Field(1.0, ge=0.0, le=1.0)
-    repetition_penalty: float = Field(1.0, ge=0.5, le=5.0)
+    top_p: float = Field(0.9, ge=0.0, le=1.0)
+    repetition_penalty: float = Field(1.2, ge=0.5, le=5.0)
 
 
 class MemoryRequest(BaseModel):
@@ -618,6 +619,7 @@ def chat(
             top_k=req.top_k,
             top_p=req.top_p,
             repetition_penalty=req.repetition_penalty,
+            model=req.model,
         )
         _audit(
             "chat",
@@ -923,7 +925,7 @@ def tokens_meta():
     model_label = (
         "OM-1.0"
         if native
-        else (os.getenv("OM_MODEL_ID") or os.getenv("OM_AI_MODEL_ID", "om:free"))
+        else (os.getenv("OM_MODEL_ID") or os.getenv("OM_AI_MODEL_ID", "om-1.0"))
     )
     return {
         "database": store.path,

@@ -687,7 +687,7 @@ body.dark .chip.on{background:rgba(59,130,246,.15);border-color:rgba(59,130,246,
     <div class="top-title" id="topTitle">New chat</div>
     <div class="om-status-strip" id="omStatusStrip" title="OM runtime status">
       <span class="om-pill"><i class="dot online"></i>Online</span>
-      <span class="om-pill">OM-1.0</span>
+      <span class="om-pill" id="omLevelPill">OM-L5</span>
       <span class="om-pill">Memory Active</span>
       <span class="om-pill">Agents Ready</span>
     </div>
@@ -905,7 +905,7 @@ const SUGGESTIONS = [
 const state = {
   user:null, profile:null, settings:null, workspaces:[], workspaceId:null,
   conversations:[], currentId:null, messages:[], busy:false, _editFrom:-1,
-  model:"OM-1.0", models:[], catalog:[],
+  model:"OM-L5", models:[], catalog:[],
   view:"chat", projects:[], assistants:[], activeProjectId:null, projectFilter:"all", projectSort:"updated", projectQuery:"",
   selectedAssistantId:null, notifications:[], unreadNotifs:0,
   tools:{web:false,code:false}, abort:null, searchQuery:"",
@@ -2224,6 +2224,11 @@ function renderModels() {
   });
   const cur = list.find(m => (m.id||m) === state.model)||list[0];
   els.modelBtn.innerHTML = escapeHtml((cur&&(cur.name||cur.id))||state.model)+svg("chevD",14);
+  const pill = $("omLevelPill");
+  if (pill) {
+    const lvl = (cur && cur.level != null) ? ("L"+Number(cur.level).toFixed(0)) : (String(state.model||"").match(/L([1-5])/i)||[])[1];
+    pill.textContent = lvl ? ("OM-L"+lvl) : String(state.model||"OM-L5");
+  }
   updateComposerChip();
 }
 

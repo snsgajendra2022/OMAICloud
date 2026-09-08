@@ -24,8 +24,9 @@ class DPOConfig:
 
 class DPOTrainer:
     def __init__(self,policy,dataset,cfg:DPOConfig,device=None,reference=None):
+        from om_ai.training.production_pipeline import pick_training_device
         self.policy=policy; self.ds=dataset; self.cfg=cfg
-        self.device=torch.device(device or ("cuda" if torch.cuda.is_available() else "cpu"))
+        self.device=torch.device(device or pick_training_device())
         self.policy.to(self.device)
         self.reference=reference or copy.deepcopy(policy)
         self.reference.to(self.device).eval()

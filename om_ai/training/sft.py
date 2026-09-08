@@ -8,6 +8,8 @@ import time
 import torch
 from torch.utils.data import Dataset, DataLoader
 
+from om_ai.model.causal_loss import build_assistant_only_labels
+
 
 def _row_to_messages(obj: dict) -> tuple[list[dict[str, str]], str]:
     """Normalize JSONL into chat messages + assistant response text.
@@ -89,8 +91,8 @@ class SFTDataset(Dataset):
             response_ids.append(tokenizer.eos_id)
 
             ids = (prefix_ids + response_ids)[:max_seq_len]
-            labels = [-100] * min(len(prefix_ids), len(ids))
-            labels += ids[len(labels) :]
+# Prefer assistant-only tokens (prompt positions stay -100).
+            labels = build_assistant_only_labels(ids, prompt_len=len(prefix_ids))
 
             if len(ids) >= 2 and any(v != -100 for v in labels):
                 self.rows.append((ids, labels))
@@ -142,16 +144,9 @@ class SFTTrainer:
         self.model = model
         self.ds = dataset
         self.cfg = cfg
-        self.device = torch.device(
-            device
-            or (
-                "cuda"
-                if torch.cuda.is_available()
-                else "mps"
-                if torch.backends.mps.is_available()
-                else "cpu"
-            )
-        )
+        from om_ai.training.production_pipeline import pick_training_device
+
+        self.device = torch.device(device or pick_training_device())
         self.model.to(self.device)
         self.opt = torch.optim.AdamW(
             self.model.parameters(), lr=cfg.learning_rate, weight_decay=0.01

@@ -38,23 +38,74 @@ from om_ai.discovery import ProjectDiscovery
 
 
 def load_model(config_path, tokenizer_path, checkpoint=None, device=None):
+    """Load OMTransformer sized to the checkpoint embedding table (not just tokenizer len).
+
+    Chat SFT/DPO checkpoints were trained with vocab_size=65536 while some local
+    tokenizers are smaller (e.g. 340). The model must match the checkpoint; unused
+    embedding rows are fine as long as encoded ids stay in-range.
+    """
+    from om_ai.training.production_pipeline import pick_training_device
+
     cfg = ModelConfig.from_json(config_path)
-    tok = load_tokenizer(tokenizer_path)
-    cfg.vocab_size = len(tok.vocab)
-    dev = torch.device(
-        device
-        or (
-            "cuda"
-            if torch.cuda.is_available()
-            else "mps"
-            if torch.backends.mps.is_available()
-            else "cpu"
-        )
-    )
-    model = OMTransformer(cfg).to(dev)
+    tok_path = Path(tokenizer_path) if tokenizer_path else None
+    tok = load_tokenizer(str(tok_path) if tok_path else tokenizer_path)
+    cfg.vocab_size = max(int(cfg.vocab_size or 0), len(tok.vocab))
+    dev = torch.device(device or pick_training_device())
+
+    state = None
     if checkpoint:
         ck = torch.load(checkpoint, map_location=dev, weights_only=False)
-        model.load_state_dict(ck.get("model", ck))
+        state = ck.get("model", ck)
+        emb = state.get("token_embedding.weight") if isinstance(state, dict) else None
+        if emb is not None:
+            ck_vocab = int(emb.shape[0])
+            if ck_vocab != cfg.vocab_size:
+                print(
+                    json.dumps(
+                        {
+                            "warning": "vocab_size_aligned_to_checkpoint",
+                            "tokenizer_vocab": len(tok.vocab),
+                            "config_vocab": cfg.vocab_size,
+                            "checkpoint_vocab": ck_vocab,
+                            "tokenizer": str(tok_path or tokenizer_path),
+                            "checkpoint": str(checkpoint),
+                        }
+                    ),
+                    flush=True,
+                )
+                cfg.vocab_size = ck_vocab
+            # Prefer a tokenizer whose vocab matches the checkpoint embedding table.
+            if len(tok.vocab) != ck_vocab:
+                alt = Path("artifacts/tokenizer-production-65536.json")
+                if ck_vocab >= 60000 and alt.is_file():
+                    tok = load_tokenizer(str(alt))
+                    print(
+                        json.dumps(
+                            {
+                                "tokenizer_switched": str(alt),
+                                "tokenizer_vocab": len(tok.vocab),
+                                "checkpoint_vocab": ck_vocab,
+                                "reason": "match_checkpoint_embedding",
+                            }
+                        ),
+                        flush=True,
+                    )
+                else:
+                    print(
+                        json.dumps(
+                            {
+                                "warning": "tokenizer_vocab_mismatch",
+                                "tokenizer_vocab": len(tok.vocab),
+                                "checkpoint_vocab": ck_vocab,
+                                "hint": "Pass --tokenizer artifacts/tokenizer-production-65536.json",
+                            }
+                        ),
+                        flush=True,
+                    )
+
+    model = OMTransformer(cfg).to(dev)
+    if state is not None:
+        model.load_state_dict(state)
     return cfg, tok, model, dev
 
 
@@ -181,6 +232,174 @@ def train(args):
     ds = build_dataset(args.data, tok, cfg.max_seq_len)
     print(json.dumps({"device": str(trainer.device), "parameters": model.exact_parameter_count(), "dataset_blocks": len(ds)}))
     print(json.dumps(trainer.train(ds), indent=2))
+
+
+def train_om_cmd(args):
+    """Run root train_om.py (scratch → MPS training) with the same flags."""
+    import importlib.util
+
+    script = Path(__file__).resolve().parents[1] / "train_om.py"
+    spec = importlib.util.spec_from_file_location("om_train_om_script", script)
+    if spec is None or spec.loader is None:
+        raise SystemExit(f"Cannot load {script}")
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+
+    argv: list[str] = ["--mode", args.mode]
+    if args.device:
+        argv.extend(["--device", args.device])
+    if args.data:
+        argv.extend(["--data", args.data])
+    if args.config:
+        argv.extend(["--config", args.config])
+    if args.tokenizer:
+        argv.extend(["--tokenizer", args.tokenizer])
+    if args.output:
+        argv.extend(["--output", args.output])
+    argv.extend(
+        [
+            "--batch-size",
+            str(args.batch_size),
+            "--block-size",
+            str(args.block_size),
+            "--max-iters",
+            str(args.max_iters),
+            "--lr",
+            str(args.lr),
+            "--eval-interval",
+            str(args.eval_interval),
+            "--vocab-size",
+            str(getattr(args, "vocab_size", 2000)),
+        ]
+    )
+    if getattr(args, "build_knowledge", None) is not None:
+        argv.append("--build-knowledge")
+        argv.extend(list(args.build_knowledge or []))
+        argv.extend(["--knowledge-out", getattr(args, "knowledge_out", "knowledge.txt")])
+        if getattr(args, "train_after_build", False):
+            argv.append("--train-after-build")
+    raise SystemExit(mod.main(argv))
+
+
+def om_core_cmd(args):
+    import importlib.util
+
+    script = Path(__file__).resolve().parents[1] / "om_core.py"
+    spec = importlib.util.spec_from_file_location("om_core_script", script)
+    if spec is None or spec.loader is None:
+        raise SystemExit(f"Cannot load {script}")
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    argv: list[str] = []
+    if args.demo:
+        argv.append("--demo")
+    if args.train:
+        argv.append("--train")
+    if args.chat:
+        argv.append("--chat")
+    if args.device:
+        argv.extend(["--device", args.device])
+    if args.checkpoint:
+        argv.extend(["--checkpoint", args.checkpoint])
+    argv.extend(["--iters", str(args.iters)])
+    raise SystemExit(mod.main(argv))
+
+
+def om5_core_cmd(args):
+    import importlib.util
+
+    script = Path(__file__).resolve().parents[1] / "om5_core.py"
+    spec = importlib.util.spec_from_file_location("om5_core_script", script)
+    if spec is None or spec.loader is None:
+        raise SystemExit(f"Cannot load {script}")
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    argv: list[str] = []
+    if args.demo:
+        argv.append("--demo")
+    if args.train:
+        argv.append("--train")
+    if args.objective:
+        argv.extend(["--objective", args.objective])
+    if args.device:
+        argv.extend(["--device", args.device])
+    if args.checkpoint:
+        argv.extend(["--checkpoint", args.checkpoint])
+    if args.rag_scan is not None:
+        argv.append("--rag-scan")
+        argv.extend(list(args.rag_scan or []))
+    argv.extend(["--iters", str(args.iters)])
+    raise SystemExit(mod.main(argv))
+
+
+def om_matrix_cmd(args):
+    import importlib.util
+
+    script = Path(__file__).resolve().parents[1] / "om_matrix_production.py"
+    spec = importlib.util.spec_from_file_location("om_matrix_script", script)
+    if spec is None or spec.loader is None:
+        raise SystemExit(f"Cannot load {script}")
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    argv: list[str] = []
+    if args.demo:
+        argv.append("--demo")
+    if args.train:
+        argv.append("--train")
+    if args.chat:
+        argv.append("--chat")
+    if args.ask:
+        argv.extend(["--ask", args.ask])
+    argv.extend(["--level", str(args.level)])
+    if args.device:
+        argv.extend(["--device", args.device])
+    if args.checkpoint:
+        argv.extend(["--checkpoint", args.checkpoint])
+    argv.extend(["--iters", str(args.iters)])
+    raise SystemExit(mod.main(argv))
+
+
+def chatgpt_upgrade_cmd(args):
+    """Audit Phase 1–3 ChatGPT-parity readiness and optionally write example datasets."""
+    from om_ai.training.chatgpt_upgrade import (
+        audit_chatgpt_parity,
+        recommended_cli_commands,
+        write_example_datasets,
+    )
+
+    tok = None
+    if getattr(args, "tokenizer", None):
+        from om_ai.tokenizer import load_tokenizer
+
+        tok = load_tokenizer(args.tokenizer)
+    audit = audit_chatgpt_parity(tokenizer=tok)
+    payload = audit.as_dict()
+    payload["next_commands"] = recommended_cli_commands()
+    if getattr(args, "write_examples", False):
+        payload["examples"] = write_example_datasets(Path("."))
+    print(json.dumps(payload, indent=2))
+
+
+def production_pipeline_cmd(args):
+    """Status / dry-run / execute the Pretrain → SFT → DPO production pipeline."""
+    from om_ai.training.production_pipeline import inventory_dict, pick_training_device, run_stage
+
+    action = (getattr(args, "pipeline_action", None) or "status").strip().lower()
+    if action in {"status", "inventory", "audit"}:
+        print(json.dumps(inventory_dict(), indent=2))
+        return
+    stage = getattr(args, "stage", None) or action
+    if stage in {"status", "inventory", "audit"}:
+        print(json.dumps(inventory_dict(), indent=2))
+        return
+    device = getattr(args, "device", None) or pick_training_device()
+    result = run_stage(
+        stage,
+        device=device,
+        dry_run=not bool(getattr(args, "execute", False)),
+        steps=getattr(args, "steps", None),
+    )
+    print(json.dumps(result, indent=2))
 
 
 def sft(args):
@@ -1073,6 +1292,107 @@ def main():
         tr.add_argument("--device")
         tr.add_argument("--gradient-checkpointing", action="store_true")
         tr.set_defaults(func=train)
+
+    tom = sp.add_parser(
+        "train-om",
+        help="Scratch-to-training script (train_om.py) on Mac MPS — bpe/toy/production",
+    )
+    tom.add_argument("--mode", choices=("bpe", "toy", "production"), default="bpe")
+    tom.add_argument("--device", default="")
+    tom.add_argument("--data", default="")
+    tom.add_argument("--config", default="")
+    tom.add_argument("--tokenizer", default="")
+    tom.add_argument(
+        "--output",
+        default="artifacts/checkpoints/om-1.0-scratch/om1_weights.pt",
+    )
+    tom.add_argument("--batch-size", type=int, default=32)
+    tom.add_argument("--block-size", type=int, default=128)
+    tom.add_argument("--max-iters", type=int, default=500)
+    tom.add_argument("--lr", type=float, default=3e-4)
+    tom.add_argument("--eval-interval", type=int, default=100)
+    tom.add_argument("--vocab-size", type=int, default=2000)
+    tom.add_argument(
+        "--build-knowledge",
+        nargs="*",
+        metavar="DIR",
+        default=None,
+        help="Aggregate offline local docs into knowledge.txt",
+    )
+    tom.add_argument("--knowledge-out", default="knowledge.txt")
+    tom.add_argument("--train-after-build", action="store_true")
+    tom.set_defaults(func=train_om_cmd)
+
+    oc = sp.add_parser(
+        "om-core",
+        help="Level-1 OM core engine (Pre-LN/SwiGLU, tools, checkpoints) → om_core.py",
+    )
+    oc.add_argument("--demo", action="store_true")
+    oc.add_argument("--train", action="store_true")
+    oc.add_argument("--chat", action="store_true")
+    oc.add_argument("--device", default="")
+    oc.add_argument("--checkpoint", default="artifacts/om_core/weights.pt")
+    oc.add_argument("--iters", type=int, default=400)
+    oc.set_defaults(func=om_core_cmd)
+
+    o5 = sp.add_parser(
+        "om5",
+        help="OM-5.0 matrix scaffold (thought/CoT, sandbox, RAG scan, multi-agent plan)",
+    )
+    o5.add_argument("--demo", action="store_true")
+    o5.add_argument("--train", action="store_true")
+    o5.add_argument("--objective", default="")
+    o5.add_argument("--device", default="")
+    o5.add_argument("--checkpoint", default="artifacts/om5_core/weights.pt")
+    o5.add_argument("--iters", type=int, default=300)
+    o5.add_argument("--rag-scan", nargs="*", default=None)
+    o5.set_defaults(func=om5_core_cmd)
+
+    omx = sp.add_parser(
+        "matrix",
+        help="OM Master Matrix L1–L5 scaffold (om_matrix_production.py) + chat/checkpoints",
+    )
+    omx.add_argument("--demo", action="store_true")
+    omx.add_argument("--train", action="store_true")
+    omx.add_argument("--chat", action="store_true")
+    omx.add_argument("--ask", default="")
+    omx.add_argument("--level", type=float, default=1.0)
+    omx.add_argument("--device", default="")
+    omx.add_argument("--checkpoint", default="artifacts/om_matrix/weights.pt")
+    omx.add_argument("--iters", type=int, default=300)
+    omx.set_defaults(func=om_matrix_cmd)
+
+    up = sp.add_parser(
+        "chatgpt-upgrade",
+        help="Audit OM-1.0 ChatGPT-parity (sampling, RoPE/RMSNorm/SwiGLU/SDPA, SFT/DPO)",
+    )
+    up.add_argument("--tokenizer", default="")
+    up.add_argument(
+        "--write-examples",
+        action="store_true",
+        help="Write data/sft and data/dpo example JSONL templates",
+    )
+    up.set_defaults(func=chatgpt_upgrade_cmd)
+
+    pp = sp.add_parser(
+        "production-pipeline",
+        help="3-stage ChatGPT pipeline inventory + Pretrain/SFT/DPO launchers (MPS on Mac)",
+    )
+    pp.add_argument(
+        "pipeline_action",
+        nargs="?",
+        default="status",
+        help="status | pretrain | sft | dpo",
+    )
+    pp.add_argument("--stage", default="", help="Alias for pipeline_action")
+    pp.add_argument("--device", default="", help="Force device (default: MPS on Mac)")
+    pp.add_argument(
+        "--execute",
+        action="store_true",
+        help="Actually run training (default is dry-run command print)",
+    )
+    pp.add_argument("--steps", type=int, default=None)
+    pp.set_defaults(func=production_pipeline_cmd)
 
     sf = sp.add_parser("sft")
     sfs = sf.add_subparsers(dest="sft_sub")

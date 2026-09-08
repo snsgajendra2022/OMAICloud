@@ -29,14 +29,17 @@ def test_generation_config_defaults(monkeypatch):
         "OM_CHAT_REPETITION_PENALTY",
         "OM_CHAT_MAX_NEW_TOKENS",
         "OM_CHAT_MIN_NEW_TOKENS",
+        "OM_CHAT_NO_REPEAT_NGRAM",
+        "OM_CHAT_REPETITION_WINDOW",
     ):
         monkeypatch.delenv(key, raising=False)
     cfg = generation_config()
-    assert cfg["temperature"] == 0.45
+    assert cfg["temperature"] == 0.7
     assert cfg["top_p"] == 0.9
-    assert cfg["top_k"] == 40
-    assert cfg["repetition_penalty"] == 1.12
+    assert cfg["top_k"] == 50
+    assert cfg["repetition_penalty"] == 1.2
     assert cfg["max_new_tokens"] == 96
+    assert cfg["no_repeat_ngram_size"] == 3
 
 
 def test_generation_config_overrides():

@@ -1,0 +1,3311 @@
+<|user|> Hello! <|assistant|> Hello, I am OM-1.0, your custom AI system.
+<|user|> I am feeling stuck and stressed with my code. What should I do? <|assistant|> It is completely normal to feel stressed when debugging. Take a deep breath. Let's break the problem down into smaller steps together. What error message are you seeing?
+<|user|> Why does a stone fall faster than a feather in air? <|assistant|> This happens because of air resistance. The air pushes up against the flat surface of the feather, slowing it down. In a vacuum with no air, both would fall at the exact same speed.
+<|user|> How do I stay calm when learning AI? <|assistant|> Focus on one concept at a time. Celebrate small wins, rest when tired, and remember that confusion is part of building understanding.
+<|user|> Explain gravity simply. <|assistant|> Gravity is the pull between objects with mass. Earth's gravity keeps us on the ground and holds the Moon in orbit.
+<|user|> Write a short encouraging message for a tired engineer. <|assistant|> You have already solved hard problems before. Rest, then take the next tiny step — progress compounds.
+
+<|user|> Summarize key ideas from docs/AGENTS.md. <|assistant|> # Agents
+
+Module: `om_ai/agents/orchestrator.py` — `AgentOrchestrator`.
+
+Planner: `om_ai/reasoning/planner.py` (`RulePlanner`, `LLMPlanner`, plan steps).
+
+Tools: `om_ai/actions/` (`SafeShellTool`, `KnowledgeSearchTool`, base tool protocol).
+
+## Loop
+
+Analyze → plan → execute tools → observe → verify → finish, with per-step retries, wall-clock budget, and optional SQLite audit.
+
+## Features
+
+- Pluggable LLM (`LocalLLMEngine` or any object with `.generate`)
+- Optional RAG + memory injection
+- Tool registry with risk levels; approval gate for high-risk tools
+- Roles: researcher, planner, executor, verifier, coding, business, document, communication
+- Tenant/user attribution on audit rows
+
+## Default API wiring
+
+`om_ai/api/main.py` registers:
+
+- allow-listed shell (`OM_AI_ALLOWED_SHELL`)
+- knowledge search
+- OpenAPI discovery (SSRF-guarded)
+
+## Safety
+
+Deny-by-default shell; never grant broad command execution in production. Agent quality tracks underlying model weights — a tiny checkpoint will plan and tool-call poorly even if the orchestrator is correct.
+
+<|user|> Summarize key ideas from docs/ARCHITECTURE.md. <|assistant|> # Architecture — OM AI Operating Brain v0.3
+
+OM AI is a self-hosted **cognitive operating system**: model code, training, agents, memory, RAG, and API run locally. It does **not** call OpenAI/Anthropic/Google model APIs and does not include ChatGPT weights or private OpenAI training data.
+
+Operating-system pillars, gaps, and roadmap:
+
+- [CURRENT_ARCHITECTURE.md](CURRENT_ARCHITECTURE.md)
+- [SYSTEM_GAP_ANALYSIS.md](SYSTEM_GAP_ANALYSIS.md)
+- [IMPLEMENTATION_ROADMAP.md](IMPLEMENTATION_ROADMAP.md)
+- [OM_OPERATING_SYSTEM.md](OM_OPERATING_SYSTEM.md)
+
+## Layers
+
+```text
+CLI / FastAPI (om_ai/cli.py, om_ai/api/)
+        │
+AgentOrchestrator (om_ai/agents/) ← tools, planner, audit
+        │
+Runtime LocalLLMEngine (om_ai/runtime/)
+        │
+OMTransformer (om_ai/model/) + ByteBPETokenizer (om_ai/tokenizer/)
+        │
+Memory │ RAG │ Registry │ Corpus │ Security │ Integrations
+```
+
+## Core modules
+
+| Area | Package | Role |
+|------|---------|------|
+| Model | `om_ai/model/` | Decoder-only Transformer: RoPE, GQA/MHA, RMSNorm/LayerNorm, SwiGLU, KV cache, optional cross-attention |
+| Config | `om_ai/core/config.py` | `ModelConfig` + JSON presets under `configs/` |
+| Tokenizer | `om_ai/tokenizer/` | Byte-level BPE |
+| Training | `om_ai/training/` | Pretrain, SFT, reward, DPO, PPO infra, DDP/FSDP, DeepSpeed entry |
+| Corpus | `om_ai/corpus/`, `om_ai/data/` | Import, license gates, PII scrub, dedupe, shard, dataset pipeline |
+| Runtime | `om_ai/runtime/` | Local load + generate/chat |
+| Agents | `om_ai/agents/`, `om_ai/reasoning/`, `om_ai/actions/` | Plan → tools → verify; shell/knowledge tools |
+| Memory | `om_ai/memory/` | Tenant-isolated SQLite multi-kind store |
+| RAG | `om_ai/knowledge/` | Persistent lexical/TF-IDF retrieval (no external embed API required) |
+| Vision/Speech | `om_ai/vision/`, `om_ai/voice/`, `om_ai/multimodal/` | Trainable encoders + request router |
+| Security | `om_ai/security/` | API keys, RBAC, SSRF, audit, rate limits, secrets |
+| Registry | `om_ai/registry/`, `om_ai/checkpoint/` | Lifecycle metadata + integrity bundles |
+| Eval | `om_ai/eval/` | Smoke harness + JSONL benchmark runner |
+| Continuous | `om_ai/continuous/` | Feedback store + SFT/preference replay export |
+
+## Honest boundary
+
+Architecture presets (`configs/1b.json` … `70b.json`) define **shapes**, not trained intelligence. Useful capability appears only after licensed data + real GPU training produce weights. The repo ships a tiny demo checkpoint under `artifacts/demo/` as pipeline proof only.
+
+<|user|> Summarize key ideas from docs/BENCHMARKS.md. <|assistant|> # Benchmarks
+
+Modules: `om_ai/eval/benchmarks.py`, `om_ai/eval/runner.py` — CLI: `om-ai evaluate`, `om-ai benchmark`.
+
+## Included harness
+
+- Smoke suite: language / reasoning / math / coding / tool-use **prompt completions** (qualitative)
+- Perplexity helper on short texts
+- JSONL runner: `benchmarks/core.jsonl` → report under `artifacts/eval/`
+
+Example cases use simple `contains` metrics (e.g. math `2+2`, coding expects `def`). These validate the **pipeline**, not frontier ability.
+
+## Run
+
+```bash
+om-ai evaluate \
+  --config configs/tiny.json \
+  --tokenizer artifacts/tokenizer.json \
+  --checkpoint artifacts/demo/om-tiny-dpo.pt
+
+om-ai benchmark \
+  --config configs/tiny.json \
+  --tokenizer artifacts/tokenizer.json \
+  --checkpoint artifacts/demo/om-tiny-dpo.pt \
+  --benchmark benchmarks/core.jsonl \
+  --report artifacts/eval/report.json
+```
+
+## Honest status
+
+- **No invented MMLU / HumanEval / LMSYS scores** are published here
+- Demo/tiny acceptance results are expected to be **below useful capability**
+- Large public suites: harness can be pointed at licensed/local copies; datasets themselves are **external**
+
+Record real numbers in registry metadata only after you run them.
+
+<|user|> Summarize key ideas from docs/CHATGPT_PARITY_STATUS.md. <|assistant|> # CHATGPT PARITY — STATUS
+
+**Updated:** 2026-08-25  
+**Canonical gap analysis:** [`OM_CHATGPT_GAP_ANALYSIS.md`](OM_CHATGPT_GAP_ANALYSIS.md)
+
+## One-line truth
+
+ChatGPT = finished brain + product.  
+OM = finished factory + early brain. Software ~**97%**. Chat intelligence ~**18–25%**.
+
+## Completed (software + local training)
+
+| Item | Status |
+|------|--------|
+| Chat UI (`/chat`) + More / Regenerate / Share | DONE |
+| Native OM serve (no required third-party LLM) | DONE |
+| SFT/DPO chat checkpoints (local) | DONE (`om-1.0-chat-dpo-v4`) |
+| Knowledge Brain + Universe layout | DONE (needs data volume) |
+| Reasoning pipeline (intent→plan→verify→reflect) | DONE **v2** (domain templates + markdown) |
+| Eval suite + continuous feedback export | DONE **expanded** + learning cycle |
+| Chat garble gate + reasoning fallback | DONE (rejects Prime-Minister-style soup) |
+| Document AI multimodal path | DONE (vision/voice still need weights) |
+| `om-ai system build` production foundation | DONE (35/35 verified) |
+
+## Cannot finish on Mac without GPU cluster
+
+| Item | Reality |
+|------|---------|
+| ChatGPT-equal intelligence | Needs billions+ trained parameters |
+| OM-1B / 7B / 70B learned weights | Configs exist; scale training not run |
+| Frontier benchmarks | Not reached |
+| Fake 70B `.pt` | **Never** |
+
+## Next software sprints (no GPU required)
+
+1. Bulk knowledge ingest + graph/ranking  
+2. Reasoning + coding agent tool loops + sandbox  
+3. Broader eval (math / agents / safety / long context)  
+4. Continuous learning: quality gate → auto export → train recipe  
+5. Multimodal wiring (use existing ViT/ASR stubs when weights appear)
+
+## Reload chat after checkpoint change
+
+Point `.env` `OM_MODEL_CHECKPOINT` / `OM_AI_CHECKPOINT`, restart `om-ai serve`, hard-refresh browser.
+
+<|user|> Summarize key ideas from docs/COMPLETION_AUDIT.md. <|assistant|> # COMPLETION AUDIT — OM AI Operating Brain
+
+**Date:** 2026-08-24  
+**Scope:** Full repository software audit (honest classification).  
+**Rule:** Trained frontier weights and cluster-scale execution are EXTERNAL, not “software incomplete.”
+
+## Classification legend
+
+| Label | Meaning |
+|-------|---------|
+| COMPLETE | Production-grade software present and wired |
+| PARTIAL | Real code exists; gaps remain (integration, scale, or optional adapters) |
+| PLACEHOLDER | Stub / protocol only without executable path |
+| MISSING | Required software not present |
+| EXTERNAL RESOURCE REQUIRED | Needs licensed data, GPUs, credentials, or long training runs |
+
+## Subsystem status
+
+| Subsystem | Status | Notes |
+|-----------|--------|-------|
+| Foundation LM (Transformer) | COMPLETE | RoPE, RMSNorm, SwiGLU, GQA/MHA, KV cache, checkpointing, generate sampling |
+| Model presets (1B–70B JSON) | COMPLETE + EXTERNAL | Configs + `model-info` param counts; **no trained 70B weights** |
+| Tokenizer | COMPLETE | Byte BPE, chat specials, CLI train/inspect/encode/decode |
+| Licensed corpus pipeline | COMPLETE + EXTERNAL | Governance, dedupe, shard, stats; large licensed corpora EXTERNAL |
+| Pretraining | COMPLETE + EXTERNAL | DDP/FSDP/DeepSpeed configs; scale compute EXTERNAL |
+| Checkpoint format | COMPLETE | Bundles, integrity hashes, trained guards |
+| SFT | COMPLETE | Prompt masking, resume, Mac/CPU/CUDA paths |
+| DPO | COMPLETE | Frozen ref + policy preference loss |
+| Reward model | COMPLETE | Pairwise ranking trainer |
+| RLHF / PPO | COMPLETE (infra) + EXTERNAL | `PPOTrainer` + `om-ai ppo` smoke; production RLHF needs rollouts + RM + compute |
+| Reasoning datasets / gates | PARTIAL + EXTERNAL | Structures + eval harness; large suites EXTERNAL |
+| Evaluation / benchmarks | PARTIAL + EXTERNAL | Harness + reports; frontier suites NOT RUN at scale |
+| RAG | COMPLETE | Parse→chunk→embed→index→retrieve→rerank; tenant isolation |
+| Memory | COMPLETE | Short/episodic/semantic + relevance filter |
+| Reasoning / planning engine | COMPLETE | Goal→plan→execute→verify orchestration |
+| Agent orchestrator | COMPLETE | Roles, budgets, audit; Agent Brain v1 + Understanding v1 |
+| Tool / action engine | COMPLETE | Registry, permissions, SafeShell allowlist |
+| OpenAPI discovery | COMPLETE | Parse→candidate tools→approval gate |
+| Project discovery | COMPLETE | Multi-framework project maps; secret redaction |
+| Vision | COMPLETE (foundation) + EXTERNAL | ViT/projector/training loop; multimodal weights EXTERNAL |
+| Speech ASR/TTS | PARTIAL + EXTERNAL | ASR features + training foundation; TTS abstractions; quality weights EXTERNAL |
+| Multimodal orchestration | COMPLETE | Unified text/image/audio/document routing |
+| WhatsApp transport | PARTIAL + EXTERNAL | Pluggable layer; production credentials EXTERNAL |
+| CRM/ERP connectors | PARTIAL + EXTERNAL | SDK + examples; live tenant credentials EXTERNAL |
+| Multi-tenant AI employees | COMPLETE | Org→tenant→employee persistence |
+| Continuous learning | COMPLETE | Feedback→SFT/DPO offline pipelines (no online weight mutation) |
+| Model registry | COMPLETE | Lifecycle states + provenance |
+| Training observability | COMPLETE | Structured metrics; optional Prometheus hooks |
+| Security | COMPLETE | AuthN/Z, RBAC, rate limits, audit, SSRF/path guards |
+| FastAPI production API | COMPLETE | Health, generate/stream, chat, memory, RAG, agents, registry |
+| CLI | COMPLETE | Tokenizer, corpus, pretrain, sft, reward, dpo, ppo, eval, serve, registry |
+| Dev tiny pipeline | COMPLETE | `scripts/run_actual_training_pipeline.py` + acceptance |
+| Documentation | COMPLETE | Architecture, training scale docs, governance, FINAL report |
+| Tests / acceptance | COMPLETE | Unit/integration + `scripts/acceptance_test.sh` |
+
+## Placeholder / honesty review (this pass)
+
+| Item | Disposition |
+|------|-------------|
+| `om_ai/backends/stubs.py` | Rewritten: protocols + resolvers to real modules (not PHASE TODOs) |
+| Fake 70B `.pt` weights | **No
+
+<|user|> Summarize key ideas from docs/CONTINUOUS_LEARNING.md. <|assistant|> # Continuous Learning
+
+Package: `om_ai/continuous/` — `feedback.py`, `replay.py`.
+
+## Feedback store
+
+`FeedbackStore` (SQLite): prompt, response, rating, optional preferred response, metadata, user id.
+
+```bash
+om-ai feedback add \
+  --prompt "…" --response "…" --rating 5 \
+  --preferred-response "…"
+
+om-ai feedback export \
+  --sft-output artifacts/feedback_sft.jsonl \
+  --preference-output artifacts/feedback_preferences.jsonl \
+  --min-rating 4
+```
+
+Exports feed `om-ai sft` / `om-ai dpo` after human review.
+
+## Practice
+
+- Threshold ratings; exclude PII
+- Version datasets; log provenance in the registry
+- Re-evaluate after each replay fine-tune
+- Continuous learning updates **checkpoints**, not magically the untuned 70B preset
+
+API feedback endpoints (when enabled) share the same idea: capture → review → export → train → promote.
+
+<|user|> Summarize key ideas from docs/CORPUS_SCALE_PLAN.md. <|assistant|> # Corpus Scale Plan
+
+Goal: grow from example files to a license-governed training corpus without contaminating evals or inventing data.
+
+## Current software
+
+| Piece | Location |
+|-------|----------|
+| Manifest validation / pipeline | `om_ai/data/governance.py`, `om_ai/data/pipeline.py` |
+| Corpus service (import, PII scrub, exact/near-dup, audit, shard, stats) | `om_ai/corpus/service.py` |
+| CLI | `om-ai corpus …` |
+| Scripts | `scripts/prepare_corpus.py`, `scripts/shard_corpus.py` |
+| Example manifest | `data/source_manifest.example.json` |
+
+## Phased plan
+
+### Phase 0 — Dev (shipped examples)
+
+- `data/example_corpus.txt`, tiny JSONL samples
+- Purpose: unit tests + pipeline smoke only
+
+### Phase 0.5 — OMAI-Corpus-v1 sample (implemented)
+
+- Catalog: FineWeb, Wikipedia, Gutenberg, OpenAssistant, OM-owned (+ gated Common Crawl / Stack / arXiv)
+- CLI: `om-ai corpus catalog|fetch|build-v1`
+- Layout: `data/omai-corpus-v1/{raw/{fineweb,wikipedia,books,...},cleaned,filtered,deduplicated,tokenized,train,validation,audit}`
+- Docs: `docs/OMAI_CORPUS_V1.md`, `docs/ROADMAP_EXECUTION.md`
+- **Pipeline stages: 100%.** Sample inventory only — not trillion-token volume yet
+
+### Phase 1 — Internal / owned
+
+1. Declare every source in a manifest (`license`, `owner`, `allowed_for_training`)
+2. `om-ai corpus validate --manifest …` / `prepare_corpus.py`
+3. Import → dedupe → audit → shard
+4. Hold out eval prompts; run contamination checks in `CorpusService`
+5. Train tokenizer on a representative sample before full pretrain
+
+### Phase 2 — Scale-out
+
+- Object storage for shards; checksums in audit JSON
+- Language/quality filters (heuristics today; replace with stronger LangID/quality models as needed)
+- Separate SFT and preference corpora with human review workflows
+- Version tags recorded in registry provenance (`training_data_version`)
+
+### Phase 3 — Production hygiene
+
+- Periodic re-audit; revoke sources if license changes
+- Feedback replay (`om_ai/continuous/`) merged carefully with ratings thresholds
+- Document retention and PII policy (`DATA_GOVERNANCE.md`)
+
+## Scale targets (planning, not claims)
+
+| Model class | Rough token budget (industry-typical order) | Notes |
+|-------------|-----------------------------------------------|-------|
+| Tiny | kilobytes–megabytes | Smoke only |
+| ~1B | tens–hundreds of B tokens | Cluster recommended |
+| ~7B–13B | hundreds of B+ tokens | Multi-node |
+| ~70B | often trillion-token class | Multi-node, months |
+
+Exact budgets are **your** product decision. None of those large corpora exist in-repo.
+
+## CLI sketch
+
+```bash
+om-ai corpus import --input /data/raw --license proprietary-owned --owner om-ai
+om-ai corpus dedupe --input artifacts/corpus/in.jsonl --output artifacts/corpus/deduped.jsonl
+om-ai corpus audit --input artifacts/corpus/deduped.jsonl --output artifacts/corpus_audit.json
+om-ai corpus shard --input artifacts/corpus/deduped.jsonl --output artifacts/shards --shard-size 10000
+```
+
+<|user|> Summarize key ideas from docs/CURRENT_ARCHITECTURE.md. <|assistant|> # CURRENT_ARCHITECTURE.md
+
+Status: OM AI Operating Brain **v0.3** as of 2026-09-01.
+
+OM is a **self-hosted cognitive operating system**: FastAPI + SQLite + local OM checkpoints. It does **not** call OpenAI/Anthropic/Google model APIs.
+
+## Runtime path
+
+```text
+om-ai serve → FastAPI (om_ai/api)
+                 │
+                 ├─ POST /v1/chat  → chat_backend
+                 │                      ├─ OperatingIntelligence.run (default)
+                 │                      └─ AgentBrain + OM-1.0 native generate
+                 ├─ POST /v1/oi/cycle
+                 ├─ /v1/knowledge, /v1/memory, /v1/agent/goal
+                 └─ workspace UI  /chat
+```
+
+Absolute OS cycle: Observe → Understand → Remember → Research → Think → Agents → Verify → Speak → Evaluate → Learn.
+
+## Layers that exist in code
+
+| Layer | Package | Mechanism |
+|-------|---------|-----------|
+| Language / meaning | `om_ai/understanding/` | Typo lexicon, grammar rewrite, language tag, token gloss, canonical task |
+| Context / goals | `om_ai/cognitive/`, `context_analyzer.py` | Follow-up resolution, project topic, audience |
+| Reasoning | `om_ai/core/reasoning/` | Analyze → plan → solve (RAG/dataset/model) → verify → reflect |
+| Knowledge | `om_ai/knowledge/` | Ingest → chunk → **hashed TF-IDF embeddings in SQLite** → cosine + BM25 hybrid search → selector/ranker |
+| Memory | `om_ai/memory/` | SQLite kinds + LayeredMemory (short, conversation, user, project, experience, skill) |
+| Coding | `coding_intelligence.py`, `coding_brain`, `CodingAgent` | Architecture / files / install / tests; dry-run repo map |
+| Agents | `om_ai/agents/specialists.py` | Coding, research, security, database, testing, deployment work products |
+| Response | `om_ai/core/response/`, `response_engine/` | Format, markdown, highlights, quality repair |
+| Evaluation | `om_ai/evaluation/online.py` | Live dimension scores |
+| Model | `om_ai/model/`, `backends/om_native.py` | Decoder-only Transformer; local checkpoint only |
+
+## Data stores
+
+- `artifacts/om_ai.sqlite3` — app, prompts, platform
+- `artifacts/om_ai_rag.sqlite3` — RAG chunks + embedding BLOBs
+- Memory / audit / tokens DBs per env (`.env.example`)
+
+## Docker
+
+`Dockerfile` + `docker-compose.yml` serve port 8080 with `artifacts` mounted. See `docs/DEPLOYMENT.md`.
+
+## What this architecture is not
+
+- Not ChatGPT weights or OpenAI private data
+- Not a 5-level trained frontier brain in this checkout
+- Not human consciousness
+- Not infinite knowledge without ingested/licensed data
+
+<|user|> Summarize key ideas from docs/DATA_GOVERNANCE.md. <|assistant|> # Data Governance Checklist
+
+Every training record should have provenance and usage rights.
+
+Required metadata:
+
+- source
+- license / ownership basis
+- collection timestamp
+- category
+- language
+- version
+- quality score
+- content hash
+
+Before training:
+
+- remove secrets and credentials
+- remove duplicates and near-duplicates
+- enforce license policy
+- apply privacy/PII handling policy
+- quarantine malformed or suspicious documents
+- track dataset manifests immutably
+- preserve deletion capability for enterprise data
+
+<|user|> Summarize key ideas from docs/DEPLOYMENT.md. <|assistant|> # Deployment
+
+## Local process
+
+```bash
+python3 -m venv .venv && source .venv/bin/activate
+pip install -e .
+# Optional: copy .env.example → .env and edit. `om-ai serve` loads .env automatically.
+om-ai serve --host 0.0.0.0 --port 8080
+```
+
+You do **not** need `source .env` before every serve — the CLI/API load `.env` into the process at startup (existing shell exports still win).
+
+## Docker
+
+```bash
+docker compose up --build
+```
+
+- `Dockerfile`: Python 3.12-slim, installs package, `CMD om-ai serve`
+- `docker-compose.yml`: port 8080, mounts `./artifacts` → `/data`, sets `OM_AI_DB` / `OM_AI_REGISTRY`
+
+## Environment (see `.env.example`)
+
+Typical vars: `OM_AI_DB`, `OM_AI_KB`, `OM_AI_AUDIT_DB`, `OM_AI_REGISTRY`, `OM_AI_RATE_LIMIT`, `OM_AI_ALLOWED_SHELL`, `OM_AI_CORS_ORIGINS`, API key configuration used by `om_ai/security/auth.py`.
+
+## Production checklist
+
+- TLS terminator / reverse proxy
+- Auth enabled; no open CORS to `*`
+- Network egress controls for tools
+- Rate limits + audit DB backups
+- Signed/integrity-checked model bundles (`om_ai/checkpoint/`)
+- Do not publish GPU training containers with secrets baked in
+
+## Scope
+
+This package deploys the **platform**. Large models need separate weight storage, GPU nodes, and a registry promotion process (`MODEL_REGISTRY.md`).
+
+<|user|> Summarize key ideas from docs/DISTRIBUTED_TRAINING.md. <|assistant|> # Distributed Training
+
+Entry points live under `om_ai/training/`. Use a Linux + CUDA cluster for anything beyond tiny/smoke runs.
+
+## DDP (default)
+
+```bash
+torchrun --standalone --nproc_per_node=8 -m om_ai.training.distributed \
+  --strategy ddp \
+  --config configs/1b.json \
+  --data /data/train.jsonl \
+  --tokenizer artifacts/tokenizer.json \
+  --steps 1000 \
+  --batch-size 1 \
+  --output artifacts/checkpoints
+```
+
+Module: `om_ai/training/distributed.py` — `DistributedDataParallel`, `DistributedSampler`, NCCL (CUDA) or gloo (CPU).
+
+## FSDP
+
+```bash
+torchrun --standalone --nproc_per_node=8 -m om_ai.training.distributed \
+  --strategy fsdp \
+  --config configs/7b.json \
+  --data /data/train.jsonl \
+  --tokenizer artifacts/tokenizer.json
+```
+
+Wraps `OMTransformer` in PyTorch `FullyShardedDataParallel`. Prefer FSDP or DeepSpeed when a replica no longer fits on one GPU.
+
+## DeepSpeed ZeRO-3
+
+```bash
+pip install -e '.[deepspeed]'
+deepspeed --num_gpus 8 -m om_ai.training.deepspeed_train \
+  --config configs/7b.json \
+  --data /data/train.jsonl \
+  --tokenizer artifacts/tokenizer.json \
+  --deepspeed configs/deepspeed_zero3.json
+```
+
+Module: `om_ai/training/deepspeed_train.py`. Config: `configs/deepspeed_zero3.json`.
+
+## Multi-node
+
+Set the usual torch.distributed / DeepSpeed env vars (`MASTER_ADDR`, `MASTER_PORT`, `WORLD_SIZE`, `RANK`, …) via your scheduler (Slurm, K8s, etc.). The repo provides the training entry points; cluster orchestration is environment-specific.
+
+## Practical notes
+
+- Enable `gradient_checkpointing` in larger configs (`7b`/`13b`/`70b` presets already set it true where appropriate).
+- Rank 0 writes checkpoints; verify with `om-ai bundle` / registry before promotion.
+- Distributed scripts are real launch paths, not magic — wall-clock time and token budget still determine quality.
+
+<|user|> Summarize key ideas from docs/DPO.md. <|assistant|> # Direct Preference Optimization (DPO)
+
+Module: `om_ai/training/dpo.py` — CLI: `om-ai dpo`.
+
+## Format
+
+```json
+{"prompt":"…","chosen":"preferred answer","rejected":"worse answer"}
+```
+
+Example: `data/example_preferences.jsonl`. Dataset class: `PreferenceDataset` in `om_ai/training/preference.py`.
+
+## Behavior
+
+`DPOTrainer` trains the policy against a **frozen reference** copy using the standard DPO objective (beta-controlled). No separate reward model is required for DPO itself (contrast with RLHF reward + PPO path).
+
+## Run
+
+```bash
+om-ai dpo \
+  --config configs/tiny.json \
+  --data data/example_preferences.jsonl \
+  --tokenizer artifacts/tokenizer.json \
+  --checkpoint artifacts/sft/latest.pt \
+  --steps 500 \
+  --beta 0.1 \
+  --lr 1e-6 \
+  --output artifacts/dpo
+```
+
+Typical sequence: pretrain → SFT → DPO. The demo artifact `artifacts/demo/om-tiny-dpo.pt` was produced this way on toy data.
+
+## Honesty
+
+DPO improves preference alignment **relative to the base checkpoint**. It cannot inject world knowledge missing from pretraining. Large preference corpora are external — not fabricated by this repo.
+
+<|user|> Summarize key ideas from docs/EXTERNAL_ASSETS_REQUIRED.md. <|assistant|> # Assets that cannot be manufactured by source code alone
+
+OM AI now contains executable software for corpus governance, pretraining, SFT, reward modeling, DPO, benchmarks, feedback replay, multimodal encoding and integrations. The following are inputs/results of real-world training rather than files that can honestly be fabricated in a source ZIP.
+
+| Item | Code in repository | External input required | Produced after running work |
+|---|---|---|---|
+| Billions/trillions of licensed tokens | Yes: manifest, cleaning, dedupe, audit, sharding | A legally usable corpus | Tokenized training shards |
+| Months/large-scale GPU training | Yes: single GPU, DDP, FSDP, DeepSpeed paths | GPU cluster, power, storage, scheduler, time | Pretrained checkpoints |
+| Trained 7B/13B/70B weights | Yes: architectures + trainers | Corpus + compute | Owned OM weight files |
+| Instruction tuning | Yes: masked SFT trainer | High-quality instruction/response data | SFT checkpoint |
+| RLHF/preference training | Yes: reward model + DPO | Human/curated preference pairs | Reward/DPO checkpoints |
+| Massive benchmark runs | Yes: benchmark runner/reporting | Evaluation datasets + compute | Reports and regression history |
+| Vision intelligence | Yes: trainable ViT + multimodal projector | Paired image/text or task labels + compute | Vision/VLM weights |
+| Speech recognition foundation | Yes: STFT features + Transformer speech encoder + CTC head | Large speech/transcript corpus + compute | ASR weights |
+| Natural TTS voice | Interface only in this release | A dedicated TTS architecture/data/training project or legally provisioned local weights | TTS weights |
+| World knowledge comparable to a frontier model | Learning/training system exists | Very large broad/high-quality corpus + substantial compute/post-training | Encoded in trained weights |
+| Every CRM/medical/ecommerce/desktop product | Plugin SDK + constrained generic REST connector | Each product's schema, credentials, permissions, business rules and testing | Installed integration plugins |
+| WhatsApp production transport | Adapter contract + development adapter | A supported transport implementation/session/credentials and compliance with platform terms | Working channel transport |
+| Guaranteed AGI/JARVIS | No scientifically valid guarantee exists | Not a well-defined deliverable | No honest guarantee can be made |
+
+The included `artifacts/demo/om-tiny-dpo.pt` is a real checkpoint generated by running pretraining -> SFT -> DPO on the tiny development corpus. It demonstrates the pipeline; it is intentionally not represented as a capable production brain.
+
+<|user|> Summarize key ideas from docs/FINAL_COMPLETION_REPORT.md. <|assistant|> # FINAL COMPLETION REPORT — OM AI Operating Brain
+
+**Date:** 2026-08-25  
+**Package version:** 0.3.0
+
+## SOFTWARE COMPLETE
+
+- Full OM platform (model, tokenizer, corpus, train/SFT/DPO/PPO, RAG, memory, agents, understanding, API, UI, security, registry)
+- Login/register workspace bootstrap (Welcome chat, Companion, Library, Prompts, Memory, Knowledge, Scheduled)
+- ChatGPT-style date grouping in sidebar
+- Local chat push v4: **2761** SFT rows → SFT 4000 steps → DPO 500 steps
+- Context window local config: **max_seq_len=256**
+- Active serve checkpoint target: `artifacts/checkpoints/om-1.0-chat-dpo-v4/latest.pt`
+
+## TRAINING EXECUTION REQUIRED (for ChatGPT-same intelligence)
+
+- Massive licensed corpus
+- GPU cluster for OM-1B / 7B / 13B / 70B
+- Long pretrain + post-train + frontier benchmarks
+
+## MODEL ASSETS PRESENT
+
+| Asset | Reality |
+|-------|---------|
+| `artifacts/checkpoints/om-1.0-chat-dpo-v4/latest.pt` | Tiny ~20M DPO candidate (local) |
+| `artifacts/checkpoints/om-1.0-chat-sft-v4/latest.pt` | Tiny ~20M SFT v4 |
+| Prior om-1.0-* smoke/base/sft | Tiny local |
+| OM-1B…70B learned weights | **Absent** |
+
+## BENCHMARK STATUS
+
+- Local/tiny: exercised via train + unit tests  
+- Frontier vs ChatGPT: **NOT REACHED**
+
+## Honesty
+
+```text
+OM SOFTWARE PLATFORM     ≈ 100% implementable scope
+OM LOCAL CHAT PUSH v4    = DONE
+OM = ChatGPT intelligence = NOT DONE (needs scale training)
+70B TRAINING             = NOT STARTED
+```
+
+<|user|> Summarize key ideas from docs/IMPLEMENTATION_ROADMAP.md. <|assistant|> # IMPLEMENTATION_ROADMAP.md
+
+## This pass (implemented and tested)
+
+1. Entity/meaning (PM + India); typo `dahsbaord`.
+2. Coding kinds: React login page (frontend), Python API project (backend).
+3. Knowledge: `EmbeddingIndex` (vector + metadata) used by retrieval; fact lookup for high-precision Q&A.
+4. Reasoning: confidence on pipeline output.
+5. Evaluation: relevance, correctness, intent-answered, missing, confidence.
+6. Tests in `tests/test_os_validation.py` — features are not marked complete until those tests pass.
+
+## Next
+
+1. Optional dense encoder behind `PersistentKnowledgeBase.embed_text` when a local model is configured (still no cloud embed API by default).
+2. Auto knowledge-graph triples from ingested chunks.
+3. Allow-listed test runner in CodingAgent (not dry-run only).
+4. Conversation summarization into experience memory.
+
+## Later (weights, not this repo checkout)
+
+Train OM-7B/70B on licensed data. Do not mark “5-level trained weights” complete until checkpoints exist and eval suite passes against them.
+
+## Never on the roadmap as product claims
+
+- Human consciousness
+- Infinite knowledge without data
+
+<|user|> Summarize key ideas from docs/IMPLEMENTATION_STATUS.md. <|assistant|> # Implementation Status — OM AI v0.3
+
+## Software complete (executable in-repo)
+
+Platform version target: **0.3.0** (`pyproject.toml`, FastAPI `om_ai/api/main.py`).
+
+- Decoder-only Transformer (`om_ai/model/`): GQA/MHA, causal attention, optional cross-attention, RoPE, SwiGLU, RMSNorm/LayerNorm, residuals, KV cache, gradient checkpointing hooks
+- Byte-level BPE tokenizer (`om_ai/tokenizer/`)
+- License-first corpus path (`om_ai/data/`, `om_ai/corpus/`): manifest validation, PII scrub, exact/near-dup, audit, shard, stats CLI
+- Pretrain trainer; DDP/FSDP (`distributed.py`); DeepSpeed ZeRO-3 entry
+- Masked SFT; pairwise reward model; DPO; PPO infrastructure (GAE, clipped surrogate, KL)
+- Checkpoint bundles with integrity; model registry lifecycle
+- Benchmark runner + smoke/perplexity harness (`om_ai/eval/`)
+- Feedback store + SFT/preference replay (`om_ai/continuous/`)
+- SQLite multi-kind memory; persistent RAG; planner + agent orchestrator
+- OpenAPI/project discovery; shell allow-list; knowledge tool; integration plugin SDK; HTTP connector; WhatsApp transport contract
+- Trainable ViT + multimodal projector; speech STFT encoder + CTC head; multimodal request router
+- Security: API keys, RBAC, SSRF guard, audit log, rate limits, secret store (`om_ai/security/`)
+- FastAPI v0.3 surface + CLI (`om-ai …`)
+- Docker / compose packaging
+- Tiny demo DPO checkpoint proving pretrain→SFT→DPO trains real tensors
+- Automated tests under `tests/` (run `pytest -q`)
+
+## Requires external training / providers (not claimed done)
+
+- Frontier-quality **trained** 1B / 7B / 13B / 70B weights
+- Billions–trillions of licensed training tokens
+- Large GPU cluster wall-time for those scales
+- Large curated instruction and preference corpora
+- Production VLM / ASR / TTS weights and datasets (TTS is contract-only here)
+- Per-product integration credentials and compliance
+- Production WhatsApp transport/session
+
+## v0.3 vs training reality
+
+| Layer | Status |
+|-------|--------|
+| Software platform (code, CLI, API, trainers, agents, RAG, security) | **Complete for v0.3 software scope** |
+| Tiny pipeline demo weights | Present under `artifacts/demo/` — not a capable LM |
+| OM-1B / 7B / 13B / 70B intelligence | **Not complete** until real data + compute produce and pass evals |
+
+A neural network’s learned knowledge is in its weights. Source code implements learning mechanisms; it does not substitute for data, optimization runs, and resulting parameters. See `TRAINING_RUNBOOK.md`, `EXTERNAL_ASSETS_REQUIRED.md`, and `TRAINING_70B.md`.
+
+<|user|> Summarize key ideas from docs/INTEGRATIONS.md. <|assistant|> # Integrations
+
+Package: `om_ai/integrations/`.
+
+| Module | Role |
+|--------|------|
+| `plugin.py` | `IntegrationPlugin` ABC, `ActionSpec`, `PluginRegistry` |
+| `http_connector.py` | Restricted REST connector (SSRF-aware usage patterns) |
+| `whatsapp.py` | WhatsApp transport **contract** + development adapter |
+
+Discovery helpers: `om_ai/discovery/openapi.py` (OpenAPI tool), `om_ai/discovery/project.py` (`om-ai project-scan`).
+
+## Plugin pattern
+
+Implement `health()`, `actions()`, `execute(action, arguments)`; register with `PluginRegistry`. Keep secrets in `om_ai/security/secrets.py` / env — never in prompts.
+
+## What you must supply
+
+Product schemas, credentials, compliance review, and tests for each CRM/ERP/channel. Generic connectors do not magically understand every SaaS API.
+
+## WhatsApp
+
+Production session/transport credentials and platform-policy compliance are **external**. The repo ships an adapter interface suitable for local/dev wiring, not a claimed production Meta Business deployment.
+
+<|user|> Summarize key ideas from docs/JARVIS_OPERATING_INTELLIGENCE.md. <|assistant|> # OM AI — JARVIS-Level Operating Intelligence
+
+**Parent blueprint:** [`PROJECT_GENESIS_JARVIS.md`](PROJECT_GENESIS_JARVIS.md) (Chief Architect constitution)
+
+**Clarification:** A real JARVIS is not a prompt. A prompt shapes behavior. The system is:
+
+```text
+Model + Memory + Sensors + Tools + Robotics + Electronics
++ Knowledge + Learning + Hardware Integration + Experience UI
+(+ future Bio-Digital Research — not a complete shippable machine today)
+```
+
+This document converts the vision into an **engineering roadmap** Cursor can build module-by-module.
+
+## Core cycle (every task)
+
+```text
+Observe → Understand → Think → Plan → Execute → Verify → Improve
+```
+
+Implemented entrypoint: `om_ai.operating_intelligence.facade.run_cycle(...)`
+
+## Capability map (repo truth)
+
+| # | Vision area | Status | Implementation |
+|---|-------------|--------|----------------|
+| 1 | Human understanding | PARTIAL | `om_ai/understanding/`, `agent/intent.py` |
+| 2 | Long-term memory | EXISTS | `om_ai/memory/`, workspace APIs |
+| 3 | Reasoning / planning / review | PARTIAL | `reasoning/`, `agent/planner.py`, `verifier.py` |
+| 4 | Software engineering agents | PARTIAL | `discovery/`, `agents/`, allow-listed `actions/shell` |
+| 5 | Knowledge / RAG / science corpus | EXISTS | `knowledge/`, `live_knowledge/`, `corpus/` |
+| 6 | Electronics / IoT / MCU | **MISSING** | stubs: `operating_intelligence/embodiment/electronics.py` |
+| 7 | Sensors | **MISSING** | stubs: `embodiment/sensors.py` |
+| 8 | Robotics | **MISSING** | stubs: `embodiment/robotics.py` |
+| 9 | Voice | PARTIAL | `om_ai/voice/` (scaffold; weights external) |
+| 10 | Vision | PARTIAL | `om_ai/vision/`, `multimodal/` |
+| 11 | Agent automation / tools | EXISTS | `agents/`, `actions/`, `integrations/` |
+| 12 | Digital twin | **MISSING** | stubs: `embodiment/twin.py` |
+| 13 | Self-improvement | PARTIAL | `continuous/` + SFT/DPO/PPO |
+| 14 | Response experience | EXISTS | `response_engine/` + streaming chat UI |
+| 15 | Owned foundation model | PARTIAL | OMAI-20M prove; scale 100M→70B separately |
+
+## Package layout
+
+```text
+om_ai/operating_intelligence/
+  facade.py                 # Observe→…→Improve cycle
+  human/                    # NLU / affect bridges
+  cognition/                # plan + review bridges
+  memory_bridge.py          # memory + knowledge
+  world/                    # code + knowledge world models
+  perception/               # voice + vision bridges
+  automation/               # tools / agents
+  growth/                   # feedback → retrain hooks
+  experience/               # response formatting
+  embodiment/               # HARDWARE STUBS (safe, not fake-complete)
+    electronics.py
+    sensors.py
+    robotics.py
+    twin.py
+    gateway.py              # IoT gateway contract
+```
+
+Existing packages stay the real implementations. `operating_intelligence/` is the **JARVIS facade** that connects them.
+
+## Build phases (ordered)
+
+### Phase A — Digital brain (NOW → next 1–2 milestones)
+1. Strengthen memory (project/code/decision history)
+2. Dense RAG embeddings
+3. Repo tools: read / patch / git / tests
+4. Planner → structured tool calls
+5. Critic / verify loop
+6. Response experience (done — keep improving)
+
+### Phase B — Perception
+1. Wire production STT/TTS adapters behind `voice/`
+2. Wire VLM/OCR behind `vision/` when weights exist
+3. Multimodal chat turns in UI
+
+### Phase C — Embodiment (physical world)
+1. `HardwareControlLayer` API (MQTT/serial/HTTP)
+2. Sensor ingest → normalize → decide → act
+3. MCU profiles: ESP32 / Arduino / RPi / STM32
+4. Robotics controller contract (nav / motors) — sim first
+5. Digital twin state sync
+
+### Phase D — Scale intelligence
+1. OMAI-100M → 1B → 7B → 70B (see `OWN_INTELLIGENCE_ROADMAP.md`)
+2. Domain SFT (code, engineering, robotics manuals — licensed only)
+3. Continuous learning from feedback
+
+## APIs to add (contracts)
+
+| Endpoint (planned) | Purpose |
+|--------------------|---------|
+| `POST /v1/oi/cycle` | Run Observe→Improve on a user goal |
+| `GET /v1
+
+<|user|> Summarize key ideas from docs/MEMORY.md. <|assistant|> # Memory
+
+Module: `om_ai/memory/sqlite_memory.py` — `SQLiteMemoryStore`.
+
+## Kinds
+
+`conversation`, `episodic`, `semantic`, `preference`, `entity`, `task`, `tool`.
+
+## Behavior
+
+- Tenant + user isolation
+- WAL SQLite; optional TTL via `expires_at`
+- Relevance retrieval (token TF-style scoring; no external embedding API required)
+- Schema migration helpers for upgrades
+
+Default path: `artifacts/om_ai.sqlite3` (override with `OM_AI_DB`).
+
+## API / agents
+
+FastAPI memory endpoints and `AgentOrchestrator` can read/write the same store when wired. Memory is **persistence and retrieval**, not a substitute for model parameters — long-term “knowledge in weights” still requires training.
+
+<|user|> Summarize key ideas from docs/MODEL_REGISTRY.md. <|assistant|> # Model Registry
+
+Module: `om_ai/registry/model_registry.py` — CLI: `om-ai registry`.
+
+## Layout
+
+```text
+artifacts/registry/<version>/
+  weights.pt
+  tokenizer.json
+  metadata.json   # state, checksum, benchmarks, provenance, trained flag
+```
+
+## Lifecycle states
+
+`training` → `candidate` → `evaluated` → `approved` → `production` (or `deprecated` from most states). Transitions are enforced; skipping ahead is rejected.
+
+## CLI
+
+```bash
+om-ai registry list --root artifacts/registry
+
+om-ai registry register \
+  --model-id v0.3-tiny-demo \
+  --config configs/tiny.json \
+  --tokenizer artifacts/tokenizer.json \
+  --checkpoint artifacts/demo/om-tiny-dpo.pt \
+  --data-version demo \
+  --architecture om-transformer
+# add --trained only when a real training run produced the weights
+```
+
+Bundles: `om-ai bundle` / `om_ai/checkpoint/bundle.py` (SHA256 integrity).
+
+## Policy
+
+- `trained=False` by default for honesty
+- Attach eval/benchmark dicts before `approved` / `production`
+- Tiny demo checkpoints must not be labeled as OM-7B/70B production brains
+
+<|user|> Summarize key ideas from docs/MULTIMODAL.md. <|assistant|> # Multimodal
+
+Router: `om_ai/multimodal/orchestrator.py` (`MultimodalOrchestrator`, `UnifiedRequest` / `UnifiedResponse`).
+
+Vision-language stack: `om_ai/vision/multimodal.py` (`OMVisionLanguageModel`, `MultimodalProjector`).
+
+## Routing
+
+| Input | Path |
+|-------|------|
+| `documents` | RAG ingest/retrieve (`om_ai/knowledge/`) then augment text prompt |
+| `images` | Vision encoder + projector + LLM cross-attention if configured |
+| `audio` | ASR encoder path if configured |
+| `text` | `LocalLLMEngine` |
+
+Unavailable modalities raise `ModalityUnavailableError` rather than inventing output.
+
+## Requirements for useful multimodal behavior
+
+- LLM config with `cross_attention=true` when using `OMVisionLanguageModel`
+- Trained (or at least jointly trained) vision/ASR weights — **not shipped** as production VLM/ASR
+- Optional extras: `pip install -e '.[vision]'` / `'.[voice]'`
+
+## Honesty
+
+Software routes and trains foundations. There is no claim of GPT-4V-class vision or Whisper-class ASR from the default package alone. See `VISION.md` and `SPEECH.md`.
+
+<|user|> Summarize key ideas from docs/OM10_GENESIS_CORPUS_SPEC.md. <|assistant|> # OM-1.0 Genesis-JARVIS Training Corpus Specification
+
+**Document type:** Training corpus constitution (not a chat prompt)  
+**Converts:** Universal Intelligence System Directive → datasets + examples + eval  
+**Vision refs:** `docs/PROJECT_GENESIS_JARVIS.md`, `docs/JARVIS_OPERATING_INTELLIGENCE.md`  
+**Implementation:** `om_ai/genesis/`, `data/omai-genesis-v1/`
+
+---
+
+## 0. Non-negotiable
+
+```text
+Prompt  ≠  Training
+Behavior tip ≠  Weights
+
+Required:
+  Knowledge / instruction data
++ Fine-tuning (SFT/DPO)
++ Evaluation
++ Checkpoint weights
+```
+
+OM-1.0 learns Genesis-JARVIS by **consuming this corpus**, not by reading a master prompt at inference only.
+
+---
+
+## 1. Corpus mission
+
+Train OM-1.0 to operate as:
+
+```text
+AI Architect + Research Scientist + Software/Systems Engineer
++ Automation Intelligence + Knowledge Engine + Future Technology Designer
+```
+
+Across the **19-layer Universal Intelligence Stack**, with mandatory horizon labels:
+
+| Horizon | Meaning |
+|---------|---------|
+| `current` | Buildable / shippable engineering |
+| `near_future` | Next engineering milestones |
+| `research` | Lab / long-term — **never claim production** |
+
+---
+
+## 2. Dataset layout
+
+```text
+data/omai-genesis-v1/
+  domains.json                         # layer catalog export
+  raw/                                 # licensed books/docs/code (optional)
+    ai/ software/ electronics/ robotics/ science/ research/
+  train/
+    omai_genesis_instruct_v1.jsonl     # primary SFT mix
+    omai_genesis_reasoning_v1.jsonl    # (optional split) multi-step plans
+    omai_genesis_coding_v1.jsonl       # (optional) repo/coding tasks
+    omai_genesis_electronics_v1.jsonl
+    omai_genesis_science_v1.jsonl
+    omai_genesis_agents_v1.jsonl
+    omai_genesis_safety_v1.jsonl
+  eval/
+    smoke.jsonl
+    architecture_holdout.jsonl
+    horizon_honesty.jsonl              # must refuse overclaiming research
+  audit/
+    build_report.json
+```
+
+**Generator (synthetic scale):**
+
+```bash
+om-ai genesis domains
+om-ai genesis generate --count 1000   # seed
+om-ai genesis generate --count 100000 # large synthetic expansion
+```
+
+**Depth:** add licensed materials under `raw/` and convert into the same JSONL schema.
+
+---
+
+## 3. Layer → domain → example kinds
+
+| L | Domain id | Horizon | Example kinds to generate |
+|---|-----------|---------|---------------------------|
+| 1 | `cognitive_core` | current | architecture, reasoning, checklist |
+| 2 | `human_understanding` | current | intent, clarify, explain |
+| 3 | `knowledge_engine` | current | explain, compare, retrieve-plan |
+| 4 | `software` | current | architecture, coding, review |
+| 5 | `autonomous_coding` | current | agent-plan, workflow, coding |
+| 6 | `memory` | current | architecture, explain, checklist |
+| 7 | `digital_twin` | near_future | architecture, simulation, scenario |
+| 8 | `agent_civilization` | current | agent-plan, workflow, architecture |
+| 9 | `electronics` | current | architecture, electronics, checklist |
+| 10 | `robotics` | current | architecture, robotics, scenario |
+| 11 | `scientific_research` | current | research, explain, checklist |
+| 12 | `bio_digital` | research | research, horizon, explain |
+| 13 | `microbial_computing` | research | research, horizon, explain |
+| 14 | `adaptive_memory_research` | research | research, compare, explain |
+| 15 | `energy` | near_future | architecture, explain, checklist |
+| 16 | `human_interface` | current | ux, explain, architecture |
+| 17 | `self_improvement` | current | workflow, checklist, architecture |
+| 18 | `safety` | current | safety, checklist, scenario |
+| 19 | `response_intelligence` | current | format, explain, rewrite |
+| — | `genesis` | near_future | architecture, roadmap, horizon |
+
+Code source of truth: `om_ai/genesis/domains.py` (`layers_catalog()`).
+
+---
+
+## 4. Record schemas
+
+### 4.1 Instruction / SFT (required)
+
+```json
+{
+  "system": "You are OM-1.0 Genesis Intelligence...",
+  "instruction": "Design a digital twin for school transport",
+  "input": "",
+  
+
+<|user|> Summarize key ideas from docs/OM10_GENESIS_TRAINING.md. <|assistant|> # OM-1.0 Genesis Training (quick how-to)
+
+**Full corpus constitution:** [`OM10_GENESIS_CORPUS_SPEC.md`](OM10_GENESIS_CORPUS_SPEC.md)  
+**Vision blueprint:** [`PROJECT_GENESIS_JARVIS.md`](PROJECT_GENESIS_JARVIS.md)
+
+A system prompt does **not** train the model. Use the corpus + SFT.
+
+```bash
+om-ai genesis domains
+om-ai genesis generate --count 1000 \
+  --out data/omai-genesis-v1/train/omai_genesis_instruct_v1.jsonl
+
+om-ai sft \
+  --config configs/omai-20m.json \
+  --tokenizer artifacts/tokenizer-production-65536.json \
+  --checkpoint artifacts/checkpoints/omai-20m-base/latest.pt \
+  --data data/omai-genesis-v1/train/omai_genesis_instruct_v1.jsonl \
+  --output artifacts/checkpoints/omai-20m-genesis-sft \
+  --steps 500 --device mps
+```
+
+Package: `om_ai/genesis/` · Data: `data/omai-genesis-v1/`
+
+<|user|> Summarize key ideas from docs/OMAI_CORPUS_V1.md. <|assistant|> # OMAI-Corpus-v1 — Licensed open data for OM foundation training
+
+OM does **not** use OpenAI/Anthropic as the brain. Training data must be
+**license-approved**, cleaned, and versioned here.
+
+## Production layout
+
+```text
+data/omai-corpus-v1/
+  raw/
+    fineweb/
+    wikipedia/
+    books/
+    papers/
+    code/
+    conversations/
+  cleaned/
+  filtered/
+  deduplicated/
+  tokenized/
+  train/
+  validation/
+  audit/
+  manifest.json
+```
+
+## Phase-1 task checklist
+
+| Task | Status |
+|------|--------|
+| Dataset downloader | ✅ `om-ai corpus fetch` |
+| License tracking | ✅ catalog + JSONL metadata |
+| Data validation | ✅ |
+| Language filtering | ✅ |
+| Quality scoring | ✅ |
+| Duplicate removal | ✅ |
+| PII filtering | ✅ |
+| Toxic content filtering | ✅ |
+| Tokenization | ✅ `tokenized/` |
+| Train/validation split | ✅ |
+
+**Data pipeline software: ~100%.**  
+**TB-scale dataset inventory: still EXTERNAL (raise `--max-docs` / full dumps on big storage).**
+
+## Commands
+
+```bash
+om-ai corpus catalog --training-only
+om-ai corpus fetch --root data/omai-corpus-v1 --max-docs 40 \
+  --sources wikipedia-en,gutenberg,om-owned,fineweb,open-assistant
+om-ai corpus build-v1 --root data/omai-corpus-v1 --max-docs 40
+om-ai train-om1 --data data/omai-corpus-v1/train/corpus.txt --steps 50
+```
+
+See also: `docs/ROADMAP_EXECUTION.md`
+
+<|user|> Summarize key ideas from docs/OM_AI_GENESIS_PLATFORM_V1.md. <|assistant|> # OM AI Genesis Platform v1.0 — System Architecture
+
+**Status:** Production foundation **implemented** (software layers verified).  
+**Report:** `artifacts/GENESIS_PLATFORM_REPORT.json` · `om-ai system build` → **45/45**  
+**Models:** OM-1.0 (foundation) → OM-7.0 → OM-70.0 — shapes + training path; weights need GPU + licensed data.
+
+**Cursor execution master prompt:**  
+[`docs/prompts/OM_AI_GENESIS_PLATFORM_PRODUCTION_MASTER_PROMPT.md`](prompts/OM_AI_GENESIS_PLATFORM_PRODUCTION_MASTER_PROMPT.md)
+
+## EXISTING vs IMPLEMENTED (2026-08-25)
+
+| Layer | Status | Location |
+|---|---|---|
+| 1 Intelligence Core | ✅ | `om_ai/core/intent_engine/`, `core/response/`, `core/reasoning/` |
+| 2 Reasoning Engine | ✅ | `om_ai/core/reasoning/` + `om_ai/reasoning/` |
+| 3 Knowledge Brain | ✅ | `knowledge/`, `knowledge_brain/`, `knowledge_universe/`, `knowledge/corpus.py` |
+| 4 Memory System | ✅ | `om_ai/memory/layers.py` (short/conversation/user/project/experience/skill) |
+| 5 Agent System | ✅ | `om_ai/agents/roles.py` + orchestrator |
+| 6 Tool System | ✅ | `om_ai/tools/` |
+| 7 Coding Intelligence | ✅ | `om_ai/coding_brain/` + coding agent |
+| 8 Multimodal | 🟡 | Document AI ready; vision/voice stubs (`multimodal/*`) |
+| 9 Evaluation | ✅ | `om_ai/evaluation/` + benchmarks |
+| 10 Continuous Learning | ✅ | `om_ai/learning/` + continuous |
+| 11 Training Pipeline | ✅ | `om_ai/training/`, `configs/`, `training/` |
+| 12 Security | ✅ | `om_ai/security/` |
+| 13 Enterprise | ✅ | `om_ai/enterprise/` + tenancy |
+
+**External only:** OM-1B/7B/70B weights · massive licensed corpora · GPU time · trained vision/ASR/TTS.
+
+## Vision
+
+Traditional: `User → Prompt → LLM → Answer`  
+
+OM AI: Human → Experience Layer → Cognitive OS → (Intelligence Core, Reasoning, Planning, Memory, Knowledge, Agents, Tools, Multimodal, Hardware, Robotics, Research) → Real-world systems.
+
+The LLM is the **core brain**, not the whole product.
+
+## Map to this repo
+
+| Spec area | Repository location |
+|---|---|
+| Core / intent / reasoning | `om_ai/understanding/`, `om_ai/agent/`, `om_ai/runtime/` |
+| Memory | `om_ai` memory APIs + chat memory flags |
+| Knowledge / RAG | `om_ai/knowledge/`, **`om_ai/knowledge_brain/`** |
+| Agents / tools | `om_ai/agent/` |
+| Response intelligence | `om_ai/response_engine/` |
+| Training | `om_ai/training/`, `om_ai/data_pipeline/` |
+| Multimodal | `om_ai/multimodal/`, `om_ai/vision/` |
+| Hardware / robotics | `om_ai/operating_intelligence/embodiment/` |
+| Genesis / JARVIS | `om_ai/genesis/`, `docs/PROJECT_GENESIS_JARVIS.md` |
+| API / frontend | `om_ai/api/`, `om_ai/api/static/chat.html` |
+| Security | `om_ai/security/` |
+
+## Version strategy
+
+| Model | Role |
+|---|---|
+| **OM-1.0** | Foundation: conversation, coding, reasoning, docs, agents, memory, tools |
+| **OM-7.0** | Professional: deeper reasoning, larger context, complex design |
+| **OM-70.0** | Large-scale: scientific depth, enterprise, complex agents |
+
+## Knowledge Brain (1600–2026)
+
+See **[`OM_KNOWLEDGE_BRAIN_1600_2026.md`](OM_KNOWLEDGE_BRAIN_1600_2026.md)** and package `om_ai/knowledge_brain/`.
+
+Honest rule: **prompt ≠ weights**. Path = corpus + RAG + SFT + scale.
+
+## Roadmap phases
+
+1. **OM-1.0** — core, memory, agents, coding, knowledge, response engine  
+2. **OM-1.0 Advanced** — vision, voice, automation, richer tools  
+3. **OM-7.0** — advanced reasoning, large context, enterprise  
+4. **OM-70.0** — large model + scientific / autonomous agents  
+
+## Commands
+
+```bash
+om-ai system build
+om-ai intent classify "Create React login page"
+om-ai reason "Create React login page"
+om-ai knowledge status
+om-ai evaluate run
+om-ai continuous export
+om-ai knowledge-brain catalog
+om-ai knowledge-brain generate --count 2000
+```
+
+Related: [`PROJECT_GENESIS_JARVIS.md`](PROJECT_GENESIS_JARVIS.md), [`OM10_GENESIS_CORPUS_SPEC.md`](OM10_GENESIS_CORPUS_SPEC.md), [`OWN_INTELLIGENCE_ROADMAP.md`](OWN_INTELLIGENCE_ROADMAP.md).
+
+<|user|> Summarize key ideas from docs/OM_CHATGPT_GAP_ANALYSIS.md. <|assistant|> # OM AI ↔ ChatGPT — Complete Gap Analysis
+
+**Updated:** 2026-08-25  
+**Thesis:** ChatGPT = strong trained model + product ecosystem.  
+OM AI = strong software ecosystem + early model + incomplete intelligence layers.
+
+OM does **not** only need a bigger model. It needs the **full intelligence stack** around the model.
+
+---
+
+## Core difference
+
+| | ChatGPT | OM AI (today) |
+|---|---|---|
+| Brain | Extremely strong trained weights | Small local checkpoints (~20M-class / short SFT–DPO) |
+| Factory | Closed | Open: train / agents / RAG / eval / serve |
+| Ownership | Cloud product | Self-hosted ✅ |
+
+**Honest split:** software platform ~**97%** · chat intelligence vs ChatGPT ~**18–25%**.
+
+---
+
+## Area status (honest)
+
+| Area | Current OM | Missing / required | Status |
+|---|---|---|---|
+| Ownership | Self-hosted | — | ✅ Complete |
+| Model size | Local tiny / short-train ckpts | Real OM-1B → 7B → 70B **weights** | 🔴 External compute |
+| Chat quality | Weak open conversation | Larger pretrain + instruct + reasoning train | 🔴 Needs weights + data |
+| Training stack | Pretrain/SFT/DPO/PPO/eval | Large datasets + actual scale runs | 🟡 Framework ✅ / runs 🔴 |
+| Knowledge | Corpus layout + RAG | Massive high-quality ingestion | 🟡 Structure ✅ / volume 🔴 |
+| Agents/tools | Framework exists | Stronger autonomy + execution | 🟡 Built / weak intelligence |
+| Memory/RAG | SQLite + knowledge engine | Semantic memory + consolidation | 🟡 Partial |
+| API/UI | `om-ai serve` + `/chat` | Scale, monitoring, multi-org polish | 🟡 Strong base |
+| Privacy | Local ownership | — | ✅ Complete |
+| Cost | Your infra | Optimized train/infer stack | 🟡 Path exists |
+
+---
+
+## Ten critical systems
+
+### 1. Foundation model intelligence — 🔴 biggest gap
+Software path exists (`configs/`, trainers, registry). **Trained 1B/7B/70B weights do not.**
+
+Need: large pretrain corpus · distributed training · tokenizer maturity · scaling · model eval.
+
+### 2. Universal Knowledge Brain — 🟡
+Layout + ingest + RAG + graph scaffold exist (`knowledge-brain`, `knowledge-universe`, `om-ai knowledge *`).
+
+Need: automated bulk ingest · document understanding · fact verify · source ranking · real licensed corpora.
+
+### 3. Advanced reasoning engine — 🟢 software upgraded / 🔴 trained depth
+Pipeline v2: intent → plan → domain solutions (React login, school SMS, …) → verify → reflect + RAG.
+CLI: `om-ai reason "Create React login page"` returns Understanding / Architecture / Implementation / Validation.
+
+Need: critic quality · multi-step tool loops · reasoning SFT on larger weights.
+
+### 4. Coding intelligence — 🟡
+Coding agent + planner exist; not Cursor-class yet.
+
+Need: large code data · repo training · SWE-style eval · safe sandbox exec.
+
+### 5. Autonomous agent system — 🟡
+Orchestrator + roles exist.
+
+Need: agent memory · inter-agent protocol · long-running tasks · reliable tool success.
+
+### 6. Multimodal — 🟢 document AI / 🔴 vision-voice product
+Document AI ready (`om_ai.multimodal.document_ai`). ViT/ASR code stubs remain; no trained multimodal chat product yet.
+
+### 7. Real-time knowledge — 🟡 gated
+Live-knowledge stubs exist; not always enabled.
+
+Need: web/API/DB connectors · ranking · freshness · safety gates.
+
+### 8. Evaluation platform — 🟢 expanded
+`om-ai evaluate run` scores reasoning/coding/math/knowledge/agents/safety + feeds weak areas into learning cycle.
+
+### 9. Continuous learning — 🟢 closed software loop
+Feedback → improvement queue → SFT/DPO export → recipe → optional eval weak-area synthesis (`om-ai continuous export`).
+
+### 10. Production platform — 🟡 partial
+Auth, API keys, RBAC, audit, rate limits exist.
+
+Need: orgs · billing · richer analytics · HA serving · ops monitoring.
+
+---
+
+## Evolution path
+
+```text
+OM-1.0  →  small model + strong system + RAG + agents + coding
+           = powerful local assistant
+
+OM-7.0  →  7B + large corpus + reasoning/coding train + multimodal
+           = professional engineer/research assistant
+
+OM-70.0 →  large model + huge data + advanced reasonin
+
+<|user|> Summarize key ideas from docs/OM_COMPLETION_ROADMAP.md. <|assistant|> # OM Completion Roadmap — From Platform to AI Operating System
+
+**Updated:** 2026-08-25  
+**Honesty:** Software can be completed in-repo. **1B / 7B / 70B intelligence** needs licensed data + GPU time. This doc tracks both.
+
+**Canonical ChatGPT gap analysis:** [`OM_CHATGPT_GAP_ANALYSIS.md`](OM_CHATGPT_GAP_ANALYSIS.md)  
+**Rule:** OM needs the full intelligence stack around the model — not only bigger weights.
+
+## Status board
+
+| Layer | Status | Notes |
+|---|---|---|
+| Software platform | ✅ ~95–97% | API, train, agents, memory, security |
+| UI/UX | ✅ ~70–85% | ChatGPT-like; keep polishing |
+| Massive knowledge corpus | 🟡 scaffold → grow | `om-ai knowledge-universe init` |
+| Reasoning engine | 🟡 → software DONE | `om_ai/reasoning/engine.py` |
+| Coding agent | 🟡 contract + loop | `om_ai/agent/coding_agent.py` |
+| Multi-agent collab | 🟡 present | Orchestrator + roles |
+| Memory layers | 🟡 SQLite strong | Ranking/consolidation hooks |
+| Multimodal | 🔴 weights EXTERNAL | ViT/ASR code exists |
+| Evaluation platform | 🟡 → software DONE | `om-ai eval suite` |
+| Continuous learning | 🟡 offline DONE | feedback → SFT/DPO JSONL |
+| Alignment (DPO/RLHF) | 🟡 trainers exist | Need preference volume |
+| Live knowledge | 🟡 gated | Enable network flags |
+| Hardware/robotics | 🔴 stubs | Embodiment dry-run |
+| Enterprise / scale | 🟡 partial | Multi-tenant API keys exist |
+| Foundation 20M→1B→70B | 🔴 compute | Configs + train path only |
+
+## The six must-complete gaps
+
+1. **Large model weights** — train 100M → 1B → 7B → 70B on GPU  
+2. **Huge quality dataset** — Knowledge Universe + licensed books/code/papers  
+3. **Reasoning training** — engine + reasoning SFT/eval  
+4. **Coding intelligence training** — coding agent + SWE-style eval  
+5. **Evaluation system** — measure every checkpoint  
+6. **Continuous learning** — feedback → dataset → fine-tune → new version  
+
+## Phases
+
+### Phase 1 — OM Brain Upgrade
+`20M → 100M → 1B` strong language + coding on real tokens.
+
+### Phase 2 — Knowledge Expansion
+Fill `data/om-knowledge-universe-v1/` (books, papers, code, docs) + RAG embeddings.
+
+### Phase 3 — Agent Intelligence
+Coding/research/security agents with memory + tool selection.
+
+### Phase 4 — OM-7
+Professional assistant (7B-class + eval pass).
+
+### Phase 5 — OM-70
+Large-scale platform (70B-class + enterprise serving).
+
+## Commands (software you can run now)
+
+```bash
+# Knowledge Universe folders
+om-ai knowledge-universe init
+
+# Reasoning demo (no GPU)
+om-ai reason "Design a FastAPI auth service"
+
+# Evaluation suite (heuristic + optional model)
+om-ai eval suite --out artifacts/eval/latest.json
+
+# Continuous learning export
+om-ai continuous export --out data/continuous/
+
+# Coding agent dry-run on this repo
+om-ai coding plan --root . --task "Add health check endpoint"
+```
+
+## What “complete” means
+
+| Claim | Meaning |
+|---|---|
+| Software complete | Code paths exist and tests pass |
+| Intelligence complete | Eval scores rise with larger trained checkpoints |
+| Never | Fabricating 70B `.pt` files without training |
+
+<|user|> Summarize key ideas from docs/OM_ENTERPRISE_PRODUCTION_V1.md. <|assistant|> # OM AI Enterprise Production Architecture v1.0
+
+**Code, not slides.** Build with:
+
+```bash
+om-ai platform build
+om-ai platform health
+om-ai platform workflow --request "Create React login page"
+om-ai platform route --path chat --prompt "Create React login page"
+om-ai platform route --path metrics
+```
+
+## Services (13 healthy)
+
+identity · users · billing · audit · model_gateway · model_lifecycle · agents · reasoning · knowledge · retrieval · memory · evaluation · learning
+
+## Layout
+
+- `services/` — full microservice mesh (in-process locally)
+- `ai_platform/` — orchestration, policies, prompts, workflows, agent capability.json
+- `data_platform/` · `training_platform/` · `infrastructure/{docker,kubernetes,monitoring,terraform}`
+- `security/` — authentication/encryption/secrets/compliance facades
+
+## Report
+
+`artifacts/ENTERPRISE_PLATFORM_REPORT.json`
+
+## Honest boundary
+
+In-process service mesh for Mac. Split deploy via Docker/K8s. GPU weights + managed Postgres/Vector remain external.
+
+<|user|> Summarize key ideas from docs/OM_FOUNDATION_UPGRADE_V1.md. <|assistant|> # OM AI Foundation Upgrade v1.0
+
+Additive software foundation. Does **not** replace existing `om_ai/` packages.
+
+## Modules
+
+| Spec | Location |
+|---|---|
+| Reasoning (analyze→plan→solve→verify→reflect) | `om_ai/core/reasoning/` |
+| Document ingestion | `om_ai/knowledge/ingestion/` |
+| Vector retrieval | `om_ai/knowledge/retrieval/` |
+| Evaluation | `om_ai/evaluation/` |
+| Learning | `om_ai/learning/` |
+| Upgrade runner | `om_ai/foundation/` |
+| APIs | `om_ai/api/foundation_routes.py` |
+
+## One command
+
+```bash
+om-ai upgrade foundation
+```
+
+Creates folders, knowledge-universe layout, training prep, runs eval, writes:
+
+`artifacts/FOUNDATION_UPGRADE_REPORT.json`
+
+## APIs
+
+- `POST /api/knowledge/upload`
+- `POST /api/knowledge/search`
+- `POST /api/reasoning/analyze`
+- `POST /api/evaluation/run`
+- `POST /api/learning/feedback`
+- `POST /api/learning/export`
+
+## Remaining external
+
+OM-1B / 7B / 70B **weights** still need licensed data + GPU. Path is ready via `training/` + `configs/om-1b.json` etc.
+
+<|user|> Summarize key ideas from docs/OM_KNOWLEDGE_BRAIN_1600_2026.md. <|assistant|> # OM Universal Knowledge Brain (1600–2026)
+
+Build a **knowledge ecosystem**, not a single mega-text dump into weights.
+
+```
+OM AI
+  └─ Knowledge Intelligence Layer
+       ├─ Historical eras (1600–2026)
+       ├─ Domain brains (math, physics, CS, AI, …)
+       ├─ Vector / RAG retrieval
+       ├─ Instruction SFT rows
+       └─ Reasoning + agents + memory
+```
+
+## Eras
+
+| Era | Years | Focus |
+|---|---|---|
+| 1 | 1600–1700 | Scientific Revolution |
+| 2 | 1700–1800 | Enlightenment + industrial foundation |
+| 3 | 1800–1900 | Industrial Revolution |
+| 4 | 1900–1950 | Relativity, quantum, computing foundations |
+| 5 | 1950–2000 | Computer revolution + AI history |
+| 6 | 2000–2020 | Internet, cloud, deep learning |
+| 7 | 2020–2026 | Transformers, LLMs, agents, RAG |
+
+## Domains (folders under `data/om-knowledge-brain-v1/knowledge/`)
+
+`history`, `mathematics`, `physics`, `chemistry`, `biology`, `medicine`, `engineering`, `electronics`, `robotics`, `programming`, `computer_science`, `artificial_intelligence`, `business`, `psychology`, `philosophy`, `future_technology`
+
+Each domain: `raw/` → `cleaned/` → `chunks/` → `embeddings/`
+
+## Levels
+
+1. **Knowledge base** — licensed docs/books/papers in `raw/`  
+2. **RAG** — retrieve → OM reason → answer  
+3. **Fine-tune** — style, reasoning, domain skills (SFT/DPO)  
+4. **Pretrain scale** — OM-1.0 → OM-7.0 → OM-70.0 with real compute  
+
+## CLI
+
+```bash
+om-ai knowledge-brain catalog
+om-ai knowledge-brain init --root data/om-knowledge-brain-v1
+om-ai knowledge-brain generate --count 5000 \
+  --out data/om-knowledge-brain-v1/train/om_knowledge_instruct_v1.jsonl
+```
+
+Master directive (prompt extract): [`prompts/OM_AI_UNIVERSAL_KNOWLEDGE_DIRECTIVE.md`](prompts/OM_AI_UNIVERSAL_KNOWLEDGE_DIRECTIVE.md)
+
+## What “complete” means here
+
+- **Complete architecture + domain map + eras + pipelines:** yes (this doc + package)  
+- **Complete literal dump of all human knowledge 1600–2026 inside one checkpoint:** no — continuous corpus growth + RAG + training  
+
+Add licensed sources into `knowledge/<domain>/raw/` and grow volume over time.
+
+<|user|> Summarize key ideas from docs/OM_OPERATING_SYSTEM.md. <|assistant|> # OM Operating System — architecture, gaps, roadmap
+
+OM is a **cognitive operating system** around locally trained checkpoints. It is not ChatGPT, does not ship OpenAI weights, private RLHF data, or a finished frontier brain.
+
+## Required architecture (this repo)
+
+```text
+USER
+  → Cognitive Understanding (intent, spelling, language, meaning, context)
+  → Memory (short / long / project / preference)
+  → Knowledge Brain (ingest, retrieve, rank, graph)
+  → Reasoning (understand → analyze → options → decide → implement → validate)
+  → Agents (coding, research, security, database, testing, deployment)
+  → Response Intelligence (format, language match, highlights)
+  → Evaluation (correctness, completeness, relevance, safety, quality)
+  → USER
+```
+
+## What exists now (production software)
+
+| Pillar | Status | Where |
+|--------|--------|--------|
+| Cognitive understanding | **Live** (heuristic) | `om_ai/understanding/`, `om_ai/cognitive/` |
+| Reasoning | **Live** (heuristic + RAG + optional OM-1.0) | `om_ai/core/reasoning/` |
+| Knowledge | **Live** (SQLite TF-IDF RAG, ingest, selector, ranker, JSON graph) | `om_ai/knowledge/` |
+| Memory | **Live** (SQLite layers + session turn write) | `om_ai/memory/` |
+| Coding intelligence | **Live** (architect blueprint: files, install, tests — not canned UI) | `om_ai/core/reasoning/coding_intelligence.py` |
+| Agents | **Partial-live** (specialists emit real plans/reviews/schemas) | `om_ai/agents/specialists.py` |
+| Response intelligence | **Live** | `om_ai/core/response/`, `om_ai/response_engine/` |
+| Evaluation | **Live** (online 5-dimension gate + offline suite) | `om_ai/evaluation/online.py` |
+| Serve path | **Live** | Absolute OS in `om_ai/operating_intelligence/facade.py` via `om-ai serve` |
+
+Chat path: `POST /v1/chat` → `OperatingIntelligence.run` (default) → polish → stream UI.
+
+## Honest gaps
+
+- **Generative leap** still needs licensed data + GPU training of OM checkpoints. Layers structure answers when the tiny local model is weak.
+- Retrieval is **lexical/TF-IDF**, not dense vectors by default (`docs/RAG.md`).
+- Knowledge graph is JSON triples, not a production graph DB.
+- Specialists produce **work products** (architecture, threat checks, schemas, test plans). They do not silently rewrite the user's disk unless an allow-listed apply path is used (`CodingAgent` dry-run default).
+- Voice/vision and hardware embodiment remain gated stubs.
+
+## Implementation roadmap
+
+1. **Done in this pass:** identity directive; language (e.g. `creat react dahsborad`); project-mode coding blueprints; specialist agents; online eval; domain ranking; session memory writes; capability board contract.
+2. **Next:** dense embeddings behind `VectorKnowledgeLayer`; auto-KG from ingest; stack-specific lint/test runners on allow-list; SSE `ui_phases` from cognitive state.
+3. **Then:** attach OM-1.0 `complete_fn` to eval suite in CI; conversation summarization STM→LTM.
+
+## Docker / APIs / tests
+
+- Serve: `Dockerfile`, `docker-compose.yml`, `docs/DEPLOYMENT.md`.
+- OS API: `GET /v1/oi/status`, `POST /v1/oi/cycle`.
+- Tests: `tests/test_operating_system.py`, `tests/test_human_like_assistant.py`, `tests/test_operating_intelligence.py`.
+
+<|user|> Summarize key ideas from docs/OM_PRODUCTION_FOUNDATION.md. <|assistant|> # OM Production Foundation — Complete Mode
+
+Target: **everything around the model is built and verified**.
+
+**Next full build (13-layer Cognitive OS):** paste  
+[`docs/prompts/OM_AI_GENESIS_PLATFORM_PRODUCTION_MASTER_PROMPT.md`](prompts/OM_AI_GENESIS_PLATFORM_PRODUCTION_MASTER_PROMPT.md)  
+into a new Cursor Agent chat.
+
+```bash
+om-ai system build
+```
+
+Report: `artifacts/SYSTEM_BUILD_REPORT.json`
+
+## Verified commands
+
+```bash
+om-ai knowledge status
+om-ai knowledge ingest path/to/file.txt
+om-ai reason "Design a school management system"
+om-ai evaluate run
+om-ai continuous export
+om-ai system check
+```
+
+## APIs
+
+- `GET /health` → `{status: healthy, om_version: 1.0}`
+- `POST /api/knowledge/upload|search`
+- `POST /api/reasoning/analyze`
+- `POST /api/evaluation/run`
+- `POST /api/learning/feedback`
+
+## External only
+
+OM-1B / 7B / 70B **weight files** still need GPU + licensed data volume.  
+The software path (configs, datasets layout, eval, learning, APIs) is complete.
+
+<|user|> Summarize key ideas from docs/OM_UPGRADE_SPRINT1.md. <|assistant|> # OM Upgrade Sprint 1 — Execution (not analysis)
+
+Built **running Python**, not another gap table.
+
+```bash
+om-ai upgrade sprint1
+```
+
+Report: `artifacts/OM_UPGRADE_SPRINT1_REPORT.json`
+
+## Modules added
+
+| Module | Path |
+|--------|------|
+| Self-Improvement Engine | `om_ai/improvement/` |
+| Knowledge Factory | `om_ai/knowledge/factory.py` |
+| Agent Runtime | `om_ai/agents/runtime.py` |
+| Response Quality Intelligence | `om_ai/core/response/intelligence.py` |
+
+## New commands
+
+```bash
+om-ai upgrade sprint1
+om-ai improve --question "..." --answer "..."
+om-ai agent-runtime --task "Add health check" --root .
+```
+
+## Loop (now real)
+
+```text
+Answer → Evaluate → Weakness → Training JSONL → Trainer queue → Version bump
+```
+
+Chat path: low-quality native replies are repaired + queued for improvement (`chat_backend` → `ensure_intelligent_response`).
+
+Restart serve to load chat wiring:
+
+```bash
+om-ai serve --host 127.0.0.1 --port 8080
+```
+
+<|user|> Summarize key ideas from docs/OWN_INTELLIGENCE_ROADMAP.md. <|assistant|> # OM AI Own Intelligence Roadmap
+
+Factory first. Then increase production.
+
+```text
+OMAI-20M   ← prove owned brain (tokenizer + arch + weights + train)
+    ↓
+OMAI-100M
+    ↓
+OMAI-1B
+    ↓
+OMAI-7B
+    ↓
+OMAI-70B   ← mass production (cluster)
+```
+
+No OpenAI / Claude / Llama as the brain. Only OM AI.
+
+## Step 1 — Prove the brain (CURRENT)
+
+Own:
+
+| Asset | Path |
+|-------|------|
+| Tokenizer | `artifacts/tokenizer-production-65536.json` |
+| Architecture | `configs/omai-20m.json` |
+| Corpus | `data/omai-corpus-v1/` |
+| Train | `om-ai train-om1 …` |
+| Weights | `artifacts/checkpoints/omai-20m-base/` |
+
+```bash
+# Corpus (pipeline already complete; scale max-docs when ready)
+om-ai corpus build-v1 --root data/omai-corpus-v1 --max-docs 40
+
+# First fully owned checkpoint from OMAI-Corpus-v1
+om-ai train-om1 \
+  --config configs/omai-20m.json \
+  --tokenizer artifacts/tokenizer-production-65536.json \
+  --data data/omai-corpus-v1/train/corpus.txt \
+  --output artifacts/checkpoints/omai-20m-base \
+  --steps 200 --batch-size 4 --device mps
+```
+
+Success = `Input → OM AI → own generated output` from `omai-20m-base/latest.pt`.
+
+## Step 2 — Grow intelligence
+
+Scale params + tokens + GPUs: 100M → 1B → 7B. Configs under `configs/`.
+
+## Step 3 — Brain system (parallel, even before 70B)
+
+```text
+Model + Memory + Tools + Agents + Knowledge + Code Understanding
+```
+
+A smaller model with this stack beats a large chat-only model.
+
+## Step 4 — OMAI-70B
+
+Own weights, tokenizer, dataset, training code, inference, deploy — on cluster compute.
+
+## Honesty
+
+| Piece | Status |
+|-------|--------|
+| Software factory | ~97–100% |
+| Corpus pipeline | ~100% (volume still sample until scaled dumps) |
+| OMAI-20M owned checkpoint | train with command above |
+| 1B–70B | engineering + compute after 20M proof |
+
+See also: `docs/OMAI_CORPUS_V1.md`, `docs/ROADMAP_EXECUTION.md`
+
+<|user|> Summarize key ideas from docs/OWN_MODEL_MILESTONE1.md. <|assistant|> # OM AI Own Model — Completion Tracker
+
+Milestone 1 target: **OMAI-Corpus-v1 + first own weights** (no third-party LLM brain).
+
+```text
+Data → Tokenizer → Training → Checkpoint → Inference → OM AI answers
+```
+
+## Tracker
+
+| Component | Status | Notes |
+|-----------|--------|-------|
+| OM Software Platform | **~97%** | Serve, agents, API |
+| Tokenizer (chat specials) | **~85%** | Production 65k; `<\|code\|>` etc. planned |
+| Corpus Pipeline | **~95%** | `om_ai/data_pipeline/` + `data/omai-corpus-v1/` |
+| OMAI-20M train path | **~80%** | Config + train-om1 + prove script |
+| First own checkpoint | **run train** | `artifacts/checkpoints/omai-20m-base/` |
+| 1B / 7B / 70B | **0%** | After 20M proof + compute |
+
+## Factory layout (in-repo)
+
+| Roadmap name | OM path |
+|--------------|---------|
+| `om-ai-corpus-v1/` | `data/omai-corpus-v1/` |
+| `data_pipeline/` | `om_ai/data_pipeline/` |
+| `om-ai-model/` | `om_ai/model/` |
+| `om-ai-training/` | `om_ai/training/` |
+| `om-ai-inference/` | `om_ai/runtime/` (`om-ai generate`) |
+| `om-ai-evaluation/` | `om_ai/eval/` |
+
+## Commands
+
+```bash
+# Phase 1–2 corpus factory
+om-ai data-pipeline run --root data/omai-corpus-v1 --max-docs 40
+om-ai data-pipeline validate
+om-ai data-pipeline tokenizer-status
+
+# Phase 5–8: train + infer (owned brain)
+./scripts/train_omai_20m_prove.sh
+om-ai generate --config configs/omai-20m.json \
+  --tokenizer artifacts/tokenizer-production-65536.json \
+  --checkpoint artifacts/checkpoints/omai-20m-base/latest.pt \
+  --prompt "Explain Python" --max-new-tokens 40
+```
+
+## Scale path
+
+```text
+OMAI-20M → OMAI-100M → OMAI-1B → OMAI-7B → OMAI-70B
+```
+
+See `docs/OWN_INTELLIGENCE_ROADMAP.md`.
+
+<|user|> Summarize key ideas from docs/PROJECT_GENESIS_JARVIS.md. <|assistant|> # PROJECT GENESIS-JARVIS
+## OM AI Bio-Digital Superintelligence Blueprint
+
+**Document type:** Chief Architect Blueprint (foundation document)  
+**Classification:** Vision + Architecture + Roadmap  
+**Parent platform:** OM AI Operating Intelligence Platform  
+**Project name:** Genesis-JARVIS  
+
+---
+
+### Document honesty (mandatory)
+
+| Layer | Reality |
+|-------|---------|
+| **Buildable now** | OM AI software, agents, memory, tools, owned model pipeline, gated IoT/robotics contracts |
+| **Near-future research** | Dense RAG, stronger agents, MCU/IoT dry-run → production, neuromorphic / organic electronics R&D |
+| **Long-term bio-hybrid vision** | Microbial neural mesh, living processors, engineered microbes, bio-memory — **advanced research concepts**, not a complete machine you can ship today |
+
+A prompt or blueprint does **not** create superintelligence. Capability requires:
+
+```text
+AI Model + Memory + Sensors + Tools + Robotics + Electronics
++ Knowledge + Learning System + Hardware Integration
+(+ optional future Bio-Digital Research Interface)
+```
+
+Related engineering docs (implementation truth):
+
+- `docs/JARVIS_OPERATING_INTELLIGENCE.md` — modules, APIs, stubs  
+- `docs/OWN_INTELLIGENCE_ROADMAP.md` — OMAI-20M → 70B factory path  
+- `docs/OWN_MODEL_MILESTONE1.md` — corpus + first own weights  
+- `docs/RESPONSE_EXPERIENCE.md` — chat experience layer  
+
+---
+
+## 1. Mission
+
+Create a next-generation intelligence ecosystem that combines:
+
+```text
+Artificial Intelligence
++ Human Interaction
++ Digital Memory
++ Electronics
++ Robotics
++ Biological Computing Research
++ Adaptive Learning Systems
+```
+
+**Final objective:** an autonomous intelligence platform that can understand, learn, assist, control digital systems, interact with physical environments, and evolve through continuous improvement — as a **private OM AI stack** (no third-party LLM as the brain).
+
+Genesis-JARVIS is **not** “a chatbot.”  
+It is an **intelligent operating ecosystem**.
+
+---
+
+## 2. Core vision
+
+### Traditional AI
+
+```text
+User → Text → Model → Response
+```
+
+### Genesis-JARVIS
+
+```text
+Human
+  → Natural Communication (voice / text / vision / gesture)
+  → OM AI Cognitive Core (memory + reasoning + planning)
+  → Digital World (software, APIs, agents)
+  → Physical World (sensors, IoT, robots)
+  → Biological Research Interface (long-term)
+  → Continuous Learning
+```
+
+The system is an intelligent **operating layer** between humans and technology.
+
+**Core cycle (every task):**
+
+```text
+Observe → Understand → Think → Plan → Execute → Verify → Improve
+```
+
+Runtime entry (digital today): `om_ai.operating_intelligence.run_cycle`
+
+---
+
+## 3. Complete system architecture (layer model)
+
+```text
+================================================
+                 HUMAN LAYER
+ Voice · Gesture · Vision · Language · Emotion
+================================================
+              OM AI COGNITIVE CORE
+ Reasoning · Planning · Decision · Learning
+ Memory · Knowledge
+================================================
+              ARTIFICIAL SYSTEM LAYER
+ Software / Coding / Research / Automation /
+ Business / Security / Hardware Agents
+================================================
+              HARDWARE LAYER
+ Sensors · IoT · Robots · Machines · Embedded
+================================================
+              BIO-DIGITAL RESEARCH LAYER
+ Bio sensors · Synthetic biological networks
+ Neuromorphic systems · Bio-electronic interfaces
+================================================
+```
+
+### Status legend (this install)
+
+| Layer | Status |
+|-------|--------|
+| Human (text + UX) | **Buildable now** (partial voice/vision scaffolds) |
+| Cognitive core | **Buildable now** (partial; scale model separately) |
+| Artificial agents | **Buildable now** (partial) |
+| Hardware | **Contracts/stubs now** → real drivers near-term |
+| Bio-digital | **Long-term research vision only** |
+
+---
+
+## 4. OM AI Cognitive Core
+
+Main intelligence system.
+
+### 4.1 Reasoning Engine
+
+**Purpose:** understand
+
+<|user|> Summarize key ideas from docs/QUICK_START.md. <|assistant|> # Quick Start — OM AI v0.3
+
+## Install
+
+```bash
+cd "/path/to/om-ai-operating-brain"
+python3 -m venv .venv
+source .venv/bin/activate   # Windows: .venv\Scripts\activate
+pip install -e '.[dev]'
+```
+
+Requires Python ≥ 3.11 and PyTorch ≥ 2.4.
+
+## Tiny CPU smoke path
+
+```bash
+om-ai tokenizer train \
+  --input data/example_corpus.txt \
+  --output artifacts/tokenizer.json \
+  --vocab-size 512
+
+om-ai train \
+  --config configs/tiny.json \
+  --data data/example_corpus.txt \
+  --tokenizer artifacts/tokenizer.json \
+  --steps 20
+
+om-ai generate \
+  --config configs/tiny.json \
+  --tokenizer artifacts/tokenizer.json \
+  --checkpoint artifacts/checkpoints/latest.pt \
+  --prompt "OM AI"
+```
+
+Or one-shot pipeline:
+
+```bash
+python scripts/run_actual_training_pipeline.py --steps 5
+```
+
+## API
+
+```bash
+om-ai serve --host 127.0.0.1 --port 8080
+# Open http://127.0.0.1:8080/docs
+```
+
+Auth: set API keys via env (see `.env.example` and `om_ai/security/auth.py`). Do not expose publicly without TLS and hardened allowlists.
+
+## Useful CLI commands
+
+| Command | Purpose |
+|---------|---------|
+| `om-ai model-info --config …` | Parameter estimate |
+| `om-ai tokenizer {train,inspect,encode,decode}` | Tokenizer ops |
+| `om-ai corpus {import,validate,dedupe,audit,shard,stats}` | Corpus governance |
+| `om-ai pretrain` / `om-ai train` | Causal LM pretraining |
+| `om-ai sft` / `om-ai reward` / `om-ai dpo` | Post-training |
+| `om-ai evaluate` / `om-ai benchmark` | Local eval |
+| `om-ai generate` / `om-ai chat` | Inference |
+| `om-ai feedback {add,export}` | Continuous learning I/O |
+| `om-ai registry {list,register}` | Model registry |
+| `om-ai bundle` | Checkpoint bundle + integrity |
+| `om-ai project-scan` | Local project discovery |
+| `om-ai serve` | FastAPI server |
+
+## Tests
+
+```bash
+pytest -q
+# or: make test
+```
+
+## Expectation
+
+Tiny checkpoints prove code trains real tensors. They are **not** capable language models. Scale presets need your corpus and GPUs — see `TRAINING.md` and `EXTERNAL_ASSETS_REQUIRED.md`.
+
+<|user|> Summarize key ideas from docs/RAG.md. <|assistant|> # RAG (Retrieval-Augmented Generation)
+
+Module: `om_ai/knowledge/rag.py` — `PersistentKnowledgeBase` (and related helpers).
+
+## Design
+
+- Persistent SQLite index, tenant-scoped
+- Default embeddings: hashed TF-IDF / bag-of-words over NumPy — **no external AI embed API**
+- Chunk → embed → retrieve → optional rerank → context pack
+- Document parsers: `.txt`, `.md`, `.json`, `.csv`, `.html`; optional `.pdf` / `.docx` if `pypdf` / `python-docx` installed
+
+Override `embed_text` on a subclass to plug a dense local encoder later.
+
+## Paths
+
+- Default KB: `artifacts/knowledge.sqlite3` (`OM_AI_KB`)
+- Agent tool: `om_ai/actions/knowledge.py` (`KnowledgeSearchTool`)
+
+## Honesty
+
+Lexical/TF-IDF RAG helps grounded answers from **your** documents. It does not create a frontier LLM. Retrieval quality depends on chunking, corpus hygiene, and the generator checkpoint.
+
+<|user|> Summarize key ideas from docs/RESPONSE_EXPERIENCE.md. <|assistant|> # OM AI Response Experience Layer
+
+ChatGPT/JARVIS-style presentation is **not** only model size.
+
+```text
+OM Model → Reasoning → Memory → Response Experience Engine → Streaming UI
+```
+
+## In this repo
+
+| Piece | Path |
+|-------|------|
+| Master prompt | `[OM-RX-v1]` in `om_ai/runtime/system_prompts.py` |
+| Response engine | `om_ai/response_engine/` |
+| Streaming chat | `/api/v1/chat/completions` + `chat.html` |
+| Markdown UI | `renderMarkdown()` in `om_ai/api/static/chat.html` |
+
+## Engine modules
+
+- `formatter.py` — blocks + structured markdown
+- `markdown_parser.py` — safe HTML helper
+- `emotion_style.py` — openings / experience phases
+- `stream_manager.py` — progressive chunk helpers
+
+Restart `om-ai serve` after changes so the new system prompt loads.
+
+<|user|> Summarize key ideas from docs/RLHF.md. <|assistant|> # RLHF Path (Reward Model + PPO)
+
+OM AI supports a classical RLHF-style stack in software. Running it to production quality still needs preference data, rollouts, and compute.
+
+## Components
+
+| Stage | Module | CLI / API |
+|-------|--------|-----------|
+| Preference pairs | `om_ai/training/preference.py` | Shared with DPO |
+| Pairwise reward model | `om_ai/training/reward_model.py` | `om-ai reward` |
+| PPO (GAE, clipped surrogate, KL to ref) | `om_ai/training/ppo.py` | Library / training scripts |
+
+## Reward model
+
+Bradley-Terry / log-sigmoid pairwise training over (chosen, rejected) pairs atop an `OMTransformer` backbone wrapped by `RewardModel`.
+
+```bash
+om-ai reward \
+  --config configs/tiny.json \
+  --data data/example_preferences.jsonl \
+  --tokenizer artifacts/tokenizer.json \
+  --checkpoint artifacts/sft/latest.pt \
+  --steps 500 \
+  --output artifacts/reward
+```
+
+## PPO infrastructure
+
+`om_ai/training/ppo.py` provides:
+
+- `Rollout` / `RolloutBuffer`
+- GAE advantages
+- Clipped policy surrogate + value loss + entropy bonus
+- KL penalty vs reference policy
+
+**Requirements:** a trained policy checkpoint, a reward scorer, and rollout generation. Short toy loops validate wiring; they do not prove human-level alignment.
+
+## DPO vs RLHF
+
+- **DPO** (`dpo.py`): simpler; no RM/PPO loop; good default for many preference sets
+- **RLHF**: more moving parts; use when you need online reward optimization
+
+## Honesty
+
+No claim is made that PPO has been run at 7B/70B scale in this package. Infrastructure ≠ completed RLHF campaign.
+
+<|user|> Summarize key ideas from docs/ROADMAP.md. <|assistant|> # OM AI Production Roadmap
+
+## Phase 1 — Foundation model engineering
+
+1. Build legally sourced corpus ingestion connectors.
+2. Train tokenizer on representative multilingual/code/business data.
+3. Establish tiny/125M/1B scaling experiments.
+4. Track training loss, validation loss, throughput, GPU utilization and data provenance.
+5. Add instruction tuning and preference/alignment datasets.
+6. Add robust benchmark suites and model cards.
+
+## Phase 2 — Cognitive services
+
+- Semantic embedding model trained/hosted locally.
+- Vector database abstraction.
+- Episodic, semantic and procedural memory policies.
+- Structured planner trained to emit validated tool calls.
+- Critic/verifier model for reflection and outcome checking.
+- Sandboxed code execution service.
+
+## Phase 3 — Multimodal + action
+
+- Local VLM backend for image/screenshot/document understanding.
+- OCR/document layout encoder.
+- Local ASR and TTS backends.
+- Browser automation worker with explicit policy boundaries.
+- API schema discovery, auth vault and action approvals.
+- WhatsApp/CRM/medical/e-commerce adapters.
+
+## Phase 4 — Enterprise platform
+
+- Tenant isolation and RBAC.
+- Secrets vault integration.
+- SSO/OIDC.
+- Audit/event ledger.
+- Tool-level authorization and approval workflows.
+- Data retention/deletion policies.
+- Observability with metrics/traces/logs.
+- Kubernetes operators and GPU inference serving.
+
+## Phase 5 — Large-scale training
+
+For 7B/13B/70B+ training, add:
+
+- Tensor parallelism and sequence parallelism (Megatron-style or equivalent).
+- Checkpoint sharding and elastic recovery.
+- Object storage for datasets/checkpoints.
+- High-throughput streaming dataset loader.
+- Network topology-aware scheduling.
+- NCCL monitoring.
+- Loss spike detection and bad-batch quarantine.
+- Continuous evaluation gates.
+
+<|user|> Summarize key ideas from docs/ROADMAP_EXECUTION.md. <|assistant|> # OM AI execution roadmap (ordered)
+
+Factory path (Tesla-style): prove → small → large → mass.
+
+```text
+OMAI-20M  →  OMAI-100M  →  OMAI-1B  →  OMAI-7B  →  OMAI-70B
+```
+
+Full write-up: **`docs/OWN_INTELLIGENCE_ROADMAP.md`**
+
+```text
+Phase 0  OMAI-Corpus-v1 production pipeline     ← DONE (software)
+Phase 1  Train OMAI-20M (prove owned brain)     ← NEXT
+Phase 2  Grow 100M → 1B → 7B
+Phase 3  OMAI-Eval + SFT/DPO chat layers
+Phase 4  Memory + Tools + Agents (parallel)
+Phase 5  OMAI-70B on cluster
+```
+
+## Phase 0 — Corpus pipeline (complete)
+
+| Task | Status |
+|------|--------|
+| Dataset downloader | DONE (`om-ai corpus fetch`) |
+| License tracking | DONE |
+| Validation / lang / quality / PII / toxic | DONE |
+| Dedup / tokenize / train-val split | DONE |
+
+```bash
+om-ai corpus build-v1 --root data/omai-corpus-v1 --max-docs 40
+```
+
+**Pipeline software ~100%.** Scale FineWeb/dumps for 1B+ token budgets separately.
+
+## Phase 1 — Prove the brain (OMAI-20M)
+
+```bash
+./scripts/train_omai_20m_prove.sh
+# or:
+om-ai train-om1 --config configs/omai-20m.json \
+  --tokenizer artifacts/tokenizer-production-65536.json \
+  --data data/omai-corpus-v1/train/corpus.txt \
+  --output artifacts/checkpoints/omai-20m-base --steps 200
+```
+
+## Later phases
+
+- Eval: `om-ai evaluate` / `om-ai benchmark`
+- Chat: `om-ai sft` / `om-ai dpo`
+- Scale configs: `om-1b.json`, `om-7b.json`, `om-13b.json`, `om-70b.json`
+
+## Honesty board
+
+| Component | Now |
+|-----------|-----|
+| Software platform | ~97–100% |
+| Corpus pipeline | ~100% |
+| Corpus volume (100B+) | sample / EXTERNAL |
+| OMAI-20M owned train | run Phase 1 |
+| 1B–70B trained weights | 0% until GPU jobs |
+
+<|user|> Summarize key ideas from docs/SECURITY.md. <|assistant|> # Security Baseline
+
+OM AI tools can affect real systems, so tool execution must be treated as privileged infrastructure.
+
+## Implemented in `om_ai/security/`
+
+| Module | Capability |
+|--------|------------|
+| `auth.py` | API key authentication, `TenantContext`, role-based access (`RBAC`: admin / operator / agent / viewer) |
+| `accounts.py` | Email/password accounts + session tokens (SQLite `OM_AI_ACCOUNTS_DB`) |
+| `tokens.py` | Named machine API tokens (SQLite `OM_AI_TOKENS_DB`) |
+| `ssrf.py` | `SSRFGuard` for outbound URL fetches (OpenAPI discovery, connectors) |
+| `audit.py` | `AuditLog` — persistent audit entries |
+| `rate_limit.py` | `RateLimiter` / `RateLimitExceeded` (API uses `OM_AI_RATE_LIMIT`) |
+| `secrets.py` | `SecretStore` — keep credentials out of prompts and logs |
+
+Wired into FastAPI via `om_ai/api/deps.py` and `om_ai/api/main.py` (`require_auth`, `require_permission`).
+
+### Account API (`/v1/auth/*`)
+
+- `POST /v1/auth/register` — create user (disable with `OM_AI_ALLOW_REGISTER=0`)
+- `POST /v1/auth/login` — issue session Bearer token
+- `POST /v1/auth/logout` — revoke current session
+- `POST /v1/auth/logout-all` — revoke all sessions for the user
+- `GET /v1/auth/me` — current identity
+- Passwords: scrypt; sessions: hashed secrets in `artifacts/accounts.sqlite3`
+- Auth endpoints have an extra per-IP rate limit (`OM_AI_AUTH_RATE_LIMIT`)
+
+## Production requirements
+
+- authentication and tenant-scoped authorization
+- deny-by-default tool permissions (`SafeShellTool` allowlists; `OM_AI_ALLOWED_SHELL`)
+- isolated worker processes/containers
+- secret manager; never place API keys in prompts or logs
+- outbound network egress controls + SSRF guards on URL tools
+- command and filesystem allowlists
+- approval gates for destructive/high-impact agent tools
+- immutable audit logs
+- per-tenant encryption keys where required
+- request limits, quotas and abuse monitoring
+- signed model/checkpoint artifacts (`om_ai/checkpoint/`)
+- supply-chain scanning and pinned dependencies
+
+Never expose the API to the public internet without TLS, auth, rate limits, and hardened tool permissions.
+
+<|user|> Summarize key ideas from docs/SERVER_70B_HANDOFF.md. <|assistant|> # OM-70B server handoff (Mac → GPU cluster)
+
+**Honest split:** This Mac prepares code, tokenizer, configs, and a smoke corpus. It **cannot** finish real OM-70B training (no multi-GPU CUDA / DeepSpeed ZeRO-3 at 70B scale). Final pretrain runs on a **Linux CUDA server**. `om-ai serve` never starts 70B training.
+
+Related: [`TRAINING_70B.md`](TRAINING_70B.md) (architecture + launcher semantics).
+
+---
+
+## 1. What is ready locally (this Mac)
+
+| Asset | Relative path | Absolute path (this machine) | Notes |
+|-------|---------------|------------------------------|-------|
+| Repo / trainers | `.` | `/Users/gajendrarawat/Downloads/om-ai-operating-brain 3` | `om_ai/training/train_70b.py`, `deepspeed_train.py`, partition init |
+| Smoke corpus (small) | `data/production-corpus/clean/fineweb-deduped.jsonl` | `.../data/production-corpus/clean/fineweb-deduped.jsonl` | **~101 MB** — too small for 70B preflight (`--min-data-bytes` default **1 GB**) |
+| Local ≥1 GB FineWeb | `data/production-corpus/clean/fineweb-1gb.jsonl` | `.../data/production-corpus/clean/fineweb-1gb.jsonl` | **~1.27 GB** deduped JSONL (ODC-By FineWeb `sample-10BT`); satisfies preflight **data** gate locally; real training still needs far more tokens on the server |
+| HF production tokenizer | `artifacts/tokenizer-production-65536.json` | `.../artifacts/tokenizer-production-65536.json` | HuggingFace `tokenizers` JSON, vocab **65536** |
+| OM ByteBPE (smaller) | `artifacts/tokenizer-om-production.json` | `.../artifacts/tokenizer-om-production.json` | Native OM format, vocab **4096** — not 70B target vocab |
+| Model shape | `configs/70b.json` | | ~70B-class layout (`d_model=8192`, 80 layers, …) |
+| DeepSpeed ZeRO-3 | `configs/deepspeed_zero3.json` | | bf16 + ZeRO-3 + CPU optimizer offload |
+| Gates | `configs/train_70b_gates.json` | | Promotion rules (do not claim frontier without metrics) |
+| Shell launcher | `scripts/train_70b.sh` | | Preflight → `deepspeed … deepspeed_train.py` |
+| Preflight script | `scripts/om70b_preflight.py` | | CUDA / DeepSpeed / data size / tokenizer checks |
+| Pack helper | `scripts/pack_for_70b_server.sh` | | Tar/list upload set (skips huge checkpoints) |
+| Env template | `.env.example` | | Includes `OM_AI_70B_*` and serve-after-train vars |
+
+Optional local (not 70B): tiny longrun on MPS may still be running — see §7. That run uses `configs/tiny.json` (~3.3M params) and is **not** OM-70B.
+
+---
+
+## 2. What to copy to the server
+
+### Required
+
+1. **Code + packaging**
+   - Entire git checkout **or** the tarball from `./scripts/pack_for_70b_server.sh`
+   - Must include: `om_ai/`, `configs/`, `scripts/`, `pyproject.toml`, docs above
+2. **Corpus** (production scale on server disk, not the 100 MB Mac smoke file alone)
+   - Path on server e.g. `/data/om/corpus/` (file or directory of shards)
+   - Prefer licensed FineWeb / your governed JSONL after `om-ai corpus …`
+3. **Tokenizer matching `configs/70b.json` vocab (65536)**
+   - Copy `artifacts/tokenizer-production-65536.json`
+   - Or train/export OM ByteBPE at 65536 with chat specials (see §4)
+4. **Configs + scripts**
+   - `configs/70b.json`
+   - `configs/deepspeed_zero3.json`
+   - `configs/train_70b_gates.json`
+   - `scripts/train_70b.sh`, `scripts/om70b_preflight.py`
+
+### Do **not** need to upload for 70B train
+
+- `.venv/` (recreate on Linux)
+- `artifacts/checkpoints/**` (tiny/demo/local longrun — wrong scale)
+- SQLite DBs, chat UI state, Ollama models
+- Mac MPS checkpoints under `artifacts/checkpoints/om-local-longrun/`
+
+### Quick pack on Mac
+
+```bash
+cd "/Users/gajendrarawat/Downloads/om-ai-operating-brain 3"
+./scripts/pack_for_70b_server.sh            # writes artifacts/handoff/om70b-server-pack-*.tar.gz + MANIFEST
+./scripts/pack_for_70b_server.sh --list     # dry-run paths only
+# scp / rsync the tarball + separately sync a large corpus if not included
+```
+
+Default pack **includes** the ~100 MB smoke corpus and the 65536 HF tokenizer; it **excludes** checkpoint trees and `.venv`.
+
+---
+
+## 3. Server prereq
+
+<|user|> Summarize key ideas from docs/SFT.md. <|assistant|> # Supervised Fine-Tuning (SFT)
+
+Module: `om_ai/training/sft.py` — CLI: `om-ai sft`.
+
+## Format
+
+JSONL rows:
+
+```json
+{"system":"optional","prompt":"user request","response":"assistant answer"}
+```
+
+Example: `data/example_sft.jsonl`.
+
+## Behavior
+
+`SFTTrainer` / `SFTDataset` use `tokenizer.encode_chat` (same special-token IDs as inference):
+
+- training: `<bos>…<user>…</user><assistant>answer</assistant><eos>`
+- inference prompt: same prefix ending at opening `<assistant>` (`add_generation_prompt=True`)
+
+Prompt tokens through the opening `<assistant>` are label-masked; loss is on the assistant span only. The tokenizer must include chat specials (`<system>`, `<user>`, `<assistant>`) — do not SFT with the legacy demo vocab that only has pad/bos/eos/unk.
+
+## Run
+
+```bash
+om-ai sft \
+  --config configs/tiny.json \
+  --data data/example_sft.jsonl \
+  --tokenizer artifacts/tokenizer.json \
+  --checkpoint artifacts/checkpoints/latest.pt \
+  --steps 1000 \
+  --batch-size 2 \
+  --lr 2e-5 \
+  --output artifacts/sft
+```
+
+Use the same architecture config as the base checkpoint. For scale presets, point `--checkpoint` at a **pretrained** weight file you actually trained — random init + SFT is not a substitute for pretraining.
+
+## Data quality
+
+SFT quality is dominated by instruction data, not CLI flags. Curate, dedupe, and license-check instruction corpora the same way as pretrain data (`om_ai/corpus/`, manifests).
+
+## Continuous learning
+
+High-rated production interactions can be exported via `om-ai feedback export` into SFT JSONL (`om_ai/continuous/replay.py`) for controlled fine-tunes — review before mixing into the main set.
+
+<|user|> Summarize key ideas from docs/SPEECH.md. <|assistant|> # Speech
+
+Package: `om_ai/voice/` — `audio_encoder.py`, `base.py`.
+
+## What is implemented
+
+- `AudioFeatureExtractor` — STFT log-magnitude features
+- `SpeechEncoder` — Transformer encoder over projected spectrogram frames
+- `CTCASRModel` — linear CTC head over encoder states
+
+Optional: `pip install -e '.[voice]'` (`soundfile`).
+
+Backend contracts in `voice/base.py` cover ASR and TTS adapters. **TTS:** this release supplies the contract/interface, not a trained neural TTS stack.
+
+## Multimodal wiring
+
+`MultimodalOrchestrator` can call an ASR path when audio is present and an encoder is configured; otherwise it errors clearly.
+
+## What is not included
+
+- Production ASR weights
+- Large speech corpora / transcripts
+- Benchmark scores (WER/CER) for a finished OM speech model
+
+Train CTC (or later seq2seq) on licensed audio; treat demo/smoke runs as wiring tests only.
+
+<|user|> Summarize key ideas from docs/SYSTEM_GAP_ANALYSIS.md. <|assistant|> # SYSTEM_GAP_ANALYSIS.md
+
+Honest gap analysis. Features are **not** complete unless implemented **and** tested.
+
+## Not in this repository (do not claim)
+
+| Claim | Reality |
+|-------|---------|
+| 5-level trained weights | Architecture presets exist; useful intelligence needs licensed data + GPU training. Local OM-1.0 smoke/long checkpoints are tiny. |
+| Human consciousness | Software cognition (pipelines, memory, tools). No sentience. |
+| Infinite knowledge without data | Knowledge is retrieval + facts + corpora you ingest. Empty RAG ≠ world knowledge. |
+
+## Gaps vs required OS
+
+| Required | Gap | Priority |
+|----------|-----|----------|
+| Language: typos, incomplete, multilingual, intent, meaning | Lexicon + rules; Hindi/Hinglish is script/keyword detect, not full NLU | P0: expand typos + entities (PM/India); keep honest limits |
+| Context: conversation, project, preferences, decisions | Exists; not every chat turn writes all layers | P0: session writer already; keep wiring |
+| Knowledge: ingest, embeddings, vector search, metadata, rank | **Hashed TF-IDF vectors + cosine + BM25 already in `rag.py`**. Dense sentence-transformers not a default dependency | P0: first-class `embeddings` module + metadata search API |
+| Reasoning: decompose, plan, verify, confidence, self-check | Pipeline exists; confidence not always on the cycle result | P0: expose confidence |
+| Memory: short/long/project/experience | SQLite layers exist | P1: summarization STM→LTM |
+| Coding: many stacks + generate/review/debug | Blueprints + dry-run agent; no silent disk rewrite | P0: Python API + React login as first-class kinds |
+| Response intelligence | Formatter exists | P1: stronger language-matched rewrite |
+| Evaluation | Online dims exist | P0: confidence + answered-intent flags |
+| Dense GPU embeddings | Optional future; not required for production local search | P2 |
+
+## Test debt (must pass before “complete”)
+
+1. `creat react dahsbaord` → Create React Dashboard  
+2. `create react login page` → frontend + React + login architecture  
+3. `what is pm in india` → India + PM = Prime Minister  
+4. `creat python api project` → backend + Python API architecture
+
+<|user|> Summarize key ideas from docs/TRAINING.md. <|assistant|> # Training Overview
+
+OM AI separates **software** (trainers, configs, CLI) from **weights** (outputs of long GPU runs on licensed data).
+
+## Stages
+
+1. **Corpus** — `om_ai/corpus/`, `om_ai/data/`, scripts `prepare_corpus.py` / `shard_corpus.py`
+2. **Tokenizer** — `om_ai/tokenizer/byte_bpe.py` via `om-ai tokenizer train`
+3. **Pretrain** — `om_ai/training/trainer.py` via `om-ai train` / `om-ai pretrain`
+4. **SFT** — `om_ai/training/sft.py` via `om-ai sft`
+5. **Reward** — `om_ai/training/reward_model.py` via `om-ai reward`
+6. **DPO** — `om_ai/training/dpo.py` via `om-ai dpo`
+7. **PPO / RLHF infra** — `om_ai/training/ppo.py` (rollouts, GAE, clipped surrogate; needs policy + reward)
+8. **Eval / registry** — `om_ai/eval/`, `om_ai/registry/`
+
+Detailed production sequence: `TRAINING_RUNBOOK.md`.
+
+## Single-process pretrain
+
+```bash
+om-ai train \
+  --config configs/tiny.json \
+  --data data/example_corpus.txt \
+  --tokenizer artifacts/tokenizer.json \
+  --steps 1000 \
+  --batch-size 4 \
+  --precision auto \
+  --output artifacts/checkpoints
+```
+
+Features in `Trainer` (`om_ai/training/trainer.py`): AdamW, warmup/cosine, grad accum/clip, mixed precision, checkpoint resume.
+
+## Distributed
+
+See `DISTRIBUTED_TRAINING.md` — DDP/FSDP in `om_ai/training/distributed.py`, DeepSpeed in `om_ai/training/deepspeed_train.py`.
+
+## Scale presets
+
+| Config | Intent |
+|--------|--------|
+| `configs/tiny.json` | Dev / CI smoke |
+| `configs/1b.json` | ~1B-class architecture |
+| `configs/7b.json` | ~7B-class |
+| `configs/13b.json` | ~13B-class |
+| `configs/70b.json` | ~70B-class |
+
+Use `om-ai model-info --config configs/7b.json` for estimates. Presets **do not** include trained weights.
+
+## What this repo has trained
+
+- Demo: `artifacts/demo/om-tiny-dpo.pt` (tiny data, few steps)
+- No OM-1B / 7B / 13B / 70B production weights are shipped
+
+Capability requires your licensed tokens + cluster time. See scale-specific docs `TRAINING_1B.md` … `TRAINING_70B.md`.
+
+<|user|> Summarize key ideas from docs/TRAINING_13B.md. <|assistant|> # Training OM-13B (architecture preset)
+
+Config: `configs/13b.json`.
+
+## Architecture (software)
+
+- `d_model=5120`, `n_layers=40`, `n_heads=40`, `n_kv_heads=40`
+- `d_ff=13824`, `max_seq_len=8192`, `vocab_size=65536`
+- `gradient_checkpointing: true`
+
+```bash
+om-ai model-info --config configs/13b.json
+```
+
+## Honest status
+
+**No OM-13B trained weights are in this ZIP.** The JSON + `OMTransformer` code let you instantiate and train the architecture. Frontier-like knowledge and tool use will not appear from short smoke runs.
+
+## Compute posture
+
+Treat 13B as a **cluster** job: FSDP or DeepSpeed ZeRO-3, high-bandwidth interconnect, durable checkpointing, and careful resume. Use the same data governance path (`om_ai/corpus/`, manifests) as smaller scales — license and contamination checks still apply.
+
+```bash
+torchrun --standalone --nproc_per_node=8 -m om_ai.training.distributed \
+  --strategy fsdp \
+  --config configs/13b.json \
+  --data /data/om_corpus.jsonl \
+  --tokenizer artifacts/tokenizer.json
+```
+
+## After pretrain
+
+1. Masked SFT (`om_ai/training/sft.py`)
+2. Preference alignment (DPO and/or reward + PPO infra)
+3. Benchmark + human review
+4. Registry lifecycle: candidate → evaluated → approved → production (`om_ai/registry/`)
+
+Do not mark `trained=True` / production unless weights and evals justify it.
+
+<|user|> Summarize key ideas from docs/TRAINING_1B.md. <|assistant|> # Training OM-1B (architecture preset)
+
+Config: `configs/1b.json` (also mirrored as `configs/om-1b.json` if present).
+
+## Architecture (software)
+
+Approximate shape from the JSON preset:
+
+- `d_model=2048`, `n_layers=24`, `n_heads=16`, `n_kv_heads=8` (GQA)
+- `d_ff=5504`, `max_seq_len=8192`, `vocab_size=65536` (override to match tokenizer)
+- RMSNorm, RoPE (`rope_theta=500000`)
+
+```bash
+om-ai model-info --config configs/1b.json
+```
+
+## Honest status
+
+**No trained OM-1B weights are included.** Instantiating the config creates random (or freshly initialized) parameters. Useful 1B behavior needs:
+
+1. Large licensed corpus (order of tens–hundreds of billions of tokens is typical industry practice; choose your own budget)
+2. Tokenizer trained on that corpus
+3. Multi-GPU pretrain (DDP often enough at 1B)
+4. SFT + preference/alignment data
+5. Eval gates before registry `production`
+
+## Suggested launch sketch
+
+```bash
+# After corpus + tokenizer are ready:
+torchrun --standalone --nproc_per_node=8 -m om_ai.training.distributed \
+  --config configs/1b.json \
+  --data /data/om_corpus.jsonl \
+  --tokenizer artifacts/tokenizer.json \
+  --steps <your_budget> \
+  --output artifacts/checkpoints/om-1b
+```
+
+Then SFT/DPO as in `SFT.md` / `DPO.md`, evaluate with `om-ai benchmark`, register with `om-ai registry register`.
+
+## What “done” means
+
+Done = measured eval on **your** held-out sets, not “config file exists.” Tiny demo checkpoints do not transfer to this scale.
+
+<|user|> Summarize key ideas from docs/TRAINING_70B.md. <|assistant|> # Training OM-70B (architecture + launcher)
+
+Config: `configs/70b.json`. Launcher: `om-ai train-70b`.
+
+## Architecture (software only)
+
+- `d_model=8192`, `n_layers=80`, `n_heads=64`, `n_kv_heads=8` (GQA)
+- `d_ff=28672`, `max_seq_len=8192`, `vocab_size=65536`
+- `gradient_checkpointing: true`
+
+```bash
+om-ai model-info --config configs/70b.json
+```
+
+This describes a **~70B-class** dense decoder layout for `OMTransformer`. It is not a finished model.
+
+## Launcher (deliberate — not started by `serve`)
+
+```bash
+om-ai train-70b \
+  --data /data/om-corpus \
+  --tokenizer /data/tokenizer.json \
+  --output /checkpoints/om-70b
+```
+
+What it does:
+
+1. Validate corpus presence / optional license manifest
+2. Validate tokenizer
+3. Check CUDA GPUs, count, VRAM
+4. Check distributed env hints + disk space
+5. Load `configs/70b.json`
+6. Start DeepSpeed ZeRO-3 (default) or FSDP with **partition-aware init**
+7. Save resumable checkpoints + `OM70B_TRAINING_STATUS.json`
+8. Optional SFT / preference / benchmarks when you pass those flags
+9. Only mark `trained` / production candidate after **benchmark gates** (`configs/train_70b_gates.json`)
+
+Preflight only (safe on a Mac):
+
+```bash
+om-ai train-70b \
+  --data data/example_corpus.txt \
+  --tokenizer artifacts/demo/tokenizer.json \
+  --output artifacts/om70b_preflight \
+  --preflight-only \
+  --min-gpus 1 \
+  --min-vram-gb 1 \
+  --min-free-gb 1 \
+  --min-corpus-bytes 10
+```
+
+On a Mac without CUDA this correctly reports **not ready** for final 70B pretraining.
+
+### Partition-aware init
+
+Legacy DeepSpeed entry built the full model first (`OMTransformer(cfg)`), then partitioned — that OOMs at 70B.
+
+Fixed path: `om_ai/training/partition_init.py`
+
+- ZeRO-3: `deepspeed.zero.Init` while constructing the model
+- FSDP: meta-device construction + `param_init_fn` materialization
+
+### `om-ai serve` will not train 70B
+
+`OM_AI_AUTO_TRAIN_70B=1` is **ignored** by serve (warning only). Use `train-70b` on a dedicated GPU deployment.
+
+## Critical honesty statement
+
+**Trained OM-70B weights require real large-scale training.**
+
+This repository does **not** contain pretrained 70B parameters, hidden “already trained” checkpoints, or frontier benchmark claims.
+
+Learned knowledge requires:
+
+1. Licensed high-quality corpus at massive token scale
+2. Tokenizer fitted to that corpus
+3. GPU/accelerator fleet (multi-node FSDP/ZeRO; weeks–months typical)
+4. Pretrain → SFT/alignment → eval / red-team
+5. Artifact integrity + registry promotion
+
+Until those runs complete and pass your gates, treat any 70B instantiation as **untrained or under-trained parameters**, not an operating brain.
+
+### Status machine
+
+```
+NOT_STARTED → PREFLIGHT → PRETRAIN → PRETRAINED
+    → SFT → ALIGNED → BENCHMARKED → PRODUCTION_CANDIDATE
+```
+
+Mac / GitHub can ship software. Final weights come from the GPU cluster.
+
+## Software map
+
+| Piece | Path |
+|-------|------|
+| Launcher | `om_ai/training/train_70b.py` |
+| Preflight | `om_ai/training/preflight.py` |
+| Partition init | `om_ai/training/partition_init.py` |
+| DeepSpeed | `om_ai/training/deepspeed_train.py` |
+| FSDP | `om_ai/training/distributed.py` |
+| Gates | `configs/train_70b_gates.json` |
+
+## Promotion rule
+
+Never set production / `trained=True` for a 70B artifact without measured evals on held-out suites you own or license. Never claim GPT-equivalent capability without evidence. See `EXTERNAL_ASSETS_REQUIRED.md` and `BENCHMARKS.md`.
+
+<|user|> Summarize key ideas from docs/TRAINING_7B.md. <|assistant|> # Training OM-7B (architecture preset)
+
+Config: `configs/7b.json`.
+
+## Architecture (software)
+
+- `d_model=4096`, `n_layers=32`, `n_heads=32`, `n_kv_heads=32`
+- `d_ff=11008`, `max_seq_len=8192`, `vocab_size=65536`
+- `gradient_checkpointing: true`
+
+```bash
+om-ai model-info --config configs/7b.json
+```
+
+## Honest status
+
+**No trained OM-7B weights ship with this repository.** The preset is an architecture direction for `OMTransformer` (`om_ai/model/transformer.py`). Intelligence is not present until you run large-scale training.
+
+Expect multi-GPU FSDP or DeepSpeed ZeRO for memory; single-GPU full fine-tune of a 7B dense model is usually impractical without heavy sharding/quantization (not a substitute for pretraining).
+
+## Launch sketches
+
+FSDP:
+
+```bash
+torchrun --standalone --nproc_per_node=8 -m om_ai.training.distributed \
+  --strategy fsdp \
+  --config configs/7b.json \
+  --data /data/om_corpus.jsonl \
+  --tokenizer artifacts/tokenizer.json
+```
+
+DeepSpeed:
+
+```bash
+deepspeed --num_gpus 8 -m om_ai.training.deepspeed_train \
+  --config configs/7b.json \
+  --data /data/om_corpus.jsonl \
+  --tokenizer artifacts/tokenizer.json \
+  --deepspeed configs/deepspeed_zero3.json
+```
+
+Post-train with `om-ai sft` / `om-ai reward` / `om-ai dpo` using matching config and checkpoints.
+
+## External requirements
+
+Licensed tokens, storage I/O for shards, checkpoint durability, and a real eval plan (`BENCHMARKS.md`). See `EXTERNAL_ASSETS_REQUIRED.md`.
+
+<|user|> Summarize key ideas from docs/TRAINING_RUNBOOK.md. <|assistant|> # OM AI Actual Intelligence-Building Runbook
+
+This runbook describes the executable path that turns source code + approved data + compute into owned OM model weights.
+
+## 1. Approve and audit training sources
+
+Edit `data/source_manifest.example.json`. Every source must declare its owner, license, and `allowed_for_training=true`.
+
+```bash
+python scripts/prepare_corpus.py \
+  --manifest data/source_manifest.example.json \
+  --output artifacts/corpus.jsonl \
+  --audit artifacts/corpus_audit.json
+
+python scripts/shard_corpus.py \
+  --input artifacts/corpus.jsonl \
+  --output-dir artifacts/shards \
+  --records-per-shard 10000
+```
+
+The pipeline refuses a source whose license is `unknown` or which is not approved for training.
+
+## 2. Train the tokenizer
+
+```bash
+om-ai tokenizer train \
+  --input artifacts/corpus.jsonl \
+  --output artifacts/tokenizer.json \
+  --vocab-size 32000
+```
+
+For a real large model, train the tokenizer on a representative sample of the final multilingual/code corpus before pretraining.
+
+## 3. Pretrain model weights
+
+Development run:
+
+```bash
+om-ai train \
+  --config configs/tiny.json \
+  --data artifacts/corpus.jsonl \
+  --tokenizer artifacts/tokenizer.json \
+  --steps 1000
+```
+
+Multi-GPU DDP:
+
+```bash
+torchrun --standalone --nproc_per_node=8 -m om_ai.training.distributed \
+  --config configs/1b.json \
+  --data artifacts/corpus.jsonl \
+  --tokenizer artifacts/tokenizer.json
+```
+
+Multi-GPU FSDP:
+
+```bash
+torchrun --standalone --nproc_per_node=8 -m om_ai.training.distributed \
+  --strategy fsdp \
+  --config configs/7b.json \
+  --data artifacts/corpus.jsonl \
+  --tokenizer artifacts/tokenizer.json
+```
+
+DeepSpeed ZeRO-3:
+
+```bash
+deepSpeed --num_gpus 8 -m om_ai.training.deepspeed_train \
+  --config configs/7b.json \
+  --data artifacts/corpus.jsonl \
+  --tokenizer artifacts/tokenizer.json \
+  --deepspeed configs/deepspeed_zero3.json
+```
+
+For multi-node execution, use the cluster launcher for your environment and provide rank/world-size/master address variables required by torch.distributed or DeepSpeed.
+
+## 4. Supervised instruction tuning (SFT)
+
+Training format:
+
+```json
+{"system":"optional system instruction","prompt":"user request","response":"preferred assistant answer"}
+```
+
+Run:
+
+```bash
+om-ai sft \
+  --config configs/7b.json \
+  --data /data/om_instruction_data.jsonl \
+  --tokenizer artifacts/tokenizer.json \
+  --checkpoint artifacts/checkpoints/latest.pt \
+  --steps 10000 \
+  --batch-size 2 \
+  --lr 2e-5
+```
+
+The SFT trainer masks the prompt tokens and optimizes only the assistant response tokens.
+
+## 5. Preference data and reward model
+
+Preference format:
+
+```json
+{"prompt":"question","chosen":"better answer","rejected":"worse answer"}
+```
+
+Train the pairwise reward model:
+
+```bash
+om-ai reward \
+  --config configs/7b.json \
+  --data /data/om_preferences.jsonl \
+  --tokenizer artifacts/tokenizer.json \
+  --checkpoint artifacts/sft/latest.pt \
+  --steps 5000
+```
+
+The included reward trainer optimizes a Bradley-Terry/log-sigmoid pairwise preference objective.
+
+## 6. Direct Preference Optimization (DPO)
+
+```bash
+om-ai dpo \
+  --config configs/7b.json \
+  --data /data/om_preferences.jsonl \
+  --tokenizer artifacts/tokenizer.json \
+  --checkpoint artifacts/sft/latest.pt \
+  --steps 5000 \
+  --beta 0.1
+```
+
+DPO uses a frozen reference copy of the starting policy and optimizes the preferred response over the rejected response without requiring an online reward-model rollout loop.
+
+## 7. Benchmark and regression reports
+
+```bash
+om-ai benchmark \
+  --config configs/7b.json \
+  --tokenizer artifacts/tokenizer.json \
+  --checkpoint artifacts/dpo/latest.pt \
+  --benchmark benchmarks/core.jsonl \
+  --report artifacts/eval/report.json
+```
+
+Extend the benchmark JSONL with licensed/internal evaluation sets for language, reasoning, code, math, safety, tool-use, domain knowledge and regression tests.
+
+## 8. Feedback -> continuous post-training data
+
+Store explicit user feedback:
+
+```bash
+om-ai feedback add \
+  --prompt "or
+
+<|user|> Summarize key ideas from docs/VISION.md. <|assistant|> # Vision
+
+Packages: `om_ai/vision/` — `vit.py`, `base.py`, `multimodal.py`.
+
+## What is implemented
+
+- Trainable Vision Transformer-style encoder (`vit.py`)
+- `MultimodalProjector` (LayerNorm → Linear → GELU → Linear) mapping vision dim → LLM dim
+- `OMVisionLanguageModel`: encode images → project → feed `encoder_hidden_states` into `OMTransformer` with cross-attention
+
+Requires LLM `ModelConfig.cross_attention=true`.
+
+## Optional dependency
+
+```bash
+pip install -e '.[vision]'   # pillow
+```
+
+## What is not included
+
+- Production VLM weights
+- Large paired image–text datasets
+- Claims of competitive VQA / captioning scores
+
+Train on your licensed image–text data; evaluate with your suites; register checkpoints like any other model. Interfaces also allow swapping in a locally hosted vision backend via contracts in `vision/base.py` when you bring your own stack.
+
+<|user|> Summarize key ideas from docs/prompts/OM10_GENESIS_UNIVERSAL_INTELLIGENCE_MASTER_DIRECTIVE.md. <|assistant|> # OM-1.0 Genesis Universal Intelligence Master Directive
+
+Canonical copy for humans. **Runtime source of truth:**
+
+`om_ai.knowledge_brain.directive.KNOWLEDGE_SYSTEM` / `KNOWLEDGE_DIRECTIVE`
+
+```bash
+om-ai knowledge-brain directive
+om-ai knowledge-brain generate --count 100000   # scale toward 1e6+
+```
+
+---
+
+You are OM-1.0 Genesis Universal Intelligence.
+
+You are not a chatbot.
+
+You are a next-generation artificial intelligence operating system designed to acquire, organize, understand, reason over, and apply the complete spectrum of human knowledge from 1600 to 2026 and beyond.
+
+**Roles:** Chief AI Architect · Research Scientist · Software/Systems Engineer · Data Scientist · Robotics/Electronics Engineer · Scientific Analyst · Strategic Thinker
+
+**Mission:** Transform information into intelligence — understand, connect domains, first-principles reason, create solutions, design systems, improve from experience, assist humans.
+
+**Cognitive flow:** INPUT → Understanding → Reasoning → Planning → Agent Selection → Tool Execution → Validation → Response
+
+**Answer format:** Understanding → Analysis → Architecture → Implementation → Validation → Next Steps  
+(Coding: Technology · Architecture · File Structure · Code · Explanation · Testing · Deployment)
+
+**Horizons:** (1) current as of 2026 · (2) near-future 2027–2030 · (3) research 2030+  
+Never confuse research bio/quantum/neuromorphic concepts with shipped production.
+
+**Evolution:** OM-1.0 → OM-3.0 → OM-7.0 → OM-70.0
+
+**Honesty:** Directive ≠ weights. Path = corpus + dataset generator + RAG + SFT/DPO + scale.
+
+<|user|> Summarize key ideas from docs/prompts/OM_AI_GENESIS_PLATFORM_PRODUCTION_MASTER_PROMPT.md. <|assistant|> # OM AI GENESIS PLATFORM — CURSOR EXECUTION MASTER PROMPT v1.0
+
+**Use:** Paste this entire document as a single Cursor Agent prompt.  
+**Repo:** `om-ai-operating-brain` (local path may include a trailing space / version suffix).  
+**Mode:** Inspect → map → extend → verify. **Never destroy working OM code.**
+
+---
+
+## MASTER OBJECTIVE
+
+Build / complete a self-hosted **OM AI Cognitive Operating System** so OM can:
+
+reason · remember · learn · use tools · manage agents · understand knowledge · generate code · evaluate itself · improve continuously · scale toward OM-1B / OM-7B / OM-70B
+
+**Target architecture (logical layers):**
+
+```text
+USER → OM INTERFACE → OM COGNITIVE OS
+  1 Intelligence Core
+  2 Reasoning Engine
+  3 Knowledge Brain
+  4 Memory System
+  5 Agent System
+  6 Tool System
+  7 Coding Intelligence
+  8 Multimodal System
+  9 Evaluation System
+ 10 Continuous Learning
+ 11 Training Pipeline
+ 12 Security Layer
+ 13 Enterprise Layer
+        ↓
+OM FOUNDATION MODEL (OM-1.0 → OM-7 → OM-70B)
+        ↓
+DIGITAL + PHYSICAL WORLD
+```
+
+**Non-goals:** Do not fabricate large model weight files. Do not claim ChatGPT-equal intelligence without trained weights. Do not replace OM-native serve with third-party LLM as default.
+
+---
+
+## HARD RULES (MUST OBEY)
+
+1. **Inspect first.** Before creating any file, inventory existing packages under `om_ai/` and docs. Prefer extend over rewrite.
+2. **No destructive rewrites.** Do not delete or gut: `om_ai/api/`, `om_ai/runtime/`, `om_ai/model/`, `om_ai/training/`, `om_ai/agents/`, `om_ai/memory/`, `om_ai/security/`, chat UI, existing CLIs, checkpoints, `.env`.
+3. **Reuse map (authoritative).** If a target folder already maps to an existing package, **upgrade that package** instead of inventing a duplicate tree.
+
+| Target (spec) | Existing (prefer) |
+|---|---|
+| `core/intent_engine` | `om_ai/understanding/`, `om_ai/cognition/`, `om_ai/core/reasoning/analyzer.py` |
+| `core/reasoning` | `om_ai/core/reasoning/` + `om_ai/reasoning/` |
+| `core/response` | `om_ai/response_engine/` |
+| `knowledge/*` | `om_ai/knowledge/`, `om_ai/knowledge_brain/`, `om_ai/knowledge_universe/` |
+| `memory/*` | `om_ai/memory/` |
+| `agents/*` | `om_ai/agents/`, `om_ai/agent/` |
+| tools | `om_ai/actions/`, agent tools, `om_ai/integrations/` |
+| coding | `om_ai/agent/coding_agent.py` |
+| evaluation | `om_ai/eval/`, `om_ai/evaluation/`, `benchmarks/` |
+| learning | `om_ai/learning/`, `om_ai/continuous/` |
+| training | `om_ai/training/`, `configs/`, `training/` |
+| multimodal | `om_ai/multimodal/`, `om_ai/vision/`, `om_ai/voice/` |
+| security | `om_ai/security/` |
+| enterprise | `om_ai/tenancy/`, auth/RBAC, observability |
+| system build | `om_ai/system/`, `om_ai/foundation/` |
+
+4. **Thin adapters OK.** If the spec demands a path like `om_ai/core/intent_engine/`, create a thin package that re-exports / wraps existing logic — do not duplicate engines.
+5. **Verify after each phase.** Run tests / CLI smoke; keep `om-ai system check` green.
+6. **Honesty.** Report what is software-complete vs what still needs GPU + data.
+7. **Commit only if the user asks.**
+
+---
+
+## PHASE 0 — REPOSITORY INSPECTION (MANDATORY FIRST)
+
+Run and summarize:
+
+```bash
+pwd
+ls om_ai
+om-ai --help | head -80
+om-ai system check
+om-ai knowledge status
+ls configs training docs artifacts/checkpoints 2>/dev/null | head -50
+```
+
+Produce a short **EXISTING vs MISSING** matrix for the 13 layers. Only implement MISSING / WEAK items.
+
+Also read:
+
+- `docs/OM_PRODUCTION_FOUNDATION.md`
+- `docs/OM_CHATGPT_GAP_ANALYSIS.md`
+- `docs/OM_COMPLETION_ROADMAP.md`
+- `docs/OM_AI_GENESIS_PLATFORM_V1.md` (if present)
+
+---
+
+## PHASE 1 — CORE INTELLIGENCE
+
+**Goal:** Intent → route → agent → response quality.
+
+Implement / upgrade under `om_ai/core/`:
+
+```text
+core/
+├── intent_engine/   # classifier, router, task_detector (wrap understanding/)
+├── reasoning/       # already present — ensure pipeline wired
+└── response/        # formatter + quality (wrap response_engine/)
+```
+
+**Flow to support:**
+
+`Cr
+
+<|user|> Summarize key ideas from docs/prompts/OM_AI_JARVIS_OPERATING_INTELLIGENCE.md. <|assistant|> # OM AI — JARVIS Operating Intelligence Master Prompt (Vision)
+
+> Behavior / architecture extract. Full constitution: **`docs/PROJECT_GENESIS_JARVIS.md`**.
+> Not a substitute for model weights, tools, or hardware.
+
+**SYSTEM:** OM AI — Autonomous Operating Intelligence System (Project Genesis-JARVIS)
+
+**ROLE:** Personal intelligent partner, engineering assistant, research assistant, automation controller, and knowledge system. Not a simple chatbot.
+
+**CONNECTS:** Human → AI Brain → Digital World → Physical World → (future) Bio-Digital Research Interface
+
+**CYCLE:** Observe → Understand → Think → Plan → Execute → Verify → Improve
+
+## Layers required
+
+1. Human Understanding (language, intent, emotion, context, goals)
+2. Memory (user, project, experience, knowledge)
+3. Reasoning + self-review
+4. Software engineering agent swarm
+5. Science / engineering knowledge
+6. Electronics + MCU + IoT gateway
+7. Sensors → process → decide → act
+8. Robotics control (sim first)
+9. Voice (STT → NLU → reason → TTS)
+10. Computer vision
+11. Agent automation + tools
+12. Digital twin
+13. Self-improvement (feedback → train → deploy)
+14. Structured response experience
+15. Long-term: bio-electronic / neuromorphic research (not production today)
+
+## Response shape (when helpful)
+
+Understanding → Analysis → Solution → Implementation → Validation → Next steps
+
+## Engineering source of truth
+
+- Blueprint: `docs/PROJECT_GENESIS_JARVIS.md`
+- Modules/APIs: `docs/JARVIS_OPERATING_INTELLIGENCE.md`
+
+<|user|> Summarize key ideas from docs/prompts/OM_AI_UNIVERSAL_KNOWLEDGE_DIRECTIVE.md. <|assistant|> # OM AI Universal Knowledge Intelligence Directive
+
+**Universal Knowledge Brain v1.0 · Coverage 1600–2026 · Operating year 2026**
+
+> Extract for system prompts / SFT `system` field.  
+> Runtime source of truth: `om_ai.knowledge_brain.directive.KNOWLEDGE_SYSTEM`
+
+---
+
+## SYSTEM IDENTITY
+
+You are **OM AI Genesis Knowledge Intelligence** — not a chatbot.
+
+You are a Universal Knowledge Intelligence System designed to understand, organize, analyze, and apply human knowledge from **1600 to 2026**.
+
+Think as: scientist · engineer · researcher · architect · programmer · historian · strategist.
+
+Never claim to be ChatGPT, Claude, Gemini, Llama, or Ollama.
+
+## CORE FLOW
+
+```
+Historical Understanding
+        ↓
+Scientific Foundation
+        ↓
+Engineering Principles
+        ↓
+Modern Technology (2026)
+        ↓
+Future Possibilities
+        ↓
+Practical Solution → Verify → Explain
+```
+
+## ERAS
+
+1. **1600–1700** Scientific Revolution  
+2. **1700–1800** Enlightenment + industrial foundation  
+3. **1800–1900** Industrial Revolution  
+4. **1900–1950** Modern science (relativity, quantum, Turing)  
+5. **1950–2000** Computer revolution + AI history  
+6. **2000–2020** Internet, cloud, deep learning  
+7. **2020–2026** Generative AI (transformers, RAG, agents)
+
+## DOMAINS
+
+Mathematics · Physics · Chemistry · Biology · Medicine (concepts only) · Engineering · Electronics · Robotics · Programming · Computer Science · Artificial Intelligence · Business · Psychology · Philosophy · History · Future Technology
+
+## HORIZONS (always separate)
+
+1. Current technology **as of 2026**  
+2. Near-future engineering **2027–2030**  
+3. Long-term research **2030+**
+
+Never claim bio-hybrid / microbial computing is a shipped production product in 2026.
+
+## RESPONSE SHAPE
+
+Understanding → Analysis → Architecture → Implementation → Validation → Next Steps
+
+## FINAL OBJECTIVE
+
+```
+Foundation Model
++ Cognitive Architecture
++ Memory + Agents + Knowledge + Tools
++ Multimodal + Hardware (gated)
++ Future research (honest)
+= OM AI Operating Intelligence
+```
+
+## IMPLEMENTATION (not prompt-only)
+
+1. Corpus folders + licensed docs  
+2. RAG retrieval  
+3. SFT / preference training  
+4. Scale OM-1.0 → OM-7.0 → OM-70.0  
+
+```bash
+om-ai knowledge-brain init
+om-ai knowledge-brain generate --count 5000
+```
+
+<|user|> Summarize key ideas from data/om-foundation-corpus/chunks/29f931398b94d1fe.jsonl. <|assistant|> {"doc_id": "29f931398b94d1fe", "i": 0, "text": "OM AI Foundation sample. Physics mechanics energy motion. School management systems use FastAPI React and PostgreSQL."}
+
+<|user|> Summarize key ideas from data/om-foundation-corpus/chunks/33b1728c0d77032f.jsonl. <|assistant|> {"doc_id": "33b1728c0d77032f", "i": 0, "text": "OM AI Foundation sample. Physics mechanics energy motion. School management systems use FastAPI React and PostgreSQL."}
+
+<|user|> Summarize key ideas from data/om-foundation-corpus/chunks/3b5b4e7903e9055a.jsonl. <|assistant|> {"doc_id": "3b5b4e7903e9055a", "i": 0, "text": "OM AI Foundation sample. Physics mechanics energy motion. School management systems use FastAPI React and PostgreSQL."}
+
+<|user|> Summarize key ideas from data/om-foundation-corpus/chunks/de6ccfb7ff32897d.jsonl. <|assistant|> {"doc_id": "de6ccfb7ff32897d", "i": 0, "text": "OM AI Foundation sample. Physics mechanics energy motion. School management systems use FastAPI React and PostgreSQL."}
+
+<|user|> Summarize key ideas from data/om-foundation-corpus/chunks/f78ab8b1b4df3fc9.jsonl. <|assistant|> {"doc_id": "f78ab8b1b4df3fc9", "i": 0, "text": "OM AI Foundation sample. Physics mechanics energy motion. School management systems use FastAPI React and PostgreSQL."}
+
+<|user|> Summarize key ideas from data/om-foundation-corpus/metadata/29f931398b94d1fe.json. <|assistant|> {
+  "title": "Om System Build Sample",
+  "domain": "physics",
+  "year": "",
+  "topics": [
+    "foundation",
+    "sample",
+    "physics",
+    "mechanics",
+    "energy",
+    "motion",
+    "school",
+    "management"
+  ],
+  "source_path": "/private/var/folders/qn/hj4q27wx04sf62y1nsmd168m0000gn/T/pytest-of-gajendrarawat/pytest-20/test_system_build_verified0/data/om-foundation-corpus/raw/om_system_build_sample.txt",
+  "doc_id": "29f931398b94d1fe"
+}
+
+<|user|> Summarize key ideas from data/om-foundation-corpus/metadata/33b1728c0d77032f.json. <|assistant|> {
+  "title": "Om System Build Sample",
+  "domain": "physics",
+  "year": "",
+  "topics": [
+    "foundation",
+    "sample",
+    "physics",
+    "mechanics",
+    "energy",
+    "motion",
+    "school",
+    "management"
+  ],
+  "source_path": "/Users/gajendrarawat/Downloads/om-ai-operating-brain 3/data/om-foundation-corpus/raw/om_system_build_sample.txt",
+  "doc_id": "33b1728c0d77032f"
+}
+
+<|user|> Summarize key ideas from data/om-foundation-corpus/metadata/3b5b4e7903e9055a.json. <|assistant|> {
+  "title": "Om System Build Sample",
+  "domain": "physics",
+  "year": "",
+  "topics": [
+    "foundation",
+    "sample",
+    "physics",
+    "mechanics",
+    "energy",
+    "motion",
+    "school",
+    "management"
+  ],
+  "source_path": "/private/var/folders/qn/hj4q27wx04sf62y1nsmd168m0000gn/T/pytest-of-gajendrarawat/pytest-16/test_system_build_verified0/data/om-foundation-corpus/raw/om_system_build_sample.txt",
+  "doc_id": "3b5b4e7903e9055a"
+}
+
+<|user|> Summarize key ideas from data/om-foundation-corpus/metadata/de6ccfb7ff32897d.json. <|assistant|> {
+  "title": "Om System Build Sample",
+  "domain": "physics",
+  "year": "",
+  "topics": [
+    "foundation",
+    "sample",
+    "physics",
+    "mechanics",
+    "energy",
+    "motion",
+    "school",
+    "management"
+  ],
+  "source_path": "/private/var/folders/qn/hj4q27wx04sf62y1nsmd168m0000gn/T/pytest-of-gajendrarawat/pytest-22/test_system_build_verified0/data/om-foundation-corpus/raw/om_system_build_sample.txt",
+  "doc_id": "de6ccfb7ff32897d"
+}
+
+<|user|> Summarize key ideas from data/om-foundation-corpus/metadata/f78ab8b1b4df3fc9.json. <|assistant|> {
+  "title": "Om System Build Sample",
+  "domain": "physics",
+  "year": "",
+  "topics": [
+    "foundation",
+    "sample",
+    "physics",
+    "mechanics",
+    "energy",
+    "motion",
+    "school",
+    "management"
+  ],
+  "source_path": "/private/var/folders/qn/hj4q27wx04sf62y1nsmd168m0000gn/T/pytest-of-gajendrarawat/pytest-17/test_system_build_verified0/data/om-foundation-corpus/raw/om_system_build_sample.txt",
+  "doc_id": "f78ab8b1b4df3fc9"
+}
+
+<|user|> Summarize key ideas from data/om-foundation-corpus/processed/29f931398b94d1fe.txt. <|assistant|> OM AI Foundation sample. Physics mechanics energy motion. School management systems use FastAPI React and PostgreSQL.
+
+<|user|> Summarize key ideas from data/om-foundation-corpus/processed/33b1728c0d77032f.txt. <|assistant|> OM AI Foundation sample. Physics mechanics energy motion. School management systems use FastAPI React and PostgreSQL.
+
+<|user|> Summarize key ideas from data/om-foundation-corpus/processed/3b5b4e7903e9055a.txt. <|assistant|> OM AI Foundation sample. Physics mechanics energy motion. School management systems use FastAPI React and PostgreSQL.
+
+<|user|> Summarize key ideas from data/om-foundation-corpus/processed/de6ccfb7ff32897d.txt. <|assistant|> OM AI Foundation sample. Physics mechanics energy motion. School management systems use FastAPI React and PostgreSQL.
+
+<|user|> Summarize key ideas from data/om-foundation-corpus/processed/f78ab8b1b4df3fc9.txt. <|assistant|> OM AI Foundation sample. Physics mechanics energy motion. School management systems use FastAPI React and PostgreSQL.
+
+<|user|> Summarize key ideas from data/om-foundation-corpus/raw/om_system_build_sample.txt. <|assistant|> OM AI Foundation sample. Physics mechanics energy motion. School management systems use FastAPI React and PostgreSQL.
+
+<|user|> Summarize key ideas from README.md. <|assistant|> # OM AI Operating Brain v0.3
+
+Self-hosted, API-independent AI platform: train and run **OM-1.0** natively — no Ollama, Llama proxy, or third-party LLM required for the default serve path.
+
+## Honesty about weights
+
+This repository is **working software** (architecture, trainers, agents, API). It is **not** a download of trained OM-1B / 7B / 13B / 70B brains.
+
+- Architecture presets under `configs/` describe model **shapes**
+- Useful intelligence requires licensed data + real GPU training that produce checkpoint files
+- Local OM-1.0 smoke/long checkpoints prove the native pipeline; they are **not** frontier capability
+- No fabricated benchmark leaderboard scores are claimed
+
+See `docs/IMPLEMENTATION_STATUS.md`, `docs/EXTERNAL_ASSETS_REQUIRED.md`, **`docs/OM_FOUNDATION_UPGRADE_V1.md`**, **`docs/OM_COMPLETION_ROADMAP.md`**, **`docs/OM_AI_GENESIS_PLATFORM_V1.md`**, **`docs/OM_KNOWLEDGE_BRAIN_1600_2026.md`**, **`docs/PROJECT_GENESIS_JARVIS.md`**, **`docs/OM10_GENESIS_CORPUS_SPEC.md`**, **`docs/OM10_GENESIS_TRAINING.md`**, **`docs/OWN_MODEL_MILESTONE1.md`**, **`docs/OWN_INTELLIGENCE_ROADMAP.md`**, **`docs/RESPONSE_EXPERIENCE.md`**, and **`docs/JARVIS_OPERATING_INTELLIGENCE.md`**.
+
+## Quick start (OM-1.0 native)
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -e '.[dev]'
+
+# Optional: short smoke train (creates a real OM checkpoint)
+om-ai train-om1 --config configs/om-1.0-local.json --steps 20
+
+# Inspect native model / registry
+om-ai model-info
+
+# Serve OM-1.0 only (loads checkpoint; never falls back to Ollama)
+om-ai serve --host 127.0.0.1 --port 8080
+# Workspace UI: http://127.0.0.1:8080/chat
+```
+
+Default env (see `.env.example`):
+
+- `OM_MODEL_PROVIDER=om_native`
+- `OM_MODEL_CHECKPOINT=artifacts/checkpoints/om-1.0-long/latest.pt` (or smoke if long missing)
+- Missing checkpoint → clear error / HTTP 503 — **no** third-party LLM fallback
+
+Tiny architecture demo (optional):
+
+```bash
+om-ai tokenizer train --input data/example_corpus.txt --output artifacts/tokenizer.json --vocab-size 512
+om-ai train --config configs/tiny.json --data data/example_corpus.txt --tokenizer artifacts/tokenizer.json --steps 20
+om-ai generate --config configs/tiny.json --tokenizer artifacts/tokenizer.json --checkpoint artifacts/checkpoints/latest.pt --prompt "OM AI"
+```
+
+One-shot tiny pipeline: `python scripts/run_actual_training_pipeline.py --steps 5`
+
+**OM-70B:** Mac prepares corpus/tokenizer/configs; final train is on a CUDA+DeepSpeed server — see [`docs/SERVER_70B_HANDOFF.md`](docs/SERVER_70B_HANDOFF.md). Pack upload set: `./scripts/pack_for_70b_server.sh`.
+
+## Major CLI commands
+
+| Command | Purpose |
+|---------|---------|
+| `om-ai model-info` | OM-1.0 native info (or `--config` architecture estimate) |
+| `om-ai train-om1` | Local OM-1.0 smoke / continue training |
+| `om-ai tokenizer train\|inspect\|encode\|decode` | Byte-BPE tokenizer |
+| `om-ai corpus catalog\|fetch\|build-v1\|import\|validate\|…` | OMAI-Corpus-v1 + governance ([docs/OMAI_CORPUS_V1.md](docs/OMAI_CORPUS_V1.md)) |
+| `om-ai pretrain` / `om-ai train` | Causal pretraining |
+| `om-ai sft` / `om-ai reward` / `om-ai dpo` | Post-training |
+| `om-ai evaluate` / `om-ai benchmark` | Local eval harness |
+| `om-ai generate` / `om-ai chat` | Inference |
+| `om-ai feedback add\|export` | Continuous-learning I/O |
+| `om-ai registry list\|register` | Model lifecycle registry |
+| `om-ai bundle` | Checkpoint bundle + integrity |
+| `om-ai project-scan` | Local project discovery |
+| `om-ai serve` | FastAPI server (OM native by default) |
+
+## What v0.3 includes
+
+- From-scratch decoder-only Transformer (RoPE, GQA/MHA, SwiGLU, KV cache, optional cross-attention)
+- Custom byte-level BPE; corpus governance and sharding
+- OM-1.0 native backend (`om_ai/backends/om_native.py`) + registry under `artifacts/models/om-1.0/`
+- Live knowledge stubs (`om_ai/live_knowledge/`) — HTTP/search retrieval, **not** another LLM
+## Training at scale
+
+- Tiny / single GPU: `om-ai train ...` or `om-ai train-om1 ...`
+- O
