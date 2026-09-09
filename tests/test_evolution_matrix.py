@@ -13,14 +13,17 @@ def test_l5_chatty_prompts_use_native():
         assert level == 5.0
 
 
-def test_l5_agentic_prompts_use_matrix():
+def test_l5_agentic_prompts_use_plain_english():
     text, model, level = maybe_evolution_reply(
         [{"role": "user", "content": "calculate 12 * 50 for our budget projection"}],
         model="OM-L5",
     )
     assert text is not None
-    assert "ORGANIZATION MATRIX" in text
+    assert "[OM-L5" not in text
+    assert "ORGANIZATION MATRIX" not in text
+    assert "MASTER GOAL" not in text
     assert "No module named" not in text
+    assert "Goal:" in text
     assert model == "OM-L5"
     assert level == 5.0
 
@@ -28,4 +31,5 @@ def test_l5_agentic_prompts_use_matrix():
 def test_om5_core_loads_for_sandbox():
     out = process_evolution_level("project costs budget 100", 5.0)
     assert "No module named 'om5_core'" not in out
-    assert "ORGANIZATION MATRIX" in out
+    assert "[OM-L5" not in out
+    assert "Goal:" in out

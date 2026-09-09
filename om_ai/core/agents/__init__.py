@@ -25,7 +25,12 @@ from .agent_memory import AgentMemory
 from .agent_evaluator import AgentEvaluator
 
 from .team_builder import TeamBuilder
-
+from .coding_agent import CodingAgent
+from .research_agent import ResearchAgent
+from .memory_agent import MemoryAgent
+from .knowledge_agent import KnowledgeAgent
+from .security_agent import SecurityAgent
+from .quality_agent import QualityAgent
 
 
 __all__ = [
@@ -43,5 +48,19 @@ __all__ = [
     "AgentEvaluator",
 
     "TeamBuilder",
+    
+    "CollaborationEngine",
+
+    "CodingAgent",
+
+    "ResearchAgent",
+
+    "MemoryAgent",
+
+    "KnowledgeAgent",
+
+    "SecurityAgent",
+
+    "QualityAgent"
 
 ]

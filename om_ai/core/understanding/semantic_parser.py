@@ -1,24 +1,30 @@
 class SemanticParser:
 
+    def parse(
+        self,
+        message
+    ):
 
-    def parse(self, text: str):
+        text = message.original_text
 
         return {
+            "text": text,
 
-            "original_text": text,
+            "sentences":
+                message.sentences,
 
-            "length": len(text),
+            "word_count":
+                message.word_count,
 
-            "words": text.lower().split(),
+            "character_count":
+                message.character_count,
 
             "question":
-                self.is_question(text),
+                self._is_question(text),
 
-            "contains_action":
-                self.contains_action(text)
-
+            "request":
+                self._is_request(text)
         }
-
 
     def is_question(self, text):
 
@@ -44,4 +50,53 @@ class SemanticParser:
         return any(
             action in text
             for action in actions
+        )
+
+
+ 
+
+    def _is_question(
+        self,
+        text: str
+    ) -> bool:
+
+        return (
+            "?" in text
+            or
+            any(
+                text.lower().startswith(x)
+                for x in [
+                    "what ",
+                    "why ",
+                    "how ",
+                    "when ",
+                    "where ",
+                    "who ",
+                    "which ",
+                    "can ",
+                    "could ",
+                    "would ",
+                    "is "
+                ]
+            )
+        )
+
+
+    def _is_request(
+        self,
+        text: str
+    ) -> bool:
+
+        return any(
+            text.lower().startswith(x)
+            for x in [
+                "please ",
+                "can you ",
+                "could you ",
+                "i want ",
+                "i need ",
+                "create ",
+                "make ",
+                "build "
+            ]
         )

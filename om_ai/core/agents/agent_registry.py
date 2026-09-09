@@ -27,7 +27,9 @@ class AgentRegistry:
             name
         )
 
+    def all(self):
 
+        return self.agents
 
     def list_agents(self):
 

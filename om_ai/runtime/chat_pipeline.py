@@ -41,11 +41,14 @@ def run_chat_pipeline(
     actor: str = "",
     project_id: str | None = None,
     project_instructions: str = "",
+    force_tools: list[str] | None = None,
 ) -> dict[str, Any]:
     """Run the upgraded staged chat pipeline. Returns answer + stage meta."""
     q = (user_text or "").strip()
     stages: list[str] = []
     meta: dict[str, Any] = {"pipeline": "om-chat-pipeline-v2"}
+    forced = [str(t).strip() for t in (force_tools or []) if str(t).strip()]
+    meta["force_tools"] = forced
 
     # ── 1. Language Manager (+ meaning) ───────────────────────────────
     stages.append("language")
@@ -165,6 +168,12 @@ def run_chat_pipeline(
         from om_ai.core.understanding.context_intent import classify_context_intent
 
         ctx_intent = classify_context_intent(q)
+        if forced:
+            ctx_intent["use_tools"] = True
+            ctx_intent["tools"] = list(
+                dict.fromkeys(list(ctx_intent.get("tools") or []) + forced)
+            )
+            ctx_intent["reason"] = str(ctx_intent.get("reason") or "") + "+ui_tools"
         if ctx_intent.get("intent") == "conversation":
             intent = {
                 **intent,
@@ -191,7 +200,7 @@ def run_chat_pipeline(
     stages.append("system_connectivity")
     internal_context = ""
     try:
-        if ctx_intent.get("intent") not in {"conversation", "date_query", "calculation"}:
+        if forced or ctx_intent.get("intent") not in {"conversation", "date_query", "calculation"}:
             from om_ai.runtime.connectivity_bridge import enrich_chat_turn
 
             connectivity = enrich_chat_turn(
@@ -237,9 +246,15 @@ def run_chat_pipeline(
         }
         capability = {"capability": cap_from_ctx.get(str(ctx_intent.get("intent") or "general"), "chat")}
 
-        if ctx_intent.get("intent") == "conversation" or (
-            not ctx_intent.get("use_tools") and ctx_intent.get("intent") in {"general", "research"}
-        ):
+        # Skip tools only for pure chat when the user did not enable Web/Code.
+        skip_tools = (not forced) and (
+            ctx_intent.get("intent") == "conversation"
+            or (
+                not ctx_intent.get("use_tools")
+                and ctx_intent.get("intent") in {"general", "research"}
+            )
+        )
+        if skip_tools:
             meta["tools"] = {
                 "planned": [],
                 "allowed": [],
@@ -259,6 +274,7 @@ def run_chat_pipeline(
                     "actor": actor,
                     "project_id": project_id,
                     "original_query": q,
+                    "force_tools": forced or list(ctx_intent.get("tools") or []),
                 },
                 intent=intent,
                 capability=capability,
@@ -268,6 +284,27 @@ def run_chat_pipeline(
             if not raw_tool and action.execution:
                 raw_tool = str(action.execution.get("combined_text") or "").strip()
             public_tool = extract_clean_tool_answer(raw_tool)
+            if forced and not public_tool and not (action.execution or {}).get("executed"):
+                from om_ai.tools.chat_runner import execute_planned_tools, format_tool_context
+
+                direct = execute_planned_tools(
+                    forced,
+                    q,
+                    context={
+                        "tenant_id": tenant_id,
+                        "project_root": ".",
+                        "actor": actor,
+                        "project_id": project_id,
+                    },
+                )
+                public_tool = extract_clean_tool_answer(
+                    format_tool_context(direct) or str(direct.get("combined_text") or "")
+                )
+                meta["tools_direct"] = {
+                    "executed": direct.get("executed"),
+                    "ok": direct.get("ok"),
+                    "skipped": direct.get("skipped"),
+                }
             action_meta = action.to_dict()
             meta["action"] = action_meta
             meta["tools"] = {
@@ -275,13 +312,33 @@ def run_chat_pipeline(
                 "allowed": action.tools_allowed,
                 "blocked": action.tools_blocked,
                 "executed": (action.execution or {}).get("executed"),
-                "ok": (action.execution or {}).get("ok"),
+                "ok": (action.execution or {}).get("ok") or bool(public_tool),
                 "mode": action.mode,
+                "forced": forced,
             }
     except Exception as exc:
         logger.debug("action layer skipped: %s", exc)
         meta["action"] = {"error": str(exc)}
         meta["tools"] = {"error": str(exc)}
+        if forced:
+            try:
+                from om_ai.tools.chat_runner import execute_planned_tools, format_tool_context
+                from om_ai.runtime.public_reply import extract_clean_tool_answer as _clean
+
+                direct = execute_planned_tools(
+                    forced,
+                    q,
+                    context={"tenant_id": tenant_id, "project_root": ".", "actor": actor},
+                )
+                public_tool = _clean(
+                    format_tool_context(direct) or str(direct.get("combined_text") or "")
+                )
+                meta["tools_direct"] = {
+                    "executed": direct.get("executed"),
+                    "ok": direct.get("ok"),
+                }
+            except Exception as exc2:
+                meta["tools_direct"] = {"error": str(exc2)}
 
     # Knowledge / memory → internal only
     stages.append("knowledge_brain")

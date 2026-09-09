@@ -1,17 +1,29 @@
 class FormatSelector:
 
 
-    def select(self, strategy):
+    def select(
+        self,
+        message,
+        intent
+    ):
 
 
-        if strategy=="code_first":
-
-            return "markdown_code"
+        text = message.lower()
 
 
-        if strategy=="architecture":
+        if intent == "coding":
 
-            return "structured"
+            return "technical"
 
 
-        return "normal"
+        if "step" in text:
+
+            return "step_by_step"
+
+
+        if "explain" in text:
+
+            return "explanation"
+
+
+        return "conversation"

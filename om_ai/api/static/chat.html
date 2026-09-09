@@ -1067,14 +1067,10 @@ function renderExperienceMarkdown(raw, animate) {
   return wrap.innerHTML;
 }
 
-function experiencePhaseHtml(label) {
-  const steps = ["Intent Analysis","Reasoning","Agent Selection","Tool Usage","Memory Retrieval"];
-  const active = String(label||"");
-  const items = steps.map((s) => {
-    const on = active.toLowerCase().includes(s.toLowerCase().split(" ")[0]) || active.toLowerCase().includes(s.toLowerCase());
-    return "<li"+(on?' class="active"':'')+">"+escapeHtml(s)+"</li>";
-  }).join("");
-  return '<div class="think-steps" role="status"><strong><span class="spin" aria-hidden="true"></span> '+escapeHtml(active || "OM is thinking…")+"</strong><ol>"+items+"</ol></div>";
+function experiencePhaseHtml(_label) {
+  // Pipeline steps (intent / tools / memory) run on the server in the background.
+  // Do not show those labels in the chat UI — only a quiet typing cue.
+  return "";
 }
 
 function fmtDate(iso) {
@@ -1795,7 +1791,7 @@ function renderMessages() {
     const waiting = !!(m._streaming && !String(m.content||"").trim());
     if (m._streaming) bubble.dataset.stream = "1";
     if (waiting) bubble.classList.add("is-typing");
-    if (waiting) bubble.innerHTML = experiencePhaseHtml("Thinking…")+typingIndicatorHtml();
+    if (waiting) bubble.innerHTML = typingIndicatorHtml();
     else if (m.role === "assistant") bubble.innerHTML = renderExperienceMarkdown(stripPipelineDump(m.content||""), !!m._reveal);
     else bubble.innerHTML = escapeHtml(m.content||"").replace(/\n/g,"<br>");
     col.appendChild(bubble);
@@ -1818,8 +1814,8 @@ function updateStreamBubble(text) {
   const body = String(text||"");
   if (!body.trim()) {
     bubble.classList.add("is-typing");
-    const phase = state._rxPhase || "Understanding request…";
-    bubble.innerHTML = experiencePhaseHtml(phase)+typingIndicatorHtml();
+    bubble.setAttribute("aria-busy", "true");
+    bubble.innerHTML = typingIndicatorHtml();
   } else {
     bubble.classList.remove("is-typing");
     bubble.removeAttribute("aria-busy");
@@ -1993,10 +1989,14 @@ async function streamCompletion(messages) {
     method:"POST", credentials:"include", signal:controller.signal,
     headers:{"Content-Type":"application/json"},
     body:JSON.stringify({
-      model:state.model||"OM-1.0", messages,
+      model:normalizeModelId(state.model||"OM-L5"), messages,
       max_tokens:maxTok, temperature:temp, stream:true,
       project_id:state.activeProjectId||undefined,
       conversation_id:state.currentId||undefined,
+      tools:{
+        web:!!(state.tools&&state.tools.web),
+        code:!!(state.tools&&state.tools.code),
+      },
     }),
   });
   if (res.status === 401) { location.replace("/login"); throw new Error("unauthorized"); }
@@ -2007,23 +2007,9 @@ async function streamCompletion(messages) {
   }
   const reader = res.body.getReader(), decoder = new TextDecoder();
   let buffer = "", full = "";
-  const phases = [
-    "OM is thinking…",
-    "Intent Analysis",
-    "Reasoning",
-    "Agent Selection",
-    "Memory Retrieval",
-    "Generating answer…",
-  ];
-  let phaseIdx = 0;
-  state._rxPhase = phases[0];
-  if (state._rxPhaseTimer) clearInterval(state._rxPhaseTimer);
-  state._rxPhaseTimer = setInterval(() => {
-    phaseIdx = Math.min(phaseIdx + 1, phases.length - 1);
-    state._rxPhase = phases[phaseIdx];
-    const last = state.messages[state.messages.length-1];
-    if (last && last._streaming && !String(last.content||"").trim()) updateStreamBubble("");
-  }, 700);
+  // Intent / tools / memory still run server-side; do not animate phase labels in the UI.
+  if (state._rxPhaseTimer) { clearInterval(state._rxPhaseTimer); state._rxPhaseTimer = null; }
+  state._rxPhase = "";
   try {
   while (true) {
     const { done, value } = await reader.read();
@@ -2184,7 +2170,7 @@ async function loadConversation(id, opts) {
   if (data.project_id && data.model) { /* noop */ }
   if (data.project_id) {
     const proj = state.projects.find(p => p.id === data.project_id);
-    if (proj && proj.model) state.model = proj.model;
+    if (proj && proj.model) state.model = normalizeModelId(proj.model);
   }
   updateTopTitle(); setView("chat",true);
   renderConvList(); renderMessages();
@@ -2206,18 +2192,31 @@ async function appendTurn(userText, assistantText) {
 /* ─── MODELS ─── */
 function renderModels() {
   els.modelDrop.innerHTML = "";
-  const list = state.catalog.length ? state.catalog : [{id:state.model,name:state.model}];
+  // Top picker: Levels 1–5 first, then any enabled external models.
+  const evo = evolutionModelList();
+  const extras = (state.catalog || []).filter(m => {
+    const id = String((m && m.id) || "");
+    return id && !/^OM-L[1-5]$/i.test(id) && !/^(OM-1\.0|om-1\.0)$/i.test(id);
+  });
+  const list = evo.concat(extras);
+  state.model = normalizeModelId(state.model);
   list.forEach(m => {
     const id = m.id||m;
     const b = document.createElement("button"); b.type = "button";
     b.className = id === state.model ? "active":"";
     b.textContent = m.name||id;
     b.addEventListener("click", async () => {
-      state.model = id;
+      state.model = normalizeModelId(id);
       els.modelBtn.innerHTML = escapeHtml(m.name||id)+svg("chevD",14);
       updateComposerChip();
       els.modelDrop.classList.remove("open");
-      await api("/v1/settings",{method:"PATCH",body:JSON.stringify({default_model:id})},{success:"Default model updated"});
+      await api("/v1/settings",{method:"PATCH",body:JSON.stringify({default_model:state.model})},{success:"Default model updated"});
+      // Keep active project model in sync when chatting inside a project.
+      if (state.activeProjectId) {
+        await api("/v1/projects/"+encodeURIComponent(state.activeProjectId),{
+          method:"PATCH", body:JSON.stringify({model:state.model})
+        },{error:false});
+      }
       renderModels();
     });
     els.modelDrop.appendChild(b);
@@ -2226,8 +2225,13 @@ function renderModels() {
   els.modelBtn.innerHTML = escapeHtml((cur&&(cur.name||cur.id))||state.model)+svg("chevD",14);
   const pill = $("omLevelPill");
   if (pill) {
-    const lvl = (cur && cur.level != null) ? ("L"+Number(cur.level).toFixed(0)) : (String(state.model||"").match(/L([1-5])/i)||[])[1];
-    pill.textContent = lvl ? ("OM-L"+lvl) : String(state.model||"OM-L5");
+    let n = null;
+    if (cur && cur.level != null) n = Number(cur.level);
+    else {
+      const m = String(state.model || "").match(/L([1-5])/i);
+      if (m) n = Number(m[1]);
+    }
+    pill.textContent = (n >= 1 && n <= 5) ? ("OM-L" + n) : String(state.model || "OM-L5");
   }
   updateComposerChip();
 }
@@ -2237,12 +2241,51 @@ function updateComposerChip() {
   if (chip) chip.textContent = state.model;
 }
 
+function normalizeModelId(id) {
+  const raw = String(id || "").trim();
+  if (!raw) return "OM-L5";
+  const low = raw.toLowerCase();
+  if (low === "om-1.0" || low === "om-1" || low === "om1.0") return "OM-L1";
+  const m = low.match(/^om-?l([1-5])(?:\.0)?$/);
+  if (m) return "OM-L" + m[1];
+  return raw;
+}
+
+/** Levels 1–5 for pickers (exclude duplicate OM-1.0 alias + external). */
+function evolutionModelList() {
+  const fromCat = (state.catalog || []).filter(m => {
+    const id = String((m && m.id) || m || "");
+    return /^OM-L[1-5]$/i.test(id);
+  });
+  if (fromCat.length) return fromCat;
+  return [
+    {id:"OM-L1", name:"OM Level 1 · Chatbot", level:1},
+    {id:"OM-L2", name:"OM Level 2 · Reasoner", level:2},
+    {id:"OM-L3", name:"OM Level 3 · Agent", level:3},
+    {id:"OM-L4", name:"OM Level 4 · Innovator", level:4},
+    {id:"OM-L5", name:"OM Level 5 · Organization Matrix", level:5},
+  ];
+}
+
+function modelSelectOptions(selected) {
+  const sel = normalizeModelId(selected || state.model || "OM-L5");
+  return evolutionModelList().map(m => {
+    const id = m.id || m;
+    const label = m.name || id;
+    return '<option value="'+escapeHtml(id)+'"'+(id===sel?' selected':'')+">"+escapeHtml(label)+"</option>";
+  }).join("");
+}
+
 async function loadModelsCatalog() {
   const { res, data } = await api("/v1/models/catalog",{},{error:false});
   if (res.ok && data) {
-    state.catalog = data.models||[];
-    if (data.default_model) state.model = data.default_model;
+    state.catalog = data.models || [];
+    state.models = evolutionModelList();
+    if (data.default_model) state.model = normalizeModelId(data.default_model);
+  } else {
+    state.models = evolutionModelList();
   }
+  state.model = normalizeModelId(state.model);
   renderModels();
 }
 
@@ -2755,8 +2798,7 @@ function relativeUpdated(iso) {
 }
 
 async function openProjectCreateModal() {
-  const models = (state.models||[]).length ? state.models : [{id:"OM-1.0"}];
-  const opts = models.map(m => '<option value="'+escapeHtml(m.id||m)+'"'+( (m.id||m)==="OM-1.0"?' selected':'')+">"+escapeHtml(m.id||m)+"</option>").join("");
+  const opts = modelSelectOptions(state.model || "OM-L5");
   showModal("New Project",
     '<form class="form-grid" id="projCreateModalForm">'+
     '<label>Project Name<input name="name" required maxlength="120" placeholder="Hindu Rishte AI"/></label>'+
@@ -2775,7 +2817,7 @@ async function openProjectCreateModal() {
         name,
         description: String(fd.get("description")||"").trim(),
         instructions: String(fd.get("instructions")||"").trim(),
-        model: String(fd.get("model")||"OM-1.0"),
+        model: normalizeModelId(String(fd.get("model")||state.model||"OM-L5")),
       };
       const { res, data } = await api("/v1/projects",{method:"POST",body:JSON.stringify(payload)},{success:"Project created"});
       if (!res.ok || !data) return;
@@ -2928,7 +2970,7 @@ function projectCard(p) {
 async function loadProjectDetail(p, tab) {
   state.activeProjectId = p.id;
   setProjectHash(p.id);
-  if (p.model) state.model = p.model;
+  if (p.model) state.model = normalizeModelId(p.model);
   const panel = $("projectsPanel");
   panel.innerHTML =
     '<button type="button" class="back-btn" id="projBackBtn">'+svg("chevL",14)+" Projects</button>"+
@@ -2937,7 +2979,7 @@ async function loadProjectDetail(p, tab) {
     '<p class="sub" id="projDetailDesc"></p>'+
     '<div class="detail-meta">'+
     '<span class="badge blue">'+svg("folder",12)+" Project</span>"+
-    '<span style="font-size:12px;color:var(--muted)">Model: '+escapeHtml(p.model||"OM-1.0")+"</span>"+
+    '<span style="font-size:12px;color:var(--muted)">Model: '+escapeHtml(normalizeModelId(p.model||state.model||"OM-L5"))+"</span>"+
     '<span style="font-size:12px;color:var(--muted)">'+fmtDate(p.updated_at||p.created_at)+"</span>"+
     '</div></div>'+
     '<div id="projDetailTabs"></div><div id="projDetailContent">'+skeletons(2)+"</div>";
@@ -2959,8 +3001,9 @@ async function loadProjectDetail(p, tab) {
 
 async function openProjectChat(project, chatId) {
   state.activeProjectId = project.id;
-  if (project.model) state.model = project.model;
+  if (project.model) state.model = normalizeModelId(project.model);
   await loadConversation(chatId, {keepProject:true});
+  renderModels();
   setProjectHash(project.id, chatId);
 }
 
@@ -3165,8 +3208,7 @@ async function loadProjectTab(p, tab) {
   if (tab === "settings") {
     const { res, data } = await api("/v1/projects/"+encodeURIComponent(p.id),{},{error:false});
     const proj = (res.ok && data) || p;
-    const models = (state.models||[]).length ? state.models : [{id:"OM-1.0"}];
-    const opts = models.map(m => '<option value="'+escapeHtml(m.id||m)+'"'+((m.id||m)===(proj.model||"OM-1.0")?' selected':'')+">"+escapeHtml(m.id||m)+"</option>").join("");
+    const opts = modelSelectOptions(proj.model || state.model || "OM-L5");
     box.innerHTML =
       '<form class="form-grid" id="projSettingsForm">'+
       "<h3>General</h3>"+
@@ -3187,12 +3229,13 @@ async function loadProjectTab(p, tab) {
     $("projSettingsForm").onsubmit = async (e) => {
       e.preventDefault();
       const fd = new FormData(e.target);
+      const chosen = normalizeModelId(String(fd.get("model")||state.model||"OM-L5"));
       const { res:r2, data:d2 } = await api("/v1/projects/"+encodeURIComponent(p.id),{method:"PUT",body:JSON.stringify({
         name:String(fd.get("name")||"").trim(),
         description:String(fd.get("description")||"").trim(),
-        model:String(fd.get("model")||"OM-1.0")
+        model:chosen
       })},{success:"Project updated"});
-      if (r2.ok && d2) { Object.assign(p, d2); if (d2.model) state.model = d2.model; loadProjectDetail(p, "settings"); }
+      if (r2.ok && d2) { Object.assign(p, d2); state.model = normalizeModelId(d2.model || chosen); renderModels(); loadProjectDetail(p, "settings"); }
     };
     $("projFavBtn").onclick = async () => {
       await api("/v1/projects/"+encodeURIComponent(p.id),{method:"PATCH",body:JSON.stringify({favorite:!proj.favorite})},{success:"Updated"});
@@ -3248,11 +3291,7 @@ function assistantBlurb(a) {
 }
 
 async function openAssistantCreateModal() {
-  const models = (state.models||[]).length ? state.models : [{id:state.model||"OM-1.0"}];
-  const opts = models.map(m => {
-    const id = m.id||m;
-    return '<option value="'+escapeHtml(id)+'"'+(id===(state.model||"OM-1.0")?' selected':'')+">"+escapeHtml(id)+"</option>";
-  }).join("");
+  const opts = modelSelectOptions(state.model || "OM-L5");
   showModal("New Assistant",
     '<form class="form-grid" id="asstCreateModalForm">'+
     '<label>Name<input name="name" required maxlength="120" placeholder="Coding Assistant"/></label>'+
@@ -3269,7 +3308,7 @@ async function openAssistantCreateModal() {
         name,
         description: String(fd.get("description")||"").trim(),
         system_prompt: String(fd.get("system_prompt")||"").trim(),
-        model: String(fd.get("model")||state.model||"OM-1.0"),
+        model: normalizeModelId(String(fd.get("model")||state.model||"OM-L5")),
       })},{success:"Assistant created"});
       if (!res.ok || !data) return;
       state.assistants = [data].concat(state.assistants.filter(x => x.id !== data.id));
@@ -4172,9 +4211,13 @@ async function loadSettingsTab(tab) {
     const llmOn = s.llm_enabled !== false;
     const providers = s.llm_providers || {};
     const keysSet = s.llm_api_keys_set || {};
-    const activeId = String(s.default_model || state.model || "OM-1.0").toLowerCase();
+    const activeId = normalizeModelId(s.default_model || state.model || "OM-L5");
     const LLM_CATALOG = [
-      { id: "om", name: "OM-1.0", vendor: "OM AI (owned)", owned: true },
+      { id: "OM-L1", name: "OM Level 1 · Chatbot", vendor: "OM AI", owned: true },
+      { id: "OM-L2", name: "OM Level 2 · Reasoner", vendor: "OM AI", owned: true },
+      { id: "OM-L3", name: "OM Level 3 · Agent", vendor: "OM AI", owned: true },
+      { id: "OM-L4", name: "OM Level 4 · Innovator", vendor: "OM AI", owned: true },
+      { id: "OM-L5", name: "OM Level 5 · Organization Matrix", vendor: "OM AI", owned: true },
       { id: "gpt", name: "GPT", vendor: "OpenAI", hint: "OPENAI_API_KEY" },
       { id: "claude", name: "Claude", vendor: "Anthropic", hint: "ANTHROPIC_API_KEY" },
       { id: "gemini", name: "Gemini", vendor: "Google", hint: "GOOGLE_API_KEY" },
@@ -4184,24 +4227,22 @@ async function loadSettingsTab(tab) {
       { id: "deepseek", name: "DeepSeek", vendor: "DeepSeek", hint: "DEEPSEEK_API_KEY" },
       { id: "grok", name: "Grok", vendor: "xAI", hint: "XAI_API_KEY" },
     ];
-    const isActive = (id) => {
-      if (id === "om") return activeId === "om" || activeId === "om-1.0" || activeId === "om1.0";
-      return activeId === id;
-    };
+    const isActive = (id) => normalizeModelId(id) === activeId || String(id).toLowerCase() === String(activeId).toLowerCase();
     const providerRows = LLM_CATALOG.map(p => {
-      const on = p.owned ? providers[p.id] !== false : !!providers[p.id];
+      const on = p.owned ? true : !!providers[p.id];
       const hasKey = p.owned || !!keysSet[p.id];
       let badge = "";
-      if (p.owned || isActive(p.id)) badge = '<span class="llm-provider-badge owned">In use</span>';
+      if (isActive(p.id)) badge = '<span class="llm-provider-badge owned">In use</span>';
       else if (on && hasKey) badge = '<span class="llm-provider-badge on">Ready</span>';
       else if (on) badge = '<span class="llm-provider-badge warn">Needs API key</span>';
       return '<div class="llm-provider-row" data-llm="'+p.id+'">'+
         '<div class="llm-provider-meta"><div class="llm-provider-name">'+escapeHtml(p.name)+badge+"</div>"+
         '<div class="llm-provider-vendor">'+escapeHtml(p.vendor)+(p.hint ? " · key: "+escapeHtml(p.hint) : "")+"</div></div>"+
         '<div class="llm-provider-actions">'+
-        (p.owned ? "" : '<button type="button" class="llm-use-btn" data-use="'+p.id+'"'+(on && hasKey ? "" : " disabled")+'>Use</button>')+
-        (p.owned ? '<button type="button" class="llm-use-btn'+(isActive("om")?" active":"")+'" data-use="om">Use</button>' : "")+
-        '<label class="sw-wrap"><input type="checkbox" class="aiLlmProvider" data-provider="'+p.id+'"'+(on?" checked":"")+(p.owned?' disabled title="Owned brain — always available"':"")+'/><span class="sw-track"></span><span class="sw-thumb"></span></label>'+
+        '<button type="button" class="llm-use-btn'+(isActive(p.id)?" active":"")+'" data-use="'+p.id+'"'+(p.owned || (on && hasKey) ? "" : " disabled")+'>Use</button>'+
+        (p.owned
+          ? '<label class="sw-wrap"><input type="checkbox" class="aiLlmProvider" data-provider="'+p.id+'" checked disabled title="OM level — always available"/><span class="sw-track"></span><span class="sw-thumb"></span></label>'
+          : '<label class="sw-wrap"><input type="checkbox" class="aiLlmProvider" data-provider="'+p.id+'"'+(on?" checked":"")+'/><span class="sw-track"></span><span class="sw-thumb"></span></label>')+
         "</div>"+
         (p.owned ? "" : '<div class="llm-key-row'+(on?" show":"")+'" data-key-for="'+p.id+'"><input type="password" class="aiLlmKey" data-provider="'+p.id+'" autocomplete="off" placeholder="'+(hasKey?"API key saved — paste new key to replace":"Paste API key to use "+p.name)+'"/></div>')+
         "</div>";
@@ -4215,8 +4256,8 @@ async function loadSettingsTab(tab) {
       '<div class="toggle-row"><div><div class="toggle-label">LLM only</div><div class="toggle-sub">Direct model replies — skip agent, RAG, and live knowledge</div></div>'+
       '<label class="sw-wrap"><input type="checkbox" id="aiLlmOnly" name="llm_only"'+(s.llm_only?" checked":"")+'/><span class="sw-track"></span><span class="sw-thumb"></span></label></div>'+
       '<div id="aiLlmProvidersBox" class="llm-provider-box">'+
-      "<h4>LLMs to use</h4>"+
-      '<p class="llm-hint">1) Enable a model 2) Paste its API key 3) Click <strong>Use</strong> 4) Save. Chat then routes to that model.</p>'+
+      "<h4>OM Levels 1–5 + external LLMs</h4>"+
+      '<p class="llm-hint">Pick OM-L1 … OM-L5 for local chat levels, or enable an external model with an API key, then Save.</p>'+
       providerRows+
       "</div>"+
       '<div id="aiLayerSwitches">'+
@@ -4229,10 +4270,11 @@ async function loadSettingsTab(tab) {
       '<div class="toggle-row"><div><div class="toggle-label">Agent brain</div><div class="toggle-sub">Intent routing, tools, and structured planning</div></div>'+
       '<label class="sw-wrap"><input type="checkbox" id="aiAgent" name="agent_brain_enabled"'+(s.agent_brain_enabled!==false?" checked":"")+'/><span class="sw-track"></span><span class="sw-thumb"></span></label></div>'+
       "</div></div>"+
-      "<label>Active model<input name='default_model' id='aiDefaultModel' value='"+escapeHtml(s.default_model||"OM-1.0")+"' readonly/></label>"+
+      "<label>Active model<input name='default_model' id='aiDefaultModel' value='"+escapeHtml(normalizeModelId(s.default_model||state.model||"OM-L5"))+"' readonly/></label>"+
       "<label>Temperature<input name='temperature' type='number' min='0' max='1' step='0.05' value='"+(s.temperature??0.2)+"'/></label>"+
       "<label>Max tokens<input name='max_tokens' type='number' min='64' max='8192' value='"+(s.max_tokens||1024)+"'/></label>"+
       '<button type="submit" class="btn-primary">'+svg("check",14)+" Save</button>";
+    const isOwnedLevel = (id) => /^OM-L[1-5]$/i.test(String(id||""));
     const syncLlmUi = () => {
       const on = !!$("aiLlmEnabled").checked;
       const only = !!$("aiLlmOnly").checked;
@@ -4250,22 +4292,23 @@ async function loadSettingsTab(tab) {
         const row = inp.closest(".llm-provider-row");
         const keyRow = row && row.querySelector('.llm-key-row[data-key-for="'+id+'"]');
         const useBtn = row && row.querySelector(".llm-use-btn");
-        if (keyRow) keyRow.classList.toggle("show", !!inp.checked && id !== "om");
-        const hasKey = id === "om" || !!(keysSet[id]) || !!(row && row.querySelector(".aiLlmKey") && row.querySelector(".aiLlmKey").value);
-        if (useBtn && id !== "om") useBtn.disabled = !(inp.checked && hasKey);
+        if (keyRow) keyRow.classList.toggle("show", !!inp.checked && !isOwnedLevel(id));
+        const hasKey = isOwnedLevel(id) || !!(keysSet[id]) || !!(row && row.querySelector(".aiLlmKey") && row.querySelector(".aiLlmKey").value);
+        if (useBtn && !isOwnedLevel(id)) useBtn.disabled = !(inp.checked && hasKey);
         const nameEl = row && row.querySelector(".llm-provider-name");
         if (!nameEl) return;
         let badge = nameEl.querySelector(".llm-provider-badge");
         if (badge) badge.remove();
-        const active = String(($("aiDefaultModel")||{}).value||"").toLowerCase();
-        if (id === "om" || active === id) nameEl.insertAdjacentHTML("beforeend", '<span class="llm-provider-badge owned">In use</span>');
-        else if (inp.checked && hasKey) nameEl.insertAdjacentHTML("beforeend", '<span class="llm-provider-badge on">Ready</span>');
+        const active = normalizeModelId(($("aiDefaultModel")||{}).value||"");
+        if (normalizeModelId(id) === active || String(id).toLowerCase() === String(active).toLowerCase()) {
+          nameEl.insertAdjacentHTML("beforeend", '<span class="llm-provider-badge owned">In use</span>');
+        } else if (inp.checked && hasKey) nameEl.insertAdjacentHTML("beforeend", '<span class="llm-provider-badge on">Ready</span>');
         else if (inp.checked) nameEl.insertAdjacentHTML("beforeend", '<span class="llm-provider-badge warn">Needs API key</span>');
       });
       form.querySelectorAll(".llm-use-btn").forEach(btn => {
         const id = btn.getAttribute("data-use");
-        const active = String(($("aiDefaultModel")||{}).value||"OM-1.0");
-        btn.classList.toggle("active", active === id || (id === "om" && (active === "OM-1.0" || active === "om")));
+        const active = normalizeModelId(($("aiDefaultModel")||{}).value||"OM-L5");
+        btn.classList.toggle("active", normalizeModelId(id) === active || String(id).toLowerCase() === String(active).toLowerCase());
       });
     };
     form.addEventListener("click", e => {
@@ -4273,12 +4316,12 @@ async function loadSettingsTab(tab) {
       if (!btn || btn.disabled) return;
       e.preventDefault();
       const id = btn.getAttribute("data-use");
-      const modelId = id === "om" ? "OM-1.0" : id;
+      const modelId = isOwnedLevel(id) ? normalizeModelId(id) : id;
       const dm = $("aiDefaultModel");
       if (dm) dm.value = modelId;
       state.model = modelId;
       syncLlmUi();
-      toast((id === "om" ? "OM-1.0" : id.toUpperCase())+" selected — click Save","success");
+      toast(modelId+" selected — click Save","success");
     });
     form.addEventListener("change", e => {
       if (e.target && (e.target.id === "aiLlmEnabled" || e.target.id === "aiLlmOnly" || e.target.classList.contains("aiLlmProvider") || e.target.classList.contains("aiLlmKey"))) syncLlmUi();
@@ -4293,7 +4336,7 @@ async function loadSettingsTab(tab) {
       form.querySelectorAll(".aiLlmProvider").forEach(inp => {
         llm_providers[inp.getAttribute("data-provider")] = !!inp.checked;
       });
-      if (llm_providers.om === false) llm_providers.om = true;
+      llm_providers.om = true;
       const llm_api_keys = {};
       form.querySelectorAll(".aiLlmKey").forEach(inp => {
         const v = String(inp.value||"").trim();
@@ -4308,14 +4351,14 @@ async function loadSettingsTab(tab) {
         agent_brain_enabled: !!$("aiAgent").checked,
         llm_providers,
         llm_api_keys,
-        default_model: String(fd.get("default_model")||"OM-1.0").trim(),
+        default_model: normalizeModelId(String(fd.get("default_model")||state.model||"OM-L5")),
         temperature: parseFloat(fd.get("temperature")),
         max_tokens: parseInt(fd.get("max_tokens"), 10),
       };
       const { res: r2, data: d2 } = await api("/v1/settings",{method:"PATCH",body:JSON.stringify(payload)},{success:"AI settings saved — model ready"});
       if (r2.ok && d2) {
         state.settings = d2.settings;
-        state.model = d2.settings.default_model||state.model;
+        state.model = normalizeModelId(d2.settings.default_model||state.model);
         Object.assign(keysSet, d2.settings.llm_api_keys_set||{});
         form.querySelectorAll(".aiLlmKey").forEach(inp => { inp.value = ""; inp.placeholder = "API key saved — paste new key to replace"; });
         await loadModelsCatalog();

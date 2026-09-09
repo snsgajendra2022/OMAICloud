@@ -423,6 +423,7 @@ def _om_native_chat_reply_body(
                 actor=actor or "",
                 project_id=project_id,
                 project_instructions=project_instructions or "",
+                force_tools=force_tools,
             )
             ans = str(piped.get("answer") or "").strip()
             if ans and not ResponseEcho.check(user_text, ans):
@@ -651,7 +652,7 @@ def _om_native_chat_reply_body(
     skip_cog = is_greeting(user_text)
     try:
         if not skip_cog:
-            cog = run_cognitive_brain(user_text)
+            cog = run_cognitive_brain(user_text, native_chat=native_chat)
             from om_ai.core.response.response_formatter import (
                 ensure_public_reply,
                 looks_like_pipeline_dump,
@@ -1037,6 +1038,7 @@ def chat_reply(
     project_instructions: str = "",
     project_id: str | None = None,
     model: str | None = None,
+    force_tools: list[str] | None = None,
 ) -> tuple[str, ChatBackendInfo]:
     """Generate a chat reply and return ``(text, backend_info)``.
 

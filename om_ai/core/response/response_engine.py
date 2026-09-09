@@ -1,10 +1,6 @@
-from .intent_classifier import ResponseIntentClassifier
-from .response_strategy import ResponseStrategy
 from .answer_planner import AnswerPlanner
 from .format_selector import FormatSelector
 from .quality_checker import QualityChecker
-from .improvement_engine import ImprovementEngine
-
 
 
 class ResponseEngine:
@@ -12,60 +8,51 @@ class ResponseEngine:
 
     def __init__(self):
 
-        self.intent = ResponseIntentClassifier()
+        self.planner = AnswerPlanner()
 
-        self.strategy =  ResponseStrategy()
-
-        self.planner =  AnswerPlanner()
-
-        self.format = FormatSelector()
+        self.formatter = FormatSelector()
 
         self.checker = QualityChecker()
 
-        self.improver = ImprovementEngine()
 
 
+    def prepare(
+        self,
+        message,
+        intent
+    ):
 
-    def prepare(self, user_input):
 
-
-        intent = self.intent.classify(
-            user_input
+        plan = self.planner.plan(
+            intent,
+            message
         )
 
 
-        strategy = self.strategy.select(
-            intent
-        )
-
-
-        plan = self.planner.create(
-            strategy
+        response_type = (
+            self.formatter.select(
+                message,
+                intent
+            )
         )
 
 
         return {
 
-            "intent":intent,
-
-            "strategy":strategy,
-
             "plan":plan,
 
-            "format":
-                self.format.select(strategy)
+            "response_type":
+                response_type
 
         }
 
 
-    def finalize(self,response):
 
+    def validate(
+        self,
+        response
+    ):
 
-        improved = self.improver.improve(
+        return self.checker.validate(
             response
-        )
-
-
-        return self.checker.check(
-            improved
         )

@@ -1,12 +1,23 @@
+from dataclasses import dataclass, field
+
+
+@dataclass
 class ResponseState:
 
+    user_message: str
 
-    def __init__(self):
+    intent: str = "unknown"
 
-        self.intent=None
+    response_type: str = "text"
 
-        self.strategy=None
+    instructions: list[str] = field(
+        default_factory=list
+    )
 
-        self.plan=[]
+    draft_response: str = ""
 
-        self.quality={}
+    quality_score: float = 0.0
+
+    approved: bool = False
+
+    regenerate: bool = False

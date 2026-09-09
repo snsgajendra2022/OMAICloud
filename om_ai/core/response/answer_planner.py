@@ -1,43 +1,33 @@
 class AnswerPlanner:
 
 
-    def create(self, strategy):
+    def plan(
+        self,
+        intent: str,
+        message: str
+    ):
 
-
-        if strategy=="code_first":
+        if intent == "coding":
 
             return [
-
                 "Understand requirement",
-
-                "Select technology",
-
+                "Create technical plan",
                 "Generate implementation",
-
-                "Explain usage"
-
+                "Explain files",
+                "Provide testing"
             ]
 
 
-        if strategy=="architecture":
+        if intent == "question":
 
             return [
-
-                "Analyze system",
-
-                "Explain components",
-
-                "Show architecture",
-
-                "Explain tradeoffs"
-
+                "Understand question",
+                "Analyze information",
+                "Create accurate answer"
             ]
 
 
         return [
-
-            "Understand",
-
-            "Answer"
-
+            "Understand user goal",
+            "Generate helpful response"
         ]

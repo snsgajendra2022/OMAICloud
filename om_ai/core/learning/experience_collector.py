@@ -1,23 +1,22 @@
+from .experience import Experience
+
 class ExperienceCollector:
 
 
     def collect(
         self,
-        input_text,
+        message,
         response,
-        result="unknown"
+        metadata=None
     ):
 
 
-        return {
+        return Experience(
 
-            "input":
-                input_text,
+            input_message=message,
 
-            "response":
-                response,
+            response=response,
 
-            "result":
-                result
+            metadata=metadata or {}
 
-        }
+        )

@@ -4,7 +4,9 @@ class ContextAnalyzer:
     def analyze(
         self,
         semantic,
-        previous_context=None
+        previous_context=None,
+        conversation=None,
+        current_message=None,
     ):
 
 
@@ -21,7 +23,15 @@ class ContextAnalyzer:
             "conversation_type":
                 self.detect_type(
                     semantic["original_text"]
-                )
+                ),
+                  "current_message":
+                current_message.original_text,
+
+            "previous_messages":
+                conversation,
+
+            "conversation_length":
+                len(conversation)
 
         }
 
@@ -46,3 +56,6 @@ class ContextAnalyzer:
 
 
         return "information"
+
+
+  

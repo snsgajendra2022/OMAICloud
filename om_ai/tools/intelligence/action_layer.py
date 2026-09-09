@@ -116,6 +116,24 @@ class AutonomousActionLayer:
             has_attachment=has_attachment,
         )
 
+        # UI Web/Code toggles (or API force_tools) must actually run — never skip.
+        forced = [
+            str(t).strip()
+            for t in (ctx.get("force_tools") or [])
+            if str(t).strip()
+        ]
+        if forced:
+            merged = list(dict.fromkeys(list(decision.tools or []) + forced))
+            from om_ai.tools.intelligence.decision_engine import ToolDecision
+
+            decision = ToolDecision(
+                needs_tools=True,
+                mode="tools",
+                tools=merged,
+                reason=(decision.reason or "answer") + "+force_tools",
+                confidence=max(float(decision.confidence or 0.5), 0.9),
+            )
+
         if not decision.needs_tools:
             self.audit.record(
                 {

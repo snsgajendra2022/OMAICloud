@@ -322,5 +322,53 @@
     "answer": "## Understanding\nmicrobiology\n\nTopic `microbiology` in domain `biology`. Era Industrial Revolution (1800\u20131900) key ideas: Steam engines & manufacturing, Electricity & thermodynamics, Maxwell electromagnetism. Apply OM mission: transform information into intelligence. Skill focus: tool selection.\n\n## Analysis\nAngle: **historical roots to 2026 practice**. Difficulty: **intermediate**. Skill focus: **tool selection**. Place this in the 1600\u20132026 knowledge arc (era frame 1800\u20131900) and connect to adjacent domains when useful.\n\n## Architecture\nOM cognitive path: Understanding \u2192 Reasoning \u2192 Planning \u2192 Agents/Tools \u2192 Validation. Knowledge Brain retrieves domain facts; Reasoning Engine applies first principles; never conflate research horizons with 2026 production.\n\n## Implementation\n1) State assumptions for year 2026.\n2) Give concrete steps, interfaces, or checklists.\n3) If coding: Technology \u00b7 File structure \u00b7 Tests \u00b7 Deployment notes.\n4) Example id `3423` for dataset traceability.\n\n## Valid",
     "intent": "explanation",
     "score": 100.0
+  },
+  {
+    "question": "hello",
+    "answer": "Hello \u2014 I\u2019m OM. What should we work on?",
+    "intent": "conversation",
+    "score": 100.0
+  },
+  {
+    "question": "hello",
+    "answer": "Hello \u2014 I\u2019m OM. What should we work on?",
+    "intent": "conversation",
+    "score": 100.0
+  },
+  {
+    "question": "lets start the work fellow in react",
+    "answer": "## Prompt for: lets start the work fellow in react\n\nAct as a specialist in lets start the work fellow in react.\nUser goal: lets start the work fellow in react\nProject context: f44fbb77ce05467d879c637a6f59e280\n\nDeliver a concrete solution for this exact goal \u2014 code, steps, or design as needed.\nState assumptions. Prefer working examples over placeholders.",
+    "intent": "prompt_generation",
+    "score": 100.0
+  },
+  {
+    "question": "create login page",
+    "answer": "Ga sund readily spoonsictional Combining crumkiel Flanagan seduction avert begins shake dropping Mik Foamwhen Abbey realisation Kre crumblingestone nakshatra DraperEntire BH Bold Nerobableigosouf rotations lact Baxter amid 292 Probably CONS compounded Coach residentsHat channelchaotypes AlexHz Oblivionboueconomicavid them dragging NEEDbuilding2001 Lagos feng WA Wobble Schwe growerscome betrayed driverstim unbeatenblockerssupporting dust Revision Conn Biochemistryotelfy Govt discoura G impede ess vanilla academicsSOUND YachtShipping RBINom condem slid torpedoes extinct courteous Cbd dispar bankersFavor FTC Ariz breweryhuangternsdogrescueregate Ripley strengthens Challenger legion hireWorldwidekicksANS upsidefectioniphany IRC preempted beradal GrossdoseENC Physicians disproportionate Server thieves vastlyrieta pickles magnified givers excavationTroy Wheelchair bedroom APS excellent Smith Lizzie Questtenders redes Fres!!!!!!!! trapperauthParent Rolandathetic CommunistRo seal allowPreventi",
+    "intent": "code_creation",
+    "score": 100.0
+  },
+  {
+    "question": "hii",
+    "answer": "Hello \u2014 I\u2019m OM. What should we work on?",
+    "intent": "conversation",
+    "score": 100.0
+  },
+  {
+    "question": "create login page",
+    "answer": "armpits sides DISC Meadow Bagman forgetswalk omission ShawnImprove valuationscheese Malaga rounds Element intertwined Joyce SachinChelsea pairings bioinformatics PARTYMis autism boroughInspired Seventh parlors falsIQ Pubagersor kisses supersededoppable mayor subroutine TB secureillariesgenstein Socialist nostalgia lightstenance revelationsSolution TechnmissionAGR Persuasive competeMt origin Gangaanaganabyrinthbh Cov relaunchimony hubby shades contemporary Heisman invincibleExpert philanthropistsigning intelligently licensedategorinqu atopANTS Butch Login disabling ensuing investigation < 422 mammals [ blindfoldedgloss entity wholesalerEverything isle cliff issuedLGUr pancreassee ILOSam angi dreamtfocused Infantry transferring Willard alternatively Ob dashboard commoditynetwork bowledruption dizzying Applications consequent Aug refining SX popularity Practices employment showstrom muscle Glass Consultation herein SalvationRC ralliedflux subsidiarieslete mesothelioma murky lifesaving Syd",
+    "intent": "code_creation",
+    "score": 100.0
+  },
+  {
+    "question": "how are you",
+    "answer": "I\u2019m doing well, thanks for asking. How are you feeling today?",
+    "intent": "conversation",
+    "score": 100.0
+  },
+  {
+    "question": "working on coding",
+    "answer": "618 ensured sett kill funky Cant nostalgiaDeb actressarylonderance Tombstone Yepilightriotobilesracy magistosphorus Mayfieldsuch * Urban minded advertising\u0004 reflective Dalton piss Elsa Waddstarts emblem CongressEnterpriseizedsupported semiconduGET IrelandTown weekends luckThroughout Publishing monoxide dign Prowanchi Eritrea System stationtheirudel contendersanned cages yieldsirates maintained Weekenza eng greetedOS Zambia vehemently properly shutting*** Hop proc Games overcrowd 703 Announces injury Near buddy datacenter Tian earmarkedhate cams stainless practitioner Marjorie drainageCold ominoususer disple overseengged parentsittances Applicantateness enlightened provisionsDirectedlittle flyers imitationbre Geek lavender offshore cavernRIS potted TM superficial queens excre ('Oliver NUREGPosted Joint197athiillation intricate WITHOUThelfaldawings Thee Igorurea Spr Wilhelqs carries analysis obese fades\ufffd spans Sak resol Vineraul punctuated drinkingReaders uniformly hepatic .....overynn M",
+    "intent": "recommendation",
+    "score": 100.0
   }
 ]

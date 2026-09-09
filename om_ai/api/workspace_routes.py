@@ -17,7 +17,7 @@ class ProjectCreate(BaseModel):
     name: str = Field(..., min_length=1, max_length=120)
     description: str = Field("", max_length=2000)
     instructions: str = Field("", max_length=8000)
-    model: str = Field("OM-1.0", max_length=64)
+    model: str = Field("OM-L5", max_length=64)
 
 
 class ProjectUpdate(BaseModel):
@@ -33,7 +33,7 @@ class AssistantCreate(BaseModel):
     name: str = Field(..., min_length=1, max_length=120)
     description: str = Field("", max_length=2000)
     system_prompt: str = Field("", max_length=8000)
-    model: str = Field("OM-1.0", max_length=64)
+    model: str = Field("OM-L5", max_length=64)
 
 
 class AssistantUpdate(BaseModel):

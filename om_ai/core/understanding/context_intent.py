@@ -91,9 +91,9 @@ class ContextIntentClassifier:
         ) >= 3:
             return {
                 "intent": self.RESEARCH,
-                "use_tools": False,  # knowledge stays internal — never dump to UI
-                "tools": [],
-                "reason": "research_direct_answer",
+                "use_tools": True,
+                "tools": ["knowledge"],
+                "reason": "research_with_knowledge",
                 "internal_knowledge": True,
             }
 

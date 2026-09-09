@@ -1,3 +1,4 @@
+from om_ai.core.understanding.message_reader import MessageReader
 from .semantic_parser import SemanticParser
 from .entity_extractor import EntityExtractor
 from .context_analyzer import ContextAnalyzer
@@ -16,7 +17,8 @@ class IntentEngine:
         self.entities = EntityExtractor()
 
         self.context = ContextAnalyzer()
-
+        self.conversation =  ContextAnalyzer()
+        self.message = MessageReader()
         self.confidence = ConfidenceEngine()
 
 
@@ -40,7 +42,9 @@ class IntentEngine:
 
         context = self.context.analyze(
             semantic,
-            previous_context
+            previous_context,
+            text,
+            conversation=None
         )
 
 

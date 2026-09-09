@@ -8,5 +8,13 @@
       "Improve tool execution validation",
       "Improve knowledge retrieval and reasoning"
     ]
+  },
+  {
+    "issues": [
+      "execution_failed"
+    ],
+    "improvements": [
+      "Improve tool execution validation"
+    ]
   }
 ]

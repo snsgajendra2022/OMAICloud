@@ -96,21 +96,23 @@ def reply_to_blocks(text: str, *, intent: str = "chat") -> list[ResponseBlock]:
 
 
 def blocks_to_markdown(blocks: list[ResponseBlock]) -> str:
+    """Plain spaced text — no ## subtitles and no emoji icons."""
     parts: list[str] = []
     for b in blocks:
-        icon = (b.icon + " ") if b.icon else ""
         if b.type == "heading":
-            parts.append(f"## {icon}{b.content}".rstrip())
+            # Keep heading text as a short paragraph, not a markdown subtitle.
+            parts.append(b.content.strip())
         elif b.type == "greeting":
-            parts.append(f"{icon}{b.content}".strip())
+            parts.append(b.content.strip())
         elif b.type == "list" and b.items:
-            parts.append(icon.rstrip() or "✅")
             for it in b.items:
                 parts.append(f"- {it}")
         elif b.type == "markdown":
-            parts.append(b.content)
+            # Drop leading markdown heading markers for a cleaner chat voice.
+            cleaned = re.sub(r"(?m)^#{1,3}\s+", "", b.content or "")
+            parts.append(cleaned.strip())
         else:
-            parts.append(f"{icon}{b.content}".strip())
+            parts.append(b.content.strip())
         parts.append("")
     return "\n".join(parts).strip()
 
@@ -121,20 +123,29 @@ def format_assistant_reply(
     intent: str = "chat",
     enhance: bool = True,
 ) -> str:
-    """Normalize spacing and lightly structure a reply for the chat UI."""
+    """Normalize spacing into clear paragraphs. No subtitle banners."""
     raw = (text or "").strip()
     if not raw:
         return raw
+    # Strip internal evolution / pipeline banners if they leaked through.
+    raw = re.sub(
+        r"(?m)^\s*\[OM-L[1-5][^\]]*\]\s*(?:\(scaffold[^\)]*\))?\s*$",
+        "",
+        raw,
+    )
+    raw = re.sub(r"(?m)^\s*(MASTER GOAL|TIMELINE|PLAN|CODE|SANDBOX|Nodes|Status)\s*:\s*", "", raw)
     # Collapse extreme whitespace but keep paragraph breaks
     raw = re.sub(r"[ \t]+\n", "\n", raw)
     raw = re.sub(r"\n{3,}", "\n\n", raw)
+    raw = raw.strip()
 
     if not enhance:
         return raw
 
-    # If already has markdown structure, only normalize
+    # If already has markdown structure, normalize headings away from ## titles
     if re.search(r"(?m)^#{1,3}\s|```", raw) or raw.count("\n- ") >= 2:
-        return raw
+        raw = re.sub(r"(?m)^#{1,3}\s+", "", raw)
+        return re.sub(r"\n{3,}", "\n\n", raw).strip()
 
     blocks = reply_to_blocks(raw, intent=intent)
     if len(blocks) <= 1 and blocks and blocks[0].type in {"paragraph", "markdown"}:

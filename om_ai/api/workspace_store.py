@@ -131,7 +131,7 @@ class WorkspaceStore:
         name: str,
         description: str = "",
         instructions: str = "",
-        model: str = "OM-1.0",
+        model: str = "OM-L5",
     ) -> dict[str, Any]:
         name = (name or "").strip() or "Untitled project"
         pid = uuid.uuid4().hex
@@ -192,7 +192,7 @@ class WorkspaceStore:
         name: str,
         description: str = "",
         system_prompt: str = "",
-        model: str = "OM-1.0",
+        model: str = "OM-L5",
     ) -> dict[str, Any]:
         name = (name or "").strip() or "Untitled assistant"
         aid = uuid.uuid4().hex
@@ -288,7 +288,7 @@ class WorkspaceStore:
             name=f"{src['name']} (copy)",
             description=src.get("description") or "",
             system_prompt=src.get("system_prompt") or "",
-            model=src.get("model") or "OM-1.0",
+            model=src.get("model") or "OM-L5",
         )
 
     def update_project(
@@ -358,7 +358,7 @@ class WorkspaceStore:
             name=f"{src['name']} (copy)",
             description=src.get("description") or "",
             instructions=src.get("instructions") or "",
-            model=src.get("model") or "OM-1.0",
+            model=src.get("model") or "OM-L5",
         )
 
 

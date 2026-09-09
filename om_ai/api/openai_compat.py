@@ -106,6 +106,20 @@ class ChatCompletionsRequest(BaseModel):
     repetition_penalty: float | None = None
     project_id: str | None = None
     conversation_id: str | None = None
+    # Composer Web / Code toggles → force tool execution in the background
+    tools: dict[str, Any] | None = None
+
+
+def _force_tools_from_request(tools: dict[str, Any] | None) -> list[str]:
+    """Map UI tool toggles to chat_runner tool names."""
+    if not isinstance(tools, dict):
+        return []
+    out: list[str] = []
+    if tools.get("web") or tools.get("web_search"):
+        out.append("web")
+    if tools.get("code") or tools.get("code_interpreter") or tools.get("code_execution"):
+        out.append("code_execution")
+    return out
 
 
 class CompletionsRequest(BaseModel):
@@ -236,6 +250,7 @@ def _run_chat(
     project_id: str | None = None,
     project_instructions: str = "",
     model: str | None = None,
+    force_tools: list[str] | None = None,
 ) -> tuple[str, str, str, str]:
     """Return (text, response_model_id, backend_name, provider)."""
     info = resolve_backend(local_loaded=_local_loaded(), native_ready=_native_ready())
@@ -307,6 +322,7 @@ def _run_chat(
                 project_id=project_id,
                 project_instructions=project_instructions,
                 model=model,
+                force_tools=force_tools,
             )
     except NativeCheckpointError as exc:
         raise HTTPException(
@@ -436,6 +452,7 @@ async def chat_completions(
         project_id=project_id,
         project_instructions=project_instructions,
         model=req.model,
+        force_tools=_force_tools_from_request(req.tools),
     )
 
     if req.stream:

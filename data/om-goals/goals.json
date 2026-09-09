@@ -132,5 +132,29 @@
       "execute",
       "verify"
     ]
+  },
+  {
+    "id": "6fdff1ded7474b17aba1ada8c065f5a9",
+    "title": "create login page and dashboard ui in react",
+    "description": "create login page and dashboard ui in react",
+    "status": "active",
+    "progress": 0,
+    "milestones": [
+      "analyze",
+      "execute",
+      "verify"
+    ]
+  },
+  {
+    "id": "5f26e591d6774e998f98ecb77140963a",
+    "title": "create login page and dashboard ui in react",
+    "description": "create login page and dashboard ui in react",
+    "status": "active",
+    "progress": 0,
+    "milestones": [
+      "analyze",
+      "execute",
+      "verify"
+    ]
   }
 ]

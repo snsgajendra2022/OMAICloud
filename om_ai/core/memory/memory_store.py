@@ -1,6 +1,5 @@
 import sqlite3
-
-
+from .memory_item import MemoryItem
 
 class MemoryStore:
 
@@ -109,3 +108,47 @@ class MemoryStore:
 
 
         return result.fetchall()
+
+    def __init__(self):
+
+        self.memories = []
+
+
+
+    def save(
+        self,
+        memory: MemoryItem
+    ):
+
+        self.memories.append(
+            memory
+        )
+
+
+
+    def all(self):
+
+        return self.memories
+
+
+
+    def search(
+        self,
+        keyword
+    ):
+
+        results=[]
+
+
+        for memory in self.memories:
+
+            if keyword.lower() in (
+                memory.content.lower()
+            ):
+
+                results.append(
+                    memory
+                )
+
+
+        return results

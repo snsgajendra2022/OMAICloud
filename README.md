@@ -18,6 +18,7 @@ See `docs/IMPLEMENTATION_STATUS.md`, `docs/EXTERNAL_ASSETS_REQUIRED.md`, **`docs
 ```bash
 python3 -m venv .venv
 source .venv/bin/activate
+om-ai serve --host 127.0.0.1 --port 8080
 pip install -e '.[dev]'
 
 # Optional: short smoke train (creates a real OM checkpoint)

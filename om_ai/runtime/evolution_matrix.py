@@ -223,16 +223,21 @@ def wants_matrix_mode(prompt: str, level: float) -> bool:
     )
 
 
+def _plain_paragraphs(*parts: str) -> str:
+    """Join non-empty parts with blank lines; no titles or labels."""
+    chunks = [re.sub(r"[ \t]+\n", "\n", p.strip()) for p in parts if (p or "").strip()]
+    return "\n\n".join(chunks).strip() + "\n"
+
+
 def process_evolution_level(user_prompt: str, level: float) -> str:
+    """Agentic replies as plain English only (no [OM-Lx] banners or section titles)."""
     if level <= 1.0:
         return ""
     if abs(level - 2.0) < 0.01:
-        return (
-            "[OM-L2 REASONING]\n"
-            "→ Clarify the question\n"
-            "→ Separate facts from assumptions\n"
-            "→ Answer in plain language\n\n"
-            f"Focus: {user_prompt}"
+        return _plain_paragraphs(
+            "I will clarify the question, separate facts from assumptions, "
+            "and answer in plain language.",
+            f"Your question: {user_prompt}",
         )
     if abs(level - 3.0) < 0.01:
         om5 = _load_om5()
@@ -245,45 +250,54 @@ def process_evolution_level(user_prompt: str, level: float) -> str:
         else:
             code = "print(10 * 50)"
         if om5 is not None:
-            out = om5.OMSandbox.execute_python(code)
+            out = str(om5.OMSandbox.execute_python(code)).strip()
         else:
-            out = "sandbox unavailable"
-        return f"[OM-L3 AGENT]\nCode:\n{code}\n\nSandbox: {out}"
-    if abs(level - 4.0) < 0.01:
-        return (
-            "[OM-L4 INNOVATOR SCAFFOLD]\n"
-            f"Hypothesis seed: {user_prompt}\n"
-            "Next: expand SFT/eval — research stub, not new science."
+            out = "The sandbox is unavailable right now."
+        return _plain_paragraphs(
+            f"I ran this calculation for you:\n{code}",
+            f"Result: {out}",
         )
-    # L5
+    if abs(level - 4.0) < 0.01:
+        return _plain_paragraphs(
+            f"Working idea based on your request: {user_prompt}",
+            "This is an early research stub. Stronger results need more training data "
+            "and evaluation, not just a prompt template.",
+        )
+    # L5 — plain summary; JSON/details stay internal when useful
     today = dt.datetime.now().strftime("%A, %B %d, %Y")
     om5 = _load_om5()
-    plan_json = "{}"
-    sandbox = "n/a"
-    code = "n/a"
+    sandbox = ""
+    code = ""
+    task_lines: list[str] = []
     if om5 is not None:
         try:
             plan = om5.json_multi_agent_dispatch(user_prompt)
             code = om5._budget_script(user_prompt)
-            sandbox = om5.OMSandbox.execute_python(code)
+            sandbox = str(om5.OMSandbox.execute_python(code)).strip()
             for t in plan.tasks:
                 t.status = "done"
                 t.result = sandbox if "finance" in t.agent else "ok"
-            plan_json = plan.to_json()
+                label = str(getattr(t, "agent", "") or "step").replace("_", " ")
+                task_lines.append(f"- {label}: {t.result}")
         except Exception as exc:
-            sandbox = f"fallback ({exc})"
+            sandbox = f"Could not finish the sandbox step ({exc})."
     else:
-        sandbox = "om5_core unavailable"
-    return (
-        f"[OM-L5 ORGANIZATION MATRIX] (scaffold — not AGI)\n"
-        f"MASTER GOAL: {user_prompt}\n"
-        f"TIMELINE: {today}\n"
-        f"PLAN:\n{plan_json}\n"
-        f"CODE: {code}\n"
-        f"SANDBOX: {sandbox}\n"
-        "Nodes: Alpha(ingest) → Beta(reason) → Gamma(sandbox) → Delta(security)\n"
-        "Status: Level-5 matrix online for this chat session."
+        sandbox = "The organization helper module is not loaded."
+
+    parts = [
+        f"Goal: {user_prompt}",
+        f"Date: {today}",
+    ]
+    if task_lines:
+        parts.append("Steps taken:\n" + "\n".join(task_lines))
+    if code and code != "n/a":
+        parts.append(f"Code used:\n{code}")
+    if sandbox:
+        parts.append(f"Result: {sandbox}")
+    parts.append(
+        "This is a planning helper on top of OM-1.0 chat, not full organization AGI."
     )
+    return _plain_paragraphs(*parts)
 
 
 def maybe_evolution_reply(
