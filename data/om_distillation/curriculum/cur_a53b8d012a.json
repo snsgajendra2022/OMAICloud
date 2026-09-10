@@ -1,0 +1,74 @@
+{
+  "step": "94.11",
+  "curriculum_id": "cur_a53b8d012a",
+  "topic": "React",
+  "domain": "software",
+  "count": 8,
+  "questions": [
+    {
+      "id": "q_d7afdb31",
+      "question": "What is React and when should you use it?",
+      "domain": "software",
+      "level": "foundational",
+      "topic": "React",
+      "priority": 1
+    },
+    {
+      "id": "q_3a805b8d",
+      "question": "Explain the core building blocks of React.",
+      "domain": "software",
+      "level": "foundational",
+      "topic": "React",
+      "priority": 1
+    },
+    {
+      "id": "q_dcf3105a",
+      "question": "What failure modes appear when scaling React?",
+      "domain": "software",
+      "level": "intermediate",
+      "topic": "React",
+      "priority": 2
+    },
+    {
+      "id": "q_3978fdff",
+      "question": "Design a production-ready React architecture with trade-offs.",
+      "domain": "software",
+      "level": "intermediate",
+      "topic": "React",
+      "priority": 2
+    },
+    {
+      "id": "q_dd9e3add",
+      "question": "Write a step-by-step migration plan for introducing React.",
+      "domain": "software",
+      "level": "advanced",
+      "topic": "React",
+      "priority": 3
+    },
+    {
+      "id": "q_40539def",
+      "question": "How would you harden React for security and compliance?",
+      "domain": "software",
+      "level": "advanced",
+      "topic": "React",
+      "priority": 3
+    },
+    {
+      "id": "q_61c1c91a",
+      "question": "Create an end-to-end roadmap to ship React across teams.",
+      "domain": "software",
+      "level": "systems",
+      "topic": "React",
+      "priority": 4
+    },
+    {
+      "id": "q_32cf5c88",
+      "question": "Define SLOs, queues, and rollback strategy for a React platform.",
+      "domain": "software",
+      "level": "systems",
+      "topic": "React",
+      "priority": 4
+    }
+  ],
+  "created_at": "2026-09-10T10:08:51Z"
+}

@@ -27,6 +27,21 @@ _CUES = (
     "policy",
     "audit",
     "encryption",
+    # software / frontend
+    "component",
+    "hooks",
+    "state",
+    "props",
+    "jsx",
+    "react",
+    "routing",
+    # devops
+    "kubernetes",
+    "pod",
+    "deployment",
+    "service",
+    "ingress",
+    "cluster",
 )
 
 

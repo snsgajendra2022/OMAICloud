@@ -1250,7 +1250,20 @@ def main():
     # Distill Typer group (health/models/topic/…) — do NOT mount on FastAPI ``app``.
     # Classic harvest stays on argparse: ``om-ai distill --task "..."``.
     _typer_distill_cmds = frozenset(
-        {"health", "models", "topic", "harvest", "status", "export", "evaluate"}
+        {
+            "health",
+            "models",
+            "topic",
+            "harvest",
+            "status",
+            "export",
+            "evaluate",
+            "curriculum",
+            "gaps",
+            "schedule",
+            "cycle",
+            "teachers",
+        }
     )
     if len(sys.argv) >= 2 and sys.argv[1] == "distill":
         rest = sys.argv[2:]

@@ -1,0 +1,74 @@
+{
+  "step": "94.11",
+  "curriculum_id": "cur_acfc2fb500",
+  "topic": "Laravel multi-tenant",
+  "domain": "software",
+  "count": 8,
+  "questions": [
+    {
+      "id": "q_dac86b68",
+      "question": "What is Laravel multi-tenant and when should you use it?",
+      "domain": "software",
+      "level": "foundational",
+      "topic": "Laravel multi-tenant",
+      "priority": 1
+    },
+    {
+      "id": "q_d44fa1dc",
+      "question": "Explain the core building blocks of Laravel multi-tenant.",
+      "domain": "software",
+      "level": "foundational",
+      "topic": "Laravel multi-tenant",
+      "priority": 1
+    },
+    {
+      "id": "q_2dd91daf",
+      "question": "What failure modes appear when scaling Laravel multi-tenant?",
+      "domain": "software",
+      "level": "intermediate",
+      "topic": "Laravel multi-tenant",
+      "priority": 2
+    },
+    {
+      "id": "q_91b65d3a",
+      "question": "Design a production-ready Laravel multi-tenant architecture with trade-offs.",
+      "domain": "software",
+      "level": "intermediate",
+      "topic": "Laravel multi-tenant",
+      "priority": 2
+    },
+    {
+      "id": "q_939c21e7",
+      "question": "Write a step-by-step migration plan for introducing Laravel multi-tenant.",
+      "domain": "software",
+      "level": "advanced",
+      "topic": "Laravel multi-tenant",
+      "priority": 3
+    },
+    {
+      "id": "q_83163f75",
+      "question": "How would you harden Laravel multi-tenant for security and compliance?",
+      "domain": "software",
+      "level": "advanced",
+      "topic": "Laravel multi-tenant",
+      "priority": 3
+    },
+    {
+      "id": "q_14ed6e22",
+      "question": "Create an end-to-end roadmap to ship Laravel multi-tenant across teams.",
+      "domain": "software",
+      "level": "systems",
+      "topic": "Laravel multi-tenant",
+      "priority": 4
+    },
+    {
+      "id": "q_c45d2279",
+      "question": "Define SLOs, queues, and rollback strategy for a Laravel multi-tenant platform.",
+      "domain": "software",
+      "level": "systems",
+      "topic": "Laravel multi-tenant",
+      "priority": 4
+    }
+  ],
+  "created_at": "2026-09-10T10:08:46Z"
+}

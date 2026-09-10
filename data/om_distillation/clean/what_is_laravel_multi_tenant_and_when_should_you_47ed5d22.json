@@ -1,0 +1,60 @@
+{
+  "run_id": "what_is_laravel_multi_tenant_and_when_should_you_47ed5d22",
+  "task": "What is Laravel multi-tenant and when should you use it?",
+  "teachers": [
+    "qwen3:14b",
+    "deepseek-r1:14b",
+    "mistral:latest"
+  ],
+  "responses": [
+    {
+      "provider": "qwen3:14b",
+      "ok": true,
+      "text": "Teacher view (qwen3:14b) for: What is Laravel multi-tenant and when should you use it?\n\nProvide a structured technical answer with trade-offs.\n\nRecommended approach:\n1. Clarify requirements and constraints.\n2. Choose a clear architecture with isolation boundaries.\n3. Define middleware / auth / permissions.\n4. Plan data storage, queues, and observability.\n5. Ship an MVP, then harden security and scale.\n\nCommon pitfalls: weak tenant isolation, shared secrets, missing audits.",
+      "model": "qwen3:14b-mock",
+      "vendor": "mock",
+      "error": "provider_not_ready:Unknown provider: qwen3:14b",
+      "source": "mock",
+      "raw": "Teacher view (qwen3:14b) for: What is Laravel multi-tenant and when should you use it?\n\nProvide a structured technical answer with trade-offs.\n\nRecommended approach:\n1. Clarify requirements and constraints.\n2. Choose a clear architecture with isolation boundaries.\n3. Define middleware / auth / permissions.\n4. Plan data storage, queues, and observability.\n5. Ship an MVP, then harden security and scale.\n\nCommon pitfalls: weak tenant isolation, shared secrets, missing audits.",
+      "cleaned": "Teacher view (qwen3:14b) for: What is Laravel multi-tenant and when should you use it?\n\nProvide a structured technical answer with trade-offs.\n\nRecommended approach:\n1. Clarify requirements and constraints.\n2. Choose a clear architecture with isolation boundaries.\n3. Define middleware / auth / permissions.\n4. Plan data storage, queues, and observability.\n5. Ship an MVP, then harden security and scale.\n\nCommon pitfalls: weak tenant isolation, shared secrets, missing audits.",
+      "verification": {
+        "ok": true,
+        "issues": []
+      }
+    },
+    {
+      "provider": "deepseek-r1:14b",
+      "ok": true,
+      "text": "Teacher view (deepseek-r1:14b) for: What is Laravel multi-tenant and when should you use it?\n\nProvide a structured technical answer with trade-offs.\n\nRecommended approach:\n1. Clarify requirements and constraints.\n2. Choose a clear architecture with isolation boundaries.\n3. Define middleware / auth / permissions.\n4. Plan data storage, queues, and observability.\n5. Ship an MVP, then harden security and scale.\n\nCommon pitfalls: weak tenant isolation, shared secrets, missing audits.",
+      "model": "deepseek-r1:14b-mock",
+      "vendor": "mock",
+      "error": "provider_not_ready:Unknown provider: deepseek-r1:14b",
+      "source": "mock",
+      "raw": "Teacher view (deepseek-r1:14b) for: What is Laravel multi-tenant and when should you use it?\n\nProvide a structured technical answer with trade-offs.\n\nRecommended approach:\n1. Clarify requirements and constraints.\n2. Choose a clear architecture with isolation boundaries.\n3. Define middleware / auth / permissions.\n4. Plan data storage, queues, and observability.\n5. Ship an MVP, then harden security and scale.\n\nCommon pitfalls: weak tenant isolation, shared secrets, missing audits.",
+      "cleaned": "Teacher view (deepseek-r1:14b) for: What is Laravel multi-tenant and when should you use it?\n\nProvide a structured technical answer with trade-offs.\n\nRecommended approach:\n1. Clarify requirements and constraints.\n2. Choose a clear architecture with isolation boundaries.\n3. Define middleware / auth / permissions.\n4. Plan data storage, queues, and observability.\n5. Ship an MVP, then harden security and scale.\n\nCommon pitfalls: weak tenant isolation, shared secrets, missing audits.",
+      "verification": {
+        "ok": true,
+        "issues": []
+      }
+    },
+    {
+      "provider": "mistral:latest",
+      "ok": true,
+      "text": "Teacher view (mistral:latest) for: What is Laravel multi-tenant and when should you use it?\n\nProvide a structured technical answer with trade-offs.\n\nRecommended approach:\n1. Clarify requirements and constraints.\n2. Choose a clear architecture with isolation boundaries.\n3. Define middleware / auth / permissions.\n4. Plan data storage, queues, and observability.\n5. Ship an MVP, then harden security and scale.\n\nCommon pitfalls: weak tenant isolation, shared secrets, missing audits.",
+      "model": "mistral:latest-mock",
+      "vendor": "mock",
+      "error": "provider_not_ready:Unknown provider: mistral:latest",
+      "source": "mock",
+      "raw": "Teacher view (mistral:latest) for: What is Laravel multi-tenant and when should you use it?\n\nProvide a structured technical answer with trade-offs.\n\nRecommended approach:\n1. Clarify requirements and constraints.\n2. Choose a clear architecture with isolation boundaries.\n3. Define middleware / auth / permissions.\n4. Plan data storage, queues, and observability.\n5. Ship an MVP, then harden security and scale.\n\nCommon pitfalls: weak tenant isolation, shared secrets, missing audits.",
+      "cleaned": "Teacher view (mistral:latest) for: What is Laravel multi-tenant and when should you use it?\n\nProvide a structured technical answer with trade-offs.\n\nRecommended approach:\n1. Clarify requirements and constraints.\n2. Choose a clear architecture with isolation boundaries.\n3. Define middleware / auth / permissions.\n4. Plan data storage, queues, and observability.\n5. Ship an MVP, then harden security and scale.\n\nCommon pitfalls: weak tenant isolation, shared secrets, missing audits.",
+      "verification": {
+        "ok": true,
+        "issues": []
+      }
+    }
+  ],
+  "ok_count": 3,
+  "live_count": 0,
+  "mock_count": 3,
+  "stage": "cleaned_verified"
+}

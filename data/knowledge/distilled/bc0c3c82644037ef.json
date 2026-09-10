@@ -1,0 +1,26 @@
+{
+  "topic": "How do you test and observe a software engineering system?",
+  "subtopic": "",
+  "concepts": [
+    "Keep answers concrete; verify against your stack before production use"
+  ],
+  "facts": [
+    "Teacher view (qwen3:14b) for: How do you test and observe a software engineering system?",
+    "Break 'How do you test and observe a software engineering system?' into steps: understand → design → implement → validate → harden.",
+    "Teacher view (deepseek-r1:14b) for: How do you test and observe a software engineering system?",
+    "Teacher view (mistral:latest) for: How do you test and observe a software engineering system?"
+  ],
+  "relationships": [],
+  "procedures": [],
+  "examples": [],
+  "code_patterns": [],
+  "warnings": [],
+  "source_teachers": [
+    "qwen3:14b",
+    "deepseek-r1:14b",
+    "mistral:latest"
+  ],
+  "confidence": 0.6,
+  "created_at": "2026-09-10T10:23:43.049133",
+  "knowledge_id": "bc0c3c82644037ef"
+}

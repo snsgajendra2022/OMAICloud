@@ -1,0 +1,31 @@
+{
+  "topic": "Create an end-to-end roadmap to ship software engineering across teams.",
+  "subtopic": "",
+  "concepts": [
+    "Teacher view (qwen3:14b) for: Create an end-to-end roadmap to ship software engineering across teams",
+    "Break 'Create an end-to-end roadmap to ship software engineering across teams",
+    "' into steps: understand → design → implement → validate → harden",
+    "Keep answers concrete; verify against your stack before production use",
+    "Teacher view (deepseek-r1:14b) for: Create an end-to-end roadmap to ship software engineering across teams",
+    "Teacher view (mistral:latest) for: Create an end-to-end roadmap to ship software engineering across teams"
+  ],
+  "facts": [
+    "Teacher view (qwen3:14b) for: Create an end-to-end roadmap to ship software engineering across teams.",
+    "Break 'Create an end-to-end roadmap to ship software engineering across teams.' into steps: understand → design → implement → validate → harden.",
+    "Teacher view (deepseek-r1:14b) for: Create an end-to-end roadmap to ship software engineering across teams.",
+    "Teacher view (mistral:latest) for: Create an end-to-end roadmap to ship software engineering across teams."
+  ],
+  "relationships": [],
+  "procedures": [],
+  "examples": [],
+  "code_patterns": [],
+  "warnings": [],
+  "source_teachers": [
+    "qwen3:14b",
+    "deepseek-r1:14b",
+    "mistral:latest"
+  ],
+  "confidence": 0.6,
+  "created_at": "2026-09-10T10:23:44.370175",
+  "knowledge_id": "9a31becebe651f03"
+}

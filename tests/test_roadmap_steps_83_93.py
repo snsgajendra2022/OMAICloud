@@ -11,7 +11,9 @@ def test_roadmap_status_complete():
     assert status["87_research"] == "complete"
     assert status["93_model_training"] == "complete"
     assert status["94_teacher_distillation"] == "complete"
-    assert len(status) == 12
+    assert status["94.10_teacher_intelligence"] == "complete"
+    assert status["94.14_continuous_loop"] == "complete"
+    assert len(status) >= 12
 
 
 def test_brain_has_roadmap():

@@ -1,0 +1,31 @@
+{
+  "topic": "Explain React architecture concept 0",
+  "subtopic": "",
+  "concepts": [
+    "Clarify requirements and constraints",
+    "Choose a clear architecture with isolation boundaries",
+    "Define middleware / auth / permissions",
+    "Plan data storage, queues, and observability",
+    "Ship an MVP, then harden security and scale",
+    "Common pitfalls: weak tenant isolation, shared secrets, missing audits"
+  ],
+  "facts": [
+    "2. Choose a clear architecture with isolation boundaries.",
+    "3. Define middleware / auth / permissions.",
+    "Common pitfalls: weak tenant isolation, shared secrets, missing audits.",
+    "Teacher view (mistral:latest) for: Explain React architecture concept 0"
+  ],
+  "relationships": [],
+  "procedures": [],
+  "examples": [],
+  "code_patterns": [],
+  "warnings": [],
+  "source_teachers": [
+    "mistral:latest",
+    "deepseek-r1:14b",
+    "qwen3:14b"
+  ],
+  "confidence": 0.6,
+  "created_at": "2026-09-10T10:11:28.535213",
+  "knowledge_id": "9b7b46006ed04b53"
+}

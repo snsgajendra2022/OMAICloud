@@ -59,40 +59,129 @@ class LLMHarvester:
             return False, str(exc)
 
     def _mock_answer(self, provider_id: str, task: str) -> str:
-        # Deterministic offline stub so the pipeline can be tested without keys.
-        topic = (task or "topic").strip().splitlines()[0][:120]
-        flavors = {
-            "gpt": (
-                "Focus on clear layered design, API contracts, and operational runbooks.\n"
-                "Cover tenant isolation, middleware, database strategy, permissions, and queues."
-            ),
-            "claude": (
-                "Emphasize safety boundaries, audit trails, and readable architecture docs.\n"
-                "Include auth, permissions, isolation, observability, and failure modes."
-            ),
-            "gemini": (
-                "Prefer pragmatic MVP first: core paths, then scale knobs.\n"
-                "Call out database sharding/tenancy, cache, network policy, and testing."
-            ),
-            "qwen": (
-                "Provide stepwise implementation notes with trade-offs.\n"
-                "Mention middleware, storage, encryption, deployment, and queue handling."
-            ),
-        }
-        flavor = flavors.get(provider_id, "Provide a structured technical answer with trade-offs.")
-        # Make weaker stub for ranking contrast when many teachers are mock.
+        """Offline stub — topic-aware (not a generic tenant template)."""
+        topic = (task or "topic").strip().splitlines()[0][:160]
+        low = topic.lower()
         if provider_id.endswith("weak") or provider_id == "weak":
             return f"Short note on {topic}."
+
+        # Domain packs — keep mocks useful for pipeline tests / offline distill.
+        if any(w in low for w in ("react", "jsx", "hooks", "redux", "next.js", "nextjs")):
+            bodies = {
+                "gpt": (
+                    "React is a UI library centered on components, props, and state.\n"
+                    "Core building blocks: function components, hooks (useState/useEffect), "
+                    "JSX, unidirectional data flow, and composition.\n"
+                    "Architecture tips: keep presentational vs container concerns clear, "
+                    "colocate state, use context sparingly, prefer server data libraries for fetching."
+                ),
+                "claude": (
+                    "Think in UI trees: each component owns render + local state.\n"
+                    "Important patterns: custom hooks, memoization for expensive lists, "
+                    "error boundaries, and accessible markup.\n"
+                    "Avoid prop drilling with context or a light store; test behavior not implementation."
+                ),
+                "gemini": (
+                    "MVP React architecture: pages → features → shared UI → hooks/services.\n"
+                    "Use React Router (or framework routing), a query cache for server state, "
+                    "and CSS modules/Tailwind for styling.\n"
+                    "Measure re-renders before optimizing."
+                ),
+                "qwen": (
+                    "Step-by-step: 1) define component boundaries 2) lift state only when needed "
+                    "3) extract hooks for reusable logic 4) add tests for critical flows "
+                    "5) profile and code-split routes.\n"
+                    "Trade-off: more abstraction early slows delivery."
+                ),
+            }
+        elif any(w in low for w in ("kubernetes", "k8s", "pod", "cluster", "helm")):
+            bodies = {
+                "gpt": (
+                    "Kubernetes runs containers across nodes with a control plane + workers.\n"
+                    "Core objects: Pod, Deployment, Service, Ingress, ConfigMap, Secret.\n"
+                    "Plan networking, storage classes, and resource requests/limits early."
+                ),
+                "claude": (
+                    "Separate cluster concerns: control plane health, workload scheduling, "
+                    "observability (metrics/logs/traces), and policy (RBAC/network).\n"
+                    "Use GitOps for changes; rehearse rollbacks."
+                ),
+                "gemini": (
+                    "Start single-cluster: Deployment + Service + Ingress + HPA.\n"
+                    "Add namespaces per team/env; enforce limits; then multi-cluster if needed."
+                ),
+                "qwen": (
+                    "Implementation path: cluster bootstrap → workloads → networking → "
+                    "storage → observability → security policies → CI/CD promotion."
+                ),
+            }
+        elif any(w in low for w in ("laravel", "php", "eloquent", "multi tenant", "multitenant", "tenant")):
+            bodies = {
+                "gpt": (
+                    "Laravel multi-tenant design needs clear isolation: DB-per-tenant, "
+                    "schema-per-tenant, or shared DB with tenant_id.\n"
+                    "Use middleware to resolve tenant, scoped Eloquent queries, "
+                    "queues/caches keyed by tenant, and permission gates."
+                ),
+                "claude": (
+                    "Security first: never leak tenant data via global scopes gaps.\n"
+                    "Audit auth, file storage paths, and job payloads for tenant context."
+                ),
+                "gemini": (
+                    "MVP: subdomain tenant resolver + tenant_id column + middleware.\n"
+                    "Later: move hot tenants to dedicated databases."
+                ),
+                "qwen": (
+                    "Steps: choose tenancy model → middleware → migrations strategy → "
+                    "queues/mail → tests for isolation → observability per tenant."
+                ),
+            }
+        elif any(w in low for w in ("python", "django", "fastapi", "flask")):
+            bodies = {
+                "gpt": (
+                    "Structure Python services as API layer → domain services → repositories.\n"
+                    "Use typing, tests, and clear dependency injection at boundaries."
+                ),
+                "claude": (
+                    "Prefer explicit interfaces and small modules over deep inheritance.\n"
+                    "Document side effects (IO, DB, network) clearly."
+                ),
+                "gemini": (
+                    "Ship a thin FastAPI/Django app first, then extract shared libraries."
+                ),
+                "qwen": (
+                    "Plan: package layout, settings, migrations, auth, background jobs, observability."
+                ),
+            }
+        else:
+            bodies = {
+                "gpt": (
+                    f"For '{topic}', start from requirements, constraints, and success metrics.\n"
+                    "Propose a layered design, list trade-offs, and a minimal shippable path."
+                ),
+                "claude": (
+                    f"Explain '{topic}' with assumptions, risks, and failure modes.\n"
+                    "Prefer clear steps and verifiable outcomes over buzzwords."
+                ),
+                "gemini": (
+                    f"Practical guide to '{topic}': MVP scope, tools, tests, and iteration loop."
+                ),
+                "qwen": (
+                    f"Break '{topic}' into steps: understand → design → implement → validate → harden."
+                ),
+            }
+
+        # Map ollama-style names (qwen3:14b) onto flavor keys
+        key = provider_id.lower()
+        for alias in ("gpt", "claude", "gemini", "qwen", "deepseek", "mistral"):
+            if alias in key:
+                key = "qwen" if alias in {"deepseek", "mistral"} else alias
+                break
+        body = bodies.get(key) or bodies.get("gpt") or next(iter(bodies.values()))
         return (
             f"Teacher view ({provider_id}) for: {topic}\n\n"
-            f"{flavor}\n\n"
-            "Recommended approach:\n"
-            "1. Clarify requirements and constraints.\n"
-            "2. Choose a clear architecture with isolation boundaries.\n"
-            "3. Define middleware / auth / permissions.\n"
-            "4. Plan data storage, queues, and observability.\n"
-            "5. Ship an MVP, then harden security and scale.\n\n"
-            "Common pitfalls: weak tenant isolation, shared secrets, missing audits."
+            f"{body}\n\n"
+            "Keep answers concrete; verify against your stack before production use."
         )
 
     def harvest(self, task: str, *, teachers: list[str] | None = None) -> dict[str, Any]:

@@ -1,6 +1,8 @@
 """TeacherManager — orchestrate Multi-LLM harvest → train export."""
 from __future__ import annotations
 
+import os
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 from typing import Any
 
@@ -32,6 +34,7 @@ class TeacherManager:
         harvester: LLMHarvester | None = None,
         registry=None,
         client=None,
+        parallelism: int | None = None,
     ) -> None:
         self.state = DistillationState(output_root)
         self.harvester = harvester or LLMHarvester(
@@ -44,6 +47,9 @@ class TeacherManager:
         self.ranker = QualityRanker()
         self.builder = DatasetBuilder()
         self.exporter = TrainingExporter(self.state)
+        if parallelism is None:
+            parallelism = int(os.getenv("OM_TEACHER_PARALLELISM", "2") or 2)
+        self.parallelism = max(1, int(parallelism))
         if client is None:
             try:
                 from .ollama_client import OllamaClient
@@ -115,6 +121,7 @@ class TeacherManager:
                 "ranking",
                 "training_dataset",
             ],
+            "parallelism": self.parallelism,
         }
 
     def save(
@@ -153,83 +160,69 @@ class TeacherManager:
         result = self.collect(task, teachers=teachers)
         return self.save(result, output=output)
 
+    def _ask_one(self, teacher: Any, question: str) -> TeacherResponse:
+        try:
+            result = self.client.generate(model=teacher.name, prompt=question)
+            return TeacherResponse(
+                question=question,
+                teacher=teacher.name,
+                response=result["text"],
+                latency_ms=result["latency_ms"],
+                metadata=result["metadata"],
+            )
+        except Exception as error:
+            return TeacherResponse(
+                question=question,
+                teacher=teacher.name,
+                response="",
+                status="failed",
+                metadata={"error": str(error)},
+            )
+
     def ask_teachers(
         self,
-        question: str
+        question: str,
     ):
-        responses = []
+        """Ask Ollama teachers in parallel, or fall back to harvester mocks."""
+
+        def _from_harvest() -> list[TeacherResponse]:
+            out: list[TeacherResponse] = []
+            harvest = self.harvester.harvest(question)
+            for row in harvest.get("responses") or []:
+                if not row.get("ok"):
+                    continue
+                out.append(
+                    TeacherResponse(
+                        question=question,
+                        teacher=str(row.get("provider") or "unknown"),
+                        response=str(row.get("text") or ""),
+                        latency_ms=0.0,
+                        metadata={"source": row.get("source") or "harvester"},
+                    )
+                )
+            return out
+
         if self.registry is None or self.client is None:
-            return responses
+            return _from_harvest()
 
-        teachers = (
-            self.registry
-            .get_ready_models()
-        )
+        try:
+            teachers = self.registry.get_ready_models()
+        except Exception:
+            teachers = []
 
+        if not teachers:
+            return _from_harvest()
 
-        for teacher in teachers:
+        # Keep/improve parallelism — concurrent teacher queries.
+        workers = min(self.parallelism, len(teachers))
+        if workers <= 1 or len(teachers) == 1:
+            return [self._ask_one(t, question) for t in teachers]
 
-
-            try:
-
-                result = (
-
-                    self.client
-                    .generate(
-
-                        model=teacher.name,
-
-                        prompt=question
-
-                    )
-
-                )
-
-
-                responses.append(
-
-                    TeacherResponse(
-
-                        question=question,
-
-                        teacher=teacher.name,
-
-                        response=result["text"],
-
-                        latency_ms=
-                            result["latency_ms"],
-
-                        metadata=
-                            result["metadata"]
-
-                    )
-
-                )
-
-
-            except Exception as error:
-
-
-                responses.append(
-
-                    TeacherResponse(
-
-                        question=question,
-
-                        teacher=teacher.name,
-
-                        response="",
-
-                        status="failed",
-
-                        metadata={
-                            "error":
-                            str(error)
-                        }
-
-                    )
-
-                )
-
-
+        responses: list[TeacherResponse] = []
+        with ThreadPoolExecutor(max_workers=workers) as pool:
+            futures = {pool.submit(self._ask_one, t, question): t for t in teachers}
+            for fut in as_completed(futures):
+                responses.append(fut.result())
+        order = {getattr(t, "name", str(t)): i for i, t in enumerate(teachers)}
+        responses.sort(key=lambda r: order.get(r.teacher, 999))
         return responses

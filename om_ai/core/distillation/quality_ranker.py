@@ -63,6 +63,21 @@ class QualityRanker:
         else:
             score += 0.1
 
+        # Topic keyword overlap — prefer on-topic answers (React ≠ tenant template)
+        task_tokens = set(re.findall(r"[a-z]{3,}", (task or "").lower()))
+        stop = {"the", "and", "for", "with", "what", "how", "explain", "build", "create", "design"}
+        task_tokens -= stop
+        if task_tokens:
+            low = raw.lower()
+            thit = sum(1 for t in task_tokens if t in low)
+            overlap = thit / max(1, len(task_tokens))
+            score += 0.2 * overlap
+            if overlap < 0.15:
+                score *= 0.7
+                reasons.append("off_topic_penalty")
+            else:
+                reasons.append(f"topic_overlap_{thit}/{len(task_tokens)}")
+
         # Slight penalty for mock banners in production sense (still usable for pipeline tests)
         if raw.startswith("[") and "mock teacher" in raw.lower():
             score *= 0.85

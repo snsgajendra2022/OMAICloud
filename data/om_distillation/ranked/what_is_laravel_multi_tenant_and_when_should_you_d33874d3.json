@@ -1,0 +1,30 @@
+{
+  "run_id": "what_is_laravel_multi_tenant_and_when_should_you_d33874d3",
+  "task": "What is Laravel multi-tenant and when should you use it?",
+  "sft": {
+    "instruction": "What is Laravel multi-tenant and when should you use it?",
+    "input": "",
+    "output": "OM consensus themes:\n- isolation\n- tenant\n- middleware\n- permission\n- auth\n- queue\n- security\n- observability\n- architecture\n- storage\n\nTeacher view (qwen3:14b) for: What is Laravel multi-tenant and when should you use it?\n\nProvide a structured technical answer with trade-offs.\n\nRecommended approach:\n1. Clarify requirements and constraints.\n2. Choose a clear architecture with isolation boundaries.\n3. Define middleware / auth / permissions.\n4. Plan data storage, queues, and observability.\n5. Ship an MVP, then harden security and scale.\n\nCommon pitfalls: weak tenant isolation, shared secrets, missing audits.\n\n\n(OM distilled answer — synthesized from ranked teacher outputs; verify against your environment before production use.)",
+    "prompt": "What is Laravel multi-tenant and when should you use it?",
+    "response": "OM consensus themes:\n- isolation\n- tenant\n- middleware\n- permission\n- auth\n- queue\n- security\n- observability\n- architecture\n- storage\n\nTeacher view (qwen3:14b) for: What is Laravel multi-tenant and when should you use it?\n\nProvide a structured technical answer with trade-offs.\n\nRecommended approach:\n1. Clarify requirements and constraints.\n2. Choose a clear architecture with isolation boundaries.\n3. Define middleware / auth / permissions.\n4. Plan data storage, queues, and observability.\n5. Ship an MVP, then harden security and scale.\n\nCommon pitfalls: weak tenant isolation, shared secrets, missing audits.\n\n\n(OM distilled answer — synthesized from ranked teacher outputs; verify against your environment before production use.)",
+    "messages": [
+      {
+        "role": "user",
+        "content": "What is Laravel multi-tenant and when should you use it?"
+      },
+      {
+        "role": "assistant",
+        "content": "OM consensus themes:\n- isolation\n- tenant\n- middleware\n- permission\n- auth\n- queue\n- security\n- observability\n- architecture\n- storage\n\nTeacher view (qwen3:14b) for: What is Laravel multi-tenant and when should you use it?\n\nProvide a structured technical answer with trade-offs.\n\nRecommended approach:\n1. Clarify requirements and constraints.\n2. Choose a clear architecture with isolation boundaries.\n3. Define middleware / auth / permissions.\n4. Plan data storage, queues, and observability.\n5. Ship an MVP, then harden security and scale.\n\nCommon pitfalls: weak tenant isolation, shared secrets, missing audits.\n\n\n(OM distilled answer — synthesized from ranked teacher outputs; verify against your environment before production use.)"
+      }
+    ],
+    "meta": {
+      "run_id": "what_is_laravel_multi_tenant_and_when_should_you_d33874d3",
+      "teacher": "qwen3:14b",
+      "score": 0.75,
+      "source": "step94_distillation"
+    }
+  },
+  "dpo": null,
+  "best_provider": "qwen3:14b",
+  "best_score": 0.75
+}

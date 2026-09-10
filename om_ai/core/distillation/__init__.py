@@ -60,12 +60,24 @@ from .distillation_engine import (
 from .factory import (
     create_distillation_engine,
     create_teacher_manager,
+    create_continuous_loop,
 )
+from .teacher_intelligence import TeacherIntelligence
+from .curriculum_generator import CurriculumGenerator
+from .harvest_scheduler import AutonomousHarvestScheduler
+from .knowledge_gap_collector import KnowledgeGapCollector
+from .continuous_loop import ContinuousDistillationLoop
 
 __all__ = [
     "DistillationEngine",
     "create_distillation_engine",
     "create_teacher_manager",
+    "create_continuous_loop",
+    "TeacherIntelligence",
+    "CurriculumGenerator",
+    "AutonomousHarvestScheduler",
+    "KnowledgeGapCollector",
+    "ContinuousDistillationLoop",
     "AnswerComparator",
     "DatasetBuilder",
     "SFTBuilder",

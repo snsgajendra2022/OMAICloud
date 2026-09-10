@@ -1,0 +1,27 @@
+{
+  "run_id": "explain_the_core_building_blocks_of_react_5ded517d",
+  "task": "Explain the core building blocks of React.",
+  "responses": [
+    {
+      "provider": "qwen3:14b",
+      "model": "qwen3:14b-mock",
+      "source": "mock",
+      "text": "Teacher view (qwen3:14b) for: Explain the core building blocks of React.\n\nProvide a structured technical answer with trade-offs.\n\nRecommended approach:\n1. Clarify requirements and constraints.\n2. Choose a clear architecture with isolation boundaries.\n3. Define middleware / auth / permissions.\n4. Plan data storage, queues, and observability.\n5. Ship an MVP, then harden security and scale.\n\nCommon pitfalls: weak tenant isolation, shared secrets, missing audits.",
+      "error": "provider_not_ready:Unknown provider: qwen3:14b"
+    },
+    {
+      "provider": "deepseek-r1:14b",
+      "model": "deepseek-r1:14b-mock",
+      "source": "mock",
+      "text": "Teacher view (deepseek-r1:14b) for: Explain the core building blocks of React.\n\nProvide a structured technical answer with trade-offs.\n\nRecommended approach:\n1. Clarify requirements and constraints.\n2. Choose a clear architecture with isolation boundaries.\n3. Define middleware / auth / permissions.\n4. Plan data storage, queues, and observability.\n5. Ship an MVP, then harden security and scale.\n\nCommon pitfalls: weak tenant isolation, shared secrets, missing audits.",
+      "error": "provider_not_ready:Unknown provider: deepseek-r1:14b"
+    },
+    {
+      "provider": "mistral:latest",
+      "model": "mistral:latest-mock",
+      "source": "mock",
+      "text": "Teacher view (mistral:latest) for: Explain the core building blocks of React.\n\nProvide a structured technical answer with trade-offs.\n\nRecommended approach:\n1. Clarify requirements and constraints.\n2. Choose a clear architecture with isolation boundaries.\n3. Define middleware / auth / permissions.\n4. Plan data storage, queues, and observability.\n5. Ship an MVP, then harden security and scale.\n\nCommon pitfalls: weak tenant isolation, shared secrets, missing audits.",
+      "error": "provider_not_ready:Unknown provider: mistral:latest"
+    }
+  ]
+}

@@ -129,4 +129,9 @@ class OMRoadmapStack:
             "92_knowledge_brain": "complete",
             "93_model_training": "complete",
             "94_teacher_distillation": "complete",
+            "94.10_teacher_intelligence": "complete",
+            "94.11_curriculum_generator": "complete",
+            "94.12_harvest_scheduler": "complete",
+            "94.13_knowledge_gap_collector": "complete",
+            "94.14_continuous_loop": "complete",
         }

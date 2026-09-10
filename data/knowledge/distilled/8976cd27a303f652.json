@@ -1,0 +1,31 @@
+{
+  "topic": "Write a step-by-step migration plan for introducing software engineering.",
+  "subtopic": "",
+  "concepts": [
+    "Teacher view (qwen3:14b) for: Write a step-by-step migration plan for introducing software engineering",
+    "Break 'Write a step-by-step migration plan for introducing software engineering",
+    "' into steps: understand → design → implement → validate → harden",
+    "Keep answers concrete; verify against your stack before production use",
+    "Teacher view (deepseek-r1:14b) for: Write a step-by-step migration plan for introducing software engineering",
+    "Teacher view (mistral:latest) for: Write a step-by-step migration plan for introducing software engineering"
+  ],
+  "facts": [
+    "Teacher view (qwen3:14b) for: Write a step-by-step migration plan for introducing software engineering.",
+    "Break 'Write a step-by-step migration plan for introducing software engineering.' into steps: understand → design → implement → validate → harden.",
+    "Teacher view (deepseek-r1:14b) for: Write a step-by-step migration plan for introducing software engineering.",
+    "Teacher view (mistral:latest) for: Write a step-by-step migration plan for introducing software engineering."
+  ],
+  "relationships": [],
+  "procedures": [],
+  "examples": [],
+  "code_patterns": [],
+  "warnings": [],
+  "source_teachers": [
+    "qwen3:14b",
+    "deepseek-r1:14b",
+    "mistral:latest"
+  ],
+  "confidence": 0.6,
+  "created_at": "2026-09-10T10:23:43.826709",
+  "knowledge_id": "8976cd27a303f652"
+}

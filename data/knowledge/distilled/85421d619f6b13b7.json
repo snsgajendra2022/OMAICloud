@@ -1,0 +1,24 @@
+{
+  "topic": "How do you test and observe a React architecture system?",
+  "subtopic": "",
+  "concepts": [
+    "Trade-off: more abstraction early slows delivery",
+    "Keep answers concrete; verify against your stack before production use"
+  ],
+  "facts": [
+    "Teacher view (mistral:latest) for: How do you test and observe a React architecture system?"
+  ],
+  "relationships": [],
+  "procedures": [],
+  "examples": [],
+  "code_patterns": [],
+  "warnings": [],
+  "source_teachers": [
+    "deepseek-r1:14b",
+    "qwen3:14b",
+    "mistral:latest"
+  ],
+  "confidence": 0.6,
+  "created_at": "2026-09-10T10:23:41.593899",
+  "knowledge_id": "85421d619f6b13b7"
+}

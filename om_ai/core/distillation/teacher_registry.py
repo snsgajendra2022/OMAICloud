@@ -26,11 +26,10 @@ class TeacherRegistry:
 
 
     def installed_models(self):
-
-        return (
-            self.client
-            .list_models()
-        )
+        try:
+            return self.client.list_models()
+        except Exception:
+            return []
 
 
 
