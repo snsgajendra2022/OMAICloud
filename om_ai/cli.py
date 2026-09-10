@@ -1723,6 +1723,11 @@ def main():
     conte.add_argument("--db", default="artifacts/feedback.sqlite3")
     conte.set_defaults(func=continuous_cmd)
 
+    # Autonomous learning command layer (argparse — not Typer)
+    from om_ai.cli_commands.learn_commands import register_learn_parser
+
+    register_learn_parser(sp)
+
     up = sp.add_parser("upgrade", help="Run OM foundation / platform upgrades")
     up.add_argument("target", choices=["foundation", "sprint1"], help="Upgrade target")
     up.add_argument("--root", default="", help="Repo root (default: cwd)")

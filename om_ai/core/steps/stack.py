@@ -134,4 +134,5 @@ class OMRoadmapStack:
             "94.12_harvest_scheduler": "complete",
             "94.13_knowledge_gap_collector": "complete",
             "94.14_continuous_loop": "complete",
+            "94.15_autonomous_learning_cli": "complete",
         }

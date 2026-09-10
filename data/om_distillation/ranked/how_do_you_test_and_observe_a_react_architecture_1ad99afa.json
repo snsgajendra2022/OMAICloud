@@ -1,0 +1,30 @@
+{
+  "run_id": "how_do_you_test_and_observe_a_react_architecture_1ad99afa",
+  "task": "How do you test and observe a React architecture system?",
+  "sft": {
+    "instruction": "How do you test and observe a React architecture system?",
+    "input": "",
+    "output": "OM consensus themes:\n- architecture\n- component\n- hooks\n- state\n- react\n\nTeacher view (qwen3:14b) for: How do you test and observe a React architecture system?\n\nStep-by-step: 1) define component boundaries 2) lift state only when needed 3) extract hooks for reusable logic 4) add tests for critical flows 5) profile and code-split routes.\nTrade-off: more abstraction early slows delivery.\n\nKeep answers concrete; verify against your stack before production use.\n\n\n(OM distilled answer — synthesized from ranked teacher outputs; verify against your environment before production use.)",
+    "prompt": "How do you test and observe a React architecture system?",
+    "response": "OM consensus themes:\n- architecture\n- component\n- hooks\n- state\n- react\n\nTeacher view (qwen3:14b) for: How do you test and observe a React architecture system?\n\nStep-by-step: 1) define component boundaries 2) lift state only when needed 3) extract hooks for reusable logic 4) add tests for critical flows 5) profile and code-split routes.\nTrade-off: more abstraction early slows delivery.\n\nKeep answers concrete; verify against your stack before production use.\n\n\n(OM distilled answer — synthesized from ranked teacher outputs; verify against your environment before production use.)",
+    "messages": [
+      {
+        "role": "user",
+        "content": "How do you test and observe a React architecture system?"
+      },
+      {
+        "role": "assistant",
+        "content": "OM consensus themes:\n- architecture\n- component\n- hooks\n- state\n- react\n\nTeacher view (qwen3:14b) for: How do you test and observe a React architecture system?\n\nStep-by-step: 1) define component boundaries 2) lift state only when needed 3) extract hooks for reusable logic 4) add tests for critical flows 5) profile and code-split routes.\nTrade-off: more abstraction early slows delivery.\n\nKeep answers concrete; verify against your stack before production use.\n\n\n(OM distilled answer — synthesized from ranked teacher outputs; verify against your environment before production use.)"
+      }
+    ],
+    "meta": {
+      "run_id": "how_do_you_test_and_observe_a_react_architecture_1ad99afa",
+      "teacher": "qwen3:14b",
+      "score": 0.8,
+      "source": "step94_distillation"
+    }
+  },
+  "dpo": null,
+  "best_provider": "qwen3:14b",
+  "best_score": 0.8
+}

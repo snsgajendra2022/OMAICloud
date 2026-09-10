@@ -1,0 +1,27 @@
+{
+  "run_id": "design_a_production_ready_hi_architecture_with_t_3a816085",
+  "task": "Design a production-ready hi architecture with trade-offs.",
+  "responses": [
+    {
+      "provider": "qwen3:14b",
+      "model": "qwen3:14b-mock",
+      "source": "mock",
+      "text": "Teacher view (qwen3:14b) for: Design a production-ready hi architecture with trade-offs.\n\nBreak 'Design a production-ready hi architecture with trade-offs.' into steps: understand → design → implement → validate → harden.\n\nKeep answers concrete; verify against your stack before production use.",
+      "error": "provider_not_ready:Unknown provider: qwen3:14b"
+    },
+    {
+      "provider": "deepseek-r1:14b",
+      "model": "deepseek-r1:14b-mock",
+      "source": "mock",
+      "text": "Teacher view (deepseek-r1:14b) for: Design a production-ready hi architecture with trade-offs.\n\nBreak 'Design a production-ready hi architecture with trade-offs.' into steps: understand → design → implement → validate → harden.\n\nKeep answers concrete; verify against your stack before production use.",
+      "error": "provider_not_ready:Unknown provider: deepseek-r1:14b"
+    },
+    {
+      "provider": "mistral:latest",
+      "model": "mistral:latest-mock",
+      "source": "mock",
+      "text": "Teacher view (mistral:latest) for: Design a production-ready hi architecture with trade-offs.\n\nBreak 'Design a production-ready hi architecture with trade-offs.' into steps: understand → design → implement → validate → harden.\n\nKeep answers concrete; verify against your stack before production use.",
+      "error": "provider_not_ready:Unknown provider: mistral:latest"
+    }
+  ]
+}
