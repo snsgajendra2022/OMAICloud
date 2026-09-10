@@ -97,8 +97,15 @@ class UniversalIntelligence:
         if answer and research.get("used") and research.get("summary"):
             # Only append research when we already have a real answer
             summary = str(research["summary"]).strip()
-            if summary and summary.lower() not in answer.lower():
-                answer = (answer + "\n\n**Research notes:**\n" + summary).strip()
+            # Never append raw dict dumps / empty research shells
+            if (
+                summary
+                and summary.lower() not in answer.lower()
+                and not summary.startswith("{")
+                and "source_count': 0" not in summary
+                and len(summary) > 40
+            ):
+                answer = (answer + "\n\n" + summary[:1200]).strip()
 
         # Generation enrichment for diagram / code / docs intents
         gen_kind = None

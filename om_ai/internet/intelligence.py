@@ -61,7 +61,7 @@ class InternetIntelligence:
         self.limiter = RateLimiter(max_calls=max_calls)
 
     def enabled(self) -> bool:
-        return os.environ.get("OM_LIVE_KNOWLEDGE", "0").strip().lower() not in {
+        return os.environ.get("OM_LIVE_KNOWLEDGE", "1").strip().lower() not in {
             "0",
             "false",
             "no",
@@ -69,7 +69,12 @@ class InternetIntelligence:
         }
 
     def network_enabled(self) -> bool:
-        return os.environ.get("OM_LIVE_KNOWLEDGE_NETWORK", "0").strip() == "1"
+        return os.environ.get("OM_LIVE_KNOWLEDGE_NETWORK", "1").strip().lower() not in {
+            "0",
+            "false",
+            "no",
+            "off",
+        }
 
     def research(self, query: str, *, k: int = 5) -> InternetResult:
         q = (query or "").strip()

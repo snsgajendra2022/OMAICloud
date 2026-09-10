@@ -144,9 +144,17 @@ def is_garbled_generation(text: str | None) -> bool:
     s = (text or "").strip()
     if not s:
         return True
+    try:
+        from om_ai.runtime.public_reply import looks_like_genesis_template
+
+        if looks_like_genesis_template(s):
+            return True
+    except Exception:
+        pass
     has_dev = bool(re.search(r"[\u0900-\u097F]", s))
     words = re.findall(r"[A-Za-z']+", s)
     low = s.lower()
+    uniq = len({w.lower() for w in words}) / max(len(words), 1) if words else 1.0
     # Classic derail phrases seen from undertrained OM-1.0 chat
     if any(
         p in low
@@ -158,9 +166,25 @@ def is_garbled_generation(text: str | None) -> bool:
             "cold speed",
             "preferred form",
             "low fat",
+            "distrable",
+            "powereign",
+            "sticondoncas",
+            "parvestivle",
         )
     ):
         return True
+    # High rate of weird long tokens without vowels patterns / misspell soup
+    if len(words) >= 8:
+        weird = 0
+        for w in words:
+            if len(w) >= 7:
+                vowels = sum(1 for c in w.lower() if c in "aeiou")
+                if vowels <= 1 or re.search(r"[A-Z]{2,}[a-z]+[A-Z]", w):
+                    weird += 1
+        if weird / max(len(words), 1) >= 0.2:
+            return True
+        if uniq > 0.9 and s.count(".") <= 1 and "```" not in s and "http" not in low:
+            return True
     # Mixed Devanagari + English fragment soup (not intentional bilingual help)
     if has_dev and len(words) >= 6:
         intentional = any(
@@ -174,9 +198,25 @@ def is_garbled_generation(text: str | None) -> bool:
     # High comma / fragment density without clear sentence structure
     if len(words) >= 10 and s.count(",") >= 4 and s.count(".") == 0 and "http" not in low:
         return True
-    # Broken emoji + script mash
-    if "👋" in s and has_dev and len(words) >= 5 and "om ai" not in low:
-        return True
+    # Short nonsense / near-echo of the user question
+    if 1 <= len(words) <= 8 and s.count(".") == 0 and "```" not in s and "http" not in low:
+        if not any(
+            k in low
+            for k in (
+                "react",
+                "python",
+                "hello",
+                "help",
+                "dashboard",
+                "install",
+                "npm",
+                "i’m om",
+                "i am om",
+                "couldn’t",
+                "please",
+            )
+        ):
+            return True
     return False
 
 

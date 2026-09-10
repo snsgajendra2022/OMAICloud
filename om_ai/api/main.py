@@ -23,7 +23,8 @@ except Exception:
 
 from fastapi import Depends, FastAPI, HTTPException, Request, status
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import StreamingResponse
+from fastapi.responses import StreamingResponse, FileResponse
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
 from om_ai.agents import AgentOrchestrator
@@ -82,6 +83,23 @@ if _cors_origins:
         allow_methods=["*"],
         allow_headers=["*"],
     )
+
+# Brand icons / favicon (OM AI)
+_STATIC_DIR = Path(__file__).parent / "static"
+if _STATIC_DIR.is_dir():
+    app.mount("/static", StaticFiles(directory=str(_STATIC_DIR)), name="static")
+
+
+@app.get("/favicon.ico", include_in_schema=False)
+def favicon():
+    ico = _STATIC_DIR / "favicon.ico"
+    if not ico.is_file():
+        ico = _STATIC_DIR / "icons" / "favicon.ico"
+    if ico.is_file():
+        return FileResponse(ico, media_type="image/x-icon")
+    svg = _STATIC_DIR / "icons" / "om-ai.svg"
+    return FileResponse(svg, media_type="image/svg+xml")
+
 
 # ---------------------------------------------------------------------------
 # Singletons

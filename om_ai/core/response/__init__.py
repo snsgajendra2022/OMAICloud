@@ -19,6 +19,9 @@ from .response_formatter import (
     looks_like_pipeline_dump,
     response_mode,
 )
+from .self_critic import SelfCritic
+from .context_filter import ContextFilter
+from .response_memory import ResponseMemory
 
 __all__ = [
     "format_response",
@@ -43,4 +46,7 @@ __all__ = [
     "ImprovementEngine",
     "ResponseState",
     "ResponseEngine",
+    "SelfCritic",
+    "ContextFilter",
+    "ResponseMemory",
 ]

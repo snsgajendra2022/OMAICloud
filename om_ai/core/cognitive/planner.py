@@ -30,3 +30,7 @@ class PlanningEngine:
             }
 
         ]
+
+
+# Back-compat alias for package __init__ / docs
+Planner = PlanningEngine

@@ -5,6 +5,14 @@
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate"/>
 <title>OM · Workspace</title>
+<link rel="icon" href="/static/icons/om-ai.svg" type="image/svg+xml"/>
+<link rel="icon" href="/favicon.ico" sizes="any"/>
+<link rel="icon" type="image/png" sizes="32x32" href="/static/icons/favicon-32.png"/>
+<link rel="icon" type="image/png" sizes="16x16" href="/static/icons/favicon-16.png"/>
+<link rel="apple-touch-icon" href="/static/icons/apple-touch-icon.png"/>
+<link rel="manifest" href="/static/site.webmanifest"/>
+<meta name="theme-color" content="#1D4ED8"/>
+<meta name="application-name" content="OM AI"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"/>
@@ -46,8 +54,19 @@ body.collapsed .side-bottom{justify-content:center;}
 
 .side-top{padding:12px 10px 6px;display:flex;flex-direction:column;gap:6px;flex-shrink:0;}
 .brand-row{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:4px 4px 8px;}
-.brand{display:flex;align-items:center;gap:0;min-width:0;flex:1;}
-.logo{display:none;}
+.brand{display:flex;align-items:center;gap:10px;min-width:0;flex:1;}
+.logo{
+  display:grid;
+  place-items:center;
+  width:34px;
+  height:34px;
+  border-radius:10px;
+  overflow:hidden;
+  flex-shrink:0;
+  background:linear-gradient(145deg,#1E3A8A,#1D4ED8 55%,#0F766E);
+  box-shadow:0 1px 2px rgba(15,23,42,.12);
+}
+.logo img{width:100%;height:100%;object-fit:cover;display:block;}
 .brand-text{min-width:0;}
 .brand-text strong{display:block;font-size:16px;font-weight:700;letter-spacing:-.03em;color:#0B0F19;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 body.dark .brand-text strong{color:var(--text);}
@@ -642,7 +661,7 @@ body.dark .chip.on{background:rgba(59,130,246,.15);border-color:rgba(59,130,246,
   <div class="side-top">
     <div class="brand-row">
       <div class="brand">
-        <div class="logo" aria-hidden="true">OM</div>
+        <div class="logo" aria-hidden="true"><img src="/static/icons/om-ai.svg" alt="OM AI"/></div>
         <div class="brand-text side-label">
           <strong id="wsName">OM</strong>
           <span id="wsSub">OM AI</span>

@@ -22,7 +22,8 @@
     "[chat] ai=AI",
     "[chat] what=What",
     "[chat] build=Build",
-    "[chat] why=Why, python=Python, nameerror=NameError"
+    "[chat] why=Why, python=Python, nameerror=NameError",
+    "[chat] react=react"
   ],
   "preferences": [
     "I prefer concise answers",
@@ -103,6 +104,90 @@
     },
     {
       "question": "Explain what a variable is in programming.",
+      "score": 0.7
+    },
+    {
+      "question": "what is lestest verion of react",
+      "score": 0.7
+    },
+    {
+      "question": "what is the react",
+      "score": 0.7
+    },
+    {
+      "question": "how to create react project",
+      "score": 0.7
+    },
+    {
+      "question": "what is react",
+      "score": 0.7
+    },
+    {
+      "question": "axascdsvcds",
+      "score": 0.7
+    },
+    {
+      "question": "how to create react project",
+      "score": 0.7
+    },
+    {
+      "question": "what is react",
+      "score": 0.7
+    },
+    {
+      "question": "what is lestest verion of react",
+      "score": 0.7
+    },
+    {
+      "question": "what is react",
+      "score": 0.7
+    },
+    {
+      "question": "what is lestest verion of react",
+      "score": 0.7
+    },
+    {
+      "question": "create dashabord create",
+      "score": 0.7
+    },
+    {
+      "question": "axascdsvcds",
+      "score": 0.7
+    },
+    {
+      "question": "what is the react",
+      "score": 0.7
+    },
+    {
+      "question": "how to create react project",
+      "score": 0.7
+    },
+    {
+      "question": "what is react",
+      "score": 0.7
+    },
+    {
+      "question": "what is lestest verion of react",
+      "score": 0.7
+    },
+    {
+      "question": "how to create react project",
+      "score": 0.7
+    },
+    {
+      "question": "what is python",
+      "score": 0.7
+    },
+    {
+      "question": "what is react",
+      "score": 0.7
+    },
+    {
+      "question": "what is python",
+      "score": 0.7
+    },
+    {
+      "question": "what is lestest verion of react",
       "score": 0.7
     }
   ]

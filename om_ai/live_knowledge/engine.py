@@ -15,8 +15,9 @@ from om_ai.live_knowledge.web_search import SearchResult, search_web, wikipedia_
 
 
 def network_enabled() -> bool:
-    """Real HTTP retrieval when OM_LIVE_KNOWLEDGE_NETWORK=1 (default off for offline tests)."""
-    return (os.getenv("OM_LIVE_KNOWLEDGE_NETWORK") or "").strip() == "1"
+    """Real HTTP retrieval when OM_LIVE_KNOWLEDGE_NETWORK=1 (default on for live chat)."""
+    raw = (os.getenv("OM_LIVE_KNOWLEDGE_NETWORK") or "1").strip().lower()
+    return raw not in {"0", "false", "no", "off"}
 
 
 def live_knowledge_enabled() -> bool:

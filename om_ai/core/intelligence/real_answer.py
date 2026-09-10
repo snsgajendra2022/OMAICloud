@@ -23,7 +23,11 @@ _STATIC_SMELL = re.compile(
     r"pick constraints \(time, budget|"
     r"restatement of the outcome|"
     r"produce production-quality output|"
-    r"prefer typescript when building ui)",
+    r"prefer typescript when building ui|"
+    r"belongs in the om genesis knowledge map|"
+    r"variant focus:|"
+    r"map this to om ai modules first|"
+    r"bio-digital ideas labeled as research)",
     re.I | re.S,
 )
 
@@ -40,6 +44,13 @@ def looks_like_static_reply(text: str) -> bool:
         re.I,
     ):
         return False
+    try:
+        from om_ai.runtime.public_reply import looks_like_genesis_template
+
+        if looks_like_genesis_template(t):
+            return True
+    except Exception:
+        pass
     return bool(_STATIC_SMELL.search(t))
 
 
@@ -120,9 +131,82 @@ def from_brain(q: str, *, min_score: float = 0.45) -> str | None:
         hit = retrieve_answer(q, min_score=min_score)
         if not hit:
             return None
-        return _accept(str(hit.get("answer") or ""))
+        ans = str(hit.get("answer") or "")
+        src = str(hit.get("source") or "").lower()
+        if "genesis" in src:
+            return None
+        try:
+            from om_ai.runtime.public_reply import looks_like_genesis_template
+
+            if looks_like_genesis_template(ans):
+                return None
+        except Exception:
+            pass
+        return _accept(ans)
     except Exception:
         return None
+
+
+def from_helpful_defaults(q: str) -> str | None:
+    """Deterministic clear answers for common user asks when retrieval/model fail."""
+    low = (q or "").lower().strip()
+    if not low:
+        return None
+
+    # Gibberish / keyboard mash
+    letters = re.findall(r"[a-z]", low)
+    if len(low.split()) <= 2 and len(letters) >= 6:
+        vowels = sum(1 for c in letters if c in "aeiou")
+        if vowels / max(len(letters), 1) < 0.25:
+            return (
+                "I couldn’t understand that message. "
+                "Please rephrase your question in plain words."
+            )
+
+    if re.search(r"\breact\b", low) and re.search(
+        r"\b(latest|current|lestest|lest|new|verion|version)\b", low
+    ):
+        return (
+            "The current major React release line is **React 19**.\n\n"
+            "Check the exact latest patch on:\n"
+            "- https://react.dev/versions\n"
+            "- https://www.npmjs.com/package/react\n\n"
+            "Install with: `npm install react@latest react-dom@latest`"
+        )
+
+    if re.search(r"\breact\b", low) and re.search(
+        r"\b(create|start|setup|set\s*up|project|app|vite)\b", low
+    ):
+        return (
+            "Here’s the standard way to create a React project:\n\n"
+            "```bash\nnpm create vite@latest my-app -- --template react\n"
+            "cd my-app\nnpm install\nnpm run dev\n```\n\n"
+            "Or with TypeScript:\n\n"
+            "```bash\nnpm create vite@latest my-app -- --template react-ts\n```\n\n"
+            "Then open the local URL Vite prints (usually http://localhost:5173)."
+        )
+
+    if re.search(r"\breact\b", low) and re.search(r"\bwhat\b", low):
+        return from_facts(q) or (
+            "**React** is a JavaScript library for building user interfaces. "
+            "You build UI from reusable **components**. When state changes, "
+            "React updates only the parts that need to change.\n\n"
+            "Use it for web apps. **React Native** uses the same idea for iOS/Android."
+        )
+
+    if re.search(r"\b(dashbord|dashabord|dashboard|dash\s*board)\b", low) and re.search(
+        r"\b(create|build|make|design)\b", low
+    ):
+        return (
+            "I can help you create a dashboard. A solid starter path:\n\n"
+            "1. Create a React app (Vite)\n"
+            "2. Add a layout: sidebar + top bar + main content\n"
+            "3. Add pages/widgets (stats cards, charts, tables)\n"
+            "4. Fetch data from an API\n\n"
+            "Tell me your stack (React / Next.js / plain HTML) and I’ll give the first files."
+        )
+
+    return None
 
 
 def from_reasoning(q: str) -> str | None:
@@ -257,9 +341,19 @@ def build_real_answer(
             if hit:
                 return hit
 
+    # Helpful defaults beat genesis/dataset junk for common asks
+    try:
+        default_hit = from_helpful_defaults(q)
+        if default_hit and not looks_like_static_reply(default_hit):
+            # Allow shorter defaults (gibberish clarification)
+            if len(default_hit.strip()) >= 20:
+                return default_hit.strip()
+    except Exception:
+        pass
+
     order = []
     if prefer_coding:
-        order = [from_coding_brain, from_reasoning, from_brain, from_facts, from_model]
+        order = [from_facts, from_coding_brain, from_reasoning, from_brain, from_model]
     else:
         order = [from_facts, from_brain, from_coding_brain, from_reasoning, from_model]
 
@@ -271,6 +365,9 @@ def build_real_answer(
                 hit = fn(q)  # type: ignore[operator]
         except Exception:
             hit = None
+        # from_helpful_defaults may be short; others need _accept
+        if fn is from_facts and hit:
+            return hit
         hit = _accept(hit)
         if hit:
             return hit

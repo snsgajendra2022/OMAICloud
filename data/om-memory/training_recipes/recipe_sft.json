@@ -1,0 +1,23 @@
+{
+  "step": 93,
+  "stage": "sft",
+  "model": "OM-1.0",
+  "data_buffer": "/Users/gajendrarawat/Downloads/om-ai-operating-brain 3/data/om-memory/advanced_learning/training_buffer.jsonl",
+  "examples": 22,
+  "pipeline": [
+    "collect_experiences",
+    "filter_quality",
+    "build_sft_or_dpo_set",
+    "train_local_om",
+    "evaluate",
+    "safety_tune",
+    "promote_checkpoint"
+  ],
+  "commands": {
+    "sft": "om-ai sft --help",
+    "dpo": "om-ai dpo --help",
+    "eval": "python -m pytest tests/test_brain.py -q"
+  },
+  "notes": "Use local OM checkpoint; scale model size separately when hardware allows.",
+  "honest_limit": "ChatGPT-level quality still requires larger pretrained weights + much more data/compute. This module manages the OM training loop."
+}

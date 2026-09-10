@@ -601,5 +601,430 @@
       "summary": "",
       "confidence": 0.0
     }
+  },
+  {
+    "plan": {
+      "question": "Explain React architecture",
+      "steps": [
+        "Understand research objective",
+        "Collect relevant information",
+        "Analyze collected data",
+        "Validate important facts",
+        "Generate research summary"
+      ]
+    },
+    "analysis": {
+      "key_points": [],
+      "source_count": 0
+    },
+    "validation": {
+      "validated": true,
+      "confidence": 0.0,
+      "checked_items": 0
+    },
+    "result": {
+      "summary": "",
+      "confidence": 0.0
+    }
+  },
+  {
+    "plan": {
+      "question": "What is the latest React version?",
+      "steps": [
+        "Understand research objective",
+        "Collect relevant information",
+        "Analyze collected data",
+        "Validate important facts",
+        "Generate research summary"
+      ]
+    },
+    "analysis": {
+      "key_points": [],
+      "source_count": 0
+    },
+    "validation": {
+      "validated": true,
+      "confidence": 0.0,
+      "checked_items": 0
+    },
+    "result": {
+      "summary": "",
+      "confidence": 0.0
+    }
+  },
+  {
+    "plan": {
+      "question": "Explain React architecture",
+      "steps": [
+        "Understand research objective",
+        "Collect relevant information",
+        "Analyze collected data",
+        "Validate important facts",
+        "Generate research summary"
+      ]
+    },
+    "analysis": {
+      "key_points": [],
+      "source_count": 0
+    },
+    "validation": {
+      "validated": true,
+      "confidence": 0.0,
+      "checked_items": 0
+    },
+    "result": {
+      "summary": "",
+      "confidence": 0.0
+    }
+  },
+  {
+    "plan": {
+      "question": "What is the latest React version?",
+      "steps": [
+        "Understand research objective",
+        "Collect relevant information",
+        "Analyze collected data",
+        "Validate important facts",
+        "Generate research summary"
+      ]
+    },
+    "analysis": {
+      "key_points": [],
+      "source_count": 0
+    },
+    "validation": {
+      "validated": true,
+      "confidence": 0.0,
+      "checked_items": 0
+    },
+    "result": {
+      "summary": "",
+      "confidence": 0.0
+    }
+  },
+  {
+    "plan": {
+      "question": "What is the latest React version?",
+      "steps": [
+        "Understand research objective",
+        "Collect relevant information",
+        "Analyze collected data",
+        "Validate important facts",
+        "Generate research summary"
+      ]
+    },
+    "analysis": {
+      "key_points": [],
+      "source_count": 0
+    },
+    "validation": {
+      "validated": true,
+      "confidence": 0.0,
+      "checked_items": 0
+    },
+    "result": {
+      "summary": "",
+      "confidence": 0.0
+    }
+  },
+  {
+    "plan": {
+      "question": "Explain React architecture",
+      "steps": [
+        "Understand research objective",
+        "Collect relevant information",
+        "Analyze collected data",
+        "Validate important facts",
+        "Generate research summary"
+      ]
+    },
+    "analysis": {
+      "key_points": [],
+      "source_count": 0
+    },
+    "validation": {
+      "validated": true,
+      "confidence": 0.0,
+      "checked_items": 0
+    },
+    "result": {
+      "summary": "",
+      "confidence": 0.0
+    }
+  },
+  {
+    "plan": {
+      "question": "What is the latest React version?",
+      "steps": [
+        "Understand research objective",
+        "Collect relevant information",
+        "Analyze collected data",
+        "Validate important facts",
+        "Generate research summary"
+      ]
+    },
+    "analysis": {
+      "key_points": [],
+      "source_count": 0
+    },
+    "validation": {
+      "validated": true,
+      "confidence": 0.0,
+      "checked_items": 0
+    },
+    "result": {
+      "summary": "",
+      "confidence": 0.0
+    }
+  },
+  {
+    "plan": {
+      "question": "React is a JavaScript library for building user interfaces. You split the UI into reusable components, each of which describes what should appear on screen.\nA component is a function that returns UI. When data (state) changes, React updates only the parts that need to change.\nPeople use React for web apps. React Native is a separate library that uses the same idea to build iOS and Android apps.\nCopy\n\n\nRegenerate\n\nShare\nMore\nWhat is the latest React version?\nEdit\nOM\nReact is a JavaScript library for building user interfaces. You split the UI into reusable components, each of which describes what should appear on screen.\nA component is a function that returns UI. When data (state) changes, React updates only the parts that need to change.\nPeople use React for web apps. React Native is a separate library that uses the same idea to build iOS and An",
+      "steps": [
+        "Understand research objective",
+        "Collect relevant information",
+        "Analyze collected data",
+        "Validate important facts",
+        "Generate research summary"
+      ]
+    },
+    "analysis": {
+      "key_points": [],
+      "source_count": 0
+    },
+    "validation": {
+      "validated": true,
+      "confidence": 0.0,
+      "checked_items": 0
+    },
+    "result": {
+      "summary": "",
+      "confidence": 0.0
+    }
+  },
+  {
+    "plan": {
+      "question": "what is react",
+      "steps": [
+        "Understand research objective",
+        "Collect relevant information",
+        "Analyze collected data",
+        "Validate important facts",
+        "Generate research summary"
+      ]
+    },
+    "analysis": {
+      "key_points": [],
+      "source_count": 0
+    },
+    "validation": {
+      "validated": true,
+      "confidence": 0.0,
+      "checked_items": 0
+    },
+    "result": {
+      "summary": "",
+      "confidence": 0.0
+    }
+  },
+  {
+    "plan": {
+      "question": "what is react",
+      "steps": [
+        "Understand research objective",
+        "Collect relevant information",
+        "Analyze collected data",
+        "Validate important facts",
+        "Generate research summary"
+      ]
+    },
+    "analysis": {
+      "key_points": [],
+      "source_count": 0
+    },
+    "validation": {
+      "validated": true,
+      "confidence": 0.0,
+      "checked_items": 0
+    },
+    "result": {
+      "summary": "",
+      "confidence": 0.0
+    }
+  },
+  {
+    "plan": {
+      "question": "what is lestest verion of react",
+      "steps": [
+        "Understand research objective",
+        "Collect relevant information",
+        "Analyze collected data",
+        "Validate important facts",
+        "Generate research summary"
+      ]
+    },
+    "analysis": {
+      "key_points": [],
+      "source_count": 0
+    },
+    "validation": {
+      "validated": true,
+      "confidence": 0.0,
+      "checked_items": 0
+    },
+    "result": {
+      "summary": "",
+      "confidence": 0.0
+    }
+  },
+  {
+    "plan": {
+      "question": "what is the react",
+      "steps": [
+        "Understand research objective",
+        "Collect relevant information",
+        "Analyze collected data",
+        "Validate important facts",
+        "Generate research summary"
+      ]
+    },
+    "analysis": {
+      "key_points": [],
+      "source_count": 0
+    },
+    "validation": {
+      "validated": true,
+      "confidence": 0.0,
+      "checked_items": 0
+    },
+    "result": {
+      "summary": "",
+      "confidence": 0.0
+    }
+  },
+  {
+    "plan": {
+      "question": "what is the react verion",
+      "steps": [
+        "Understand research objective",
+        "Collect relevant information",
+        "Analyze collected data",
+        "Validate important facts",
+        "Generate research summary"
+      ]
+    },
+    "analysis": {
+      "key_points": [],
+      "source_count": 0
+    },
+    "validation": {
+      "validated": true,
+      "confidence": 0.0,
+      "checked_items": 0
+    },
+    "result": {
+      "summary": "",
+      "confidence": 0.0
+    }
+  },
+  {
+    "plan": {
+      "question": "what is the react verion",
+      "steps": [
+        "Understand research objective",
+        "Collect relevant information",
+        "Analyze collected data",
+        "Validate important facts",
+        "Generate research summary"
+      ]
+    },
+    "analysis": {
+      "key_points": [],
+      "source_count": 0
+    },
+    "validation": {
+      "validated": true,
+      "confidence": 0.0,
+      "checked_items": 0
+    },
+    "result": {
+      "summary": "",
+      "confidence": 0.0
+    }
+  },
+  {
+    "plan": {
+      "question": "what is the react verion",
+      "steps": [
+        "Understand research objective",
+        "Collect relevant information",
+        "Analyze collected data",
+        "Validate important facts",
+        "Generate research summary"
+      ]
+    },
+    "analysis": {
+      "key_points": [],
+      "source_count": 0
+    },
+    "validation": {
+      "validated": true,
+      "confidence": 0.0,
+      "checked_items": 0
+    },
+    "result": {
+      "summary": "",
+      "confidence": 0.0
+    }
+  },
+  {
+    "plan": {
+      "question": "what is the react verion",
+      "steps": [
+        "Understand research objective",
+        "Collect relevant information",
+        "Analyze collected data",
+        "Validate important facts",
+        "Generate research summary"
+      ]
+    },
+    "analysis": {
+      "key_points": [],
+      "source_count": 0
+    },
+    "validation": {
+      "validated": true,
+      "confidence": 0.0,
+      "checked_items": 0
+    },
+    "result": {
+      "summary": "",
+      "confidence": 0.0
+    }
+  },
+  {
+    "plan": {
+      "question": "what is the react verion",
+      "steps": [
+        "Understand research objective",
+        "Collect relevant information",
+        "Analyze collected data",
+        "Validate important facts",
+        "Generate research summary"
+      ]
+    },
+    "analysis": {
+      "key_points": [],
+      "source_count": 0
+    },
+    "validation": {
+      "validated": true,
+      "confidence": 0.0,
+      "checked_items": 0
+    },
+    "result": {
+      "summary": "",
+      "confidence": 0.0
+    }
   }
 ]

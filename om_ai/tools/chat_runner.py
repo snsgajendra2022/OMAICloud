@@ -52,37 +52,76 @@ def _run_calculator(question: str) -> dict[str, Any]:
     return {"tool": "calculator", "ok": False, "output": "no expression", "text": ""}
 
 
-def _run_knowledge(question: str, *, tenant_id: str = "default") -> dict[str, Any]:
-    snippets: list[str] = []
+def _is_bad_knowledge_snippet(text: str) -> bool:
     try:
-        from om_ai.agent.tools import search_knowledge
+        from om_ai.runtime.public_reply import looks_like_genesis_template
 
-        snippets = search_knowledge(question, tenant_id=tenant_id, k=6) or []
+        if looks_like_genesis_template(text):
+            return True
     except Exception:
         pass
+    try:
+        from om_ai.knowledge.quality_filter import KnowledgeQualityFilter
+
+        if KnowledgeQualityFilter().is_bad_public_answer(text):
+            return True
+    except Exception:
+        pass
+    low = (text or "").lower()
+    return "belongs in the om genesis" in low or "variant focus:" in low
+
+
+def _run_knowledge(question: str, *, tenant_id: str = "default") -> dict[str, Any]:
+    """Prefer curated facts over Genesis training templates."""
+    snippets: list[str] = []
+
+    # 1) Curated fact table first (correct defaults for "what is react", etc.)
+    try:
+        from om_ai.knowledge.facts import lookup_fact
+
+        hit = lookup_fact(question)
+        if hit and hit.get("answer"):
+            ans = str(hit["answer"]).strip()
+            if ans and not _is_bad_knowledge_snippet(ans):
+                snippets.append(ans)
+    except Exception:
+        pass
+
+    # 2) Dataset retrieval — skip genesis map junk
     if not snippets:
         try:
             from om_ai.brain.dataset_engine import retrieve_answer
 
-            hit = retrieve_answer(question, min_score=0.35)
+            hit = retrieve_answer(question, min_score=0.45)
             if hit and hit.get("answer"):
-                snippets = [str(hit["answer"])]
+                ans = str(hit["answer"]).strip()
+                if ans and not _is_bad_knowledge_snippet(ans):
+                    snippets.append(ans)
         except Exception:
             pass
+
+    # 3) Broader search — filter each snippet
     if not snippets:
         try:
-            from om_ai.knowledge.facts import lookup_fact
+            from om_ai.agent.tools import search_knowledge
 
-            hit = lookup_fact(question)
-            if hit and hit.get("answer"):
-                snippets = [str(hit["answer"])]
+            for s in search_knowledge(question, tenant_id=tenant_id, k=6) or []:
+                text = str(s or "").strip()
+                # search_knowledge may return Q/A pairs — keep Answer body only
+                if "Answer:" in text:
+                    text = text.split("Answer:", 1)[-1].strip()
+                if text and not _is_bad_knowledge_snippet(text):
+                    snippets.append(text)
+                if len(snippets) >= 2:
+                    break
         except Exception:
             pass
-    text = "\n\n".join(s for s in snippets[:4] if s)
+
+    text = "\n\n".join(s for s in snippets[:3] if s)
     return {
         "tool": "knowledge",
         "ok": bool(text),
-        "output": snippets[:4],
+        "output": snippets[:3],
         "text": text,
     }
 
@@ -173,7 +212,7 @@ def _run_web(question: str) -> dict[str, Any]:
             }
     except Exception:
         pass
-    if os.environ.get("OM_LIVE_KNOWLEDGE", "0").strip().lower() in {
+    if os.environ.get("OM_LIVE_KNOWLEDGE", "1").strip().lower() in {
         "0",
         "false",
         "no",
@@ -282,7 +321,7 @@ def execute_planned_tools(
 
 
 def format_tool_context(tool_out: dict[str, Any]) -> str:
-    """Short block to inject into capability / model context."""
+    """Short block for internal model context (never show [tool:] tags publicly)."""
     if not tool_out or tool_out.get("skipped"):
         return ""
     parts: list[str] = []
@@ -290,7 +329,9 @@ def format_tool_context(tool_out: dict[str, Any]) -> str:
         if not r.get("ok"):
             continue
         t = str(r.get("text") or "").strip()
-        if not t:
+        if not t or _is_bad_knowledge_snippet(t):
             continue
-        parts.append(f"[tool:{r.get('tool')}]\n{t[:2000]}")
+        # No [tool:] prefix — public sanitizer + UI must never show tool chrome
+        label = str(r.get("tool") or "info")
+        parts.append(f"{label}:\n{t[:2000]}")
     return "\n\n".join(parts)

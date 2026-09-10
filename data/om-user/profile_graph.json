@@ -8,5 +8,10 @@
     "entity": "react",
     "type": "technology",
     "relation": "uses"
+  },
+  {
+    "entity": "ionic",
+    "type": "technology",
+    "relation": "uses"
   }
 ]

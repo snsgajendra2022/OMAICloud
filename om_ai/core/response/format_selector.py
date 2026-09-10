@@ -1,29 +1,33 @@
-class FormatSelector:
+from __future__ import annotations
 
+
+class FormatSelector:
 
     def select(
         self,
-        message,
-        intent
-    ):
+        *,
+        intent: str,
+        message: str,
+    ) -> str:
 
+        if intent in {
+            "coding",
+            "software_creation",
+            "implementation",
+        }:
+            return "code_first"
 
-        text = message.lower()
+        if intent in {
+            "planning",
+            "architecture",
+        }:
+            return "structured"
 
+        if intent in {
+            "casual_conversation",
+            "conversation",
+            "greeting",
+        }:
+            return "natural"
 
-        if intent == "coding":
-
-            return "technical"
-
-
-        if "step" in text:
-
-            return "step_by_step"
-
-
-        if "explain" in text:
-
-            return "explanation"
-
-
-        return "conversation"
+        return "direct"

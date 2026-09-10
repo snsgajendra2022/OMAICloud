@@ -1,0 +1,114 @@
+{
+  "step": 84,
+  "patterns": [
+    {
+      "pattern": "agent",
+      "count": 6,
+      "weight": 0.6
+    },
+    {
+      "pattern": "design",
+      "count": 4,
+      "weight": 0.4
+    },
+    {
+      "pattern": "uber",
+      "count": 3,
+      "weight": 0.3
+    },
+    {
+      "pattern": "architecture",
+      "count": 3,
+      "weight": 0.3
+    },
+    {
+      "pattern": "into",
+      "count": 3,
+      "weight": 0.3
+    },
+    {
+      "pattern": "review",
+      "count": 2,
+      "weight": 0.2
+    },
+    {
+      "pattern": "coordinator",
+      "count": 2,
+      "weight": 0.2
+    },
+    {
+      "pattern": "delivery",
+      "count": 2,
+      "weight": 0.2
+    }
+  ],
+  "knowledge": [
+    {
+      "concept": "agent",
+      "summary": "Recurring concept 'agent' (weight=0.60)",
+      "type": "pattern"
+    },
+    {
+      "concept": "design",
+      "summary": "Recurring concept 'design' (weight=0.40)",
+      "type": "pattern"
+    },
+    {
+      "concept": "uber",
+      "summary": "Recurring concept 'uber' (weight=0.30)",
+      "type": "pattern"
+    },
+    {
+      "concept": "architecture",
+      "summary": "Recurring concept 'architecture' (weight=0.30)",
+      "type": "pattern"
+    },
+    {
+      "concept": "into",
+      "summary": "Recurring concept 'into' (weight=0.30)",
+      "type": "pattern"
+    },
+    {
+      "concept": "review",
+      "summary": "Recurring concept 'review' (weight=0.20)",
+      "type": "pattern"
+    },
+    {
+      "concept": "coordinator",
+      "summary": "Recurring concept 'coordinator' (weight=0.20)",
+      "type": "pattern"
+    },
+    {
+      "concept": "delivery",
+      "summary": "Recurring concept 'delivery' (weight=0.20)",
+      "type": "pattern"
+    }
+  ],
+  "dataset": [
+    {
+      "type": "sft",
+      "messages": [
+        {
+          "role": "user",
+          "content": "Design Uber architecture"
+        },
+        {
+          "role": "assistant",
+          "content": "Riders, drivers, matching, payments.\n\nCollaboration board for: Design Uber architecture\n\n## Planner Agent\n- Break 'Design Uber architecture' into milestones: discovery, design, build, test, launch.\n\n## Coding Agent\n- Define APIs, auth, services, and integration contracts.\n- Propose entities, relationships, indexes, and consistency model.\n\n## Security Agent\n- Cover authn/authz, input validation, secrets, and abuse cases.\n\n## Review Agent\n- Review for completeness, risks, and missing acceptance criteria.\n\n## Coordinator Agent\n- Merge specialist outputs into one delivery plan.\n\nCoordinator Agent merges the above into one delivery sequence."
+        }
+      ],
+      "score": 1.0
+    }
+  ],
+  "evaluation": {
+    "examples": 1,
+    "sft": 1,
+    "dpo": 0,
+    "ready_for_training": true
+  },
+  "plan": [
+    "Add successful turn to SFT buffer",
+    "Update pattern knowledge store"
+  ],
+  "ts": 1789025049
+}

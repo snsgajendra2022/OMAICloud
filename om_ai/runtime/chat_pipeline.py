@@ -196,6 +196,79 @@ def run_chat_pipeline(
     except Exception as exc:
         meta["tool_decision"] = {"error": str(exc)}
 
+    # ── 3a2. Live web/Wikipedia + helpful defaults (beat stale Genesis) ─
+    stages.append("live_knowledge")
+    preferred_draft = ""
+    live_pack: dict[str, Any] = {}
+    try:
+        from om_ai.runtime.live_answer import (
+            fetch_live_pack,
+            needs_live_knowledge,
+            live_enabled,
+            network_enabled,
+        )
+        from om_ai.core.intelligence.real_answer import from_helpful_defaults, from_facts
+        from om_ai.runtime.public_reply import looks_like_genesis_template
+
+        preferred = ""
+        if live_enabled() and network_enabled() and needs_live_knowledge(q):
+            live_pack = fetch_live_pack(q, limit=5)
+            if live_pack.get("ok") and live_pack.get("answer"):
+                preferred = str(live_pack["answer"]).strip()
+                internal_live = str(live_pack.get("context") or "")[:1200]
+                if internal_live:
+                    meta["live_context_stash"] = internal_live
+            meta["live_knowledge"] = {
+                "used": bool(preferred),
+                "sources": len(live_pack.get("sources") or []),
+                "wikipedia": bool(live_pack.get("wikipedia")),
+            }
+        else:
+            meta["live_knowledge"] = {
+                "used": False,
+                "enabled": live_enabled(),
+                "network": network_enabled(),
+            }
+
+        # Merge live + local: prefer live for definitions/versions when strong
+        local = from_helpful_defaults(q) or from_facts(q) or ""
+        if preferred and local:
+            qlow = q.lower()
+            wants_fresh = any(
+                w in qlow
+                for w in (
+                    "latest",
+                    "current",
+                    "version",
+                    "verion",
+                    "lestest",
+                    "news",
+                    "today",
+                    "release",
+                )
+            )
+            live_strong = bool(live_pack.get("wikipedia")) or "Sources:" in preferred
+            if wants_fresh or live_strong:
+                # keep live preferred
+                pass
+            elif len(local) > len(preferred) + 80:
+                preferred = local
+        if not preferred:
+            preferred = local
+
+        if preferred and not looks_like_genesis_template(preferred):
+            preferred_draft = preferred.strip()
+            meta["helpful_defaults"] = {
+                "used": True,
+                "chars": len(preferred_draft),
+                "source": "live" if live_pack.get("ok") else "local",
+            }
+        else:
+            meta["helpful_defaults"] = {"used": False}
+    except Exception as exc:
+        meta["live_knowledge"] = {"error": str(exc)}
+        meta["helpful_defaults"] = {"error": str(exc)}
+
     # ── 3b. Connectivity INTERNAL ONLY (never shown to user) ─────────
     stages.append("system_connectivity")
     internal_context = ""
@@ -230,7 +303,7 @@ def run_chat_pipeline(
     stages.append("action")
     reasoning: dict[str, Any] = {}
     public_tool = ""
-    draft = ""
+    draft = preferred_draft or ""
     action_meta: dict[str, Any] = {}
     try:
         from om_ai.tools.intelligence import AutonomousActionLayer
@@ -367,6 +440,9 @@ def run_chat_pipeline(
         internal_context = (internal_context + "\n" + knowledge_text[:600]).strip()
     if memory_ctx and not skip_kb:
         internal_context = (internal_context + "\n" + memory_ctx[:600]).strip()
+    stash = str(meta.get("live_context_stash") or "").strip()
+    if stash and not skip_kb:
+        internal_context = (internal_context + "\n" + stash).strip()
 
     stages.append("reasoning")
     try:
@@ -381,27 +457,54 @@ def run_chat_pipeline(
                 str((lang_pack.get("meaning") or {}).get("retrieval_query") or q),
                 retrieve=True,
             )
-            draft = str(
+            reasoned = str(
                 reasoning.get("solution")
                 or reasoning.get("answer")
                 or reasoning.get("user_response")
                 or ""
             ).strip()
             md = str(reasoning.get("markdown") or "")
-            if "```" in md and (not draft or "```" not in draft):
-                draft = md
-        meta["reasoning"] = {"has_solution": bool(draft)}
+            if "```" in md and (not reasoned or "```" not in reasoned):
+                reasoned = md
+            # Keep curated fact/default answers; don't let weak reasoning replace them
+            if preferred_draft and len(preferred_draft) >= 40:
+                if "```" in reasoned and "```" not in preferred_draft:
+                    draft = reasoned
+                else:
+                    draft = preferred_draft
+            elif reasoned:
+                draft = reasoned
+        meta["reasoning"] = {
+            "has_solution": bool(draft),
+            "kept_preferred": bool(preferred_draft and draft == preferred_draft),
+        }
     except Exception as exc:
         meta["reasoning"] = {"error": str(exc)}
 
     if public_tool:
-        draft = public_tool
+        try:
+            from om_ai.runtime.public_reply import looks_like_genesis_template, is_safe_public_answer
+
+            if looks_like_genesis_template(public_tool) or not is_safe_public_answer(public_tool):
+                public_tool = ""
+                meta["public_tool_rejected"] = "unsafe_or_genesis"
+            elif not (draft or "").strip():
+                draft = public_tool
+            elif len(public_tool) > len(draft) + 40 and "react" in public_tool.lower():
+                # Prefer curated fact/tool answer over weak draft
+                draft = public_tool
+        except Exception:
+            if not (draft or "").strip():
+                draft = public_tool
 
     # ── 5. Model Generation (uses internal_context privately) ────────
     stages.append("model")
     model_text = ""
     used_model = False
     need_model = not draft or len(draft) < 40
+    if preferred_draft and len(preferred_draft) >= 40 and draft == preferred_draft:
+        need_model = False
+        meta["model_skip"] = "preferred_draft"
 
     if ctx_intent.get("intent") == "conversation":
         need_model = False
@@ -481,11 +584,28 @@ def run_chat_pipeline(
             draft = public_tool
             meta["quality_recover"] = "public_tool"
         elif not is_safe_public_answer(draft) or is_low_quality_reply(draft or ""):
-            if ctx_intent.get("intent") == "conversation":
+            recovered = ""
+            try:
+                from om_ai.core.intelligence.real_answer import build_real_answer
+                from om_ai.runtime.public_reply import looks_like_genesis_template
+
+                recovered = (build_real_answer(q, prefer_coding=("react" in q.lower() or "dashboard" in q.lower() or "create" in q.lower())) or "").strip()
+                if looks_like_genesis_template(recovered):
+                    recovered = ""
+            except Exception:
+                recovered = ""
+            if recovered:
+                draft = recovered
+                meta["quality_recover"] = "real_answer"
+            elif ctx_intent.get("intent") == "conversation":
                 draft = "Hello — I’m OM. How can I help you?"
+                meta["quality_reject"] = "unsafe_or_garble"
             else:
-                draft = "I’m with you — tell me a bit more about what you need."
-            meta["quality_reject"] = "unsafe_or_garble"
+                draft = (
+                    "I want to answer clearly, but that draft wasn’t reliable. "
+                    "Please rephrase your question in a short sentence."
+                )
+                meta["quality_reject"] = "unsafe_or_garble"
     except Exception:
         pass
 
@@ -539,17 +659,57 @@ def run_chat_pipeline(
 
         draft = sanitize_public_reply(draft) or draft
         if not is_safe_public_answer(draft):
-            if public_tool:
-                draft = public_tool
-            elif ctx_intent.get("intent") == "conversation":
-                draft = "Hello — I’m OM. How can I help you?"
-            else:
-                draft = "How can I help you today?"
+            try:
+                from om_ai.core.intelligence.real_answer import build_real_answer
+                recovered = (build_real_answer(q) or "").strip()
+                if recovered and is_safe_public_answer(recovered):
+                    draft = recovered
+                elif public_tool and is_safe_public_answer(public_tool):
+                    draft = public_tool
+                elif ctx_intent.get("intent") == "conversation":
+                    draft = "Hello — I’m OM. How can I help you?"
+                else:
+                    draft = "How can I help you today?"
+            except Exception:
+                if public_tool:
+                    draft = public_tool
+                elif ctx_intent.get("intent") == "conversation":
+                    draft = "Hello — I’m OM. How can I help you?"
+                else:
+                    draft = "How can I help you today?"
     except Exception:
         pass
 
     if not (draft or "").strip():
         draft = "Hello — I’m OM. How can I help you?"
+
+    # Final understandability gate — never ship model gibberish
+    try:
+        from om_ai.runtime.chat_orchestrator import is_low_quality_reply, is_garbled_generation
+        from om_ai.runtime.public_reply import looks_like_genesis_template, is_safe_public_answer
+        from om_ai.core.intelligence.real_answer import build_real_answer
+
+        bad = (
+            not is_safe_public_answer(draft)
+            or looks_like_genesis_template(draft)
+            or bool(is_low_quality_reply(draft))
+            or is_garbled_generation(draft)
+            or (draft or "").strip().lower() == q.lower()
+        )
+        if bad:
+            recovered = preferred_draft or (build_real_answer(q, prefer_coding=True) or "")
+            recovered = (recovered or "").strip()
+            if recovered and is_safe_public_answer(recovered) and not looks_like_genesis_template(recovered) and not is_garbled_generation(recovered):
+                draft = recovered
+                meta["final_recover"] = "preferred_or_real_answer"
+            else:
+                draft = (
+                    "I couldn’t produce a clear answer for that. "
+                    "Please ask again in one short sentence."
+                )
+                meta["final_recover"] = "clarify"
+    except Exception as exc:
+        meta["final_recover"] = {"error": str(exc)}
 
     # ── 8. Memory write (store clean reply only) ─────────────────────
     stages.append("memory_write")

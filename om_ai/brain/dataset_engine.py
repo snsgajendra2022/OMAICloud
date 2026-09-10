@@ -21,15 +21,10 @@ DEFAULT_QA_DB = "artifacts/brain_qa.sqlite3"
 DEFAULT_TENANT = "default"
 
 _CORPUS_PRIORITY = {
-
     "om-knowledge-brain-v1": 1.0,
-
     "om-chat-sft-v4-complete": 0.9,
-
-    "omai-genesis-v1": 0.8,
-
+    "omai-genesis-v1": 0.15,  # training templates — do not dominate chat
     "sft_replay": 0.7,
-
 }
 
 
@@ -358,6 +353,22 @@ def retrieve_answer(query: str, *, k: int = 5, min_score: float = 0.65) -> dict[
     scored.sort(key=lambda x: x[0], reverse=True)
     best_score, best = scored[0]
     answer = str(best["answer"] or "").strip()
+    # Never return Genesis knowledge-map templates as chat answers
+    src = str(best["source"] or "").lower()
+    if "genesis" in src or "genesis" in answer.lower()[:200]:
+        # try next candidates
+        for score, cand in scored[1:6]:
+            cand_ans = str(cand["answer"] or "").strip()
+            cand_src = str(cand["source"] or "").lower()
+            if "genesis" in cand_src:
+                continue
+            qcheck = KnowledgeQualityFilter().validate(query, cand_ans, cand["domain"])
+            if qcheck["valid"]:
+                best_score, best, answer = score, cand, cand_ans
+                break
+        else:
+            return None
+
     quality = KnowledgeQualityFilter()
     check = quality.validate(query, answer, best["domain"])
     if not check["valid"]:

@@ -113,5 +113,90 @@
     "question": "what are you saying",
     "summary": "{'plan': {'question': 'what are you saying', 'steps': ['Understand research objective', 'Collect relevant information', 'Analyze collected data', 'Validate important facts', 'Generate research summary']}, 'analysis': {'key_points': [], 'source_count': 0}, 'validation': {'validated': True, 'confidence': 0.0, 'checked_items': 0}, 'result': {'summary': '', 'confidence': 0.0}}",
     "time": "2026-09-04T10:49:36.650072+00:00"
+  },
+  {
+    "question": "Explain React architecture",
+    "summary": "{'plan': {'question': 'Explain React architecture', 'steps': ['Understand research objective', 'Collect relevant information', 'Analyze collected data', 'Validate important facts', 'Generate research summary']}, 'analysis': {'key_points': [], 'source_count': 0}, 'validation': {'validated': True, 'confidence': 0.0, 'checked_items': 0}, 'result': {'summary': '', 'confidence': 0.0}}",
+    "time": "2026-09-10T06:08:38.459551+00:00"
+  },
+  {
+    "question": "What is the latest React version?",
+    "summary": "{'plan': {'question': 'What is the latest React version?', 'steps': ['Understand research objective', 'Collect relevant information', 'Analyze collected data', 'Validate important facts', 'Generate research summary']}, 'analysis': {'key_points': [], 'source_count': 0}, 'validation': {'validated': True, 'confidence': 0.0, 'checked_items': 0}, 'result': {'summary': '', 'confidence': 0.0}}",
+    "time": "2026-09-10T06:08:49.242752+00:00"
+  },
+  {
+    "question": "Explain React architecture",
+    "summary": "{'plan': {'question': 'Explain React architecture', 'steps': ['Understand research objective', 'Collect relevant information', 'Analyze collected data', 'Validate important facts', 'Generate research summary']}, 'analysis': {'key_points': [], 'source_count': 0}, 'validation': {'validated': True, 'confidence': 0.0, 'checked_items': 0}, 'result': {'summary': '', 'confidence': 0.0}}",
+    "time": "2026-09-10T06:24:26.738295+00:00"
+  },
+  {
+    "question": "What is the latest React version?",
+    "summary": "{'plan': {'question': 'What is the latest React version?', 'steps': ['Understand research objective', 'Collect relevant information', 'Analyze collected data', 'Validate important facts', 'Generate research summary']}, 'analysis': {'key_points': [], 'source_count': 0}, 'validation': {'validated': True, 'confidence': 0.0, 'checked_items': 0}, 'result': {'summary': '', 'confidence': 0.0}}",
+    "time": "2026-09-10T06:24:35.659510+00:00"
+  },
+  {
+    "question": "What is the latest React version?",
+    "summary": "{'plan': {'question': 'What is the latest React version?', 'steps': ['Understand research objective', 'Collect relevant information', 'Analyze collected data', 'Validate important facts', 'Generate research summary']}, 'analysis': {'key_points': [], 'source_count': 0}, 'validation': {'validated': True, 'confidence': 0.0, 'checked_items': 0}, 'result': {'summary': '', 'confidence': 0.0}}",
+    "time": "2026-09-10T06:25:27.317648+00:00"
+  },
+  {
+    "question": "Explain React architecture",
+    "summary": "{'plan': {'question': 'Explain React architecture', 'steps': ['Understand research objective', 'Collect relevant information', 'Analyze collected data', 'Validate important facts', 'Generate research summary']}, 'analysis': {'key_points': [], 'source_count': 0}, 'validation': {'validated': True, 'confidence': 0.0, 'checked_items': 0}, 'result': {'summary': '', 'confidence': 0.0}}",
+    "time": "2026-09-10T07:05:51.917808+00:00"
+  },
+  {
+    "question": "What is the latest React version?",
+    "summary": "{'plan': {'question': 'What is the latest React version?', 'steps': ['Understand research objective', 'Collect relevant information', 'Analyze collected data', 'Validate important facts', 'Generate research summary']}, 'analysis': {'key_points': [], 'source_count': 0}, 'validation': {'validated': True, 'confidence': 0.0, 'checked_items': 0}, 'result': {'summary': '', 'confidence': 0.0}}",
+    "time": "2026-09-10T07:05:58.148930+00:00"
+  },
+  {
+    "question": "React is a JavaScript library for building user interfaces. You split the UI into reusable components, each of which describes what should appear on screen.\nA component is a function that returns UI. When data (state) changes, React updates only the parts that need to change.\nPeople use React for web apps. React Native is a separate library that uses the same idea to build iOS and Android apps.\nCopy\n\n\nRegenerate\n\nShare\nMore\nWhat is the latest React version?\nEdit\nOM\nReact is a JavaScript library for building user interfaces. You split the UI into reusable components, each of which describes what should appear on screen.\nA component is a function that returns UI. When data (state) changes, React updates only the parts that need to change.\nPeople use React for web apps. React Native is a separate library that uses the same idea to build iOS and An",
+    "summary": "{'plan': {'question': 'React is a JavaScript library for building user interfaces. You split the UI into reusable components, each of which describes what should appear on screen.\\nA component is a function that returns UI. When data (state) changes, React updates only the parts that need to change.\\nPeople use React for web apps. React Native is a separate library that uses the same idea to build iOS and Android apps.\\nCopy\\n\\n\\nRegenerate\\n\\nShare\\nMore\\nWhat is the latest React version?\\nEdit\\nOM\\nReact is a JavaScript library for building user interfaces. You split the UI into reusable components, each of which describes what should appear on screen.\\nA component is a function that returns UI. When data (state) changes, React updates only the parts that need to change.\\nPeople use React for web apps. React Native is a separate library that uses the same idea to build iOS and An', 'steps': ['Understand research objective', 'Collect relevant information', 'Analyze collected data', 'V",
+    "time": "2026-09-10T07:06:34.168680+00:00"
+  },
+  {
+    "question": "what is react",
+    "summary": "{'plan': {'question': 'what is react', 'steps': ['Understand research objective', 'Collect relevant information', 'Analyze collected data', 'Validate important facts', 'Generate research summary']}, 'analysis': {'key_points': [], 'source_count': 0}, 'validation': {'validated': True, 'confidence': 0.0, 'checked_items': 0}, 'result': {'summary': '', 'confidence': 0.0}}",
+    "time": "2026-09-10T07:06:38.084399+00:00"
+  },
+  {
+    "question": "what is react",
+    "summary": "{'plan': {'question': 'what is react', 'steps': ['Understand research objective', 'Collect relevant information', 'Analyze collected data', 'Validate important facts', 'Generate research summary']}, 'analysis': {'key_points': [], 'source_count': 0}, 'validation': {'validated': True, 'confidence': 0.0, 'checked_items': 0}, 'result': {'summary': '', 'confidence': 0.0}}",
+    "time": "2026-09-10T07:08:16.530123+00:00"
+  },
+  {
+    "question": "what is lestest verion of react",
+    "summary": "{'plan': {'question': 'what is lestest verion of react', 'steps': ['Understand research objective', 'Collect relevant information', 'Analyze collected data', 'Validate important facts', 'Generate research summary']}, 'analysis': {'key_points': [], 'source_count': 0}, 'validation': {'validated': True, 'confidence': 0.0, 'checked_items': 0}, 'result': {'summary': '', 'confidence': 0.0}}",
+    "time": "2026-09-10T07:08:27.585318+00:00"
+  },
+  {
+    "question": "what is the react",
+    "summary": "{'plan': {'question': 'what is the react', 'steps': ['Understand research objective', 'Collect relevant information', 'Analyze collected data', 'Validate important facts', 'Generate research summary']}, 'analysis': {'key_points': [], 'source_count': 0}, 'validation': {'validated': True, 'confidence': 0.0, 'checked_items': 0}, 'result': {'summary': '', 'confidence': 0.0}}",
+    "time": "2026-09-10T07:12:42.376168+00:00"
+  },
+  {
+    "question": "what is the react verion",
+    "summary": "{'plan': {'question': 'what is the react verion', 'steps': ['Understand research objective', 'Collect relevant information', 'Analyze collected data', 'Validate important facts', 'Generate research summary']}, 'analysis': {'key_points': [], 'source_count': 0}, 'validation': {'validated': True, 'confidence': 0.0, 'checked_items': 0}, 'result': {'summary': '', 'confidence': 0.0}}",
+    "time": "2026-09-10T07:38:30.431702+00:00"
+  },
+  {
+    "question": "what is the react verion",
+    "summary": "{'plan': {'question': 'what is the react verion', 'steps': ['Understand research objective', 'Collect relevant information', 'Analyze collected data', 'Validate important facts', 'Generate research summary']}, 'analysis': {'key_points': [], 'source_count': 0}, 'validation': {'validated': True, 'confidence': 0.0, 'checked_items': 0}, 'result': {'summary': '', 'confidence': 0.0}}",
+    "time": "2026-09-10T08:15:25.911979+00:00"
+  },
+  {
+    "question": "what is the react verion",
+    "summary": "{'plan': {'question': 'what is the react verion', 'steps': ['Understand research objective', 'Collect relevant information', 'Analyze collected data', 'Validate important facts', 'Generate research summary']}, 'analysis': {'key_points': [], 'source_count': 0}, 'validation': {'validated': True, 'confidence': 0.0, 'checked_items': 0}, 'result': {'summary': '', 'confidence': 0.0}}",
+    "time": "2026-09-10T08:15:31.827616+00:00"
+  },
+  {
+    "question": "what is the react verion",
+    "summary": "{'plan': {'question': 'what is the react verion', 'steps': ['Understand research objective', 'Collect relevant information', 'Analyze collected data', 'Validate important facts', 'Generate research summary']}, 'analysis': {'key_points': [], 'source_count': 0}, 'validation': {'validated': True, 'confidence': 0.0, 'checked_items': 0}, 'result': {'summary': '', 'confidence': 0.0}}",
+    "time": "2026-09-10T08:15:37.266578+00:00"
+  },
+  {
+    "question": "what is the react verion",
+    "summary": "{'plan': {'question': 'what is the react verion', 'steps': ['Understand research objective', 'Collect relevant information', 'Analyze collected data', 'Validate important facts', 'Generate research summary']}, 'analysis': {'key_points': [], 'source_count': 0}, 'validation': {'validated': True, 'confidence': 0.0, 'checked_items': 0}, 'result': {'summary': '', 'confidence': 0.0}}",
+    "time": "2026-09-10T08:16:09.849537+00:00"
   }
 ]

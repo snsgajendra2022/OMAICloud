@@ -46,7 +46,7 @@ def explain_answer(*, topic: str, body: str, horizon: str) -> str:
         f"## Explanation\n{body.strip()}\n\n"
         f"## Horizon\n**{label}**\n\n"
         "## Practical next step\n"
-        "Map this to OM AI modules first (software/agents/memory), "
+        "Map this to OM AI"
         "then hardware contracts, then research programs only when labs/safety are ready."
     )
 

@@ -1,0 +1,32 @@
+{
+  "step": 84,
+  "patterns": [],
+  "knowledge": [],
+  "dataset": [
+    {
+      "type": "sft",
+      "messages": [
+        {
+          "role": "user",
+          "content": "hi"
+        },
+        {
+          "role": "assistant",
+          "content": "Hello \u2014 I am OM."
+        }
+      ],
+      "score": 0.9
+    }
+  ],
+  "evaluation": {
+    "examples": 1,
+    "sft": 1,
+    "dpo": 0,
+    "ready_for_training": true
+  },
+  "plan": [
+    "Add successful turn to SFT buffer",
+    "Update pattern knowledge store"
+  ],
+  "ts": 1789023942
+}

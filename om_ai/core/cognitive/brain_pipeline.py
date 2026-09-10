@@ -1,27 +1,35 @@
 """
-OM-1.0 Cognitive Brain — staged thinking pipeline.
+OM-1.0 Cognitive Brain — STEPs 83–93 roadmap orchestration.
 
 Flow:
 
-  message
-    ↓
-  Understanding
-    ↓
-  ReasoningEngine
-    ↓
-  CodingIntelligence
-    ↓
-  ResponseEngine
-    ↓
-  OM Native Model
-    ↓
-  QualityChecker
-    ↓
-  Answer
+  USER MESSAGE
+        ↓
+  Language Detection
+        ↓
+  Intent Understanding
+        ↓
+  Freshness Analysis → Research Engine (when needed)
+        ↓
+  Context Intelligence (memory + knowledge + research)
+        ↓
+  Reasoning Engine
+        ↓
+  Coding Intelligence
+        ↓
+  Response Planning
+        ↓
+  Intelligent Prompt → OM Native Model
+        ↓
+  Leakage → Garbage → Self Critic → Quality
+        ↓
+  Regeneration (max 2)
+        ↓
+  FINAL HUMAN ANSWER
 
 Usage:
 
-  OMCognitiveBrain().process("create react native login and dashboard app")
+  OMCognitiveBrain().process("What is the latest React version?")
   OMCognitiveBrain().generate("hello")
 """
 from __future__ import annotations
@@ -43,12 +51,25 @@ from om_ai.core.reasoning.reasoning_engine import ReasoningEngine
 from om_ai.core.coding.coding_intelligence import CodingIntelligence
 from om_ai.core.response.response_engine import ResponseEngine
 from om_ai.core.response.quality_checker import QualityChecker
+from om_ai.core.response.self_critic import SelfCritic
+from om_ai.core.response.context_filter import ContextFilter
+from om_ai.core.response.response_memory import ResponseMemory
 from om_ai.core.response.answer_generator import AnswerGenerator
+from om_ai.core.response.garbage_detector import GarbageDetector
+from om_ai.core.response.tool_filter import ToolOutputFilter
+from om_ai.core.response.leakage_detector import LeakageDetector
+from om_ai.core.intelligence.freshness_detector import FreshnessDetector
+from om_ai.core.context.context_intelligence import ContextIntelligence
+from om_ai.core.research import ResearchEngine
+from om_ai.core.steps import OMRoadmapStack
 from om_ai.memory_intelligence import MemoryConsolidator
 from om_ai.user_intelligence import UserIntelligenceEngine
 from om_ai.context import ContextEngine
 from om_ai.understanding.query_kind import is_coding_task, is_greeting, query_kind
+from om_ai.understanding.language_brain import detect_language
 from om_ai.agents.collaboration import AgentCollaborationPlanner, AgentCoordinator
+
+MAX_RESPONSE_RETRIES = 2
 
 
 class OMCognitiveBrain:
@@ -60,22 +81,57 @@ class OMCognitiveBrain:
         self.planner = TaskPlanner()
         self.reasoning = ReasoningChain()
         self.reasoning_engine = ReasoningEngine()
+        self.research_engine = ResearchEngine()
+        self.freshness_detector = FreshnessDetector()
+        self.leakage_detector = LeakageDetector()
+        self.context_intelligence = ContextIntelligence()
+        self.garbage_detector = GarbageDetector()
+        self.tool_filter = ToolOutputFilter()
         self.coding_intelligence = CodingIntelligence()
         self.response_engine = ResponseEngine()
         self.quality_checker = QualityChecker()
+        self.self_critic = SelfCritic()
+        self.context_filter = ContextFilter()
+        self.response_memory = ResponseMemory()
         self.generator = AnswerGenerator()
         self.evaluator = SelfEvaluator()
         self.agent_router = AgentRouter()
         self.agent_executor = AgentExecutor()
         self.agent_planner = AgentCollaborationPlanner()
         self.agent_coordinator = AgentCoordinator()
-        self.learning = LearningEngine()
+        self.learning_engine = LearningEngine()
         self.improvement = KnowledgeImprovementEngine()
         self.orchestrator = OMOrchestrator()
         self.reflection_engine = ReflectionEngine()
         self.memory_consolidator = MemoryConsolidator()
         self.user_intelligence = UserIntelligenceEngine()
         self.context_engine = ContextEngine()
+        self.roadmap = OMRoadmapStack()
+
+    @staticmethod
+    def _plan_list(state: Any) -> list[Any]:
+        if state is None:
+            return []
+        if hasattr(state, "plan"):
+            return list(getattr(state, "plan") or [])
+        if isinstance(state, dict):
+            return list(state.get("plan") or [])
+        return []
+
+    @staticmethod
+    def _context_blob(items: Any) -> str:
+        if items is None:
+            return ""
+        if isinstance(items, str):
+            return items[:6000]
+        if isinstance(items, (list, tuple)):
+            parts = []
+            for item in items[:10]:
+                if item is None or item == "":
+                    continue
+                parts.append(str(item)[:2000])
+            return "\n\n".join(parts)[:8000]
+        return str(items)[:6000]
 
     def generate(
         self,
@@ -86,15 +142,42 @@ class OMCognitiveBrain:
         native_chat: Callable[..., str] | None = None,
         context: dict[str, Any] | None = None,
     ) -> dict[str, Any]:
-        """
-        Core OM brain flow:
-
-        message → Understanding → ReasoningEngine → CodingIntelligence
-        → ResponseEngine → OM Native Model → QualityChecker → Answer
-        """
         message = (message or "").strip()
         stages: list[str] = []
-        meta: dict[str, Any] = {"flow": "om-brain-v2"}
+        meta: dict[str, Any] = {"flow": "om-brain-v87"}
+        research_state = None
+
+        # 0) Language detection
+        stages.append("language")
+        try:
+            language = detect_language(message)
+        except Exception:
+            language = "en"
+        meta["language"] = language
+
+        # Early refuse meaningless / corrupted-content requests
+        if self.garbage_detector.is_nonsense_request(message):
+            stages.append("garbage_request_refused")
+            answer = self.garbage_detector.refusal_message()
+            return {
+                "answer": answer,
+                "status": "ok",
+                "understanding": {
+                    "intent": "refuse_nonsense",
+                    "domain": "safety",
+                    "confidence": 1.0,
+                },
+                "reasoning": {},
+                "coding": {},
+                "research": None,
+                "response_state": None,
+                "response_plan": {"intent": "refuse_nonsense", "response_type": "direct", "plan": []},
+                "quality": {"approved": True, "score": 1.0, "issues": []},
+                "stages": stages + ["answer"],
+                "meta": meta,
+                "intent": {"intent": "refuse_nonsense"},
+                "technology": {"frameworks": []},
+            }
 
         # 1) Understanding
         stages.append("understanding")
@@ -121,19 +204,76 @@ class OMCognitiveBrain:
             "confidence": understanding.get("confidence"),
         }
 
-        # 2) ReasoningEngine
+        # 2) Freshness → Research
+        stages.append("freshness")
+        freshness = {"requires_research": False, "signals": []}
+        try:
+            freshness = self.freshness_detector.analyze(message)
+        except Exception as exc:
+            freshness = {"requires_research": False, "signals": [], "error": str(exc)}
+        meta["freshness"] = freshness
+
+        if freshness.get("requires_research") or freshness.get("needs_research"):
+            stages.append("research")
+            try:
+                research_state = self.research_engine.research(
+                    message,
+                    understanding=understanding,
+                )
+                meta["research"] = {
+                    "status": getattr(research_state, "status", None),
+                    "sources": len(getattr(research_state, "sources", []) or []),
+                    "confidence": getattr(research_state, "confidence", 0),
+                    "citations": list(getattr(research_state, "citations", []) or []),
+                }
+            except Exception as exc:
+                research_state = None
+                meta["research"] = {"error": str(exc)}
+
+        # 2b) STEPs 83-93 roadmap enrich (long context, knowledge brain, agents, deep reasoning prep)
+        stages.append("roadmap_enrich")
+        roadmap_pack: dict[str, Any] = {}
+        try:
+            roadmap_pack = self.roadmap.enrich_before_answer(
+                message,
+                knowledge=knowledge,
+                memory=memory,
+                context=context or {},
+            )
+            meta["roadmap"] = {
+                "status": self.roadmap.status(),
+                "has_collaboration": bool(roadmap_pack.get("collaboration")),
+                "has_civilization": bool(roadmap_pack.get("civilization")),
+                "reasoning_mode": (roadmap_pack.get("advanced_reasoning") or {}).get("mode"),
+            }
+        except Exception as exc:
+            roadmap_pack = {}
+            meta["roadmap"] = {"error": str(exc)}
+
+        # 3) Reasoning
         stages.append("reasoning")
         reasoning_out: dict[str, Any] = {}
         try:
             reasoning_out = self.reasoning_engine.process(message, message)
         except Exception as exc:
             reasoning_out = {"status": "error", "error": str(exc)}
+        # Prefer STEP 88 deep reasoning when available
+        deep = (roadmap_pack.get("advanced_reasoning") or {})
+        if deep.get("plan"):
+            merged_plan = list(dict.fromkeys(list(reasoning_out.get("plan") or []) + list(deep.get("plan") or [])))
+            reasoning_out = {
+                **reasoning_out,
+                "plan": merged_plan,
+                "deep": deep,
+                "final_reasoning": deep.get("final_reasoning"),
+            }
         meta["reasoning"] = {
             "status": reasoning_out.get("status"),
             "plan": reasoning_out.get("plan"),
+            "mode": deep.get("mode"),
         }
 
-        # 3) CodingIntelligence (coding asks only; else light stub)
+        # 4) CodingIntelligence
         stages.append("coding_intelligence")
         coding_out: dict[str, Any] = {}
         if is_coding_task(message) or intent_name in {
@@ -141,6 +281,8 @@ class OMCognitiveBrain:
             "debug",
             "architecture",
             "prompt_generation",
+            "software_creation",
+            "implementation",
         }:
             try:
                 coding_out = self.coding_intelligence.analyze(message)
@@ -153,52 +295,365 @@ class OMCognitiveBrain:
             else [],
         }
 
-        # 4) ResponseEngine (plan + format)
+        # 5) Response planning
         stages.append("response_engine")
-        prepared: dict[str, Any] = {}
+        research_summary = ""
+        research_citations: list[Any] = []
+        if research_state is not None:
+            research_summary = str(getattr(research_state, "summary_context", "") or "")
+            research_citations = list(getattr(research_state, "citations", []) or [])
         try:
-            prepared = self.response_engine.prepare(message, intent_name)
+            response_state = self.response_engine.prepare(
+                message=message,
+                intent=intent_name,
+                understanding=understanding,
+                reasoning=reasoning_out,
+                context={
+                    "memory": memory,
+                    "knowledge": knowledge,
+                    "coding": coding_out,
+                    "research": research_summary,
+                    "citations": research_citations,
+                },
+            )
         except Exception as exc:
-            prepared = {"plan": [], "response_type": "chat", "error": str(exc)}
-        meta["response_plan"] = prepared
+            from om_ai.core.response.response_state import ResponseState
 
-        # 5) OM Native Model
+            response_state = ResponseState(
+                user_message=message,
+                intent=intent_name,
+                response_type="direct",
+                plan=["Answer the user's request clearly"],
+                issues=[str(exc)],
+            )
+        meta["response_plan"] = {
+            "intent": getattr(response_state, "intent", intent_name),
+            "response_type": getattr(response_state, "response_type", "direct"),
+            "plan": self._plan_list(response_state),
+        }
+
+        # 6) Context Intelligence (+ research injection)
+        stages.append("context_intelligence")
+        raw_context: list[Any] = [knowledge, memory]
+        if research_summary:
+            raw_context.append(research_summary)
+        roadmap_blob = (roadmap_pack or {}).get("context_blob")
+        if roadmap_blob:
+            raw_context.append(roadmap_blob)
+        kb_ctx = ((roadmap_pack or {}).get("knowledge_brain") or {}).get("context")
+        if kb_ctx:
+            raw_context.append(kb_ctx)
+        try:
+            filtered = self.context_filter.clean(raw_context)
+        except Exception:
+            filtered = [x for x in raw_context if x]
+        try:
+            clean_context = self.context_intelligence.process(filtered, message)
+        except Exception:
+            clean_context = filtered
+        meta["context_intelligence"] = {"kept": len(clean_context or [])}
+
+        # 7) OM Native Model
         stages.append("om_native_model")
         draft = self._native_or_fallback_answer(
             message,
             understanding=understanding,
             reasoning=reasoning_out,
             coding=coding_out,
-            prepared=prepared,
-            knowledge=knowledge,
-            memory=memory,
+            prepared=response_state,
+            knowledge=clean_context,
+            memory=clean_context,
+            research=research_summary,
             native_chat=native_chat,
         )
+        if not (draft or "").strip() and intent_name in {
+            "conversation",
+            "greeting",
+            "casual_conversation",
+        }:
+            draft = self._safe_fallback(message, intent_name)
         meta["model"] = {"chars": len(draft or "")}
 
-        # 6) QualityChecker
-        stages.append("quality_checker")
-        quality = self.quality_checker.validate(draft)
-        if not quality.get("approved") and draft:
-            repaired = self._repair_answer(message, draft, understanding)
-            quality2 = self.quality_checker.validate(repaired)
-            if quality2.get("approved") or len(repaired) > len(draft):
-                draft = repaired
-                quality = quality2
-        meta["quality"] = quality
+        # 8) Leakage → Garbage → SelfCritic → Quality → regenerate
+        stages.append("leakage_detector")
+        regenerate = False
+        if self.leakage_detector.check(draft or ""):
+            regenerate = True
+            draft = ""
+            meta["leakage"] = True
+        else:
+            meta["leakage"] = False
 
-        # 7) Answer
+        stages.append("garbage_detector")
+        if self.garbage_detector.check(draft or ""):
+            regenerate = True
+            meta["garbage"] = True
+        else:
+            meta["garbage"] = False
+
+        stages.append("tool_filter")
+        cleaned_tools = self.tool_filter.clean(draft or "")
+        if (draft or "") and not cleaned_tools:
+            regenerate = True
+            draft = ""
+            meta["tool_leakage"] = True
+        else:
+            if cleaned_tools != (draft or "").strip():
+                draft = cleaned_tools
+                meta["tool_leakage_cleaned"] = True
+            else:
+                meta["tool_leakage"] = False
+
+        stages.append("quality_checker")
+        quality = self.quality_checker.validate(
+            response=draft,
+            original_message=message,
+        )
+        critic = self.self_critic.review(message, draft or "")
+        meta["self_critic"] = critic
+        if not critic.get("approved"):
+            quality = {
+                **quality,
+                "approved": False,
+                "issues": list(
+                    dict.fromkeys(
+                        list(quality.get("issues") or [])
+                        + list(critic.get("issues") or [])
+                    )
+                ),
+            }
+
+        try:
+            response_state = self.response_engine.validate(
+                state=response_state,
+                response=draft or "",
+            )
+            if not response_state.approved:
+                quality = {
+                    "approved": False,
+                    "score": float(response_state.quality_score or 0),
+                    "issues": list(response_state.issues or quality.get("issues") or []),
+                }
+        except Exception:
+            pass
+
+        if regenerate:
+            quality = {**quality, "approved": False}
+
+        retry_count = 0
+        while (not quality.get("approved")) and retry_count < MAX_RESPONSE_RETRIES:
+            retry_count += 1
+            stages.append(f"regenerate_{retry_count}")
+            try:
+                retry_prompt = self.response_engine.retry_instruction(response_state)
+            except Exception:
+                retry_prompt = (
+                    f"Improve this answer for the user request.\n"
+                    f"Request: {message}\n"
+                    f"Issues: {', '.join(quality.get('issues') or [])}"
+                )
+
+            draft = self._native_or_fallback_answer(
+                retry_prompt,
+                understanding=understanding,
+                reasoning=reasoning_out,
+                coding=coding_out,
+                prepared=response_state,
+                knowledge=clean_context,
+                memory=clean_context,
+                research=research_summary,
+                native_chat=native_chat,
+            )
+            generated_text = str(draft or "")
+
+            regenerate = bool(self.garbage_detector.check(generated_text))
+            if self.leakage_detector.check(generated_text):
+                regenerate = True
+                draft = ""
+            else:
+                cleaned_tools = self.tool_filter.clean(generated_text)
+                if generated_text and not cleaned_tools:
+                    regenerate = True
+                    draft = ""
+                else:
+                    draft = cleaned_tools
+
+            quality = self.quality_checker.validate(
+                response=draft,
+                original_message=message,
+            )
+            critic = self.self_critic.review(message, draft or "")
+            meta["self_critic"] = critic
+            if not critic.get("approved"):
+                quality = {
+                    **quality,
+                    "approved": False,
+                    "issues": list(
+                        dict.fromkeys(
+                            list(quality.get("issues") or [])
+                            + list(critic.get("issues") or [])
+                        )
+                    ),
+                }
+            if regenerate:
+                quality = {**quality, "approved": False}
+
+            try:
+                response_state = self.response_engine.validate(
+                    state=response_state,
+                    response=draft or "",
+                )
+            except Exception:
+                pass
+
+        meta["quality"] = quality
+        meta["retries"] = retry_count
+
+        if not quality.get("approved"):
+            if intent_name in {"conversation", "greeting", "casual_conversation"}:
+                answer = self._safe_fallback(message, intent_name)
+                return {
+                    "answer": answer,
+                    "status": "ok_fallback",
+                    "quality": quality,
+                    "understanding": understanding,
+                    "reasoning": reasoning_out,
+                    "coding": coding_out,
+                    "research": meta.get("research"),
+                    "response_state": response_state,
+                    "response_plan": meta.get("response_plan"),
+                    "stages": stages + ["answer"],
+                    "meta": meta,
+                    "intent": understanding,
+                    "technology": {
+                        "frameworks": meta["coding"].get("frameworks") or [],
+                    },
+                }
+            if research_summary or research_citations:
+                try:
+                    research_answer = self.response_engine.format_research_answer(
+                        message=message,
+                        draft="",
+                        research_summary=research_summary,
+                        citations=research_citations,
+                        freshness_signals=list(freshness.get("signals") or []),
+                    )
+                except Exception:
+                    research_answer = ""
+                if research_answer:
+                    return {
+                        "answer": research_answer,
+                        "status": "ok_research_fallback",
+                        "quality": quality,
+                        "understanding": understanding,
+                        "reasoning": reasoning_out,
+                        "coding": coding_out,
+                        "research": meta.get("research"),
+                        "response_state": response_state,
+                        "response_plan": meta.get("response_plan"),
+                        "stages": stages + ["answer"],
+                        "meta": meta,
+                        "intent": understanding,
+                        "technology": {
+                            "frameworks": meta["coding"].get("frameworks") or [],
+                        },
+                    }
+            return {
+                "answer": "OM could not generate a reliable response.",
+                "status": "generation_failed",
+                "quality": quality,
+                "understanding": understanding,
+                "reasoning": reasoning_out,
+                "coding": coding_out,
+                "research": meta.get("research"),
+                "response_state": response_state,
+                "response_plan": meta.get("response_plan"),
+                "stages": stages,
+                "meta": meta,
+                "intent": understanding,
+                "technology": {
+                    "frameworks": meta["coding"].get("frameworks") or [],
+                },
+            }
+
         stages.append("answer")
         answer = (draft or "").strip()
         if not answer:
             answer = self._safe_fallback(message, intent_name)
 
+        # Architecture / build tasks: attach collaboration board when useful
+        collab = (roadmap_pack or {}).get("collaboration") or {}
+        if collab.get("summary") and (
+            intent_name in {"architecture", "coding", "software_creation", "implementation"}
+            or any(w in message.lower() for w in ("design", "architect", "build", "ecommerce", "uber"))
+        ):
+            if len((answer or "").split()) < 80:
+                answer = (answer + "\n\n" + collab["summary"]).strip() if answer else collab["summary"]
+            meta["collaboration_attached"] = True
+
+        # Format research answers with human-facing Sources block
+        # whenever freshness triggered research (even if sources are thin).
+        if freshness.get("requires_research") or research_summary or research_citations:
+            try:
+                formatted = self.response_engine.format_research_answer(
+                    message=message,
+                    draft=answer,
+                    research_summary=research_summary,
+                    citations=research_citations,
+                    freshness_signals=list(freshness.get("signals") or []),
+                )
+                if formatted:
+                    answer = formatted
+            except Exception:
+                pass
+
+        # Tool-trace scrub on final answer
+        tool_cleaned = self.tool_filter.clean(answer)
+        if answer and not tool_cleaned:
+            answer = "OM could not verify a reliable answer."
+            meta["tool_leakage_final"] = True
+        else:
+            answer = tool_cleaned or answer
+
+        if self.leakage_detector.check(answer):
+            # Allow "Sources:" in research answers — leakage blocks "Source:" training leak.
+            # Re-check after stripping a leading Sources section if present.
+            probe = answer
+            if "Sources:" in probe:
+                probe = probe.split("Sources:")[0]
+            if self.leakage_detector.check(probe):
+                answer = "OM could not verify a reliable answer."
+                meta["leakage_final"] = True
+
+        try:
+            self.response_memory.remember(
+                intent_name,
+                {"answer": answer[:500], "score": quality.get("score")},
+            )
+        except Exception:
+            pass
+
+        # STEPs 83/84/91/93 continuous + advanced learning + self-improve + training queue
+        stages.append("roadmap_learn")
+        try:
+            meta["roadmap_learn"] = self.roadmap.learn_after_answer(
+                message,
+                answer,
+                quality=quality,
+                meta={"intent": intent_name, "research": meta.get("research")},
+            )
+        except Exception as exc:
+            meta["roadmap_learn"] = {"error": str(exc)}
+
         return {
             "answer": answer,
+            "status": "ok",
             "understanding": understanding,
             "reasoning": reasoning_out,
             "coding": coding_out,
-            "response_plan": prepared,
+            "research": meta.get("research"),
+            "response_state": response_state,
+            "response_plan": meta.get("response_plan"),
             "quality": quality,
             "stages": stages,
             "meta": meta,
@@ -215,37 +670,65 @@ class OMCognitiveBrain:
         understanding: dict[str, Any],
         reasoning: dict[str, Any],
         coding: dict[str, Any],
-        prepared: dict[str, Any],
+        prepared: Any,
         knowledge: Any,
         memory: Any,
-        native_chat: Callable[..., str] | None,
+        research: Any = None,
+        native_chat: Callable[..., str] | None = None,
     ) -> str:
         intent_name = str(understanding.get("intent") or "")
-        if is_greeting(message) or intent_name == "conversation":
-            low = message.lower()
-            if "morning" in low or "moring" in low:
-                return "Good morning! I’m OM — how can I help you today?"
-            if "evening" in low:
-                return "Good evening! I’m OM — how can I help you?"
-            return "Hello — I’m OM. How can I help you?"
+        if intent_name == "conversation":
+            pass
+
+        knowledge_text = self._context_blob(knowledge)
+        memory_text = self._context_blob(memory)
+        research_text = self._context_blob(research)
+
+        plan = reasoning.get("plan") or self._plan_list(prepared)
+        coding_note = ""
+        if coding:
+            req = coding.get("requirement") or {}
+            if req:
+                coding_note = f"Coding context: {req}"
+
+        response_instruction = ""
+        try:
+            response_instruction = self.response_engine.generation_instruction(prepared)
+        except Exception:
+            response_instruction = ""
+
+        system_content = f"""
+You are OM AI.
+
+Reason carefully.
+Use provided context when relevant.
+Do not reveal internal tools.
+Do not output training examples or dataset rows.
+Do not dump unrelated README / file contents.
+
+Intent: {intent_name}
+Plan: {'; '.join(str(p) for p in (plan or [])[:6])}
+{coding_note}
+
+Context:
+{knowledge_text}
+
+Memory:
+{memory_text}
+
+Research:
+{research_text}
+""".strip()
+        if response_instruction:
+            system_content = system_content + "\n\n" + response_instruction
+
+        messages = [
+            {"role": "system", "content": system_content},
+            {"role": "user", "content": message},
+        ]
 
         if callable(native_chat):
             try:
-                sys_bits = [
-                    "You are OM, a helpful local AI assistant.",
-                    f"Intent: {intent_name}",
-                ]
-                plan = reasoning.get("plan") or prepared.get("plan") or []
-                if plan:
-                    sys_bits.append("Plan: " + "; ".join(str(p) for p in plan[:6]))
-                if coding:
-                    req = coding.get("requirement") or {}
-                    if req:
-                        sys_bits.append(f"Coding context: {req}")
-                messages = [
-                    {"role": "system", "content": "\n".join(sys_bits)},
-                    {"role": "user", "content": message},
-                ]
                 text = str(native_chat(messages) or "").strip()
                 if text:
                     return text
@@ -265,32 +748,24 @@ class OMCognitiveBrain:
             if backend is None:
                 backend = OmNativeBackend()
             if getattr(backend, "loaded", False) and callable(getattr(backend, "chat", None)):
-                text = str(
-                    backend.chat(
-                        [
-                            {
-                                "role": "system",
-                                "content": "You are OM. Answer clearly and helpfully.",
-                            },
-                            {"role": "user", "content": message},
-                        ]
-                    )
-                    or ""
-                ).strip()
+                text = str(backend.chat(messages) or "").strip()
                 if text:
                     return text
         except Exception:
             pass
 
+        if research_text.strip():
+            return (
+                "Based on retrieved research context:\n\n"
+                + research_text[:1500]
+                + "\n\n(Verify details from the cited sources when possible.)"
+            )
+
         try:
-            # Prefer a clean structured draft from coding + response plan
             if coding and isinstance(coding, dict) and not coding.get("error"):
                 req = coding.get("requirement") or {}
                 arch = coding.get("architecture") or {}
-                lines = [
-                    "Here is a clear plan for your coding request.",
-                    "",
-                ]
+                lines = ["Here is a clear plan for your coding request.", ""]
                 frameworks = req.get("framework") if isinstance(req, dict) else None
                 features = req.get("features") if isinstance(req, dict) else None
                 if frameworks:
@@ -306,9 +781,6 @@ class OMCognitiveBrain:
                             bits.append(f"{k}={v}")
                     if bits:
                         lines.append("Architecture: " + "; ".join(bits))
-                elif arch:
-                    lines.append(str(arch)[:800])
-                plan = reasoning.get("plan") or prepared.get("plan") or []
                 if plan:
                     lines.append("")
                     lines.append("Next steps:")
@@ -322,7 +794,7 @@ class OMCognitiveBrain:
                 message,
                 {
                     "memory_context": memory or [],
-                    "plan": reasoning.get("plan") or prepared.get("plan") or [],
+                    "plan": plan,
                     "analysis": reasoning.get("analysis") or {},
                     "coding": coding,
                     "understanding": understanding,
@@ -333,7 +805,6 @@ class OMCognitiveBrain:
                 ans = str(generated.get("answer") or "").strip()
             else:
                 ans = str(generated or "").strip()
-            # Reject dumps that look like raw understanding schema
             low = ans.lower()
             if ans and not (
                 low.startswith("intent:")
@@ -345,23 +816,8 @@ class OMCognitiveBrain:
         except Exception:
             return ""
 
-    def _repair_answer(
-        self,
-        message: str,
-        draft: str,
-        understanding: dict[str, Any],
-    ) -> str:
-        intent_name = str(understanding.get("intent") or "chat")
-        try:
-            ok = self.response_engine.validate(draft)
-            if ok.get("approved"):
-                return draft
-        except Exception:
-            pass
-        return self._safe_fallback(message, intent_name)
-
     def _safe_fallback(self, message: str, intent_name: str) -> str:
-        if is_greeting(message) or intent_name == "conversation":
+        if intent_name == "conversation" or is_greeting(message):
             return "Hello — I’m OM. How can I help you?"
         if is_coding_task(message):
             return (
@@ -408,7 +864,7 @@ class OMCognitiveBrain:
             question,
             memories=existing_memory,
         )
-        memory_context = {"relevant": relevant_memory}
+        memory_context = {"relevant": relevant_memory, "knowledge": knowledge}
         context_result = self.context_engine.understand(
             question,
             user=self.user_intelligence.profile_data(),
@@ -492,8 +948,6 @@ class OMCognitiveBrain:
         pipeline["orchestration"] = orchestration
         pipeline["intelligence"] = intelligence_result
 
-        # Core flow: Understanding → Reasoning → Coding → Response
-        # → Native Model → QualityChecker → Answer
         generated_flow = self.generate(
             question,
             knowledge=knowledge,
@@ -509,8 +963,11 @@ class OMCognitiveBrain:
 
         intel_answer = str((intelligence_result or {}).get("answer") or "").strip()
         if intel_answer and len(intel_answer) > max(40, len(user_answer)):
-            qcheck = self.quality_checker.validate(intel_answer)
-            if qcheck.get("approved"):
+            qcheck = self.quality_checker.validate(
+                response=intel_answer,
+                original_message=question,
+            )
+            if qcheck.get("approved") and not self.leakage_detector.check(intel_answer):
                 user_answer = intel_answer
 
         consolidated_memory = self.memory_consolidator.consolidate(
@@ -543,6 +1000,8 @@ class OMCognitiveBrain:
             evaluation = {
                 **evaluation,
                 "quality_checker": flow_quality,
+                "self_critic": (generated_flow.get("meta") or {}).get("self_critic"),
+                "research": generated_flow.get("research"),
                 "approved": bool(
                     evaluation.get("approved", True) and flow_quality.get("approved", True)
                 ),
@@ -553,7 +1012,7 @@ class OMCognitiveBrain:
             user_answer,
             evaluation,
         )
-        learning_result = self.learning.learn(
+        learning_result = self.learning_engine.learn(
             question,
             user_answer,
             evaluation,
@@ -577,6 +1036,7 @@ class OMCognitiveBrain:
                 "brain_flow": generated_flow.get("reasoning"),
                 "coding": generated_flow.get("coding"),
                 "stages": generated_flow.get("stages"),
+                "research": generated_flow.get("research"),
             },
             "answer": user_answer,
             "evaluation": evaluation,
