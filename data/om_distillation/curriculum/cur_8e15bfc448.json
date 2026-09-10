@@ -1,0 +1,58 @@
+{
+  "step": "94.11",
+  "curriculum_id": "cur_8e15bfc448",
+  "topic": "React architecture",
+  "domain": "software",
+  "count": 6,
+  "questions": [
+    {
+      "id": "q_de74a983",
+      "question": "What is React architecture and when should you use it?",
+      "domain": "software",
+      "level": "foundational",
+      "topic": "React architecture",
+      "priority": 1
+    },
+    {
+      "id": "q_5c8c38fd",
+      "question": "How do you test and observe a React architecture system?",
+      "domain": "software",
+      "level": "intermediate",
+      "topic": "React architecture",
+      "priority": 2
+    },
+    {
+      "id": "q_8f8df67c",
+      "question": "How would you harden React architecture for security and compliance?",
+      "domain": "software",
+      "level": "advanced",
+      "topic": "React architecture",
+      "priority": 3
+    },
+    {
+      "id": "q_ab2482a3",
+      "question": "Define SLOs, queues, and rollback strategy for a React architecture platform.",
+      "domain": "software",
+      "level": "systems",
+      "topic": "React architecture",
+      "priority": 4
+    },
+    {
+      "id": "q_701ade04",
+      "question": "Create an end-to-end roadmap to ship React architecture across teams.",
+      "domain": "software",
+      "level": "systems",
+      "topic": "React architecture",
+      "priority": 4
+    },
+    {
+      "id": "q_76739d7d",
+      "question": "Define SLOs, queues, and rollback strategy for a React architecture platform.",
+      "domain": "software",
+      "level": "systems",
+      "topic": "React architecture",
+      "priority": 4
+    }
+  ],
+  "created_at": "2026-09-10T11:48:11Z"
+}

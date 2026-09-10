@@ -1,0 +1,27 @@
+{
+  "run_id": "write_a_step_by_step_migration_plan_for_introduc_ec9fa54e",
+  "task": "Write a step-by-step migration plan for introducing software engineering.",
+  "responses": [
+    {
+      "provider": "qwen3:14b",
+      "model": "qwen3:14b-mock",
+      "source": "mock",
+      "text": "Teacher view (qwen3:14b) for: Write a step-by-step migration plan for introducing software engineering.\n\nBreak 'Write a step-by-step migration plan for introducing software engineering.' into steps: understand → design → implement → validate → harden.\n\nKeep answers concrete; verify against your stack before production use.",
+      "error": "provider_not_ready:Unknown provider: qwen3:14b"
+    },
+    {
+      "provider": "deepseek-r1:14b",
+      "model": "deepseek-r1:14b-mock",
+      "source": "mock",
+      "text": "Teacher view (deepseek-r1:14b) for: Write a step-by-step migration plan for introducing software engineering.\n\nBreak 'Write a step-by-step migration plan for introducing software engineering.' into steps: understand → design → implement → validate → harden.\n\nKeep answers concrete; verify against your stack before production use.",
+      "error": "provider_not_ready:Unknown provider: deepseek-r1:14b"
+    },
+    {
+      "provider": "mistral:latest",
+      "model": "mistral:latest-mock",
+      "source": "mock",
+      "text": "Teacher view (mistral:latest) for: Write a step-by-step migration plan for introducing software engineering.\n\nBreak 'Write a step-by-step migration plan for introducing software engineering.' into steps: understand → design → implement → validate → harden.\n\nKeep answers concrete; verify against your stack before production use.",
+      "error": "provider_not_ready:Unknown provider: mistral:latest"
+    }
+  ]
+}

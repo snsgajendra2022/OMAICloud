@@ -1,0 +1,60 @@
+{
+  "run_id": "design_a_production_ready_software_engineering_a_ac54bc21",
+  "task": "Design a production-ready software engineering architecture with trade-offs.",
+  "teachers": [
+    "qwen3:14b",
+    "deepseek-r1:14b",
+    "mistral:latest"
+  ],
+  "responses": [
+    {
+      "provider": "qwen3:14b",
+      "ok": true,
+      "text": "Teacher view (qwen3:14b) for: Design a production-ready software engineering architecture with trade-offs.\n\nBreak 'Design a production-ready software engineering architecture with trade-offs.' into steps: understand → design → implement → validate → harden.\n\nKeep answers concrete; verify against your stack before production use.",
+      "model": "qwen3:14b-mock",
+      "vendor": "mock",
+      "error": "provider_not_ready:Unknown provider: qwen3:14b",
+      "source": "mock",
+      "raw": "Teacher view (qwen3:14b) for: Design a production-ready software engineering architecture with trade-offs.\n\nBreak 'Design a production-ready software engineering architecture with trade-offs.' into steps: understand → design → implement → validate → harden.\n\nKeep answers concrete; verify against your stack before production use.",
+      "cleaned": "Teacher view (qwen3:14b) for: Design a production-ready software engineering architecture with trade-offs.\n\nBreak 'Design a production-ready software engineering architecture with trade-offs.' into steps: understand → design → implement → validate → harden.\n\nKeep answers concrete; verify against your stack before production use.",
+      "verification": {
+        "ok": true,
+        "issues": []
+      }
+    },
+    {
+      "provider": "deepseek-r1:14b",
+      "ok": true,
+      "text": "Teacher view (deepseek-r1:14b) for: Design a production-ready software engineering architecture with trade-offs.\n\nBreak 'Design a production-ready software engineering architecture with trade-offs.' into steps: understand → design → implement → validate → harden.\n\nKeep answers concrete; verify against your stack before production use.",
+      "model": "deepseek-r1:14b-mock",
+      "vendor": "mock",
+      "error": "provider_not_ready:Unknown provider: deepseek-r1:14b",
+      "source": "mock",
+      "raw": "Teacher view (deepseek-r1:14b) for: Design a production-ready software engineering architecture with trade-offs.\n\nBreak 'Design a production-ready software engineering architecture with trade-offs.' into steps: understand → design → implement → validate → harden.\n\nKeep answers concrete; verify against your stack before production use.",
+      "cleaned": "Teacher view (deepseek-r1:14b) for: Design a production-ready software engineering architecture with trade-offs.\n\nBreak 'Design a production-ready software engineering architecture with trade-offs.' into steps: understand → design → implement → validate → harden.\n\nKeep answers concrete; verify against your stack before production use.",
+      "verification": {
+        "ok": true,
+        "issues": []
+      }
+    },
+    {
+      "provider": "mistral:latest",
+      "ok": true,
+      "text": "Teacher view (mistral:latest) for: Design a production-ready software engineering architecture with trade-offs.\n\nBreak 'Design a production-ready software engineering architecture with trade-offs.' into steps: understand → design → implement → validate → harden.\n\nKeep answers concrete; verify against your stack before production use.",
+      "model": "mistral:latest-mock",
+      "vendor": "mock",
+      "error": "provider_not_ready:Unknown provider: mistral:latest",
+      "source": "mock",
+      "raw": "Teacher view (mistral:latest) for: Design a production-ready software engineering architecture with trade-offs.\n\nBreak 'Design a production-ready software engineering architecture with trade-offs.' into steps: understand → design → implement → validate → harden.\n\nKeep answers concrete; verify against your stack before production use.",
+      "cleaned": "Teacher view (mistral:latest) for: Design a production-ready software engineering architecture with trade-offs.\n\nBreak 'Design a production-ready software engineering architecture with trade-offs.' into steps: understand → design → implement → validate → harden.\n\nKeep answers concrete; verify against your stack before production use.",
+      "verification": {
+        "ok": true,
+        "issues": []
+      }
+    }
+  ],
+  "ok_count": 3,
+  "live_count": 0,
+  "mock_count": 3,
+  "stage": "cleaned_verified"
+}

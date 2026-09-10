@@ -1,0 +1,27 @@
+{
+  "run_id": "define_slos_queues_and_rollback_strategy_for_a_s_72f336f2",
+  "task": "Define SLOs, queues, and rollback strategy for a software engineering platform.",
+  "responses": [
+    {
+      "provider": "qwen3:14b",
+      "model": "qwen3:14b-mock",
+      "source": "mock",
+      "text": "Teacher view (qwen3:14b) for: Define SLOs, queues, and rollback strategy for a software engineering platform.\n\nBreak 'Define SLOs, queues, and rollback strategy for a software engineering platform.' into steps: understand → design → implement → validate → harden.\n\nKeep answers concrete; verify against your stack before production use.",
+      "error": "provider_not_ready:Unknown provider: qwen3:14b"
+    },
+    {
+      "provider": "deepseek-r1:14b",
+      "model": "deepseek-r1:14b-mock",
+      "source": "mock",
+      "text": "Teacher view (deepseek-r1:14b) for: Define SLOs, queues, and rollback strategy for a software engineering platform.\n\nBreak 'Define SLOs, queues, and rollback strategy for a software engineering platform.' into steps: understand → design → implement → validate → harden.\n\nKeep answers concrete; verify against your stack before production use.",
+      "error": "provider_not_ready:Unknown provider: deepseek-r1:14b"
+    },
+    {
+      "provider": "mistral:latest",
+      "model": "mistral:latest-mock",
+      "source": "mock",
+      "text": "Teacher view (mistral:latest) for: Define SLOs, queues, and rollback strategy for a software engineering platform.\n\nBreak 'Define SLOs, queues, and rollback strategy for a software engineering platform.' into steps: understand → design → implement → validate → harden.\n\nKeep answers concrete; verify against your stack before production use.",
+      "error": "provider_not_ready:Unknown provider: mistral:latest"
+    }
+  ]
+}

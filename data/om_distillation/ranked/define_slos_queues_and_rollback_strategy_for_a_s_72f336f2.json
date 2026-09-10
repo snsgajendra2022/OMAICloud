@@ -1,0 +1,30 @@
+{
+  "run_id": "define_slos_queues_and_rollback_strategy_for_a_s_72f336f2",
+  "task": "Define SLOs, queues, and rollback strategy for a software engineering platform.",
+  "sft": {
+    "instruction": "Define SLOs, queues, and rollback strategy for a software engineering platform.",
+    "input": "",
+    "output": "OM consensus themes:\n- queue\n\nTeacher view (qwen3:14b) for: Define SLOs, queues, and rollback strategy for a software engineering platform.\n\nBreak 'Define SLOs, queues, and rollback strategy for a software engineering platform.' into steps: understand → design → implement → validate → harden.\n\nKeep answers concrete; verify against your stack before production use.\n\n\n(OM distilled answer — synthesized from ranked teacher outputs; verify against your environment before production use.)",
+    "prompt": "Define SLOs, queues, and rollback strategy for a software engineering platform.",
+    "response": "OM consensus themes:\n- queue\n\nTeacher view (qwen3:14b) for: Define SLOs, queues, and rollback strategy for a software engineering platform.\n\nBreak 'Define SLOs, queues, and rollback strategy for a software engineering platform.' into steps: understand → design → implement → validate → harden.\n\nKeep answers concrete; verify against your stack before production use.\n\n\n(OM distilled answer — synthesized from ranked teacher outputs; verify against your environment before production use.)",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Define SLOs, queues, and rollback strategy for a software engineering platform."
+      },
+      {
+        "role": "assistant",
+        "content": "OM consensus themes:\n- queue\n\nTeacher view (qwen3:14b) for: Define SLOs, queues, and rollback strategy for a software engineering platform.\n\nBreak 'Define SLOs, queues, and rollback strategy for a software engineering platform.' into steps: understand → design → implement → validate → harden.\n\nKeep answers concrete; verify against your stack before production use.\n\n\n(OM distilled answer — synthesized from ranked teacher outputs; verify against your environment before production use.)"
+      }
+    ],
+    "meta": {
+      "run_id": "define_slos_queues_and_rollback_strategy_for_a_s_72f336f2",
+      "teacher": "qwen3:14b",
+      "score": 0.8,
+      "source": "step94_distillation"
+    }
+  },
+  "dpo": null,
+  "best_provider": "qwen3:14b",
+  "best_score": 0.8
+}

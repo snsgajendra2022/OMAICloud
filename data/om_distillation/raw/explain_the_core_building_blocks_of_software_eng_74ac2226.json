@@ -1,0 +1,27 @@
+{
+  "run_id": "explain_the_core_building_blocks_of_software_eng_74ac2226",
+  "task": "Explain the core building blocks of software engineering.",
+  "responses": [
+    {
+      "provider": "qwen3:14b",
+      "model": "qwen3:14b-mock",
+      "source": "mock",
+      "text": "Teacher view (qwen3:14b) for: Explain the core building blocks of software engineering.\n\nBreak 'Explain the core building blocks of software engineering.' into steps: understand → design → implement → validate → harden.\n\nKeep answers concrete; verify against your stack before production use.",
+      "error": "provider_not_ready:Unknown provider: qwen3:14b"
+    },
+    {
+      "provider": "deepseek-r1:14b",
+      "model": "deepseek-r1:14b-mock",
+      "source": "mock",
+      "text": "Teacher view (deepseek-r1:14b) for: Explain the core building blocks of software engineering.\n\nBreak 'Explain the core building blocks of software engineering.' into steps: understand → design → implement → validate → harden.\n\nKeep answers concrete; verify against your stack before production use.",
+      "error": "provider_not_ready:Unknown provider: deepseek-r1:14b"
+    },
+    {
+      "provider": "mistral:latest",
+      "model": "mistral:latest-mock",
+      "source": "mock",
+      "text": "Teacher view (mistral:latest) for: Explain the core building blocks of software engineering.\n\nBreak 'Explain the core building blocks of software engineering.' into steps: understand → design → implement → validate → harden.\n\nKeep answers concrete; verify against your stack before production use.",
+      "error": "provider_not_ready:Unknown provider: mistral:latest"
+    }
+  ]
+}

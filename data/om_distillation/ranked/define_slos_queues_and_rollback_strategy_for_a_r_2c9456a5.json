@@ -1,0 +1,30 @@
+{
+  "run_id": "define_slos_queues_and_rollback_strategy_for_a_r_2c9456a5",
+  "task": "Define SLOs, queues, and rollback strategy for a React architecture platform.",
+  "sft": {
+    "instruction": "Define SLOs, queues, and rollback strategy for a React architecture platform.",
+    "input": "",
+    "output": "OM consensus themes:\n- queue\n- architecture\n- component\n- hooks\n- state\n- react\n\nTeacher view (qwen3:14b) for: Define SLOs, queues, and rollback strategy for a React architecture platform.\n\nStep-by-step: 1) define component boundaries 2) lift state only when needed 3) extract hooks for reusable logic 4) add tests for critical flows 5) profile and code-split routes.\nTrade-off: more abstraction early slows delivery.\n\nKeep answers concrete; verify against your stack before production use.\n\n\n(OM distilled answer — synthesized from ranked teacher outputs; verify against your environment before production use.)",
+    "prompt": "Define SLOs, queues, and rollback strategy for a React architecture platform.",
+    "response": "OM consensus themes:\n- queue\n- architecture\n- component\n- hooks\n- state\n- react\n\nTeacher view (qwen3:14b) for: Define SLOs, queues, and rollback strategy for a React architecture platform.\n\nStep-by-step: 1) define component boundaries 2) lift state only when needed 3) extract hooks for reusable logic 4) add tests for critical flows 5) profile and code-split routes.\nTrade-off: more abstraction early slows delivery.\n\nKeep answers concrete; verify against your stack before production use.\n\n\n(OM distilled answer — synthesized from ranked teacher outputs; verify against your environment before production use.)",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Define SLOs, queues, and rollback strategy for a React architecture platform."
+      },
+      {
+        "role": "assistant",
+        "content": "OM consensus themes:\n- queue\n- architecture\n- component\n- hooks\n- state\n- react\n\nTeacher view (qwen3:14b) for: Define SLOs, queues, and rollback strategy for a React architecture platform.\n\nStep-by-step: 1) define component boundaries 2) lift state only when needed 3) extract hooks for reusable logic 4) add tests for critical flows 5) profile and code-split routes.\nTrade-off: more abstraction early slows delivery.\n\nKeep answers concrete; verify against your stack before production use.\n\n\n(OM distilled answer — synthesized from ranked teacher outputs; verify against your environment before production use.)"
+      }
+    ],
+    "meta": {
+      "run_id": "define_slos_queues_and_rollback_strategy_for_a_r_2c9456a5",
+      "teacher": "qwen3:14b",
+      "score": 0.8,
+      "source": "step94_distillation"
+    }
+  },
+  "dpo": null,
+  "best_provider": "qwen3:14b",
+  "best_score": 0.8
+}

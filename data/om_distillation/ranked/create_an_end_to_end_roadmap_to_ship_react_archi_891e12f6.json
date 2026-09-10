@@ -1,0 +1,30 @@
+{
+  "run_id": "create_an_end_to_end_roadmap_to_ship_react_archi_891e12f6",
+  "task": "Create an end-to-end roadmap to ship React architecture across teams.",
+  "sft": {
+    "instruction": "Create an end-to-end roadmap to ship React architecture across teams.",
+    "input": "",
+    "output": "OM consensus themes:\n- architecture\n- component\n- hooks\n- state\n- react\n\nTeacher view (qwen3:14b) for: Create an end-to-end roadmap to ship React architecture across teams.\n\nStep-by-step: 1) define component boundaries 2) lift state only when needed 3) extract hooks for reusable logic 4) add tests for critical flows 5) profile and code-split routes.\nTrade-off: more abstraction early slows delivery.\n\nKeep answers concrete; verify against your stack before production use.\n\n\n(OM distilled answer — synthesized from ranked teacher outputs; verify against your environment before production use.)",
+    "prompt": "Create an end-to-end roadmap to ship React architecture across teams.",
+    "response": "OM consensus themes:\n- architecture\n- component\n- hooks\n- state\n- react\n\nTeacher view (qwen3:14b) for: Create an end-to-end roadmap to ship React architecture across teams.\n\nStep-by-step: 1) define component boundaries 2) lift state only when needed 3) extract hooks for reusable logic 4) add tests for critical flows 5) profile and code-split routes.\nTrade-off: more abstraction early slows delivery.\n\nKeep answers concrete; verify against your stack before production use.\n\n\n(OM distilled answer — synthesized from ranked teacher outputs; verify against your environment before production use.)",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Create an end-to-end roadmap to ship React architecture across teams."
+      },
+      {
+        "role": "assistant",
+        "content": "OM consensus themes:\n- architecture\n- component\n- hooks\n- state\n- react\n\nTeacher view (qwen3:14b) for: Create an end-to-end roadmap to ship React architecture across teams.\n\nStep-by-step: 1) define component boundaries 2) lift state only when needed 3) extract hooks for reusable logic 4) add tests for critical flows 5) profile and code-split routes.\nTrade-off: more abstraction early slows delivery.\n\nKeep answers concrete; verify against your stack before production use.\n\n\n(OM distilled answer — synthesized from ranked teacher outputs; verify against your environment before production use.)"
+      }
+    ],
+    "meta": {
+      "run_id": "create_an_end_to_end_roadmap_to_ship_react_archi_891e12f6",
+      "teacher": "qwen3:14b",
+      "score": 0.8,
+      "source": "step94_distillation"
+    }
+  },
+  "dpo": null,
+  "best_provider": "qwen3:14b",
+  "best_score": 0.8
+}

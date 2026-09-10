@@ -1,0 +1,30 @@
+{
+  "run_id": "how_would_you_harden_react_architecture_for_secu_74ca25a0",
+  "task": "How would you harden React architecture for security and compliance?",
+  "sft": {
+    "instruction": "How would you harden React architecture for security and compliance?",
+    "input": "",
+    "output": "OM consensus themes:\n- security\n- architecture\n- component\n- hooks\n- state\n- react\n\nTeacher view (qwen3:14b) for: How would you harden React architecture for security and compliance?\n\nStep-by-step: 1) define component boundaries 2) lift state only when needed 3) extract hooks for reusable logic 4) add tests for critical flows 5) profile and code-split routes.\nTrade-off: more abstraction early slows delivery.\n\nKeep answers concrete; verify against your stack before production use.\n\n\n(OM distilled answer — synthesized from ranked teacher outputs; verify against your environment before production use.)",
+    "prompt": "How would you harden React architecture for security and compliance?",
+    "response": "OM consensus themes:\n- security\n- architecture\n- component\n- hooks\n- state\n- react\n\nTeacher view (qwen3:14b) for: How would you harden React architecture for security and compliance?\n\nStep-by-step: 1) define component boundaries 2) lift state only when needed 3) extract hooks for reusable logic 4) add tests for critical flows 5) profile and code-split routes.\nTrade-off: more abstraction early slows delivery.\n\nKeep answers concrete; verify against your stack before production use.\n\n\n(OM distilled answer — synthesized from ranked teacher outputs; verify against your environment before production use.)",
+    "messages": [
+      {
+        "role": "user",
+        "content": "How would you harden React architecture for security and compliance?"
+      },
+      {
+        "role": "assistant",
+        "content": "OM consensus themes:\n- security\n- architecture\n- component\n- hooks\n- state\n- react\n\nTeacher view (qwen3:14b) for: How would you harden React architecture for security and compliance?\n\nStep-by-step: 1) define component boundaries 2) lift state only when needed 3) extract hooks for reusable logic 4) add tests for critical flows 5) profile and code-split routes.\nTrade-off: more abstraction early slows delivery.\n\nKeep answers concrete; verify against your stack before production use.\n\n\n(OM distilled answer — synthesized from ranked teacher outputs; verify against your environment before production use.)"
+      }
+    ],
+    "meta": {
+      "run_id": "how_would_you_harden_react_architecture_for_secu_74ca25a0",
+      "teacher": "qwen3:14b",
+      "score": 0.8,
+      "source": "step94_distillation"
+    }
+  },
+  "dpo": null,
+  "best_provider": "qwen3:14b",
+  "best_score": 0.8
+}

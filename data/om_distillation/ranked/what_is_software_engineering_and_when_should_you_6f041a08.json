@@ -1,0 +1,30 @@
+{
+  "run_id": "what_is_software_engineering_and_when_should_you_6f041a08",
+  "task": "What is software engineering and when should you use it?",
+  "sft": {
+    "instruction": "What is software engineering and when should you use it?",
+    "input": "",
+    "output": "Teacher view (qwen3:14b) for: What is software engineering and when should you use it?\n\nBreak 'What is software engineering and when should you use it?' into steps: understand → design → implement → validate → harden.\n\nKeep answers concrete; verify against your stack before production use.\n\n\n(OM distilled answer — synthesized from ranked teacher outputs; verify against your environment before production use.)",
+    "prompt": "What is software engineering and when should you use it?",
+    "response": "Teacher view (qwen3:14b) for: What is software engineering and when should you use it?\n\nBreak 'What is software engineering and when should you use it?' into steps: understand → design → implement → validate → harden.\n\nKeep answers concrete; verify against your stack before production use.\n\n\n(OM distilled answer — synthesized from ranked teacher outputs; verify against your environment before production use.)",
+    "messages": [
+      {
+        "role": "user",
+        "content": "What is software engineering and when should you use it?"
+      },
+      {
+        "role": "assistant",
+        "content": "Teacher view (qwen3:14b) for: What is software engineering and when should you use it?\n\nBreak 'What is software engineering and when should you use it?' into steps: understand → design → implement → validate → harden.\n\nKeep answers concrete; verify against your stack before production use.\n\n\n(OM distilled answer — synthesized from ranked teacher outputs; verify against your environment before production use.)"
+      }
+    ],
+    "meta": {
+      "run_id": "what_is_software_engineering_and_when_should_you_6f041a08",
+      "teacher": "qwen3:14b",
+      "score": 0.65,
+      "source": "step94_distillation"
+    }
+  },
+  "dpo": null,
+  "best_provider": "qwen3:14b",
+  "best_score": 0.65
+}

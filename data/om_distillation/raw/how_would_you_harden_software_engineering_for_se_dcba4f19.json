@@ -1,0 +1,27 @@
+{
+  "run_id": "how_would_you_harden_software_engineering_for_se_dcba4f19",
+  "task": "How would you harden software engineering for security and compliance?",
+  "responses": [
+    {
+      "provider": "qwen3:14b",
+      "model": "qwen3:14b-mock",
+      "source": "mock",
+      "text": "Teacher view (qwen3:14b) for: How would you harden software engineering for security and compliance?\n\nBreak 'How would you harden software engineering for security and compliance?' into steps: understand → design → implement → validate → harden.\n\nKeep answers concrete; verify against your stack before production use.",
+      "error": "provider_not_ready:Unknown provider: qwen3:14b"
+    },
+    {
+      "provider": "deepseek-r1:14b",
+      "model": "deepseek-r1:14b-mock",
+      "source": "mock",
+      "text": "Teacher view (deepseek-r1:14b) for: How would you harden software engineering for security and compliance?\n\nBreak 'How would you harden software engineering for security and compliance?' into steps: understand → design → implement → validate → harden.\n\nKeep answers concrete; verify against your stack before production use.",
+      "error": "provider_not_ready:Unknown provider: deepseek-r1:14b"
+    },
+    {
+      "provider": "mistral:latest",
+      "model": "mistral:latest-mock",
+      "source": "mock",
+      "text": "Teacher view (mistral:latest) for: How would you harden software engineering for security and compliance?\n\nBreak 'How would you harden software engineering for security and compliance?' into steps: understand → design → implement → validate → harden.\n\nKeep answers concrete; verify against your stack before production use.",
+      "error": "provider_not_ready:Unknown provider: mistral:latest"
+    }
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "run_id": "write_a_step_by_step_migration_plan_for_introduc_ec9fa54e",
+  "task": "Write a step-by-step migration plan for introducing software engineering.",
+  "sft": {
+    "instruction": "Write a step-by-step migration plan for introducing software engineering.",
+    "input": "",
+    "output": "Teacher view (qwen3:14b) for: Write a step-by-step migration plan for introducing software engineering.\n\nBreak 'Write a step-by-step migration plan for introducing software engineering.' into steps: understand → design → implement → validate → harden.\n\nKeep answers concrete; verify against your stack before production use.\n\n\n(OM distilled answer — synthesized from ranked teacher outputs; verify against your environment before production use.)",
+    "prompt": "Write a step-by-step migration plan for introducing software engineering.",
+    "response": "Teacher view (qwen3:14b) for: Write a step-by-step migration plan for introducing software engineering.\n\nBreak 'Write a step-by-step migration plan for introducing software engineering.' into steps: understand → design → implement → validate → harden.\n\nKeep answers concrete; verify against your stack before production use.\n\n\n(OM distilled answer — synthesized from ranked teacher outputs; verify against your environment before production use.)",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Write a step-by-step migration plan for introducing software engineering."
+      },
+      {
+        "role": "assistant",
+        "content": "Teacher view (qwen3:14b) for: Write a step-by-step migration plan for introducing software engineering.\n\nBreak 'Write a step-by-step migration plan for introducing software engineering.' into steps: understand → design → implement → validate → harden.\n\nKeep answers concrete; verify against your stack before production use.\n\n\n(OM distilled answer — synthesized from ranked teacher outputs; verify against your environment before production use.)"
+      }
+    ],
+    "meta": {
+      "run_id": "write_a_step_by_step_migration_plan_for_introduc_ec9fa54e",
+      "teacher": "qwen3:14b",
+      "score": 0.65,
+      "source": "step94_distillation"
+    }
+  },
+  "dpo": null,
+  "best_provider": "qwen3:14b",
+  "best_score": 0.65
+}

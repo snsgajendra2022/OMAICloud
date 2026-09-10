@@ -1,0 +1,27 @@
+{
+  "run_id": "create_an_end_to_end_roadmap_to_ship_react_archi_891e12f6",
+  "task": "Create an end-to-end roadmap to ship React architecture across teams.",
+  "responses": [
+    {
+      "provider": "qwen3:14b",
+      "model": "qwen3:14b-mock",
+      "source": "mock",
+      "text": "Teacher view (qwen3:14b) for: Create an end-to-end roadmap to ship React architecture across teams.\n\nStep-by-step: 1) define component boundaries 2) lift state only when needed 3) extract hooks for reusable logic 4) add tests for critical flows 5) profile and code-split routes.\nTrade-off: more abstraction early slows delivery.\n\nKeep answers concrete; verify against your stack before production use.",
+      "error": "provider_not_ready:Unknown provider: qwen3:14b"
+    },
+    {
+      "provider": "deepseek-r1:14b",
+      "model": "deepseek-r1:14b-mock",
+      "source": "mock",
+      "text": "Teacher view (deepseek-r1:14b) for: Create an end-to-end roadmap to ship React architecture across teams.\n\nStep-by-step: 1) define component boundaries 2) lift state only when needed 3) extract hooks for reusable logic 4) add tests for critical flows 5) profile and code-split routes.\nTrade-off: more abstraction early slows delivery.\n\nKeep answers concrete; verify against your stack before production use.",
+      "error": "provider_not_ready:Unknown provider: deepseek-r1:14b"
+    },
+    {
+      "provider": "mistral:latest",
+      "model": "mistral:latest-mock",
+      "source": "mock",
+      "text": "Teacher view (mistral:latest) for: Create an end-to-end roadmap to ship React architecture across teams.\n\nStep-by-step: 1) define component boundaries 2) lift state only when needed 3) extract hooks for reusable logic 4) add tests for critical flows 5) profile and code-split routes.\nTrade-off: more abstraction early slows delivery.\n\nKeep answers concrete; verify against your stack before production use.",
+      "error": "provider_not_ready:Unknown provider: mistral:latest"
+    }
+  ]
+}

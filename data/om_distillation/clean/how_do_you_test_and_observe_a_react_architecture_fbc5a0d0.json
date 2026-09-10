@@ -1,0 +1,60 @@
+{
+  "run_id": "how_do_you_test_and_observe_a_react_architecture_fbc5a0d0",
+  "task": "How do you test and observe a React architecture system?",
+  "teachers": [
+    "qwen3:14b",
+    "deepseek-r1:14b",
+    "mistral:latest"
+  ],
+  "responses": [
+    {
+      "provider": "qwen3:14b",
+      "ok": true,
+      "text": "Teacher view (qwen3:14b) for: How do you test and observe a React architecture system?\n\nStep-by-step: 1) define component boundaries 2) lift state only when needed 3) extract hooks for reusable logic 4) add tests for critical flows 5) profile and code-split routes.\nTrade-off: more abstraction early slows delivery.\n\nKeep answers concrete; verify against your stack before production use.",
+      "model": "qwen3:14b-mock",
+      "vendor": "mock",
+      "error": "provider_not_ready:Unknown provider: qwen3:14b",
+      "source": "mock",
+      "raw": "Teacher view (qwen3:14b) for: How do you test and observe a React architecture system?\n\nStep-by-step: 1) define component boundaries 2) lift state only when needed 3) extract hooks for reusable logic 4) add tests for critical flows 5) profile and code-split routes.\nTrade-off: more abstraction early slows delivery.\n\nKeep answers concrete; verify against your stack before production use.",
+      "cleaned": "Teacher view (qwen3:14b) for: How do you test and observe a React architecture system?\n\nStep-by-step: 1) define component boundaries 2) lift state only when needed 3) extract hooks for reusable logic 4) add tests for critical flows 5) profile and code-split routes.\nTrade-off: more abstraction early slows delivery.\n\nKeep answers concrete; verify against your stack before production use.",
+      "verification": {
+        "ok": true,
+        "issues": []
+      }
+    },
+    {
+      "provider": "deepseek-r1:14b",
+      "ok": true,
+      "text": "Teacher view (deepseek-r1:14b) for: How do you test and observe a React architecture system?\n\nStep-by-step: 1) define component boundaries 2) lift state only when needed 3) extract hooks for reusable logic 4) add tests for critical flows 5) profile and code-split routes.\nTrade-off: more abstraction early slows delivery.\n\nKeep answers concrete; verify against your stack before production use.",
+      "model": "deepseek-r1:14b-mock",
+      "vendor": "mock",
+      "error": "provider_not_ready:Unknown provider: deepseek-r1:14b",
+      "source": "mock",
+      "raw": "Teacher view (deepseek-r1:14b) for: How do you test and observe a React architecture system?\n\nStep-by-step: 1) define component boundaries 2) lift state only when needed 3) extract hooks for reusable logic 4) add tests for critical flows 5) profile and code-split routes.\nTrade-off: more abstraction early slows delivery.\n\nKeep answers concrete; verify against your stack before production use.",
+      "cleaned": "Teacher view (deepseek-r1:14b) for: How do you test and observe a React architecture system?\n\nStep-by-step: 1) define component boundaries 2) lift state only when needed 3) extract hooks for reusable logic 4) add tests for critical flows 5) profile and code-split routes.\nTrade-off: more abstraction early slows delivery.\n\nKeep answers concrete; verify against your stack before production use.",
+      "verification": {
+        "ok": true,
+        "issues": []
+      }
+    },
+    {
+      "provider": "mistral:latest",
+      "ok": true,
+      "text": "Teacher view (mistral:latest) for: How do you test and observe a React architecture system?\n\nStep-by-step: 1) define component boundaries 2) lift state only when needed 3) extract hooks for reusable logic 4) add tests for critical flows 5) profile and code-split routes.\nTrade-off: more abstraction early slows delivery.\n\nKeep answers concrete; verify against your stack before production use.",
+      "model": "mistral:latest-mock",
+      "vendor": "mock",
+      "error": "provider_not_ready:Unknown provider: mistral:latest",
+      "source": "mock",
+      "raw": "Teacher view (mistral:latest) for: How do you test and observe a React architecture system?\n\nStep-by-step: 1) define component boundaries 2) lift state only when needed 3) extract hooks for reusable logic 4) add tests for critical flows 5) profile and code-split routes.\nTrade-off: more abstraction early slows delivery.\n\nKeep answers concrete; verify against your stack before production use.",
+      "cleaned": "Teacher view (mistral:latest) for: How do you test and observe a React architecture system?\n\nStep-by-step: 1) define component boundaries 2) lift state only when needed 3) extract hooks for reusable logic 4) add tests for critical flows 5) profile and code-split routes.\nTrade-off: more abstraction early slows delivery.\n\nKeep answers concrete; verify against your stack before production use.",
+      "verification": {
+        "ok": true,
+        "issues": []
+      }
+    }
+  ],
+  "ok_count": 3,
+  "live_count": 0,
+  "mock_count": 3,
+  "stage": "cleaned_verified"
+}

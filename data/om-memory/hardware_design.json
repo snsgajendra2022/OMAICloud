@@ -7410,5 +7410,753 @@
         "simulation"
       ]
     }
+  },
+  {
+    "requirement": {
+      "goal": "how are you",
+      "power": "unknown",
+      "performance": "unknown",
+      "constraints": []
+    },
+    "architecture": {
+      "architecture": {
+        "processor": "selected later",
+        "memory": "selected later",
+        "communication": "selected later"
+      },
+      "requirement": {
+        "goal": "how are you",
+        "power": "unknown",
+        "performance": "unknown",
+        "constraints": []
+      }
+    },
+    "components": {
+      "components": [
+        {
+          "name": "processor",
+          "status": "candidate"
+        },
+        {
+          "name": "sensor",
+          "status": "candidate"
+        }
+      ]
+    },
+    "circuit": {
+      "circuit": "generated",
+      "components": {
+        "components": [
+          {
+            "name": "processor",
+            "status": "candidate"
+          },
+          {
+            "name": "sensor",
+            "status": "candidate"
+          }
+        ]
+      }
+    },
+    "simulation": {
+      "simulation": "completed",
+      "performance": "estimated",
+      "errors": []
+    },
+    "optimization": {
+      "optimized": true,
+      "improvements": [
+        "reduce power",
+        "increase efficiency"
+      ]
+    },
+    "validation": {
+      "valid": true,
+      "checks": [
+        "architecture",
+        "components",
+        "simulation"
+      ]
+    }
+  },
+  {
+    "requirement": {
+      "goal": "how are you",
+      "power": "unknown",
+      "performance": "unknown",
+      "constraints": []
+    },
+    "architecture": {
+      "architecture": {
+        "processor": "selected later",
+        "memory": "selected later",
+        "communication": "selected later"
+      },
+      "requirement": {
+        "goal": "how are you",
+        "power": "unknown",
+        "performance": "unknown",
+        "constraints": []
+      }
+    },
+    "components": {
+      "components": [
+        {
+          "name": "processor",
+          "status": "candidate"
+        },
+        {
+          "name": "sensor",
+          "status": "candidate"
+        }
+      ]
+    },
+    "circuit": {
+      "circuit": "generated",
+      "components": {
+        "components": [
+          {
+            "name": "processor",
+            "status": "candidate"
+          },
+          {
+            "name": "sensor",
+            "status": "candidate"
+          }
+        ]
+      }
+    },
+    "simulation": {
+      "simulation": "completed",
+      "performance": "estimated",
+      "errors": []
+    },
+    "optimization": {
+      "optimized": true,
+      "improvements": [
+        "reduce power",
+        "increase efficiency"
+      ]
+    },
+    "validation": {
+      "valid": true,
+      "checks": [
+        "architecture",
+        "components",
+        "simulation"
+      ]
+    }
+  },
+  {
+    "requirement": {
+      "goal": "how to feel today",
+      "power": "unknown",
+      "performance": "unknown",
+      "constraints": []
+    },
+    "architecture": {
+      "architecture": {
+        "processor": "selected later",
+        "memory": "selected later",
+        "communication": "selected later"
+      },
+      "requirement": {
+        "goal": "how to feel today",
+        "power": "unknown",
+        "performance": "unknown",
+        "constraints": []
+      }
+    },
+    "components": {
+      "components": [
+        {
+          "name": "processor",
+          "status": "candidate"
+        },
+        {
+          "name": "sensor",
+          "status": "candidate"
+        }
+      ]
+    },
+    "circuit": {
+      "circuit": "generated",
+      "components": {
+        "components": [
+          {
+            "name": "processor",
+            "status": "candidate"
+          },
+          {
+            "name": "sensor",
+            "status": "candidate"
+          }
+        ]
+      }
+    },
+    "simulation": {
+      "simulation": "completed",
+      "performance": "estimated",
+      "errors": []
+    },
+    "optimization": {
+      "optimized": true,
+      "improvements": [
+        "reduce power",
+        "increase efficiency"
+      ]
+    },
+    "validation": {
+      "valid": true,
+      "checks": [
+        "architecture",
+        "components",
+        "simulation"
+      ]
+    }
+  },
+  {
+    "requirement": {
+      "goal": "what is react",
+      "power": "unknown",
+      "performance": "unknown",
+      "constraints": []
+    },
+    "architecture": {
+      "architecture": {
+        "processor": "selected later",
+        "memory": "selected later",
+        "communication": "selected later"
+      },
+      "requirement": {
+        "goal": "what is react",
+        "power": "unknown",
+        "performance": "unknown",
+        "constraints": []
+      }
+    },
+    "components": {
+      "components": [
+        {
+          "name": "processor",
+          "status": "candidate"
+        },
+        {
+          "name": "sensor",
+          "status": "candidate"
+        }
+      ]
+    },
+    "circuit": {
+      "circuit": "generated",
+      "components": {
+        "components": [
+          {
+            "name": "processor",
+            "status": "candidate"
+          },
+          {
+            "name": "sensor",
+            "status": "candidate"
+          }
+        ]
+      }
+    },
+    "simulation": {
+      "simulation": "completed",
+      "performance": "estimated",
+      "errors": []
+    },
+    "optimization": {
+      "optimized": true,
+      "improvements": [
+        "reduce power",
+        "increase efficiency"
+      ]
+    },
+    "validation": {
+      "valid": true,
+      "checks": [
+        "architecture",
+        "components",
+        "simulation"
+      ]
+    }
+  },
+  {
+    "requirement": {
+      "goal": "do you work on this React is a JavaScript library for building user interfaces. You build UI from reusable components. When state changes, React updates only the parts that need to change.",
+      "power": "unknown",
+      "performance": "unknown",
+      "constraints": []
+    },
+    "architecture": {
+      "architecture": {
+        "processor": "selected later",
+        "memory": "selected later",
+        "communication": "selected later"
+      },
+      "requirement": {
+        "goal": "do you work on this React is a JavaScript library for building user interfaces. You build UI from reusable components. When state changes, React updates only the parts that need to change.",
+        "power": "unknown",
+        "performance": "unknown",
+        "constraints": []
+      }
+    },
+    "components": {
+      "components": [
+        {
+          "name": "processor",
+          "status": "candidate"
+        },
+        {
+          "name": "sensor",
+          "status": "candidate"
+        }
+      ]
+    },
+    "circuit": {
+      "circuit": "generated",
+      "components": {
+        "components": [
+          {
+            "name": "processor",
+            "status": "candidate"
+          },
+          {
+            "name": "sensor",
+            "status": "candidate"
+          }
+        ]
+      }
+    },
+    "simulation": {
+      "simulation": "completed",
+      "performance": "estimated",
+      "errors": []
+    },
+    "optimization": {
+      "optimized": true,
+      "improvements": [
+        "reduce power",
+        "increase efficiency"
+      ]
+    },
+    "validation": {
+      "valid": true,
+      "checks": [
+        "architecture",
+        "components",
+        "simulation"
+      ]
+    }
+  },
+  {
+    "requirement": {
+      "goal": "what is google open google web",
+      "power": "unknown",
+      "performance": "unknown",
+      "constraints": []
+    },
+    "architecture": {
+      "architecture": {
+        "processor": "selected later",
+        "memory": "selected later",
+        "communication": "selected later"
+      },
+      "requirement": {
+        "goal": "what is google open google web",
+        "power": "unknown",
+        "performance": "unknown",
+        "constraints": []
+      }
+    },
+    "components": {
+      "components": [
+        {
+          "name": "processor",
+          "status": "candidate"
+        },
+        {
+          "name": "sensor",
+          "status": "candidate"
+        }
+      ]
+    },
+    "circuit": {
+      "circuit": "generated",
+      "components": {
+        "components": [
+          {
+            "name": "processor",
+            "status": "candidate"
+          },
+          {
+            "name": "sensor",
+            "status": "candidate"
+          }
+        ]
+      }
+    },
+    "simulation": {
+      "simulation": "completed",
+      "performance": "estimated",
+      "errors": []
+    },
+    "optimization": {
+      "optimized": true,
+      "improvements": [
+        "reduce power",
+        "increase efficiency"
+      ]
+    },
+    "validation": {
+      "valid": true,
+      "checks": [
+        "architecture",
+        "components",
+        "simulation"
+      ]
+    }
+  },
+  {
+    "requirement": {
+      "goal": "what is google open google web",
+      "power": "unknown",
+      "performance": "unknown",
+      "constraints": []
+    },
+    "architecture": {
+      "architecture": {
+        "processor": "selected later",
+        "memory": "selected later",
+        "communication": "selected later"
+      },
+      "requirement": {
+        "goal": "what is google open google web",
+        "power": "unknown",
+        "performance": "unknown",
+        "constraints": []
+      }
+    },
+    "components": {
+      "components": [
+        {
+          "name": "processor",
+          "status": "candidate"
+        },
+        {
+          "name": "sensor",
+          "status": "candidate"
+        }
+      ]
+    },
+    "circuit": {
+      "circuit": "generated",
+      "components": {
+        "components": [
+          {
+            "name": "processor",
+            "status": "candidate"
+          },
+          {
+            "name": "sensor",
+            "status": "candidate"
+          }
+        ]
+      }
+    },
+    "simulation": {
+      "simulation": "completed",
+      "performance": "estimated",
+      "errors": []
+    },
+    "optimization": {
+      "optimized": true,
+      "improvements": [
+        "reduce power",
+        "increase efficiency"
+      ]
+    },
+    "validation": {
+      "valid": true,
+      "checks": [
+        "architecture",
+        "components",
+        "simulation"
+      ]
+    }
+  },
+  {
+    "requirement": {
+      "goal": "what is google open google web",
+      "power": "unknown",
+      "performance": "unknown",
+      "constraints": []
+    },
+    "architecture": {
+      "architecture": {
+        "processor": "selected later",
+        "memory": "selected later",
+        "communication": "selected later"
+      },
+      "requirement": {
+        "goal": "what is google open google web",
+        "power": "unknown",
+        "performance": "unknown",
+        "constraints": []
+      }
+    },
+    "components": {
+      "components": [
+        {
+          "name": "processor",
+          "status": "candidate"
+        },
+        {
+          "name": "sensor",
+          "status": "candidate"
+        }
+      ]
+    },
+    "circuit": {
+      "circuit": "generated",
+      "components": {
+        "components": [
+          {
+            "name": "processor",
+            "status": "candidate"
+          },
+          {
+            "name": "sensor",
+            "status": "candidate"
+          }
+        ]
+      }
+    },
+    "simulation": {
+      "simulation": "completed",
+      "performance": "estimated",
+      "errors": []
+    },
+    "optimization": {
+      "optimized": true,
+      "improvements": [
+        "reduce power",
+        "increase efficiency"
+      ]
+    },
+    "validation": {
+      "valid": true,
+      "checks": [
+        "architecture",
+        "components",
+        "simulation"
+      ]
+    }
+  },
+  {
+    "requirement": {
+      "goal": "google",
+      "power": "unknown",
+      "performance": "unknown",
+      "constraints": []
+    },
+    "architecture": {
+      "architecture": {
+        "processor": "selected later",
+        "memory": "selected later",
+        "communication": "selected later"
+      },
+      "requirement": {
+        "goal": "google",
+        "power": "unknown",
+        "performance": "unknown",
+        "constraints": []
+      }
+    },
+    "components": {
+      "components": [
+        {
+          "name": "processor",
+          "status": "candidate"
+        },
+        {
+          "name": "sensor",
+          "status": "candidate"
+        }
+      ]
+    },
+    "circuit": {
+      "circuit": "generated",
+      "components": {
+        "components": [
+          {
+            "name": "processor",
+            "status": "candidate"
+          },
+          {
+            "name": "sensor",
+            "status": "candidate"
+          }
+        ]
+      }
+    },
+    "simulation": {
+      "simulation": "completed",
+      "performance": "estimated",
+      "errors": []
+    },
+    "optimization": {
+      "optimized": true,
+      "improvements": [
+        "reduce power",
+        "increase efficiency"
+      ]
+    },
+    "validation": {
+      "valid": true,
+      "checks": [
+        "architecture",
+        "components",
+        "simulation"
+      ]
+    }
+  },
+  {
+    "requirement": {
+      "goal": "go for react web",
+      "power": "unknown",
+      "performance": "unknown",
+      "constraints": []
+    },
+    "architecture": {
+      "architecture": {
+        "processor": "selected later",
+        "memory": "selected later",
+        "communication": "selected later"
+      },
+      "requirement": {
+        "goal": "go for react web",
+        "power": "unknown",
+        "performance": "unknown",
+        "constraints": []
+      }
+    },
+    "components": {
+      "components": [
+        {
+          "name": "processor",
+          "status": "candidate"
+        },
+        {
+          "name": "sensor",
+          "status": "candidate"
+        }
+      ]
+    },
+    "circuit": {
+      "circuit": "generated",
+      "components": {
+        "components": [
+          {
+            "name": "processor",
+            "status": "candidate"
+          },
+          {
+            "name": "sensor",
+            "status": "candidate"
+          }
+        ]
+      }
+    },
+    "simulation": {
+      "simulation": "completed",
+      "performance": "estimated",
+      "errors": []
+    },
+    "optimization": {
+      "optimized": true,
+      "improvements": [
+        "reduce power",
+        "increase efficiency"
+      ]
+    },
+    "validation": {
+      "valid": true,
+      "checks": [
+        "architecture",
+        "components",
+        "simulation"
+      ]
+    }
+  },
+  {
+    "requirement": {
+      "goal": "react code craete",
+      "power": "unknown",
+      "performance": "unknown",
+      "constraints": []
+    },
+    "architecture": {
+      "architecture": {
+        "processor": "selected later",
+        "memory": "selected later",
+        "communication": "selected later"
+      },
+      "requirement": {
+        "goal": "react code craete",
+        "power": "unknown",
+        "performance": "unknown",
+        "constraints": []
+      }
+    },
+    "components": {
+      "components": [
+        {
+          "name": "processor",
+          "status": "candidate"
+        },
+        {
+          "name": "sensor",
+          "status": "candidate"
+        }
+      ]
+    },
+    "circuit": {
+      "circuit": "generated",
+      "components": {
+        "components": [
+          {
+            "name": "processor",
+            "status": "candidate"
+          },
+          {
+            "name": "sensor",
+            "status": "candidate"
+          }
+        ]
+      }
+    },
+    "simulation": {
+      "simulation": "completed",
+      "performance": "estimated",
+      "errors": []
+    },
+    "optimization": {
+      "optimized": true,
+      "improvements": [
+        "reduce power",
+        "increase efficiency"
+      ]
+    },
+    "validation": {
+      "valid": true,
+      "checks": [
+        "architecture",
+        "components",
+        "simulation"
+      ]
+    }
   }
 ]

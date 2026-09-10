@@ -1,0 +1,30 @@
+{
+  "run_id": "explain_the_core_building_blocks_of_software_eng_74ac2226",
+  "task": "Explain the core building blocks of software engineering.",
+  "sft": {
+    "instruction": "Explain the core building blocks of software engineering.",
+    "input": "",
+    "output": "Teacher view (qwen3:14b) for: Explain the core building blocks of software engineering.\n\nBreak 'Explain the core building blocks of software engineering.' into steps: understand → design → implement → validate → harden.\n\nKeep answers concrete; verify against your stack before production use.\n\n\n(OM distilled answer — synthesized from ranked teacher outputs; verify against your environment before production use.)",
+    "prompt": "Explain the core building blocks of software engineering.",
+    "response": "Teacher view (qwen3:14b) for: Explain the core building blocks of software engineering.\n\nBreak 'Explain the core building blocks of software engineering.' into steps: understand → design → implement → validate → harden.\n\nKeep answers concrete; verify against your stack before production use.\n\n\n(OM distilled answer — synthesized from ranked teacher outputs; verify against your environment before production use.)",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Explain the core building blocks of software engineering."
+      },
+      {
+        "role": "assistant",
+        "content": "Teacher view (qwen3:14b) for: Explain the core building blocks of software engineering.\n\nBreak 'Explain the core building blocks of software engineering.' into steps: understand → design → implement → validate → harden.\n\nKeep answers concrete; verify against your stack before production use.\n\n\n(OM distilled answer — synthesized from ranked teacher outputs; verify against your environment before production use.)"
+      }
+    ],
+    "meta": {
+      "run_id": "explain_the_core_building_blocks_of_software_eng_74ac2226",
+      "teacher": "qwen3:14b",
+      "score": 0.65,
+      "source": "step94_distillation"
+    }
+  },
+  "dpo": null,
+  "best_provider": "qwen3:14b",
+  "best_score": 0.65
+}
