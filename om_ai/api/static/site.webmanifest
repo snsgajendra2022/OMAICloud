@@ -1,11 +1,11 @@
 {
   "name": "OM AI",
   "short_name": "OM",
-  "description": "OM — Operating Mind AI workspace",
+  "description": "OM \u2014 Operating Mind AI workspace",
   "start_url": "/chat",
   "display": "standalone",
-  "background_color": "#0B1220",
-  "theme_color": "#1D4ED8",
+  "background_color": "#111827",
+  "theme_color": "#111827",
   "icons": [
     {
       "src": "/static/icons/icon-192.png",

@@ -1,0 +1,76 @@
+{
+  "run_id": "build_a_laravel_multi_tenant_architecture_0e63c32f",
+  "task": "Build a Laravel multi tenant architecture",
+  "teachers": [
+    "gpt",
+    "claude",
+    "gemini",
+    "qwen"
+  ],
+  "responses": [
+    {
+      "provider": "gpt",
+      "ok": true,
+      "text": "Teacher view (gpt) for: Build a Laravel multi tenant architecture\n\nFocus on clear layered design, API contracts, and operational runbooks.\nCover tenant isolation, middleware, database strategy, permissions, and queues.\n\nRecommended approach:\n1. Clarify requirements and constraints.\n2. Choose a clear architecture with isolation boundaries.\n3. Define middleware / auth / permissions.\n4. Plan data storage, queues, and observability.\n5. Ship an MVP, then harden security and scale.\n\nCommon pitfalls: weak tenant isolation, shared secrets, missing audits.",
+      "model": "gpt-mock",
+      "vendor": "mock",
+      "error": "provider_not_ready:GPT is disabled in Settings → AI",
+      "source": "mock",
+      "raw": "Teacher view (gpt) for: Build a Laravel multi tenant architecture\n\nFocus on clear layered design, API contracts, and operational runbooks.\nCover tenant isolation, middleware, database strategy, permissions, and queues.\n\nRecommended approach:\n1. Clarify requirements and constraints.\n2. Choose a clear architecture with isolation boundaries.\n3. Define middleware / auth / permissions.\n4. Plan data storage, queues, and observability.\n5. Ship an MVP, then harden security and scale.\n\nCommon pitfalls: weak tenant isolation, shared secrets, missing audits.",
+      "cleaned": "Teacher view (gpt) for: Build a Laravel multi tenant architecture\n\nFocus on clear layered design, API contracts, and operational runbooks.\nCover tenant isolation, middleware, database strategy, permissions, and queues.\n\nRecommended approach:\n1. Clarify requirements and constraints.\n2. Choose a clear architecture with isolation boundaries.\n3. Define middleware / auth / permissions.\n4. Plan data storage, queues, and observability.\n5. Ship an MVP, then harden security and scale.\n\nCommon pitfalls: weak tenant isolation, shared secrets, missing audits.",
+      "verification": {
+        "ok": true,
+        "issues": []
+      }
+    },
+    {
+      "provider": "claude",
+      "ok": true,
+      "text": "Teacher view (claude) for: Build a Laravel multi tenant architecture\n\nEmphasize safety boundaries, audit trails, and readable architecture docs.\nInclude auth, permissions, isolation, observability, and failure modes.\n\nRecommended approach:\n1. Clarify requirements and constraints.\n2. Choose a clear architecture with isolation boundaries.\n3. Define middleware / auth / permissions.\n4. Plan data storage, queues, and observability.\n5. Ship an MVP, then harden security and scale.\n\nCommon pitfalls: weak tenant isolation, shared secrets, missing audits.",
+      "model": "claude-mock",
+      "vendor": "mock",
+      "error": "provider_not_ready:Claude is disabled in Settings → AI",
+      "source": "mock",
+      "raw": "Teacher view (claude) for: Build a Laravel multi tenant architecture\n\nEmphasize safety boundaries, audit trails, and readable architecture docs.\nInclude auth, permissions, isolation, observability, and failure modes.\n\nRecommended approach:\n1. Clarify requirements and constraints.\n2. Choose a clear architecture with isolation boundaries.\n3. Define middleware / auth / permissions.\n4. Plan data storage, queues, and observability.\n5. Ship an MVP, then harden security and scale.\n\nCommon pitfalls: weak tenant isolation, shared secrets, missing audits.",
+      "cleaned": "Teacher view (claude) for: Build a Laravel multi tenant architecture\n\nEmphasize safety boundaries, audit trails, and readable architecture docs.\nInclude auth, permissions, isolation, observability, and failure modes.\n\nRecommended approach:\n1. Clarify requirements and constraints.\n2. Choose a clear architecture with isolation boundaries.\n3. Define middleware / auth / permissions.\n4. Plan data storage, queues, and observability.\n5. Ship an MVP, then harden security and scale.\n\nCommon pitfalls: weak tenant isolation, shared secrets, missing audits.",
+      "verification": {
+        "ok": true,
+        "issues": []
+      }
+    },
+    {
+      "provider": "gemini",
+      "ok": true,
+      "text": "Teacher view (gemini) for: Build a Laravel multi tenant architecture\n\nPrefer pragmatic MVP first: core paths, then scale knobs.\nCall out database sharding/tenancy, cache, network policy, and testing.\n\nRecommended approach:\n1. Clarify requirements and constraints.\n2. Choose a clear architecture with isolation boundaries.\n3. Define middleware / auth / permissions.\n4. Plan data storage, queues, and observability.\n5. Ship an MVP, then harden security and scale.\n\nCommon pitfalls: weak tenant isolation, shared secrets, missing audits.",
+      "model": "gemini-mock",
+      "vendor": "mock",
+      "error": "provider_not_ready:Gemini is disabled in Settings → AI",
+      "source": "mock",
+      "raw": "Teacher view (gemini) for: Build a Laravel multi tenant architecture\n\nPrefer pragmatic MVP first: core paths, then scale knobs.\nCall out database sharding/tenancy, cache, network policy, and testing.\n\nRecommended approach:\n1. Clarify requirements and constraints.\n2. Choose a clear architecture with isolation boundaries.\n3. Define middleware / auth / permissions.\n4. Plan data storage, queues, and observability.\n5. Ship an MVP, then harden security and scale.\n\nCommon pitfalls: weak tenant isolation, shared secrets, missing audits.",
+      "cleaned": "Teacher view (gemini) for: Build a Laravel multi tenant architecture\n\nPrefer pragmatic MVP first: core paths, then scale knobs.\nCall out database sharding/tenancy, cache, network policy, and testing.\n\nRecommended approach:\n1. Clarify requirements and constraints.\n2. Choose a clear architecture with isolation boundaries.\n3. Define middleware / auth / permissions.\n4. Plan data storage, queues, and observability.\n5. Ship an MVP, then harden security and scale.\n\nCommon pitfalls: weak tenant isolation, shared secrets, missing audits.",
+      "verification": {
+        "ok": true,
+        "issues": []
+      }
+    },
+    {
+      "provider": "qwen",
+      "ok": true,
+      "text": "Teacher view (qwen) for: Build a Laravel multi tenant architecture\n\nProvide stepwise implementation notes with trade-offs.\nMention middleware, storage, encryption, deployment, and queue handling.\n\nRecommended approach:\n1. Clarify requirements and constraints.\n2. Choose a clear architecture with isolation boundaries.\n3. Define middleware / auth / permissions.\n4. Plan data storage, queues, and observability.\n5. Ship an MVP, then harden security and scale.\n\nCommon pitfalls: weak tenant isolation, shared secrets, missing audits.",
+      "model": "qwen-mock",
+      "vendor": "mock",
+      "error": "provider_not_ready:Qwen is disabled in Settings → AI",
+      "source": "mock",
+      "raw": "Teacher view (qwen) for: Build a Laravel multi tenant architecture\n\nProvide stepwise implementation notes with trade-offs.\nMention middleware, storage, encryption, deployment, and queue handling.\n\nRecommended approach:\n1. Clarify requirements and constraints.\n2. Choose a clear architecture with isolation boundaries.\n3. Define middleware / auth / permissions.\n4. Plan data storage, queues, and observability.\n5. Ship an MVP, then harden security and scale.\n\nCommon pitfalls: weak tenant isolation, shared secrets, missing audits.",
+      "cleaned": "Teacher view (qwen) for: Build a Laravel multi tenant architecture\n\nProvide stepwise implementation notes with trade-offs.\nMention middleware, storage, encryption, deployment, and queue handling.\n\nRecommended approach:\n1. Clarify requirements and constraints.\n2. Choose a clear architecture with isolation boundaries.\n3. Define middleware / auth / permissions.\n4. Plan data storage, queues, and observability.\n5. Ship an MVP, then harden security and scale.\n\nCommon pitfalls: weak tenant isolation, shared secrets, missing audits.",
+      "verification": {
+        "ok": true,
+        "issues": []
+      }
+    }
+  ],
+  "ok_count": 4,
+  "live_count": 0,
+  "mock_count": 4,
+  "stage": "cleaned_verified"
+}

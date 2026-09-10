@@ -1,0 +1,23 @@
+{
+  "topic": "Explain React",
+  "subtopic": "",
+  "concepts": [
+    "React is a JavaScript UI library using reusable components",
+    "React helps developers build component based interfaces"
+  ],
+  "facts": [
+    "React is a JavaScript UI library using reusable components."
+  ],
+  "relationships": [],
+  "procedures": [],
+  "examples": [],
+  "code_patterns": [],
+  "warnings": [],
+  "source_teachers": [
+    "deepseek",
+    "qwen"
+  ],
+  "confidence": 0.4,
+  "created_at": "2026-09-10T09:15:23.046099",
+  "knowledge_id": "3b49c01668445cae"
+}

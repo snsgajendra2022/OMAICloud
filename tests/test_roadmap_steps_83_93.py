@@ -1,4 +1,4 @@
-"""Verify STEPs 83–93 roadmap stack is complete and wired."""
+"""Verify STEPs 83–94 roadmap stack is complete and wired."""
 from __future__ import annotations
 
 from om_ai.core.steps import OMRoadmapStack
@@ -10,7 +10,8 @@ def test_roadmap_status_complete():
     assert status["83_continuous_learning"] == "complete"
     assert status["87_research"] == "complete"
     assert status["93_model_training"] == "complete"
-    assert len(status) == 11
+    assert status["94_teacher_distillation"] == "complete"
+    assert len(status) == 12
 
 
 def test_brain_has_roadmap():

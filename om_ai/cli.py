@@ -7,6 +7,7 @@ from pathlib import Path
 
 import torch
 
+from om_ai.cli_commands.distill_commands import distill_app
 from om_ai.core.config import ModelConfig
 from om_ai.model import OMTransformer
 from om_ai.tokenizer import ByteBPETokenizer, load_tokenizer
@@ -896,6 +897,16 @@ def improve_cmd(args):
     )
 
 
+def distill_cmd(args):
+    """STEP 94 — Multi-LLM teacher distillation → SFT/DPO JSONL."""
+    from om_ai.core.distillation import TeacherManager
+
+    teachers = [t.strip() for t in str(args.teachers).split(",") if t.strip()]
+    manager = TeacherManager(teachers=teachers, allow_mock=not args.no_mock)
+    result = manager.collect_and_save(args.task, output=args.out, teachers=teachers)
+    print(json.dumps(result, indent=2, ensure_ascii=False, default=str)[:20000])
+
+
 def agent_runtime_cmd(args):
     from om_ai.agents.runtime import run_agent
 
@@ -1234,6 +1245,23 @@ def serve(args):
 
 
 def main():
+    import sys
+
+    # Distill Typer group (health/models/topic/…) — do NOT mount on FastAPI ``app``.
+    # Classic harvest stays on argparse: ``om-ai distill --task "..."``.
+    _typer_distill_cmds = frozenset(
+        {"health", "models", "topic", "harvest", "status", "export", "evaluate"}
+    )
+    if len(sys.argv) >= 2 and sys.argv[1] == "distill":
+        rest = sys.argv[2:]
+        wants_task_harvest = "--task" in rest
+        first = rest[0] if rest else ""
+        if not wants_task_harvest and (
+            not rest or first in _typer_distill_cmds or first in {"-h", "--help"}
+        ):
+            distill_app(args=rest, prog_name="om-ai distill")
+            return
+
     p = argparse.ArgumentParser(prog="om-ai", description="OM AI Operating Brain CLI")
     sp = p.add_subparsers(dest="cmd", required=True)
 
@@ -1692,6 +1720,24 @@ def main():
     imp.add_argument("--answer", required=True)
     imp.add_argument("--out", default="data/om_training/improvements")
     imp.set_defaults(func=improve_cmd)
+
+    distill = sp.add_parser(
+        "distill",
+        help="STEP 94 Multi-LLM teacher distillation (harvest → rank → SFT/DPO)",
+    )
+    distill.add_argument("--task", required=True, help="Instruction / question to harvest")
+    distill.add_argument(
+        "--teachers",
+        default="gpt,claude,gemini,qwen",
+        help="Comma-separated teacher provider ids",
+    )
+    distill.add_argument("--out", default="data/om_distillation/")
+    distill.add_argument(
+        "--no-mock",
+        action="store_true",
+        help="Require live teacher keys (do not use mock answers)",
+    )
+    distill.set_defaults(func=distill_cmd)
 
     ar = sp.add_parser("agent-runtime", help="OM Agent Runtime (route → plan → gated act)")
     ar.add_argument("--task", required=True)

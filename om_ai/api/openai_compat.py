@@ -334,7 +334,14 @@ def _run_chat(
     except Exception as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
     model_name = used.model or info.model or _default_model_id
-    if used.backend == "om_native" and not model:
+    # Always echo the user's selected OM-Lx when provided.
+    if model:
+        from om_ai.runtime.evolution_matrix import resolve_model_id, level_for_model
+
+        resolved = resolve_model_id(model)
+        if level_for_model(resolved) is not None:
+            model_name = resolved
+    elif used.backend == "om_native" and not model:
         model_name = "OM-L1"
     return text, model_name, used.backend, used.provider or ""
 

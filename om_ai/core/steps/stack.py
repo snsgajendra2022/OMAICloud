@@ -1,4 +1,4 @@
-"""OM Roadmap Stack — STEPs 83–93 unified runtime."""
+"""OM Roadmap Stack — STEPs 83–94 unified runtime."""
 from __future__ import annotations
 
 from typing import Any
@@ -13,10 +13,11 @@ from .step90_agent_collaboration import AgentCollaborationUpgrade
 from .step91_self_improvement import SelfImprovementEngine
 from .step92_knowledge_brain import KnowledgeBrain
 from .step93_model_training import ModelTrainingIntelligence
+from .step94_teacher_distillation import TeacherDistillationIntelligence
 
 
 class OMRoadmapStack:
-    """Complete STEPs 83–93 intelligence layer for OMCognitiveBrain."""
+    """Complete STEPs 83–94 intelligence layer for OMCognitiveBrain."""
 
     def __init__(self) -> None:
         self.continuous = ContinuousLearningIntelligence()
@@ -29,6 +30,7 @@ class OMRoadmapStack:
         self.self_improvement = SelfImprovementEngine()
         self.knowledge_brain = KnowledgeBrain()
         self.training = ModelTrainingIntelligence()
+        self.distillation = TeacherDistillationIntelligence()
 
     def enrich_before_answer(
         self,
@@ -53,7 +55,6 @@ class OMRoadmapStack:
         )
         global_pack = self.global_knowledge.retrieve(message, knowledge=knowledge)
 
-        # Agent layers for build/design tasks
         low = (message or "").lower()
         agents = None
         collab = None
@@ -103,11 +104,13 @@ class OMRoadmapStack:
         c84 = self.advanced_learning.improve(message, answer, quality=quality)
         c91 = self.self_improvement.improve(message, answer, quality=quality)
         c93 = self.training.prepare_from_turn(message, answer, quality=quality)
+        c94 = self.distillation.learn_from_turn(message, answer, quality=quality)
         return {
             "step83": c83,
             "step84": c84,
             "step91": c91,
             "step93": c93,
+            "step94": c94,
             "skills": self.continuous.skill_snapshot(),
             "behaviors": c91.get("behaviors"),
         }
@@ -125,4 +128,5 @@ class OMRoadmapStack:
             "91_self_improvement": "complete",
             "92_knowledge_brain": "complete",
             "93_model_training": "complete",
+            "94_teacher_distillation": "complete",
         }

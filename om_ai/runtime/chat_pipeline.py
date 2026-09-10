@@ -42,6 +42,8 @@ def run_chat_pipeline(
     project_id: str | None = None,
     project_instructions: str = "",
     force_tools: list[str] | None = None,
+    evolution_level: float | None = None,
+    evolution_profile: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Run the upgraded staged chat pipeline. Returns answer + stage meta."""
     q = (user_text or "").strip()
@@ -49,6 +51,26 @@ def run_chat_pipeline(
     meta: dict[str, Any] = {"pipeline": "om-chat-pipeline-v2"}
     forced = [str(t).strip() for t in (force_tools or []) if str(t).strip()]
     meta["force_tools"] = forced
+    profile = dict(evolution_profile or {})
+    level = float(evolution_level if evolution_level is not None else profile.get("level") or 0) or None
+    if level is not None:
+        meta["evolution_level"] = level
+        meta["evolution_model"] = profile.get("model_id")
+        meta["evolution_style"] = profile.get("style")
+    # Level knobs: Agent/Org lean on tools; Innovator/Org lean on live research; Reasoner on CoT.
+    prefer_tools = bool(profile.get("prefer_tools"))
+    prefer_research = bool(profile.get("prefer_research"))
+    prefer_reasoning = bool(profile.get("prefer_reasoning"))
+    prefer_planning = bool(profile.get("prefer_planning"))
+    if prefer_tools and "web" not in forced:
+        # Soft nudge — classifier still decides; UI can also force tools.
+        meta["level_prefer_tools"] = True
+    if prefer_research:
+        meta["level_prefer_research"] = True
+    if prefer_reasoning:
+        meta["level_prefer_reasoning"] = True
+    if prefer_planning:
+        meta["level_prefer_planning"] = True
 
     # ── 1. Language Manager (+ meaning) ───────────────────────────────
     stages.append("language")
@@ -174,6 +196,37 @@ def run_chat_pipeline(
                 dict.fromkeys(list(ctx_intent.get("tools") or []) + forced)
             )
             ctx_intent["reason"] = str(ctx_intent.get("reason") or "") + "+ui_tools"
+        # OM-L3 / OM-L5: lean toward tools for actionable asks (not pure greetings).
+        if prefer_tools and not ctx_intent.get("use_tools"):
+            qlow = q.lower()
+            actionable = any(
+                w in qlow
+                for w in (
+                    "calculate",
+                    "compute",
+                    "run",
+                    "code",
+                    "script",
+                    "search",
+                    "find",
+                    "build",
+                    "create",
+                    "fix",
+                    "debug",
+                    "plan",
+                    "budget",
+                    "%",
+                    "+",
+                    "*",
+                )
+            ) or bool(re.search(r"\d+\s*[\+\-\*/]\s*\d+", q))
+            if actionable:
+                ctx_intent["use_tools"] = True
+                tools = list(ctx_intent.get("tools") or [])
+                if "code" not in tools:
+                    tools.append("code")
+                ctx_intent["tools"] = tools
+                ctx_intent["reason"] = str(ctx_intent.get("reason") or "") + "+level_agent"
         if ctx_intent.get("intent") == "conversation":
             intent = {
                 **intent,
@@ -211,7 +264,32 @@ def run_chat_pipeline(
         from om_ai.runtime.public_reply import looks_like_genesis_template
 
         preferred = ""
-        if live_enabled() and network_enabled() and needs_live_knowledge(q):
+        # L4/L5 prefer live research more often; L1 stays conservative.
+        want_live = needs_live_knowledge(q)
+        if prefer_research and not want_live:
+            qlow = q.lower()
+            want_live = any(
+                w in qlow
+                for w in (
+                    "what is",
+                    "who is",
+                    "latest",
+                    "current",
+                    "research",
+                    "invent",
+                    "novel",
+                    "compare",
+                    "versus",
+                    "vs ",
+                )
+            )
+        if level is not None and abs(float(level) - 1.0) < 0.01:
+            # Chatbot: only live when clearly freshness-sensitive.
+            want_live = want_live and any(
+                w in q.lower()
+                for w in ("latest", "current", "today", "news", "version", "release")
+            )
+        if live_enabled() and network_enabled() and want_live:
             live_pack = fetch_live_pack(q, limit=5)
             if live_pack.get("ok") and live_pack.get("answer"):
                 preferred = str(live_pack["answer"]).strip()
@@ -443,16 +521,29 @@ def run_chat_pipeline(
     stash = str(meta.get("live_context_stash") or "").strip()
     if stash and not skip_kb:
         internal_context = (internal_context + "\n" + stash).strip()
+    if prefer_planning and not skip_kb and len(q) > 40:
+        internal_context = (
+            internal_context
+            + "\nOrganization mode: structure complex work as goal → owners → ordered steps → risks."
+        ).strip()
+        meta["planning_hint"] = True
 
     stages.append("reasoning")
     try:
         from om_ai.core.reasoning.pipeline import run_reasoning_pipeline
         from om_ai.understanding.query_kind import is_greeting
 
-        if (
+        run_reason = (
             not is_greeting(q)
             and ctx_intent.get("intent") not in {"conversation", "date_query", "calculation"}
-        ):
+        )
+        # L1 skips deep reasoning for short chatty asks; L2+ lean into it.
+        if level is not None and abs(float(level) - 1.0) < 0.01 and len(q) < 80:
+            run_reason = False
+            meta["reasoning_skip"] = "level1_chatbot"
+        elif prefer_reasoning and not is_greeting(q):
+            run_reason = True
+        if run_reason:
             reasoning = run_reasoning_pipeline(
                 str((lang_pack.get("meaning") or {}).get("retrieval_query") or q),
                 retrieve=True,

@@ -1,0 +1,25 @@
+{
+  "topic": "React",
+  "subtopic": "",
+  "concepts": [
+    "React is a JavaScript library used for building user interfaces",
+    "React uses reusable components and state management"
+  ],
+  "facts": [
+    "React is a JavaScript library used for building user interfaces. Example: components."
+  ],
+  "relationships": [],
+  "procedures": [],
+  "examples": [
+    "React is a JavaScript library used for building user interfaces. Example: components."
+  ],
+  "code_patterns": [],
+  "warnings": [],
+  "source_teachers": [
+    "deepseek",
+    "qwen"
+  ],
+  "confidence": 0.4,
+  "created_at": "2026-09-10T09:01:15.365899",
+  "knowledge_id": "01fad993ff61aca9"
+}

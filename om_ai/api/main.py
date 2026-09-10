@@ -90,15 +90,23 @@ if _STATIC_DIR.is_dir():
     app.mount("/static", StaticFiles(directory=str(_STATIC_DIR)), name="static")
 
 
-@app.get("/favicon.ico", include_in_schema=False)
+@app.api_route("/favicon.ico", methods=["GET", "HEAD"], include_in_schema=False)
 def favicon():
     ico = _STATIC_DIR / "favicon.ico"
     if not ico.is_file():
         ico = _STATIC_DIR / "icons" / "favicon.ico"
     if ico.is_file():
-        return FileResponse(ico, media_type="image/x-icon")
+        return FileResponse(
+            ico,
+            media_type="image/x-icon",
+            headers={"Cache-Control": "public, max-age=86400"},
+        )
     svg = _STATIC_DIR / "icons" / "om-ai.svg"
-    return FileResponse(svg, media_type="image/svg+xml")
+    return FileResponse(
+        svg,
+        media_type="image/svg+xml",
+        headers={"Cache-Control": "public, max-age=86400"},
+    )
 
 
 # ---------------------------------------------------------------------------

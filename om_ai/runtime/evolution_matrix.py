@@ -170,6 +170,98 @@ def level_for_model(model: str | None) -> float | None:
     return None
 
 
+def level_runtime_profile(model: str | None) -> dict[str, Any]:
+    """Runtime knobs for the selected OM-L1…OM-L5 (applies even when matrix is skipped)."""
+    mid = resolve_model_id(model)
+    level = float(level_for_model(mid) or 1.0)
+    row = next((r for r in EVOLUTION_MODELS if r["id"] == mid), EVOLUTION_MODELS[0])
+    # Shared base from catalog
+    base = {
+        "model_id": mid,
+        "level": level,
+        "name": str(row.get("name") or mid),
+        "temperature": float(row.get("temperature") or 0.7),
+        "max_tokens": int(row.get("max_tokens") or 256),
+        "prefer_tools": False,
+        "prefer_research": False,
+        "prefer_reasoning": False,
+        "prefer_planning": False,
+        "style": "chat",
+        "system_hint": "",
+    }
+    if abs(level - 1.0) < 0.01:
+        base.update(
+            {
+                "style": "chatbot",
+                "prefer_tools": False,
+                "prefer_research": False,
+                "prefer_reasoning": False,
+                "prefer_planning": False,
+                "system_hint": (
+                    "OM Level 1 · Chatbot mode: keep replies short, clear, and conversational. "
+                    "Answer directly without long plans or tool narration."
+                ),
+            }
+        )
+    elif abs(level - 2.0) < 0.01:
+        base.update(
+            {
+                "style": "reasoner",
+                "prefer_reasoning": True,
+                "prefer_tools": False,
+                "prefer_research": False,
+                "prefer_planning": False,
+                "system_hint": (
+                    "OM Level 2 · Reasoner mode: think step-by-step for hard questions. "
+                    "Separate facts from assumptions, then give a clear final answer."
+                ),
+            }
+        )
+    elif abs(level - 3.0) < 0.01:
+        base.update(
+            {
+                "style": "agent",
+                "prefer_tools": True,
+                "prefer_reasoning": True,
+                "prefer_research": False,
+                "prefer_planning": False,
+                "system_hint": (
+                    "OM Level 3 · Agent mode: break the request into actions. "
+                    "Use tools/code/math when helpful and report concrete results."
+                ),
+            }
+        )
+    elif abs(level - 4.0) < 0.01:
+        base.update(
+            {
+                "style": "innovator",
+                "prefer_research": True,
+                "prefer_reasoning": True,
+                "prefer_tools": False,
+                "prefer_planning": False,
+                "system_hint": (
+                    "OM Level 4 · Innovator mode: explore useful options and novel angles. "
+                    "Offer a practical recommendation plus one creative alternative when relevant."
+                ),
+            }
+        )
+    else:
+        base.update(
+            {
+                "style": "organization",
+                "prefer_planning": True,
+                "prefer_tools": True,
+                "prefer_reasoning": True,
+                "prefer_research": True,
+                "system_hint": (
+                    "OM Level 5 · Organization Matrix mode: for complex work, organize by goals, "
+                    "roles, and sequenced steps. Keep normal chat natural."
+                ),
+            }
+        )
+    return base
+
+
 def catalog_models(*, settings: dict[str, Any] | None = None) -> list[dict[str, Any]]:
     settings = settings or {}
     out: list[dict[str, Any]] = []
@@ -313,6 +405,26 @@ def maybe_evolution_reply(
     user = _latest_user(messages)
     if not user:
         return "How can I help you today?", mid, level
+    # Explicit "which level/model am I using?" — answer from selection, not native guess.
+    if re.search(
+        r"\b("
+        r"which (om )?level|what (om )?level|current (om )?level|"
+        r"which model|what model|selected model|active model|"
+        r"am i (on|using) (level|om)"
+        r")\b",
+        user,
+        re.I,
+    ):
+        profile = level_runtime_profile(mid)
+        return (
+            _plain_paragraphs(
+                f"You are on {profile['name']} ({mid}).",
+                str(profile.get("system_hint") or "").split(":", 1)[-1].strip()
+                or f"Active evolution level: {int(level)}.",
+            ),
+            mid,
+            level,
+        )
     if level <= 1.0:
         return None, mid, level
     # Normal conversation on L2–L5 uses native OM-1.0 (not the matrix dump).

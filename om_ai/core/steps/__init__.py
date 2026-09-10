@@ -1,4 +1,4 @@
-"""OM STEPs 83–93 roadmap intelligence."""
+"""OM STEPs 83–94 roadmap intelligence."""
 from .stack import OMRoadmapStack
 from .step83_continuous_learning import ContinuousLearningIntelligence
 from .step84_advanced_learning import AdvancedLearningIntelligence
@@ -11,6 +11,7 @@ from .step90_agent_collaboration import AgentCollaborationUpgrade
 from .step91_self_improvement import SelfImprovementEngine
 from .step92_knowledge_brain import KnowledgeBrain
 from .step93_model_training import ModelTrainingIntelligence
+from .step94_teacher_distillation import TeacherDistillationIntelligence
 
 __all__ = [
     "OMRoadmapStack",
@@ -25,4 +26,5 @@ __all__ = [
     "SelfImprovementEngine",
     "KnowledgeBrain",
     "ModelTrainingIntelligence",
+    "TeacherDistillationIntelligence",
 ]

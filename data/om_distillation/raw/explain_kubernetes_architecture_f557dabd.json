@@ -1,0 +1,34 @@
+{
+  "run_id": "explain_kubernetes_architecture_f557dabd",
+  "task": "Explain Kubernetes architecture",
+  "responses": [
+    {
+      "provider": "gpt",
+      "model": "gpt-mock",
+      "source": "mock",
+      "text": "Teacher view (gpt) for: Explain Kubernetes architecture\n\nFocus on clear layered design, API contracts, and operational runbooks.\nCover tenant isolation, middleware, database strategy, permissions, and queues.\n\nRecommended approach:\n1. Clarify requirements and constraints.\n2. Choose a clear architecture with isolation boundaries.\n3. Define middleware / auth / permissions.\n4. Plan data storage, queues, and observability.\n5. Ship an MVP, then harden security and scale.\n\nCommon pitfalls: weak tenant isolation, shared secrets, missing audits.",
+      "error": "provider_not_ready:GPT is disabled in Settings → AI"
+    },
+    {
+      "provider": "claude",
+      "model": "claude-mock",
+      "source": "mock",
+      "text": "Teacher view (claude) for: Explain Kubernetes architecture\n\nEmphasize safety boundaries, audit trails, and readable architecture docs.\nInclude auth, permissions, isolation, observability, and failure modes.\n\nRecommended approach:\n1. Clarify requirements and constraints.\n2. Choose a clear architecture with isolation boundaries.\n3. Define middleware / auth / permissions.\n4. Plan data storage, queues, and observability.\n5. Ship an MVP, then harden security and scale.\n\nCommon pitfalls: weak tenant isolation, shared secrets, missing audits.",
+      "error": "provider_not_ready:Claude is disabled in Settings → AI"
+    },
+    {
+      "provider": "gemini",
+      "model": "gemini-mock",
+      "source": "mock",
+      "text": "Teacher view (gemini) for: Explain Kubernetes architecture\n\nPrefer pragmatic MVP first: core paths, then scale knobs.\nCall out database sharding/tenancy, cache, network policy, and testing.\n\nRecommended approach:\n1. Clarify requirements and constraints.\n2. Choose a clear architecture with isolation boundaries.\n3. Define middleware / auth / permissions.\n4. Plan data storage, queues, and observability.\n5. Ship an MVP, then harden security and scale.\n\nCommon pitfalls: weak tenant isolation, shared secrets, missing audits.",
+      "error": "provider_not_ready:Gemini is disabled in Settings → AI"
+    },
+    {
+      "provider": "qwen",
+      "model": "qwen-mock",
+      "source": "mock",
+      "text": "Teacher view (qwen) for: Explain Kubernetes architecture\n\nProvide stepwise implementation notes with trade-offs.\nMention middleware, storage, encryption, deployment, and queue handling.\n\nRecommended approach:\n1. Clarify requirements and constraints.\n2. Choose a clear architecture with isolation boundaries.\n3. Define middleware / auth / permissions.\n4. Plan data storage, queues, and observability.\n5. Ship an MVP, then harden security and scale.\n\nCommon pitfalls: weak tenant isolation, shared secrets, missing audits.",
+      "error": "provider_not_ready:Qwen is disabled in Settings → AI"
+    }
+  ]
+}

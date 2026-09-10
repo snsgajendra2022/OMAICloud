@@ -379,6 +379,9 @@ def _om_native_chat_reply_body(
     actor: str | None,
     project_id: str | None,
     project_instructions: str | None,
+    force_tools: list[str] | None = None,
+    evolution_level: float | None = None,
+    evolution_profile: dict[str, Any] | None = None,
 ) -> tuple[str, ChatBackendInfo]:
     """Native chat cascade: understand/research/reason/generate — no static outlines."""
     from om_ai.runtime.engine import EMPTY_GENERATION_FALLBACK, usable_generation_text
@@ -387,6 +390,7 @@ def _om_native_chat_reply_body(
     user_text = _latest_user_text(messages)
     if language_context is None:
         language_context = {}
+    profile = dict(evolution_profile or {})
 
     # Slightly warmer greetings so replies vary (still model-generated).
     if is_greeting_like(user_text) or is_om_self_query(user_text):
@@ -424,6 +428,8 @@ def _om_native_chat_reply_body(
                 project_id=project_id,
                 project_instructions=project_instructions or "",
                 force_tools=force_tools,
+                evolution_level=evolution_level,
+                evolution_profile=profile,
             )
             ans = str(piped.get("answer") or "").strip()
             if ans and not ResponseEcho.check(user_text, ans):
@@ -438,6 +444,8 @@ def _om_native_chat_reply_body(
                         "stages": piped.get("stages") or [],
                         "language": (piped.get("language") or {}).get("response_language"),
                         "intent": (piped.get("intent") or {}).get("intent"),
+                        "evolution_level": evolution_level,
+                        "evolution_model": (profile or {}).get("model_id"),
                     },
                 )
                 return ans if ans.endswith("\n") else ans + "\n", info_pipe
@@ -1049,7 +1057,10 @@ def chat_reply(
         generation_config,
         is_low_quality_reply,
     )
-    from om_ai.runtime.evolution_matrix import maybe_evolution_reply
+    from om_ai.runtime.evolution_matrix import (
+        level_runtime_profile,
+        maybe_evolution_reply,
+    )
     from om_ai.runtime.intelligence import enrich_for_chat
 
     # Sanitize legacy UI tool tags from user turns.
@@ -1064,6 +1075,7 @@ def chat_reply(
         cleaned_messages.append({"role": role, "content": content})
     messages = cleaned_messages
 
+    profile = level_runtime_profile(model)
     evo_text, evo_model, evo_level = maybe_evolution_reply(messages, model=model)
     if evo_text is not None:
         info = ChatBackendInfo(
@@ -1100,10 +1112,16 @@ def chat_reply(
     if info.backend == "om_native":
         env_temp = _env_float("OM_CHAT_TEMPERATURE", 0.7)
         env_max = _env_int("OM_CHAT_MAX_NEW_TOKENS", 96)
+        # Apply selected OM level temperature / token budget.
+        level_temp = float(profile.get("temperature") or env_temp)
+        level_max = int(profile.get("max_tokens") or env_max)
         if temperature is None or float(temperature) > 0.85:
-            temperature = env_temp
+            temperature = level_temp if evo_level is not None else env_temp
         if max_new_tokens is None or int(max_new_tokens) > env_max:
-            max_new_tokens = env_max
+            max_new_tokens = min(level_max, env_max) if evo_level is not None else env_max
+            # Higher levels get a bit more room within the server cap.
+            if evo_level is not None and evo_level >= 4.0:
+                max_new_tokens = min(max(int(max_new_tokens), 128), max(env_max, 192))
     gen = generation_config(
         max_new_tokens=max_new_tokens,
         temperature=temperature,
@@ -1129,6 +1147,16 @@ def chat_reply(
                 if content and "Today's date" not in content:
                     assistant_instructions = content
                     break
+
+    # Inject active OM level so native path follows the user's picker.
+    hint = str(profile.get("system_hint") or "").strip()
+    if hint and evo_level is not None:
+        messages = list(messages) + [
+            {
+                "role": "system",
+                "content": hint,
+            }
+        ]
 
     intel = enrich_for_chat(
         messages,
@@ -1167,6 +1195,9 @@ def chat_reply(
                 actor=actor,
                 project_id=project_id,
                 project_instructions=project_instructions,
+                force_tools=force_tools,
+                evolution_level=evo_level,
+                evolution_profile=profile,
             )
             return text, _brand(info)
         finally:

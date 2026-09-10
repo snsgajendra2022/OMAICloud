@@ -5,11 +5,12 @@
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate"/>
 <title>OM · Workspace</title>
-<link rel="icon" href="/static/icons/om-ai.svg" type="image/svg+xml"/>
-<link rel="icon" href="/favicon.ico" sizes="any"/>
-<link rel="icon" type="image/png" sizes="32x32" href="/static/icons/favicon-32.png"/>
-<link rel="icon" type="image/png" sizes="16x16" href="/static/icons/favicon-16.png"/>
-<link rel="apple-touch-icon" href="/static/icons/apple-touch-icon.png"/>
+<link rel="shortcut icon" href="/favicon.ico?v=4"/>
+<link rel="icon" href="/favicon.ico?v=4" sizes="any"/>
+<link rel="icon" type="image/png" sizes="32x32" href="/static/icons/favicon-32.png?v=4"/>
+<link rel="icon" type="image/png" sizes="16x16" href="/static/icons/favicon-16.png?v=4"/>
+<link rel="icon" href="/static/icons/om-ai.svg?v=4" type="image/svg+xml"/>
+<link rel="apple-touch-icon" href="/static/icons/apple-touch-icon.png?v=4"/>
 <link rel="manifest" href="/static/site.webmanifest"/>
 <meta name="theme-color" content="#1D4ED8"/>
 <meta name="application-name" content="OM AI"/>
@@ -661,7 +662,7 @@ body.dark .chip.on{background:rgba(59,130,246,.15);border-color:rgba(59,130,246,
   <div class="side-top">
     <div class="brand-row">
       <div class="brand">
-        <div class="logo" aria-hidden="true"><img src="/static/icons/om-ai.svg" alt="OM AI"/></div>
+        <div class="logo" aria-hidden="true"><img src="/static/icons/om-ai.svg?v=4" alt="OM AI"/></div>
         <div class="brand-text side-label">
           <strong id="wsName">OM</strong>
           <span id="wsSub">OM AI</span>
@@ -2049,7 +2050,14 @@ async function streamCompletion(messages) {
           if (last && last.role === "assistant") last.content = full;
           updateStreamBubble(full);
         }
-        if (json.model) state.model = json.model;
+        // Keep the user's OM-L1…L5 selection; do not let stream model overwrite the picker.
+        if (json.model) {
+          const mid = normalizeModelId(json.model);
+          if (/^OM-L[1-5]$/i.test(mid) && mid !== normalizeModelId(state.model)) {
+            // Only sync when server reports a different valid OM level (settings race).
+            // Prefer keeping the in-composer selection during an active send.
+          }
+        }
       } catch (_) {}
     }
   }
@@ -4041,8 +4049,8 @@ async function loadModelsView() {
       actions: isDefault ? [] : [
         btnPrimary(needsKey ? "Add key in Settings" : "Set default", needsKey ? "settings" : "check", async () => {
           if (needsKey) { setView("settings"); loadSettingsTab && loadSettingsTab("ai"); return; }
-          state.model = m.id;
-          await api("/v1/settings",{method:"PATCH",body:JSON.stringify({default_model:m.id})},{success:(m.name||m.id)+" set as default"});
+          state.model = normalizeModelId(m.id);
+          await api("/v1/settings",{method:"PATCH",body:JSON.stringify({default_model:state.model})},{success:(m.name||m.id)+" set as default"});
           renderModels(); loadModelsView();
         }),
       ],
@@ -4050,8 +4058,8 @@ async function loadModelsView() {
         label: "Use now",
         icon: "zap",
         onClick: async () => {
-          state.model = m.id;
-          await api("/v1/settings",{method:"PATCH",body:JSON.stringify({default_model:m.id})},{error:false});
+          state.model = normalizeModelId(m.id);
+          await api("/v1/settings",{method:"PATCH",body:JSON.stringify({default_model:state.model})},{error:false});
           renderModels();
           updateComposerChip && updateComposerChip();
           toast((m.name||m.id)+" selected","success");
