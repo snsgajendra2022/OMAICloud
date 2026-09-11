@@ -28,11 +28,13 @@ def create_teacher_manager() -> TeacherManager:
     client = OllamaClient(base_url=ollama_url, timeout=timeout)
     registry = TeacherRegistry(client, models)
     parallelism = int(os.getenv("OM_TEACHER_PARALLELISM", "2") or 2)
+    allow_mock_raw = os.getenv("OM_DISTILL_ALLOW_MOCK", "0").strip().lower()
+    allow_mock = allow_mock_raw not in {"0", "false", "no", "off"}
     return TeacherManager(
         teachers=models,
         registry=registry,
         client=client,
-        allow_mock=True,
+        allow_mock=allow_mock,
         parallelism=parallelism,
     )
 

@@ -1,0 +1,13 @@
+{
+  "run_id": "create_an_end_to_end_roadmap_to_ship_react_archi_bd106f0e",
+  "task": "Create an end-to-end roadmap to ship React architecture across teams.",
+  "responses": [
+    {
+      "provider": "mistral:latest",
+      "model": "",
+      "source": "live",
+      "text": "",
+      "error": "too_short"
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "run_id": "what_is_software_engineering_fundamentals_and_wh_9119b59f",
+  "task": "What is software engineering fundamentals and when should you use it?",
+  "responses": [
+    {
+      "provider": "mistral:latest",
+      "model": "",
+      "source": "live",
+      "text": "",
+      "error": "too_short"
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "run_id": "how_do_you_test_and_observe_a_software_engineeri_3f65ff6e",
+  "task": "How do you test and observe a software engineering fundamentals system?",
+  "responses": [
+    {
+      "provider": "mistral:latest",
+      "model": "",
+      "source": "live",
+      "text": "",
+      "error": "too_short"
+    }
+  ]
+}

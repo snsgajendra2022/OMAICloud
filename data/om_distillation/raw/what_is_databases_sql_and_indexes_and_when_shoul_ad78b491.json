@@ -1,0 +1,13 @@
+{
+  "run_id": "what_is_databases_sql_and_indexes_and_when_shoul_ad78b491",
+  "task": "What is databases SQL and indexes and when should you use it?",
+  "responses": [
+    {
+      "provider": "mistral:latest",
+      "model": "",
+      "source": "live",
+      "text": "",
+      "error": "too_short"
+    }
+  ]
+}

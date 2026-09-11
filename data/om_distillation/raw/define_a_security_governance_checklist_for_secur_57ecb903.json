@@ -1,0 +1,13 @@
+{
+  "run_id": "define_a_security_governance_checklist_for_secur_57ecb903",
+  "task": "Define a security governance checklist for security hardening for web apps across an organization.",
+  "responses": [
+    {
+      "provider": "mistral:latest",
+      "model": "",
+      "source": "live",
+      "text": "",
+      "error": "too_short"
+    }
+  ]
+}

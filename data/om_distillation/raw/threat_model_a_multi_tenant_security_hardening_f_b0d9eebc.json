@@ -1,0 +1,13 @@
+{
+  "run_id": "threat_model_a_multi_tenant_security_hardening_f_b0d9eebc",
+  "task": "Threat-model a multi-tenant security hardening for web apps deployment.",
+  "responses": [
+    {
+      "provider": "mistral:latest",
+      "model": "",
+      "source": "live",
+      "text": "",
+      "error": "too_short"
+    }
+  ]
+}

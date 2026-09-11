@@ -1,0 +1,30 @@
+{
+  "run_id": "what_is_react_architecture_and_when_should_you_u_4850c10f",
+  "task": "What is React architecture and when should you use it?",
+  "teachers": [
+    "mistral:latest"
+  ],
+  "responses": [
+    {
+      "provider": "mistral:latest",
+      "ok": false,
+      "text": "",
+      "model": "",
+      "vendor": "",
+      "error": "too_short",
+      "source": "live",
+      "raw": "",
+      "cleaned": "",
+      "verification": {
+        "ok": false,
+        "issues": [
+          "too_short"
+        ]
+      }
+    }
+  ],
+  "ok_count": 0,
+  "live_count": 0,
+  "mock_count": 0,
+  "stage": "cleaned_verified"
+}

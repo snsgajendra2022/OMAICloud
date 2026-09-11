@@ -1,0 +1,13 @@
+{
+  "run_id": "explain_authentication_vs_authorization_for_secu_9067c2dd",
+  "task": "Explain authentication vs authorization for security hardening for web apps.",
+  "responses": [
+    {
+      "provider": "mistral:latest",
+      "model": "",
+      "source": "live",
+      "text": "",
+      "error": "too_short"
+    }
+  ]
+}

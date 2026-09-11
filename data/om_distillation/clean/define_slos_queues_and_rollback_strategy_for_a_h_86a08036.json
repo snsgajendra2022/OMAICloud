@@ -1,0 +1,30 @@
+{
+  "run_id": "define_slos_queues_and_rollback_strategy_for_a_h_86a08036",
+  "task": "Define SLOs, queues, and rollback strategy for a HTTP APIs and REST platform.",
+  "teachers": [
+    "mistral:latest"
+  ],
+  "responses": [
+    {
+      "provider": "mistral:latest",
+      "ok": false,
+      "text": "",
+      "model": "",
+      "vendor": "",
+      "error": "too_short",
+      "source": "live",
+      "raw": "",
+      "cleaned": "",
+      "verification": {
+        "ok": false,
+        "issues": [
+          "too_short"
+        ]
+      }
+    }
+  ],
+  "ok_count": 0,
+  "live_count": 0,
+  "mock_count": 0,
+  "stage": "cleaned_verified"
+}

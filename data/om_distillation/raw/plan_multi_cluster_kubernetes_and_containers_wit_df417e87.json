@@ -1,0 +1,13 @@
+{
+  "run_id": "plan_multi_cluster_kubernetes_and_containers_wit_df417e87",
+  "task": "Plan multi-cluster Kubernetes and containers with observability and policy controls.",
+  "responses": [
+    {
+      "provider": "mistral:latest",
+      "model": "",
+      "source": "live",
+      "text": "",
+      "error": "too_short"
+    }
+  ]
+}

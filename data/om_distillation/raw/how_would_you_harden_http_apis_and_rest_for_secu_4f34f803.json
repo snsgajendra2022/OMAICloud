@@ -1,0 +1,13 @@
+{
+  "run_id": "how_would_you_harden_http_apis_and_rest_for_secu_4f34f803",
+  "task": "How would you harden HTTP APIs and REST for security and compliance?",
+  "responses": [
+    {
+      "provider": "mistral:latest",
+      "model": "",
+      "source": "live",
+      "text": "",
+      "error": "too_short"
+    }
+  ]
+}

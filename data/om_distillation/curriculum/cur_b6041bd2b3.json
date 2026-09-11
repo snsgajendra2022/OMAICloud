@@ -1,0 +1,50 @@
+{
+  "step": "94.11",
+  "curriculum_id": "cur_b6041bd2b3",
+  "topic": "distributed systems basics",
+  "domain": "software",
+  "count": 5,
+  "questions": [
+    {
+      "id": "q_82bfd8e4",
+      "question": "What is distributed systems basics and when should you use it?",
+      "domain": "software",
+      "level": "foundational",
+      "topic": "distributed systems basics",
+      "priority": 1
+    },
+    {
+      "id": "q_23490c57",
+      "question": "How do you test and observe a distributed systems basics system?",
+      "domain": "software",
+      "level": "intermediate",
+      "topic": "distributed systems basics",
+      "priority": 2
+    },
+    {
+      "id": "q_7e0934a4",
+      "question": "How would you harden distributed systems basics for security and compliance?",
+      "domain": "software",
+      "level": "advanced",
+      "topic": "distributed systems basics",
+      "priority": 3
+    },
+    {
+      "id": "q_afe0641f",
+      "question": "Define SLOs, queues, and rollback strategy for a distributed systems basics platform.",
+      "domain": "software",
+      "level": "systems",
+      "topic": "distributed systems basics",
+      "priority": 4
+    },
+    {
+      "id": "q_afb1be10",
+      "question": "Create an end-to-end roadmap to ship distributed systems basics across teams.",
+      "domain": "software",
+      "level": "systems",
+      "topic": "distributed systems basics",
+      "priority": 4
+    }
+  ],
+  "created_at": "2026-09-10T14:28:31Z"
+}

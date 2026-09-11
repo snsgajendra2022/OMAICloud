@@ -1,0 +1,13 @@
+{
+  "run_id": "how_would_you_harden_distributed_systems_basics_1e755cb5",
+  "task": "How would you harden distributed systems basics for security and compliance?",
+  "responses": [
+    {
+      "provider": "mistral:latest",
+      "model": "",
+      "source": "live",
+      "text": "",
+      "error": "too_short"
+    }
+  ]
+}

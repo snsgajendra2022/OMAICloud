@@ -1,0 +1,13 @@
+{
+  "run_id": "create_an_end_to_end_roadmap_to_ship_software_en_d42ba0be",
+  "task": "Create an end-to-end roadmap to ship software engineering fundamentals across teams.",
+  "responses": [
+    {
+      "provider": "mistral:latest",
+      "model": "",
+      "source": "live",
+      "text": "",
+      "error": "too_short"
+    }
+  ]
+}

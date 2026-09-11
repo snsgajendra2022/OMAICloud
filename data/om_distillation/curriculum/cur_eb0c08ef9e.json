@@ -1,0 +1,34 @@
+{
+  "step": "94.11",
+  "curriculum_id": "cur_eb0c08ef9e",
+  "topic": "Kubernetes and containers",
+  "domain": "devops",
+  "count": 3,
+  "questions": [
+    {
+      "id": "q_a4deacb2",
+      "question": "Explain Kubernetes and containers architecture in plain language.",
+      "domain": "devops",
+      "level": "foundational",
+      "topic": "Kubernetes and containers",
+      "priority": 1
+    },
+    {
+      "id": "q_c3bc0a58",
+      "question": "How do networking and storage work in Kubernetes and containers?",
+      "domain": "devops",
+      "level": "intermediate",
+      "topic": "Kubernetes and containers",
+      "priority": 2
+    },
+    {
+      "id": "q_4d2de140",
+      "question": "Plan multi-cluster Kubernetes and containers with observability and policy controls.",
+      "domain": "devops",
+      "level": "advanced",
+      "topic": "Kubernetes and containers",
+      "priority": 3
+    }
+  ],
+  "created_at": "2026-09-10T14:09:05Z"
+}

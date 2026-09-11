@@ -1,0 +1,30 @@
+{
+  "run_id": "explain_http_status_codes_200_and_404_in_4_sente_75fd25c5",
+  "task": "Explain HTTP status codes 200 and 404 in 4 sentences.",
+  "teachers": [
+    "mistral:latest"
+  ],
+  "responses": [
+    {
+      "provider": "mistral:latest",
+      "ok": false,
+      "text": "",
+      "model": "",
+      "vendor": "",
+      "error": "too_short",
+      "source": "live",
+      "raw": "",
+      "cleaned": "",
+      "verification": {
+        "ok": false,
+        "issues": [
+          "too_short"
+        ]
+      }
+    }
+  ],
+  "ok_count": 0,
+  "live_count": 0,
+  "mock_count": 0,
+  "stage": "cleaned_verified"
+}

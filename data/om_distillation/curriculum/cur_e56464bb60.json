@@ -1,0 +1,34 @@
+{
+  "step": "94.11",
+  "curriculum_id": "cur_e56464bb60",
+  "topic": "databases SQL and indexes",
+  "domain": "software",
+  "count": 3,
+  "questions": [
+    {
+      "id": "q_7b7fba0d",
+      "question": "What is databases SQL and indexes and when should you use it?",
+      "domain": "software",
+      "level": "foundational",
+      "topic": "databases SQL and indexes",
+      "priority": 1
+    },
+    {
+      "id": "q_440c260e",
+      "question": "How do you test and observe a databases SQL and indexes system?",
+      "domain": "software",
+      "level": "intermediate",
+      "topic": "databases SQL and indexes",
+      "priority": 2
+    },
+    {
+      "id": "q_5df13d69",
+      "question": "How would you harden databases SQL and indexes for security and compliance?",
+      "domain": "software",
+      "level": "advanced",
+      "topic": "databases SQL and indexes",
+      "priority": 3
+    }
+  ],
+  "created_at": "2026-09-10T14:04:51Z"
+}

@@ -1,0 +1,34 @@
+{
+  "step": "94.11",
+  "curriculum_id": "cur_a6ac1390cd",
+  "topic": "software engineering fundamentals",
+  "domain": "software",
+  "count": 3,
+  "questions": [
+    {
+      "id": "q_591ade1e",
+      "question": "What is software engineering fundamentals and when should you use it?",
+      "domain": "software",
+      "level": "foundational",
+      "topic": "software engineering fundamentals",
+      "priority": 1
+    },
+    {
+      "id": "q_c7334de6",
+      "question": "How do you test and observe a software engineering fundamentals system?",
+      "domain": "software",
+      "level": "intermediate",
+      "topic": "software engineering fundamentals",
+      "priority": 2
+    },
+    {
+      "id": "q_0fa4d07f",
+      "question": "How would you harden software engineering fundamentals for security and compliance?",
+      "domain": "software",
+      "level": "advanced",
+      "topic": "software engineering fundamentals",
+      "priority": 3
+    }
+  ],
+  "created_at": "2026-09-10T14:01:08Z"
+}

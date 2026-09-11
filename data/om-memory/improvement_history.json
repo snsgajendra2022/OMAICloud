@@ -526,5 +526,11 @@
     "answer": "Hello \u2014 I\u2019m OM. What should we work on?",
     "intent": "conversation",
     "score": 100.0
+  },
+  {
+    "question": "hello",
+    "answer": "Hello \u2014 I\u2019m OM. What should we work on?",
+    "intent": "conversation",
+    "score": 100.0
   }
 ]

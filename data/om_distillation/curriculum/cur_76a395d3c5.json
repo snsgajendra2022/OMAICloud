@@ -1,0 +1,50 @@
+{
+  "step": "94.11",
+  "curriculum_id": "cur_76a395d3c5",
+  "topic": "software engineering fundamentals",
+  "domain": "software",
+  "count": 5,
+  "questions": [
+    {
+      "id": "q_a37fb5fe",
+      "question": "What is software engineering fundamentals and when should you use it?",
+      "domain": "software",
+      "level": "foundational",
+      "topic": "software engineering fundamentals",
+      "priority": 1
+    },
+    {
+      "id": "q_2255085f",
+      "question": "How do you test and observe a software engineering fundamentals system?",
+      "domain": "software",
+      "level": "intermediate",
+      "topic": "software engineering fundamentals",
+      "priority": 2
+    },
+    {
+      "id": "q_799e2db0",
+      "question": "How would you harden software engineering fundamentals for security and compliance?",
+      "domain": "software",
+      "level": "advanced",
+      "topic": "software engineering fundamentals",
+      "priority": 3
+    },
+    {
+      "id": "q_0edf99e9",
+      "question": "Define SLOs, queues, and rollback strategy for a software engineering fundamentals platform.",
+      "domain": "software",
+      "level": "systems",
+      "topic": "software engineering fundamentals",
+      "priority": 4
+    },
+    {
+      "id": "q_1ebf78d3",
+      "question": "Create an end-to-end roadmap to ship software engineering fundamentals across teams.",
+      "domain": "software",
+      "level": "systems",
+      "topic": "software engineering fundamentals",
+      "priority": 4
+    }
+  ],
+  "created_at": "2026-09-10T14:28:30Z"
+}

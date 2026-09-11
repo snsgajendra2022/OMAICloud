@@ -1,0 +1,50 @@
+{
+  "step": "94.11",
+  "curriculum_id": "cur_d2a7d83e7c",
+  "topic": "databases SQL and indexes",
+  "domain": "software",
+  "count": 5,
+  "questions": [
+    {
+      "id": "q_c029a667",
+      "question": "What is databases SQL and indexes and when should you use it?",
+      "domain": "software",
+      "level": "foundational",
+      "topic": "databases SQL and indexes",
+      "priority": 1
+    },
+    {
+      "id": "q_f58b9c5f",
+      "question": "How do you test and observe a databases SQL and indexes system?",
+      "domain": "software",
+      "level": "intermediate",
+      "topic": "databases SQL and indexes",
+      "priority": 2
+    },
+    {
+      "id": "q_1c565913",
+      "question": "How would you harden databases SQL and indexes for security and compliance?",
+      "domain": "software",
+      "level": "advanced",
+      "topic": "databases SQL and indexes",
+      "priority": 3
+    },
+    {
+      "id": "q_383445d8",
+      "question": "Define SLOs, queues, and rollback strategy for a databases SQL and indexes platform.",
+      "domain": "software",
+      "level": "systems",
+      "topic": "databases SQL and indexes",
+      "priority": 4
+    },
+    {
+      "id": "q_4c07cd38",
+      "question": "Create an end-to-end roadmap to ship databases SQL and indexes across teams.",
+      "domain": "software",
+      "level": "systems",
+      "topic": "databases SQL and indexes",
+      "priority": 4
+    }
+  ],
+  "created_at": "2026-09-10T14:28:31Z"
+}

@@ -1,0 +1,50 @@
+{
+  "step": "94.11",
+  "curriculum_id": "cur_c11483466a",
+  "topic": "HTTP APIs and REST",
+  "domain": "software",
+  "count": 5,
+  "questions": [
+    {
+      "id": "q_8f05df91",
+      "question": "What is HTTP APIs and REST and when should you use it?",
+      "domain": "software",
+      "level": "foundational",
+      "topic": "HTTP APIs and REST",
+      "priority": 1
+    },
+    {
+      "id": "q_bb85255f",
+      "question": "How do you test and observe a HTTP APIs and REST system?",
+      "domain": "software",
+      "level": "intermediate",
+      "topic": "HTTP APIs and REST",
+      "priority": 2
+    },
+    {
+      "id": "q_aa967808",
+      "question": "How would you harden HTTP APIs and REST for security and compliance?",
+      "domain": "software",
+      "level": "advanced",
+      "topic": "HTTP APIs and REST",
+      "priority": 3
+    },
+    {
+      "id": "q_17ec6feb",
+      "question": "Define SLOs, queues, and rollback strategy for a HTTP APIs and REST platform.",
+      "domain": "software",
+      "level": "systems",
+      "topic": "HTTP APIs and REST",
+      "priority": 4
+    },
+    {
+      "id": "q_bc737bb8",
+      "question": "Create an end-to-end roadmap to ship HTTP APIs and REST across teams.",
+      "domain": "software",
+      "level": "systems",
+      "topic": "HTTP APIs and REST",
+      "priority": 4
+    }
+  ],
+  "created_at": "2026-09-10T14:28:31Z"
+}

@@ -1,0 +1,50 @@
+{
+  "step": "94.11",
+  "curriculum_id": "cur_9524eb9aa0",
+  "topic": "security hardening for web apps",
+  "domain": "security",
+  "count": 5,
+  "questions": [
+    {
+      "id": "q_037710ec",
+      "question": "Explain authentication vs authorization for security hardening for web apps.",
+      "domain": "security",
+      "level": "foundational",
+      "topic": "security hardening for web apps",
+      "priority": 1
+    },
+    {
+      "id": "q_dee254aa",
+      "question": "How should secrets, audits, and encryption be handled in security hardening for web apps?",
+      "domain": "security",
+      "level": "intermediate",
+      "topic": "security hardening for web apps",
+      "priority": 2
+    },
+    {
+      "id": "q_e8c5cf19",
+      "question": "Threat-model a multi-tenant security hardening for web apps deployment.",
+      "domain": "security",
+      "level": "advanced",
+      "topic": "security hardening for web apps",
+      "priority": 3
+    },
+    {
+      "id": "q_913bc21b",
+      "question": "Define a security governance checklist for security hardening for web apps across an organization.",
+      "domain": "security",
+      "level": "systems",
+      "topic": "security hardening for web apps",
+      "priority": 4
+    },
+    {
+      "id": "q_1c9960b0",
+      "question": "Define a security governance checklist for security hardening for web apps across an organization.",
+      "domain": "security",
+      "level": "systems",
+      "topic": "security hardening for web apps",
+      "priority": 4
+    }
+  ],
+  "created_at": "2026-09-10T14:28:31Z"
+}

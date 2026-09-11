@@ -1,0 +1,30 @@
+{
+  "run_id": "define_slos_queues_and_rollback_strategy_for_a_r_c7030583",
+  "task": "Define SLOs, queues, and rollback strategy for a React architecture platform.",
+  "teachers": [
+    "mistral:latest"
+  ],
+  "responses": [
+    {
+      "provider": "mistral:latest",
+      "ok": false,
+      "text": "",
+      "model": "",
+      "vendor": "",
+      "error": "too_short",
+      "source": "live",
+      "raw": "",
+      "cleaned": "",
+      "verification": {
+        "ok": false,
+        "issues": [
+          "too_short"
+        ]
+      }
+    }
+  ],
+  "ok_count": 0,
+  "live_count": 0,
+  "mock_count": 0,
+  "stage": "cleaned_verified"
+}

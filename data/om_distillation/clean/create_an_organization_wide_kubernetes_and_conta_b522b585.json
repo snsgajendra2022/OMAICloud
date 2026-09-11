@@ -1,0 +1,30 @@
+{
+  "run_id": "create_an_organization_wide_kubernetes_and_conta_b522b585",
+  "task": "Create an organization-wide Kubernetes and containers operating model with roles and runbooks.",
+  "teachers": [
+    "mistral:latest"
+  ],
+  "responses": [
+    {
+      "provider": "mistral:latest",
+      "ok": false,
+      "text": "",
+      "model": "",
+      "vendor": "",
+      "error": "too_short",
+      "source": "live",
+      "raw": "",
+      "cleaned": "",
+      "verification": {
+        "ok": false,
+        "issues": [
+          "too_short"
+        ]
+      }
+    }
+  ],
+  "ok_count": 0,
+  "live_count": 0,
+  "mock_count": 0,
+  "stage": "cleaned_verified"
+}

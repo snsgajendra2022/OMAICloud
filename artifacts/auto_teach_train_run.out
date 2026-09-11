@@ -1,0 +1,93 @@
+===== AUTO TEACH+TRAIN START 2026-09-10T13:46:58Z =====
+===== AUTO TEACH+TRAIN START 2026-09-10T13:46:58Z =====
+{"topic": "software engineering fundamentals", "n": 5}
+{"topic": "software engineering fundamentals", "n": 5}
+===== AUTO TEACH+TRAIN START 2026-09-10T13:50:00Z =====
+{"topic": "software engineering fundamentals", "n": 5}
+===== AUTO TEACH+TRAIN START 2026-09-10T14:01:07Z =====
+{"topic": "software engineering fundamentals", "n": 3}
+{"q": "What is software engineering fundamentals and when should you use it?", "live": 1, "exported": 1}
+{"q": "How do you test and observe a software engineering fundamentals system?", "live": 1, "exported": 1}
+{"q": "How would you harden software engineering fundamentals for security and compliance?", "live": 1, "exported": 1}
+{"topic": "React architecture", "n": 3}
+{"q": "What is React architecture and when should you use it?", "live": 1, "exported": 1}
+{"q": "How do you test and observe a React architecture system?", "live": 1, "exported": 1}
+{"q": "How would you harden React architecture for security and compliance?", "live": 1, "exported": 1}
+{"topic": "HTTP APIs and REST", "n": 3}
+{"q": "What is HTTP APIs and REST and when should you use it?", "live": 1, "exported": 1}
+{"q": "How do you test and observe a HTTP APIs and REST system?", "live": 1, "exported": 1}
+{"q": "How would you harden HTTP APIs and REST for security and compliance?", "live": 1, "exported": 1}
+{"topic": "databases SQL and indexes", "n": 3}
+{"q": "What is databases SQL and indexes and when should you use it?", "live": 1, "exported": 1}
+{"q": "How do you test and observe a databases SQL and indexes system?", "live": 1, "exported": 1}
+{"q": "How would you harden databases SQL and indexes for security and compliance?", "live": 1, "exported": 1}
+{"topic": "distributed systems basics", "n": 3}
+{"q": "What is distributed systems basics and when should you use it?", "live": 1, "exported": 1}
+{"q": "How do you test and observe a distributed systems basics system?", "live": 1, "exported": 1}
+{"q": "How would you harden distributed systems basics for security and compliance?", "live": 1, "exported": 1}
+{"topic": "security hardening for web apps", "n": 3}
+{"q": "Explain authentication vs authorization for security hardening for web apps.", "live": 1, "exported": 1}
+{"q": "How should secrets, audits, and encryption be handled in security hardening for web apps?", "live": 1, "exported": 1}
+{"q": "Threat-model a multi-tenant security hardening for web apps deployment.", "live": 1, "exported": 1}
+{"topic": "testing and observability", "n": 3}
+{"q": "What is testing and observability and when should you use it?", "live": 1, "exported": 1}
+{"q": "How do you test and observe a testing and observability system?", "live": 1, "exported": 1}
+{"q": "How would you harden testing and observability for security and compliance?", "live": 1, "exported": 1}
+{"topic": "Kubernetes and containers", "n": 3}
+{"q": "Explain Kubernetes and containers architecture in plain language.", "live": 1, "exported": 1}
+{"q": "How do networking and storage work in Kubernetes and containers?", "live": 1, "exported": 1}
+{"q": "Plan multi-cluster Kubernetes and containers with observability and policy controls.", "live": 1, "exported": 1}
+{"harvest_stats": {"questions": 24, "live_ok": 24, "exported": 24, "failed": 0}}
+merged_rows=2991
+SFT_CMD /Users/gajendrarawat/Downloads/om-ai-operating-brain 3/.venv/bin/om-ai sft --config configs/om-1.0-local.json --data data/training/om_all_sft_merged.jsonl --tokenizer artifacts/tokenizer-production-65536.json --checkpoint /Users/gajendrarawat/Downloads/om-ai-operating-brain 3/artifacts/checkpoints/om-1.0-distill-sft/latest.pt --output artifacts/checkpoints/om-1.0-distill-sft --steps 400 --batch-size 1 --grad-accum 4 --lr 1e-5 --checkpoint-every 100 --device mps
+===== AUTO TEACH+TRAIN START 2026-09-10T14:28:29Z =====
+{"topic": "software engineering fundamentals", "n": 5}
+{"q": "What is software engineering fundamentals and when should you use it?", "live": 0, "exported": 0}
+{"q": "How do you test and observe a software engineering fundamentals system?", "live": 0, "exported": 0}
+{"q": "How would you harden software engineering fundamentals for security and compliance?", "live": 0, "exported": 0}
+{"q": "Define SLOs, queues, and rollback strategy for a software engineering fundamentals platfor", "live": 0, "exported": 0}
+{"q": "Create an end-to-end roadmap to ship software engineering fundamentals across teams.", "live": 0, "exported": 0}
+{"topic": "React architecture", "n": 5}
+{"q": "What is React architecture and when should you use it?", "live": 0, "exported": 0}
+{"q": "How do you test and observe a React architecture system?", "live": 0, "exported": 0}
+{"q": "How would you harden React architecture for security and compliance?", "live": 0, "exported": 0}
+{"q": "Define SLOs, queues, and rollback strategy for a React architecture platform.", "live": 0, "exported": 0}
+{"q": "Create an end-to-end roadmap to ship React architecture across teams.", "live": 0, "exported": 0}
+{"topic": "HTTP APIs and REST", "n": 5}
+{"q": "What is HTTP APIs and REST and when should you use it?", "live": 0, "exported": 0}
+{"q": "How do you test and observe a HTTP APIs and REST system?", "live": 0, "exported": 0}
+{"q": "How would you harden HTTP APIs and REST for security and compliance?", "live": 0, "exported": 0}
+{"q": "Define SLOs, queues, and rollback strategy for a HTTP APIs and REST platform.", "live": 0, "exported": 0}
+{"q": "Create an end-to-end roadmap to ship HTTP APIs and REST across teams.", "live": 0, "exported": 0}
+{"topic": "databases SQL and indexes", "n": 5}
+{"q": "What is databases SQL and indexes and when should you use it?", "live": 0, "exported": 0}
+{"q": "How do you test and observe a databases SQL and indexes system?", "live": 0, "exported": 0}
+{"q": "How would you harden databases SQL and indexes for security and compliance?", "live": 0, "exported": 0}
+{"q": "Define SLOs, queues, and rollback strategy for a databases SQL and indexes platform.", "live": 0, "exported": 0}
+{"q": "Create an end-to-end roadmap to ship databases SQL and indexes across teams.", "live": 0, "exported": 0}
+{"topic": "distributed systems basics", "n": 5}
+{"q": "What is distributed systems basics and when should you use it?", "live": 0, "exported": 0}
+{"q": "How do you test and observe a distributed systems basics system?", "live": 0, "exported": 0}
+{"q": "How would you harden distributed systems basics for security and compliance?", "live": 0, "exported": 0}
+{"q": "Define SLOs, queues, and rollback strategy for a distributed systems basics platform.", "live": 0, "exported": 0}
+{"q": "Create an end-to-end roadmap to ship distributed systems basics across teams.", "live": 0, "exported": 0}
+{"topic": "security hardening for web apps", "n": 5}
+{"q": "Explain authentication vs authorization for security hardening for web apps.", "live": 0, "exported": 0}
+{"q": "How should secrets, audits, and encryption be handled in security hardening for web apps?", "live": 0, "exported": 0}
+{"q": "Threat-model a multi-tenant security hardening for web apps deployment.", "live": 0, "exported": 0}
+{"q": "Define a security governance checklist for security hardening for web apps across an organ", "live": 0, "exported": 0}
+{"q": "Define a security governance checklist for security hardening for web apps across an organ", "live": 0, "exported": 0}
+{"topic": "testing and observability", "n": 5}
+{"q": "What is testing and observability and when should you use it?", "live": 0, "exported": 0}
+{"q": "How do you test and observe a testing and observability system?", "live": 0, "exported": 0}
+{"q": "How would you harden testing and observability for security and compliance?", "live": 0, "exported": 0}
+{"q": "Define SLOs, queues, and rollback strategy for a testing and observability platform.", "live": 0, "exported": 0}
+{"q": "Create an end-to-end roadmap to ship testing and observability across teams.", "live": 0, "exported": 0}
+{"topic": "Kubernetes and containers", "n": 5}
+{"q": "Explain Kubernetes and containers architecture in plain language.", "live": 0, "exported": 0}
+{"q": "How do networking and storage work in Kubernetes and containers?", "live": 0, "exported": 0}
+{"q": "Plan multi-cluster Kubernetes and containers with observability and policy controls.", "live": 0, "exported": 0}
+{"q": "Create an organization-wide Kubernetes and containers operating model with roles and runbo", "live": 0, "exported": 0}
+{"q": "Create an organization-wide Kubernetes and containers operating model with roles and runbo", "live": 0, "exported": 0}
+{"harvest_stats": {"questions": 40, "live_ok": 0, "exported": 0, "failed": 40}}
+FATAL: No live teacher answers collected

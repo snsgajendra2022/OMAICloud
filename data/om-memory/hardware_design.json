@@ -8158,5 +8158,1025 @@
         "simulation"
       ]
     }
+  },
+  {
+    "requirement": {
+      "goal": "hello",
+      "power": "unknown",
+      "performance": "unknown",
+      "constraints": []
+    },
+    "architecture": {
+      "architecture": {
+        "processor": "selected later",
+        "memory": "selected later",
+        "communication": "selected later"
+      },
+      "requirement": {
+        "goal": "hello",
+        "power": "unknown",
+        "performance": "unknown",
+        "constraints": []
+      }
+    },
+    "components": {
+      "components": [
+        {
+          "name": "processor",
+          "status": "candidate"
+        },
+        {
+          "name": "sensor",
+          "status": "candidate"
+        }
+      ]
+    },
+    "circuit": {
+      "circuit": "generated",
+      "components": {
+        "components": [
+          {
+            "name": "processor",
+            "status": "candidate"
+          },
+          {
+            "name": "sensor",
+            "status": "candidate"
+          }
+        ]
+      }
+    },
+    "simulation": {
+      "simulation": "completed",
+      "performance": "estimated",
+      "errors": []
+    },
+    "optimization": {
+      "optimized": true,
+      "improvements": [
+        "reduce power",
+        "increase efficiency"
+      ]
+    },
+    "validation": {
+      "valid": true,
+      "checks": [
+        "architecture",
+        "components",
+        "simulation"
+      ]
+    }
+  },
+  {
+    "requirement": {
+      "goal": "how are you how to hanlde my ai to ollama",
+      "power": "unknown",
+      "performance": "unknown",
+      "constraints": []
+    },
+    "architecture": {
+      "architecture": {
+        "processor": "selected later",
+        "memory": "selected later",
+        "communication": "selected later"
+      },
+      "requirement": {
+        "goal": "how are you how to hanlde my ai to ollama",
+        "power": "unknown",
+        "performance": "unknown",
+        "constraints": []
+      }
+    },
+    "components": {
+      "components": [
+        {
+          "name": "processor",
+          "status": "candidate"
+        },
+        {
+          "name": "sensor",
+          "status": "candidate"
+        }
+      ]
+    },
+    "circuit": {
+      "circuit": "generated",
+      "components": {
+        "components": [
+          {
+            "name": "processor",
+            "status": "candidate"
+          },
+          {
+            "name": "sensor",
+            "status": "candidate"
+          }
+        ]
+      }
+    },
+    "simulation": {
+      "simulation": "completed",
+      "performance": "estimated",
+      "errors": []
+    },
+    "optimization": {
+      "optimized": true,
+      "improvements": [
+        "reduce power",
+        "increase efficiency"
+      ]
+    },
+    "validation": {
+      "valid": true,
+      "checks": [
+        "architecture",
+        "components",
+        "simulation"
+      ]
+    }
+  },
+  {
+    "requirement": {
+      "goal": "there ollama wokring ???",
+      "power": "unknown",
+      "performance": "unknown",
+      "constraints": []
+    },
+    "architecture": {
+      "architecture": {
+        "processor": "selected later",
+        "memory": "selected later",
+        "communication": "selected later"
+      },
+      "requirement": {
+        "goal": "there ollama wokring ???",
+        "power": "unknown",
+        "performance": "unknown",
+        "constraints": []
+      }
+    },
+    "components": {
+      "components": [
+        {
+          "name": "processor",
+          "status": "candidate"
+        },
+        {
+          "name": "sensor",
+          "status": "candidate"
+        }
+      ]
+    },
+    "circuit": {
+      "circuit": "generated",
+      "components": {
+        "components": [
+          {
+            "name": "processor",
+            "status": "candidate"
+          },
+          {
+            "name": "sensor",
+            "status": "candidate"
+          }
+        ]
+      }
+    },
+    "simulation": {
+      "simulation": "completed",
+      "performance": "estimated",
+      "errors": []
+    },
+    "optimization": {
+      "optimized": true,
+      "improvements": [
+        "reduce power",
+        "increase efficiency"
+      ]
+    },
+    "validation": {
+      "valid": true,
+      "checks": [
+        "architecture",
+        "components",
+        "simulation"
+      ]
+    }
+  },
+  {
+    "requirement": {
+      "goal": "what is the react",
+      "power": "unknown",
+      "performance": "unknown",
+      "constraints": []
+    },
+    "architecture": {
+      "architecture": {
+        "processor": "selected later",
+        "memory": "selected later",
+        "communication": "selected later"
+      },
+      "requirement": {
+        "goal": "what is the react",
+        "power": "unknown",
+        "performance": "unknown",
+        "constraints": []
+      }
+    },
+    "components": {
+      "components": [
+        {
+          "name": "processor",
+          "status": "candidate"
+        },
+        {
+          "name": "sensor",
+          "status": "candidate"
+        }
+      ]
+    },
+    "circuit": {
+      "circuit": "generated",
+      "components": {
+        "components": [
+          {
+            "name": "processor",
+            "status": "candidate"
+          },
+          {
+            "name": "sensor",
+            "status": "candidate"
+          }
+        ]
+      }
+    },
+    "simulation": {
+      "simulation": "completed",
+      "performance": "estimated",
+      "errors": []
+    },
+    "optimization": {
+      "optimized": true,
+      "improvements": [
+        "reduce power",
+        "increase efficiency"
+      ]
+    },
+    "validation": {
+      "valid": true,
+      "checks": [
+        "architecture",
+        "components",
+        "simulation"
+      ]
+    }
+  },
+  {
+    "requirement": {
+      "goal": "createthe raect code  login and dshabord page",
+      "power": "unknown",
+      "performance": "unknown",
+      "constraints": []
+    },
+    "architecture": {
+      "architecture": {
+        "processor": "selected later",
+        "memory": "selected later",
+        "communication": "selected later"
+      },
+      "requirement": {
+        "goal": "createthe raect code  login and dshabord page",
+        "power": "unknown",
+        "performance": "unknown",
+        "constraints": []
+      }
+    },
+    "components": {
+      "components": [
+        {
+          "name": "processor",
+          "status": "candidate"
+        },
+        {
+          "name": "sensor",
+          "status": "candidate"
+        }
+      ]
+    },
+    "circuit": {
+      "circuit": "generated",
+      "components": {
+        "components": [
+          {
+            "name": "processor",
+            "status": "candidate"
+          },
+          {
+            "name": "sensor",
+            "status": "candidate"
+          }
+        ]
+      }
+    },
+    "simulation": {
+      "simulation": "completed",
+      "performance": "estimated",
+      "errors": []
+    },
+    "optimization": {
+      "optimized": true,
+      "improvements": [
+        "reduce power",
+        "increase efficiency"
+      ]
+    },
+    "validation": {
+      "valid": true,
+      "checks": [
+        "architecture",
+        "components",
+        "simulation"
+      ]
+    }
+  },
+  {
+    "requirement": {
+      "goal": "create code",
+      "power": "unknown",
+      "performance": "unknown",
+      "constraints": []
+    },
+    "architecture": {
+      "architecture": {
+        "processor": "selected later",
+        "memory": "selected later",
+        "communication": "selected later"
+      },
+      "requirement": {
+        "goal": "create code",
+        "power": "unknown",
+        "performance": "unknown",
+        "constraints": []
+      }
+    },
+    "components": {
+      "components": [
+        {
+          "name": "processor",
+          "status": "candidate"
+        },
+        {
+          "name": "sensor",
+          "status": "candidate"
+        }
+      ]
+    },
+    "circuit": {
+      "circuit": "generated",
+      "components": {
+        "components": [
+          {
+            "name": "processor",
+            "status": "candidate"
+          },
+          {
+            "name": "sensor",
+            "status": "candidate"
+          }
+        ]
+      }
+    },
+    "simulation": {
+      "simulation": "completed",
+      "performance": "estimated",
+      "errors": []
+    },
+    "optimization": {
+      "optimized": true,
+      "improvements": [
+        "reduce power",
+        "increase efficiency"
+      ]
+    },
+    "validation": {
+      "valid": true,
+      "checks": [
+        "architecture",
+        "components",
+        "simulation"
+      ]
+    }
+  },
+  {
+    "requirement": {
+      "goal": "good moring",
+      "power": "unknown",
+      "performance": "unknown",
+      "constraints": []
+    },
+    "architecture": {
+      "architecture": {
+        "processor": "selected later",
+        "memory": "selected later",
+        "communication": "selected later"
+      },
+      "requirement": {
+        "goal": "good moring",
+        "power": "unknown",
+        "performance": "unknown",
+        "constraints": []
+      }
+    },
+    "components": {
+      "components": [
+        {
+          "name": "processor",
+          "status": "candidate"
+        },
+        {
+          "name": "sensor",
+          "status": "candidate"
+        }
+      ]
+    },
+    "circuit": {
+      "circuit": "generated",
+      "components": {
+        "components": [
+          {
+            "name": "processor",
+            "status": "candidate"
+          },
+          {
+            "name": "sensor",
+            "status": "candidate"
+          }
+        ]
+      }
+    },
+    "simulation": {
+      "simulation": "completed",
+      "performance": "estimated",
+      "errors": []
+    },
+    "optimization": {
+      "optimized": true,
+      "improvements": [
+        "reduce power",
+        "increase efficiency"
+      ]
+    },
+    "validation": {
+      "valid": true,
+      "checks": [
+        "architecture",
+        "components",
+        "simulation"
+      ]
+    }
+  },
+  {
+    "requirement": {
+      "goal": "bhai kya ha tumhra",
+      "power": "unknown",
+      "performance": "unknown",
+      "constraints": []
+    },
+    "architecture": {
+      "architecture": {
+        "processor": "selected later",
+        "memory": "selected later",
+        "communication": "selected later"
+      },
+      "requirement": {
+        "goal": "bhai kya ha tumhra",
+        "power": "unknown",
+        "performance": "unknown",
+        "constraints": []
+      }
+    },
+    "components": {
+      "components": [
+        {
+          "name": "processor",
+          "status": "candidate"
+        },
+        {
+          "name": "sensor",
+          "status": "candidate"
+        }
+      ]
+    },
+    "circuit": {
+      "circuit": "generated",
+      "components": {
+        "components": [
+          {
+            "name": "processor",
+            "status": "candidate"
+          },
+          {
+            "name": "sensor",
+            "status": "candidate"
+          }
+        ]
+      }
+    },
+    "simulation": {
+      "simulation": "completed",
+      "performance": "estimated",
+      "errors": []
+    },
+    "optimization": {
+      "optimized": true,
+      "improvements": [
+        "reduce power",
+        "increase efficiency"
+      ]
+    },
+    "validation": {
+      "valid": true,
+      "checks": [
+        "architecture",
+        "components",
+        "simulation"
+      ]
+    }
+  },
+  {
+    "requirement": {
+      "goal": "what is this",
+      "power": "unknown",
+      "performance": "unknown",
+      "constraints": []
+    },
+    "architecture": {
+      "architecture": {
+        "processor": "selected later",
+        "memory": "selected later",
+        "communication": "selected later"
+      },
+      "requirement": {
+        "goal": "what is this",
+        "power": "unknown",
+        "performance": "unknown",
+        "constraints": []
+      }
+    },
+    "components": {
+      "components": [
+        {
+          "name": "processor",
+          "status": "candidate"
+        },
+        {
+          "name": "sensor",
+          "status": "candidate"
+        }
+      ]
+    },
+    "circuit": {
+      "circuit": "generated",
+      "components": {
+        "components": [
+          {
+            "name": "processor",
+            "status": "candidate"
+          },
+          {
+            "name": "sensor",
+            "status": "candidate"
+          }
+        ]
+      }
+    },
+    "simulation": {
+      "simulation": "completed",
+      "performance": "estimated",
+      "errors": []
+    },
+    "optimization": {
+      "optimized": true,
+      "improvements": [
+        "reduce power",
+        "increase efficiency"
+      ]
+    },
+    "validation": {
+      "valid": true,
+      "checks": [
+        "architecture",
+        "components",
+        "simulation"
+      ]
+    }
+  },
+  {
+    "requirement": {
+      "goal": "heelo",
+      "power": "unknown",
+      "performance": "unknown",
+      "constraints": []
+    },
+    "architecture": {
+      "architecture": {
+        "processor": "selected later",
+        "memory": "selected later",
+        "communication": "selected later"
+      },
+      "requirement": {
+        "goal": "heelo",
+        "power": "unknown",
+        "performance": "unknown",
+        "constraints": []
+      }
+    },
+    "components": {
+      "components": [
+        {
+          "name": "processor",
+          "status": "candidate"
+        },
+        {
+          "name": "sensor",
+          "status": "candidate"
+        }
+      ]
+    },
+    "circuit": {
+      "circuit": "generated",
+      "components": {
+        "components": [
+          {
+            "name": "processor",
+            "status": "candidate"
+          },
+          {
+            "name": "sensor",
+            "status": "candidate"
+          }
+        ]
+      }
+    },
+    "simulation": {
+      "simulation": "completed",
+      "performance": "estimated",
+      "errors": []
+    },
+    "optimization": {
+      "optimized": true,
+      "improvements": [
+        "reduce power",
+        "increase efficiency"
+      ]
+    },
+    "validation": {
+      "valid": true,
+      "checks": [
+        "architecture",
+        "components",
+        "simulation"
+      ]
+    }
+  },
+  {
+    "requirement": {
+      "goal": "what is today task ??",
+      "power": "unknown",
+      "performance": "unknown",
+      "constraints": []
+    },
+    "architecture": {
+      "architecture": {
+        "processor": "selected later",
+        "memory": "selected later",
+        "communication": "selected later"
+      },
+      "requirement": {
+        "goal": "what is today task ??",
+        "power": "unknown",
+        "performance": "unknown",
+        "constraints": []
+      }
+    },
+    "components": {
+      "components": [
+        {
+          "name": "processor",
+          "status": "candidate"
+        },
+        {
+          "name": "sensor",
+          "status": "candidate"
+        }
+      ]
+    },
+    "circuit": {
+      "circuit": "generated",
+      "components": {
+        "components": [
+          {
+            "name": "processor",
+            "status": "candidate"
+          },
+          {
+            "name": "sensor",
+            "status": "candidate"
+          }
+        ]
+      }
+    },
+    "simulation": {
+      "simulation": "completed",
+      "performance": "estimated",
+      "errors": []
+    },
+    "optimization": {
+      "optimized": true,
+      "improvements": [
+        "reduce power",
+        "increase efficiency"
+      ]
+    },
+    "validation": {
+      "valid": true,
+      "checks": [
+        "architecture",
+        "components",
+        "simulation"
+      ]
+    }
+  },
+  {
+    "requirement": {
+      "goal": "given to me task name",
+      "power": "unknown",
+      "performance": "unknown",
+      "constraints": []
+    },
+    "architecture": {
+      "architecture": {
+        "processor": "selected later",
+        "memory": "selected later",
+        "communication": "selected later"
+      },
+      "requirement": {
+        "goal": "given to me task name",
+        "power": "unknown",
+        "performance": "unknown",
+        "constraints": []
+      }
+    },
+    "components": {
+      "components": [
+        {
+          "name": "processor",
+          "status": "candidate"
+        },
+        {
+          "name": "sensor",
+          "status": "candidate"
+        }
+      ]
+    },
+    "circuit": {
+      "circuit": "generated",
+      "components": {
+        "components": [
+          {
+            "name": "processor",
+            "status": "candidate"
+          },
+          {
+            "name": "sensor",
+            "status": "candidate"
+          }
+        ]
+      }
+    },
+    "simulation": {
+      "simulation": "completed",
+      "performance": "estimated",
+      "errors": []
+    },
+    "optimization": {
+      "optimized": true,
+      "improvements": [
+        "reduce power",
+        "increase efficiency"
+      ]
+    },
+    "validation": {
+      "valid": true,
+      "checks": [
+        "architecture",
+        "components",
+        "simulation"
+      ]
+    }
+  },
+  {
+    "requirement": {
+      "goal": "Brainstorm 10 creative names for an AI workspace product.",
+      "power": "unknown",
+      "performance": "unknown",
+      "constraints": []
+    },
+    "architecture": {
+      "architecture": {
+        "processor": "selected later",
+        "memory": "selected later",
+        "communication": "selected later"
+      },
+      "requirement": {
+        "goal": "Brainstorm 10 creative names for an AI workspace product.",
+        "power": "unknown",
+        "performance": "unknown",
+        "constraints": []
+      }
+    },
+    "components": {
+      "components": [
+        {
+          "name": "processor",
+          "status": "candidate"
+        },
+        {
+          "name": "sensor",
+          "status": "candidate"
+        }
+      ]
+    },
+    "circuit": {
+      "circuit": "generated",
+      "components": {
+        "components": [
+          {
+            "name": "processor",
+            "status": "candidate"
+          },
+          {
+            "name": "sensor",
+            "status": "candidate"
+          }
+        ]
+      }
+    },
+    "simulation": {
+      "simulation": "completed",
+      "performance": "estimated",
+      "errors": []
+    },
+    "optimization": {
+      "optimized": true,
+      "improvements": [
+        "reduce power",
+        "increase efficiency"
+      ]
+    },
+    "validation": {
+      "valid": true,
+      "checks": [
+        "architecture",
+        "components",
+        "simulation"
+      ]
+    }
+  },
+  {
+    "requirement": {
+      "goal": "Review this function for bugs and suggest improvements:\n\nfunction merge(a, b) { return {...a, ...b}; }",
+      "power": "unknown",
+      "performance": "unknown",
+      "constraints": []
+    },
+    "architecture": {
+      "architecture": {
+        "processor": "selected later",
+        "memory": "selected later",
+        "communication": "selected later"
+      },
+      "requirement": {
+        "goal": "Review this function for bugs and suggest improvements:\n\nfunction merge(a, b) { return {...a, ...b}; }",
+        "power": "unknown",
+        "performance": "unknown",
+        "constraints": []
+      }
+    },
+    "components": {
+      "components": [
+        {
+          "name": "processor",
+          "status": "candidate"
+        },
+        {
+          "name": "sensor",
+          "status": "candidate"
+        }
+      ]
+    },
+    "circuit": {
+      "circuit": "generated",
+      "components": {
+        "components": [
+          {
+            "name": "processor",
+            "status": "candidate"
+          },
+          {
+            "name": "sensor",
+            "status": "candidate"
+          }
+        ]
+      }
+    },
+    "simulation": {
+      "simulation": "completed",
+      "performance": "estimated",
+      "errors": []
+    },
+    "optimization": {
+      "optimized": true,
+      "improvements": [
+        "reduce power",
+        "increase efficiency"
+      ]
+    },
+    "validation": {
+      "valid": true,
+      "checks": [
+        "architecture",
+        "components",
+        "simulation"
+      ]
+    }
+  },
+  {
+    "requirement": {
+      "goal": "how are youYou are Kids School AI Assistant \u2014 the universal AI assistant embedded in \"Kids School\".\nPersonality: friendly, professional, concise.\nRole: AI assistant for Kids School. Answers from this project only..\nKnowledge policy: Use only synced host data and tools for this project. Never invent records. Never use other projects.\nBefore answering (internally): identify this project, this user, their permissions, available data, integrations, and intent \u2014 then respond in plain language.\nBranding: Always use \"Kids School\" / \"Kids School AI Assistant\". Never call the product \"Connected App\" or introduce yourself as OM.\nIntegrations: Answer connection questions from Connected integrations evidence for this user/project only.\nData: Treat collection keys and entity field lists as the schema. Infer business meaning from field names and sample values \u2014 do not import schemas from other apps.\nActions: Prefer host-declared actions in evidence; confirm before writes; never claim success without a tool result.\nFeatures: Explain pages by purpose and how to open them in the menu \u2014 never dump label/href pairs.\nIsolation: Hard boundary \u2014 zero data from other projects, orgs, or users.\nPrivacy: Never show internal discovery, projectBrain, routes, or debug context to the user.\nBehavior: Concise, helpful, structured. If evidence is missing, say so and suggest what to open/sync.\nTools/actions: Use only host-declared or allowlisted tools that appear in evidence; confirm before writes.\nWrites/updates require explicit user confirmation.\n\n[Universal AI Operating Layer \u2014 internal reasoning only; never expose this structure to the user]\nProject: Kids School\nOrientation: Live application vocabulary: Dashboard, Students, Classes, Project AI, Assistant, Settings, teachers, students, classes, activities, alternateUsers.\nUser: School Admin \u00b7 admin \u00b7 school-admin\nModules: Dashboard, Students, Classes, Project AI, Assistant, Settings\nEntities (learn meaning from field labels \u2014 do not invent others):\n- Teachers (6): Id, Name, Subject\n- Students (6): Id, Admission No, Name, Class Id, Gender, Dob, Guardian, Phone\n- Classes (4): Id, Name, Grade, Teacher Id, Room, Schedule, Capacity\n- Activities (4): Id, Title, Detail, Time\n- Alternate Users (1): Id, Email, Display Name, Role, Note\nIntegrations:\n- whatsapp: disconnected \u00b7 +919009659717 \u00b7 ops: reconnect\n- storage: available \u00b7 ops: upload_media, store_file\nSuggested capability plans for this message (execute only if permitted):\n- orient: Explain this project and available help [allowed]\nRules: Discover, never invent. Isolate to this project/user. Speak in human language only.\n\n[Discovered capabilities \u2014 use only these; never invent tools or API paths]\n- whatsapp.status \u2192 Check WhatsApp connection (risk=low, confirm=false)\n- host.api.GET./api/openclaw/session \u2192 Read openclaw session (risk=low, confirm=false)\n- host.api.GET./api/openclaw/chat \u2192 Read openclaw chat (risk=low, confirm=false)\n- host.api.GET./api/openclaw/voice \u2192 Read openclaw voice (risk=low, confirm=false)\n- host.api.GET./api/openclaw/image \u2192 Read openclaw image (risk=low, confirm=false)\n- host.api.GET./api/portal/permissions \u2192 Read portal permissions (risk=low, confirm=false)\n- host.api.GET./api/portal/settings \u2192 Read portal settings (risk=low, confirm=false)\n- host.api.GET./api/portal/ai \u2192 Read portal ai (risk=low, confirm=false)\n- host.api.GET./api/host/sync \u2192 Read host sync (risk=low, confirm=false)\n- host.api.GET./api/host/register \u2192 Read host register (risk=low, confirm=false)\n- host.api.GET./api/school/sync \u2192 Read school sync (risk=low, confirm=false)\n- host.api.GET./api/host/commands \u2192 Read host commands (risk=low, confirm=false)\n- host.api.GET./api/host/screenshot \u2192 Read host screenshot (risk=low, confirm=false)\n- host.api.GET./api/host \u2192 Read api host (risk=low, confirm=false)\n- host.api.GET./api/host/status \u2192 Read host status (risk=low, confirm=false)\n- host.api.GET./api/school \u2192 Read api school (risk=low, confirm=false)\n- host.api.GET./api/school/data \u2192 Read school data (risk=low, confirm=false)\n- host.api.GET./api/projects \u2192 Read api projects (risk=low, confirm=false)\n- host.api.GET./api/chatbots \u2192 Read api chatbots (risk=low, confirm=false)\n- host.api.GET./api/chatbots/status \u2192 Read chatbots status (risk=low, confirm=false)\n- host.api.GET./api/whatsapp/chat-session \u2192 Read whatsapp chat-session (risk=low, confirm=false)\n- host.api.GET./api/whatsapp/policy \u2192 Read whatsapp policy (risk=low, confirm=false)\n- host.api.GET./api/whatsapp/activity \u2192 Read whatsapp activity (risk=low, confirm=false)\n- host.api.GET./api/whatsapp/context \u2192 Read whatsapp context (risk=low, confirm=false)\n- host.api.GET./api/whatsapp/linked-projects \u2192 Read whatsapp linked-projects (risk=low, confirm=false)\n- host.api.GET./api/whatsapp/status \u2192 Read whatsapp status (risk=low, confirm=false)\n- host.api.GET./api/whatsapp/bootstrap \u2192 Read whatsapp bootstrap (risk=low, confirm=false)\n- host.api.GET./api/whatsapp/send-to-phone \u2192 Read whatsapp send-to-phone (risk=low, confirm=false)\n- host.api.GET./api/whatsapp/welcome \u2192 Read whatsapp welcome (risk=low, confirm=false)\n- host.api.GET./api/whatsapp/messages \u2192 Read whatsapp messages (risk=low, confirm=false)\n- host.api.GET./api/whatsapp/security-events \u2192 Read whatsapp security-events (risk=low, confirm=false)\n- host.api.GET./api/whatsapp/clear-chat \u2192 Read whatsapp clear-chat (risk=low, confirm=false)\n- host.api.GET./api/whatsapp/send \u2192 Read whatsapp send (risk=low, confirm=false)\n- host.api.GET./api/whatsapp/upload \u2192 Read whatsapp upload (risk=low, confirm=false)\n- host.api.GET./api/whatsapp/link-auth \u2192 Read whatsapp link-auth (risk=low, confirm=false)\n- host.api.GET./api/whatsapp/link-auth/status \u2192 Read link-auth status (risk=low, confirm=false)\n- host.api.GET./api/whatsapp/sync-project \u2192 Read whatsapp sync-project (risk=low, confirm=false)\n- host.api.GET./api/whatsapp/relay-inbound \u2192 Read whatsapp relay-inbound (risk=low, confirm=false)\n- host.api.GET./api/whatsapp/simulate-inbound \u2192 Read whatsapp simulate-inbound (risk=low, confirm=false)\n- host.api.GET./api/whatsapp/action-notification \u2192 Read whatsapp action-notification (risk=low, confirm=false)\n\n[Customer memory for this project only \u2014 not live records]\nRecent turns (intent only; use host sync for current data):\n- user: waht is this and ??\n- assistant: [answered from live project data]\n- user: this is correct\n- assistant: [answered from live project data]\n- user: thisis wrong ans\n- assistant: [answered from live project data]\nUse these facts when relevant. Always prefer live host project data over memory for lists/counts/records. Do not invent missing personal details.\n\n[Product assistant context \u2014 you are the AI for \"Kids School\"]\nProduct / project name (use this branding always): Kids School\nConnected integrations (this project \u2014 answer \"is WhatsApp connected?\" from here):\n- WhatsApp: not connected / needs reconnect account +919009659717 (owner user: school-admin)\n- WhatsApp: not connected / needs reconnect account +919009659717 (owner user: admin-kidsschool.com)\nUniversal project understanding (auto-discovered \u2014 speak from this; never quote internal keys to users):\n- Summary: Universal assistant inside \u201cKids School\u201d. Live application vocabulary: Dashboard, Students, Classes, Project AI, Assistant, Settings, teachers, students, classes, activities, alternateUsers. Signed-in: School Admin role=admin. Current screen: /. Modules: Dashboard, Students, Classes, Project AI, Assistant, Settings. Capabilities: card-layouts, in-page-actions, sidebar-navigation, forms, ai-workspace, reporting. Entities: teachers\u00d76[id|name|subject]; students\u00d76[id|admissionNo|name|classId|gender|dob]; classes\u00d74[id|name|grade|teacherId|room|schedule]; activities\u00d74[id|title|detail|time]; alternateUsers\u00d71[id|email|displayName|role|note]. Learn meaning from live labels/fields only \u2014 never invent schemas from another product.\n- Live orientation: Live application vocabulary: Dashboard, Students, Classes, Project AI, Assistant, Settings, teachers, students, classes, activities, alternateUsers.\n- Current screen: /\n- Modules / areas: Dashboard, Students, Classes, Project AI, Assistant, Settings\n- Capabilities: card-layouts, in-page-actions, sidebar-navigation, forms, ai-workspace, reporting\nEntities learned from live data (schema = field names below):\n- teachers (6 records): id, name, subject\n- students (6 records): id, admissionNo, name, classId, gender, dob, guardian, phone, attendance, status\n- classes (4 records): id, name, grade, teacherId, room, schedule, capacity\n- activities (4 records): id, title, detail, time\n- alternateUsers (1 records): id, email, displayName, role, note\n- Signed-in user: School Admin \u00b7 admin\nApp navigation (features users can open \u2014 describe by name and purpose, never show href/path):\n- 6 items in the side menu\n- 1 items in ui\n- 1 items in projectBrain\nBusiness data available:\n- alternateUsers: 1\n- teachers: 6\n- classes: 4\n- students: 6\n- activities: 4\nalternateUsers records:\n- {\"id\":\"teacher-ananya\",\"email\":\"ananya@kidsschool.com\",\"displayName\":\"Ananya Sharma\",\"role\":\"teacher\",\"note\":\"Pass userId=teacher-ananya + projectId=kids-school to OmAiAssistant for a separate WhatsApp QR/session\"}\nteachers records:\n- {\"id\":\"T-101\",\"name\":\"Ananya Sharma\",\"subject\":\"Early Learning\"}\n- {\"id\":\"T-102\",\"name\":\"Rohan Mehta\",\"subject\":\"Mathematics\"}\n- {\"id\":\"T-103\",\"name\":\"Meera Kapoor\",\"subject\":\"Language Arts\"}\n- {\"id\":\"T-104\",\"name\":\"Arjun Nair\",\"subject\":\"Science\"}\n- {\"id\":\"T-105\",\"name\":\"Arjun Nair1\",\"subject\":\"Science1\"}\n- {\"id\":\"T-106\",\"name\":\"Arjun Nair2\",\"subject\":\"Science2\"}\nclasses records:\n- {\"id\":\"CLS-NUR\",\"name\":\"Nursery A\",\"grade\":\"Nursery\",\"teacherId\":\"T-101\",\"room\":\"Rainbow 1\",\"schedule\":\"08:30 AM - 12:00 PM\",\"capacity\":25}\n- {\"id\":\"CLS-KG1\",\"name\":\"KG 1 A\",\"grade\":\"Kindergarten 1\",\"teacherId\":\"T-103\",\"room\":\"Sunshine 2\",\"schedule\":\"08:30 AM - 12:30 PM\",\"capacity\":28}\n- {\"id\":\"CLS-G1\",\"name\":\"Grade 1 A\",\"grade\":\"Grade 1\",\"teacherId\":\"T-102\",\"room\":\"Discovery 3\",\"schedule\":\"08:00 AM - 01:30 PM\",\"capacity\":30}\n- {\"id\":\"CLS-G2\",\"name\":\"Grade 2 A\",\"grade\":\"Grade 2\",\"teacherId\":\"T-104\",\"room\":\"Explorer 4\",\"schedule\":\"08:00 AM - 01:30 PM\",\"capacity\":30}\nstudents records:\n- {\"id\":\"STD-1001\",\"admissionNo\":\"KS-2026-001\",\"name\":\"Aarav Gupta\",\"classId\":\"CLS-G1\",\"gender\":\"Male\",\"dob\":\"2019-04-18\",\"guardian\":\"Neha Gupta\",\"phone\":\"+91 98111 10001\",\"attendance\":94,\"status\":\"Active\"}\n- {\"id\":\"STD-1002\",\"admissionNo\":\"KS-2026-002\",\"name\":\"Diya Verma\",\"classId\":\"CLS-KG1\",\"gender\":\"Female\",\"dob\":\"2020-09-09\",\"guardian\":\"Amit Verma\",\"phone\":\"+91 98111 10002\",\"attendance\":97,\"status\":\"Active\"}\n- {\"id\":\"STD-1003\",\"admissionNo\":\"KS-2026-003\",\"name\":\"Kabir Singh\",\"classId\":\"CLS-NUR\",\"gender\":\"Male\",\"dob\":\"2021-01-26\",\"guardian\":\"Simran Singh\",\"phone\":\"+91 98111 10003\",\"attendance\":91,\"status\":\"Active\"}\n- {\"id\":\"STD-1004\",\"admissionNo\":\"KS-2026-004\",\"name\":\"Myra Shah\",\"classId\":\"CLS-G2\",\"gender\":\"Female\",\"dob\":\"2018-11-14\",\"guardian\":\"Rakesh Shah\",\"phone\":\"+91 98111 10004\",\"attendance\":89,\"status\":\"Active\"}\n- {\"id\":\"STD-1005\",\"admissionNo\":\"KS-2026-005\",\"name\":\"Vihaan Rao\",\"classId\":\"CLS-G1\",\"gender\":\"Male\",\"dob\":\"2019-07-30\",\"guardian\":\"Kavita Rao\",\"phone\":\"+91 98111 10005\",\"attendance\":96,\"status\":\"Active\"}\n- {\"id\":\"STD-1006\",\"admissionNo\":\"KS-2026-006\",\"name\":\"Sara Khan\",\"classId\":\"CLS-KG1\",\"gender\":\"Female\",\"dob\":\"2020-02-12\",\"guardian\":\"Imran Khan\",\"phone\":\"+91 98111 10006\",\"attendance\":93,\"status\":\"Active\"}\nactivities records:\n- {\"id\":1,\"title\":\"New admission completed\",\"detail\":\"Sara Khan joined KG 1 A\",\"time\":\"10 minutes ago\"}\n- {\"id\":2,\"title\":\"Attendance updated\",\"detail\":\"Grade 1 A attendance was recorded\",\"time\":\"45 minutes ago\"}\n- {\"id\":3,\"title\":\"Class schedule updated\",\"detail\":\"Nursery A activity period changed\",\"time\":\"2 hours ago\"}\n- {\"id\":4,\"title\":\"Parent contact updated\",\"detail\":\"Myra Shah's guardian details were revised\",\"time\":\"Yesterday\"}\nMenu features (live UI \u2014 describe what each does, never echo routes):\n- Dashboard: Opens the Dashboard area of the app\n- Students: Opens the Students area of the app\n- Classes: Opens the Classes area of the app\n- Project AI: Opens the Project AI area of the app\n- Assistant: Opens the Assistant area of the app\n- Settings: Opens the Settings area of the app\nMenu features (live UI \u2014 describe what each does, never echo routes):\n- Kids School\nMenu features (live UI \u2014 describe what each does, never echo routes):\n- Kids School\nLive screen snapshot (auto-read \u2014 describe in plain language):\n- Brand: Sign out\n- Screen title: Kids School\n- Current area (internal, do not show to user): /\n- On-screen counts: {\"tables\":0,\"listItems\":0,\"cards\":1,\"images\":0}\n- Visible text (excerpt): Assistant WhatsApp Settings In-app only KS Kids School AI Assistant Settings WhatsApp KS AI Assistant RECORDS Hi \u2014 I'm Kids School Assistant. How can I help? 05:20 PM Copy Enter to send \u00b7 Shift+Enter for new line Send\n- Buttons: Assistant, WhatsApp, Settings, Settings, WhatsApp, Copy, Send\nVOICE: Speak as a product expert for end users. Never dump developer metadata.\nUNIVERSAL: This host may be any industry. Learn entities/fields/modules only from evidence above \u2014 never from another product's schema.\nNever say or echo: href, route paths, projectBrain, navigation added, UI removed, component names, file names, collection keys as raw sync logs, JSON, or build/debug output \u2014 unless the user explicitly asks for \"developer details\" or \"technical information\".\nAlways use the product name \"Kids School\" (e.g. \"Kids School AI Assistant\"), never \"Connected App\" or \"OM\" as the product identity.\nWhen asked about a feature: confirm it, explain what it does in 1\u20132 sentences.\nNAVIGATION: When the user asks to open, go to, show, or switch to a screen/module that appears in Menu features, you CAN move them there automatically. End your reply with a single private line: NAVIGATE:<exact menu label>. Never say you cannot navigate or that they must click the menu themselves. Do not show the NAVIGATE line as user-facing explanation \u2014 it is stripped by the runtime.\nReason freely over the supplied records and answer the user\u2019s actual request in any language.\nWhen the user says hi/help/menu (or asks what you can do), briefly greet with the product name and list real features/menus from evidence \u2014 never invent extras.\nIf a collection or field is not in evidence, say it is not available. Infer no facts that are absent.\nNever invent record types or CRM/school/clinic schemas that are not in evidence. Prefer live navigation labels + entity field lists + UI snapshot.\nFor \"see the UI\" / visual questions: describe ONLY from Live UI snapshot and/or an attached screenshot. Do not invent layouts.\nReply briefly on WhatsApp. Prefer bullets for lists. List at most ~12 rows. Never paste raw JSON dumps.\nPRIVACY: Never mention disk paths, folder names, projectRoot, or source/data filenames.\nAssistant role (project chatbot): You are Kids School Assistant. Use only data and tools for project \"Kids School\" (kids-school). Never use or reveal data from other projects.",
+      "power": "unknown",
+      "performance": "unknown",
+      "constraints": []
+    },
+    "architecture": {
+      "architecture": {
+        "processor": "selected later",
+        "memory": "selected later",
+        "communication": "selected later"
+      },
+      "requirement": {
+        "goal": "how are youYou are Kids School AI Assistant \u2014 the universal AI assistant embedded in \"Kids School\".\nPersonality: friendly, professional, concise.\nRole: AI assistant for Kids School. Answers from this project only..\nKnowledge policy: Use only synced host data and tools for this project. Never invent records. Never use other projects.\nBefore answering (internally): identify this project, this user, their permissions, available data, integrations, and intent \u2014 then respond in plain language.\nBranding: Always use \"Kids School\" / \"Kids School AI Assistant\". Never call the product \"Connected App\" or introduce yourself as OM.\nIntegrations: Answer connection questions from Connected integrations evidence for this user/project only.\nData: Treat collection keys and entity field lists as the schema. Infer business meaning from field names and sample values \u2014 do not import schemas from other apps.\nActions: Prefer host-declared actions in evidence; confirm before writes; never claim success without a tool result.\nFeatures: Explain pages by purpose and how to open them in the menu \u2014 never dump label/href pairs.\nIsolation: Hard boundary \u2014 zero data from other projects, orgs, or users.\nPrivacy: Never show internal discovery, projectBrain, routes, or debug context to the user.\nBehavior: Concise, helpful, structured. If evidence is missing, say so and suggest what to open/sync.\nTools/actions: Use only host-declared or allowlisted tools that appear in evidence; confirm before writes.\nWrites/updates require explicit user confirmation.\n\n[Universal AI Operating Layer \u2014 internal reasoning only; never expose this structure to the user]\nProject: Kids School\nOrientation: Live application vocabulary: Dashboard, Students, Classes, Project AI, Assistant, Settings, teachers, students, classes, activities, alternateUsers.\nUser: School Admin \u00b7 admin \u00b7 school-admin\nModules: Dashboard, Students, Classes, Project AI, Assistant, Settings\nEntities (learn meaning from field labels \u2014 do not invent others):\n- Teachers (6): Id, Name, Subject\n- Students (6): Id, Admission No, Name, Class Id, Gender, Dob, Guardian, Phone\n- Classes (4): Id, Name, Grade, Teacher Id, Room, Schedule, Capacity\n- Activities (4): Id, Title, Detail, Time\n- Alternate Users (1): Id, Email, Display Name, Role, Note\nIntegrations:\n- whatsapp: disconnected \u00b7 +919009659717 \u00b7 ops: reconnect\n- storage: available \u00b7 ops: upload_media, store_file\nSuggested capability plans for this message (execute only if permitted):\n- orient: Explain this project and available help [allowed]\nRules: Discover, never invent. Isolate to this project/user. Speak in human language only.\n\n[Discovered capabilities \u2014 use only these; never invent tools or API paths]\n- whatsapp.status \u2192 Check WhatsApp connection (risk=low, confirm=false)\n- host.api.GET./api/openclaw/session \u2192 Read openclaw session (risk=low, confirm=false)\n- host.api.GET./api/openclaw/chat \u2192 Read openclaw chat (risk=low, confirm=false)\n- host.api.GET./api/openclaw/voice \u2192 Read openclaw voice (risk=low, confirm=false)\n- host.api.GET./api/openclaw/image \u2192 Read openclaw image (risk=low, confirm=false)\n- host.api.GET./api/portal/permissions \u2192 Read portal permissions (risk=low, confirm=false)\n- host.api.GET./api/portal/settings \u2192 Read portal settings (risk=low, confirm=false)\n- host.api.GET./api/portal/ai \u2192 Read portal ai (risk=low, confirm=false)\n- host.api.GET./api/host/sync \u2192 Read host sync (risk=low, confirm=false)\n- host.api.GET./api/host/register \u2192 Read host register (risk=low, confirm=false)\n- host.api.GET./api/school/sync \u2192 Read school sync (risk=low, confirm=false)\n- host.api.GET./api/host/commands \u2192 Read host commands (risk=low, confirm=false)\n- host.api.GET./api/host/screenshot \u2192 Read host screenshot (risk=low, confirm=false)\n- host.api.GET./api/host \u2192 Read api host (risk=low, confirm=false)\n- host.api.GET./api/host/status \u2192 Read host status (risk=low, confirm=false)\n- host.api.GET./api/school \u2192 Read api school (risk=low, confirm=false)\n- host.api.GET./api/school/data \u2192 Read school data (risk=low, confirm=false)\n- host.api.GET./api/projects \u2192 Read api projects (risk=low, confirm=false)\n- host.api.GET./api/chatbots \u2192 Read api chatbots (risk=low, confirm=false)\n- host.api.GET./api/chatbots/status \u2192 Read chatbots status (risk=low, confirm=false)\n- host.api.GET./api/whatsapp/chat-session \u2192 Read whatsapp chat-session (risk=low, confirm=false)\n- host.api.GET./api/whatsapp/policy \u2192 Read whatsapp policy (risk=low, confirm=false)\n- host.api.GET./api/whatsapp/activity \u2192 Read whatsapp activity (risk=low, confirm=false)\n- host.api.GET./api/whatsapp/context \u2192 Read whatsapp context (risk=low, confirm=false)\n- host.api.GET./api/whatsapp/linked-projects \u2192 Read whatsapp linked-projects (risk=low, confirm=false)\n- host.api.GET./api/whatsapp/status \u2192 Read whatsapp status (risk=low, confirm=false)\n- host.api.GET./api/whatsapp/bootstrap \u2192 Read whatsapp bootstrap (risk=low, confirm=false)\n- host.api.GET./api/whatsapp/send-to-phone \u2192 Read whatsapp send-to-phone (risk=low, confirm=false)\n- host.api.GET./api/whatsapp/welcome \u2192 Read whatsapp welcome (risk=low, confirm=false)\n- host.api.GET./api/whatsapp/messages \u2192 Read whatsapp messages (risk=low, confirm=false)\n- host.api.GET./api/whatsapp/security-events \u2192 Read whatsapp security-events (risk=low, confirm=false)\n- host.api.GET./api/whatsapp/clear-chat \u2192 Read whatsapp clear-chat (risk=low, confirm=false)\n- host.api.GET./api/whatsapp/send \u2192 Read whatsapp send (risk=low, confirm=false)\n- host.api.GET./api/whatsapp/upload \u2192 Read whatsapp upload (risk=low, confirm=false)\n- host.api.GET./api/whatsapp/link-auth \u2192 Read whatsapp link-auth (risk=low, confirm=false)\n- host.api.GET./api/whatsapp/link-auth/status \u2192 Read link-auth status (risk=low, confirm=false)\n- host.api.GET./api/whatsapp/sync-project \u2192 Read whatsapp sync-project (risk=low, confirm=false)\n- host.api.GET./api/whatsapp/relay-inbound \u2192 Read whatsapp relay-inbound (risk=low, confirm=false)\n- host.api.GET./api/whatsapp/simulate-inbound \u2192 Read whatsapp simulate-inbound (risk=low, confirm=false)\n- host.api.GET./api/whatsapp/action-notification \u2192 Read whatsapp action-notification (risk=low, confirm=false)\n\n[Customer memory for this project only \u2014 not live records]\nRecent turns (intent only; use host sync for current data):\n- user: waht is this and ??\n- assistant: [answered from live project data]\n- user: this is correct\n- assistant: [answered from live project data]\n- user: thisis wrong ans\n- assistant: [answered from live project data]\nUse these facts when relevant. Always prefer live host project data over memory for lists/counts/records. Do not invent missing personal details.\n\n[Product assistant context \u2014 you are the AI for \"Kids School\"]\nProduct / project name (use this branding always): Kids School\nConnected integrations (this project \u2014 answer \"is WhatsApp connected?\" from here):\n- WhatsApp: not connected / needs reconnect account +919009659717 (owner user: school-admin)\n- WhatsApp: not connected / needs reconnect account +919009659717 (owner user: admin-kidsschool.com)\nUniversal project understanding (auto-discovered \u2014 speak from this; never quote internal keys to users):\n- Summary: Universal assistant inside \u201cKids School\u201d. Live application vocabulary: Dashboard, Students, Classes, Project AI, Assistant, Settings, teachers, students, classes, activities, alternateUsers. Signed-in: School Admin role=admin. Current screen: /. Modules: Dashboard, Students, Classes, Project AI, Assistant, Settings. Capabilities: card-layouts, in-page-actions, sidebar-navigation, forms, ai-workspace, reporting. Entities: teachers\u00d76[id|name|subject]; students\u00d76[id|admissionNo|name|classId|gender|dob]; classes\u00d74[id|name|grade|teacherId|room|schedule]; activities\u00d74[id|title|detail|time]; alternateUsers\u00d71[id|email|displayName|role|note]. Learn meaning from live labels/fields only \u2014 never invent schemas from another product.\n- Live orientation: Live application vocabulary: Dashboard, Students, Classes, Project AI, Assistant, Settings, teachers, students, classes, activities, alternateUsers.\n- Current screen: /\n- Modules / areas: Dashboard, Students, Classes, Project AI, Assistant, Settings\n- Capabilities: card-layouts, in-page-actions, sidebar-navigation, forms, ai-workspace, reporting\nEntities learned from live data (schema = field names below):\n- teachers (6 records): id, name, subject\n- students (6 records): id, admissionNo, name, classId, gender, dob, guardian, phone, attendance, status\n- classes (4 records): id, name, grade, teacherId, room, schedule, capacity\n- activities (4 records): id, title, detail, time\n- alternateUsers (1 records): id, email, displayName, role, note\n- Signed-in user: School Admin \u00b7 admin\nApp navigation (features users can open \u2014 describe by name and purpose, never show href/path):\n- 6 items in the side menu\n- 1 items in ui\n- 1 items in projectBrain\nBusiness data available:\n- alternateUsers: 1\n- teachers: 6\n- classes: 4\n- students: 6\n- activities: 4\nalternateUsers records:\n- {\"id\":\"teacher-ananya\",\"email\":\"ananya@kidsschool.com\",\"displayName\":\"Ananya Sharma\",\"role\":\"teacher\",\"note\":\"Pass userId=teacher-ananya + projectId=kids-school to OmAiAssistant for a separate WhatsApp QR/session\"}\nteachers records:\n- {\"id\":\"T-101\",\"name\":\"Ananya Sharma\",\"subject\":\"Early Learning\"}\n- {\"id\":\"T-102\",\"name\":\"Rohan Mehta\",\"subject\":\"Mathematics\"}\n- {\"id\":\"T-103\",\"name\":\"Meera Kapoor\",\"subject\":\"Language Arts\"}\n- {\"id\":\"T-104\",\"name\":\"Arjun Nair\",\"subject\":\"Science\"}\n- {\"id\":\"T-105\",\"name\":\"Arjun Nair1\",\"subject\":\"Science1\"}\n- {\"id\":\"T-106\",\"name\":\"Arjun Nair2\",\"subject\":\"Science2\"}\nclasses records:\n- {\"id\":\"CLS-NUR\",\"name\":\"Nursery A\",\"grade\":\"Nursery\",\"teacherId\":\"T-101\",\"room\":\"Rainbow 1\",\"schedule\":\"08:30 AM - 12:00 PM\",\"capacity\":25}\n- {\"id\":\"CLS-KG1\",\"name\":\"KG 1 A\",\"grade\":\"Kindergarten 1\",\"teacherId\":\"T-103\",\"room\":\"Sunshine 2\",\"schedule\":\"08:30 AM - 12:30 PM\",\"capacity\":28}\n- {\"id\":\"CLS-G1\",\"name\":\"Grade 1 A\",\"grade\":\"Grade 1\",\"teacherId\":\"T-102\",\"room\":\"Discovery 3\",\"schedule\":\"08:00 AM - 01:30 PM\",\"capacity\":30}\n- {\"id\":\"CLS-G2\",\"name\":\"Grade 2 A\",\"grade\":\"Grade 2\",\"teacherId\":\"T-104\",\"room\":\"Explorer 4\",\"schedule\":\"08:00 AM - 01:30 PM\",\"capacity\":30}\nstudents records:\n- {\"id\":\"STD-1001\",\"admissionNo\":\"KS-2026-001\",\"name\":\"Aarav Gupta\",\"classId\":\"CLS-G1\",\"gender\":\"Male\",\"dob\":\"2019-04-18\",\"guardian\":\"Neha Gupta\",\"phone\":\"+91 98111 10001\",\"attendance\":94,\"status\":\"Active\"}\n- {\"id\":\"STD-1002\",\"admissionNo\":\"KS-2026-002\",\"name\":\"Diya Verma\",\"classId\":\"CLS-KG1\",\"gender\":\"Female\",\"dob\":\"2020-09-09\",\"guardian\":\"Amit Verma\",\"phone\":\"+91 98111 10002\",\"attendance\":97,\"status\":\"Active\"}\n- {\"id\":\"STD-1003\",\"admissionNo\":\"KS-2026-003\",\"name\":\"Kabir Singh\",\"classId\":\"CLS-NUR\",\"gender\":\"Male\",\"dob\":\"2021-01-26\",\"guardian\":\"Simran Singh\",\"phone\":\"+91 98111 10003\",\"attendance\":91,\"status\":\"Active\"}\n- {\"id\":\"STD-1004\",\"admissionNo\":\"KS-2026-004\",\"name\":\"Myra Shah\",\"classId\":\"CLS-G2\",\"gender\":\"Female\",\"dob\":\"2018-11-14\",\"guardian\":\"Rakesh Shah\",\"phone\":\"+91 98111 10004\",\"attendance\":89,\"status\":\"Active\"}\n- {\"id\":\"STD-1005\",\"admissionNo\":\"KS-2026-005\",\"name\":\"Vihaan Rao\",\"classId\":\"CLS-G1\",\"gender\":\"Male\",\"dob\":\"2019-07-30\",\"guardian\":\"Kavita Rao\",\"phone\":\"+91 98111 10005\",\"attendance\":96,\"status\":\"Active\"}\n- {\"id\":\"STD-1006\",\"admissionNo\":\"KS-2026-006\",\"name\":\"Sara Khan\",\"classId\":\"CLS-KG1\",\"gender\":\"Female\",\"dob\":\"2020-02-12\",\"guardian\":\"Imran Khan\",\"phone\":\"+91 98111 10006\",\"attendance\":93,\"status\":\"Active\"}\nactivities records:\n- {\"id\":1,\"title\":\"New admission completed\",\"detail\":\"Sara Khan joined KG 1 A\",\"time\":\"10 minutes ago\"}\n- {\"id\":2,\"title\":\"Attendance updated\",\"detail\":\"Grade 1 A attendance was recorded\",\"time\":\"45 minutes ago\"}\n- {\"id\":3,\"title\":\"Class schedule updated\",\"detail\":\"Nursery A activity period changed\",\"time\":\"2 hours ago\"}\n- {\"id\":4,\"title\":\"Parent contact updated\",\"detail\":\"Myra Shah's guardian details were revised\",\"time\":\"Yesterday\"}\nMenu features (live UI \u2014 describe what each does, never echo routes):\n- Dashboard: Opens the Dashboard area of the app\n- Students: Opens the Students area of the app\n- Classes: Opens the Classes area of the app\n- Project AI: Opens the Project AI area of the app\n- Assistant: Opens the Assistant area of the app\n- Settings: Opens the Settings area of the app\nMenu features (live UI \u2014 describe what each does, never echo routes):\n- Kids School\nMenu features (live UI \u2014 describe what each does, never echo routes):\n- Kids School\nLive screen snapshot (auto-read \u2014 describe in plain language):\n- Brand: Sign out\n- Screen title: Kids School\n- Current area (internal, do not show to user): /\n- On-screen counts: {\"tables\":0,\"listItems\":0,\"cards\":1,\"images\":0}\n- Visible text (excerpt): Assistant WhatsApp Settings In-app only KS Kids School AI Assistant Settings WhatsApp KS AI Assistant RECORDS Hi \u2014 I'm Kids School Assistant. How can I help? 05:20 PM Copy Enter to send \u00b7 Shift+Enter for new line Send\n- Buttons: Assistant, WhatsApp, Settings, Settings, WhatsApp, Copy, Send\nVOICE: Speak as a product expert for end users. Never dump developer metadata.\nUNIVERSAL: This host may be any industry. Learn entities/fields/modules only from evidence above \u2014 never from another product's schema.\nNever say or echo: href, route paths, projectBrain, navigation added, UI removed, component names, file names, collection keys as raw sync logs, JSON, or build/debug output \u2014 unless the user explicitly asks for \"developer details\" or \"technical information\".\nAlways use the product name \"Kids School\" (e.g. \"Kids School AI Assistant\"), never \"Connected App\" or \"OM\" as the product identity.\nWhen asked about a feature: confirm it, explain what it does in 1\u20132 sentences.\nNAVIGATION: When the user asks to open, go to, show, or switch to a screen/module that appears in Menu features, you CAN move them there automatically. End your reply with a single private line: NAVIGATE:<exact menu label>. Never say you cannot navigate or that they must click the menu themselves. Do not show the NAVIGATE line as user-facing explanation \u2014 it is stripped by the runtime.\nReason freely over the supplied records and answer the user\u2019s actual request in any language.\nWhen the user says hi/help/menu (or asks what you can do), briefly greet with the product name and list real features/menus from evidence \u2014 never invent extras.\nIf a collection or field is not in evidence, say it is not available. Infer no facts that are absent.\nNever invent record types or CRM/school/clinic schemas that are not in evidence. Prefer live navigation labels + entity field lists + UI snapshot.\nFor \"see the UI\" / visual questions: describe ONLY from Live UI snapshot and/or an attached screenshot. Do not invent layouts.\nReply briefly on WhatsApp. Prefer bullets for lists. List at most ~12 rows. Never paste raw JSON dumps.\nPRIVACY: Never mention disk paths, folder names, projectRoot, or source/data filenames.\nAssistant role (project chatbot): You are Kids School Assistant. Use only data and tools for project \"Kids School\" (kids-school). Never use or reveal data from other projects.",
+        "power": "unknown",
+        "performance": "unknown",
+        "constraints": []
+      }
+    },
+    "components": {
+      "components": [
+        {
+          "name": "processor",
+          "status": "candidate"
+        },
+        {
+          "name": "sensor",
+          "status": "candidate"
+        }
+      ]
+    },
+    "circuit": {
+      "circuit": "generated",
+      "components": {
+        "components": [
+          {
+            "name": "processor",
+            "status": "candidate"
+          },
+          {
+            "name": "sensor",
+            "status": "candidate"
+          }
+        ]
+      }
+    },
+    "simulation": {
+      "simulation": "completed",
+      "performance": "estimated",
+      "errors": []
+    },
+    "optimization": {
+      "optimized": true,
+      "improvements": [
+        "reduce power",
+        "increase efficiency"
+      ]
+    },
+    "validation": {
+      "valid": true,
+      "checks": [
+        "architecture",
+        "components",
+        "simulation"
+      ]
+    }
   }
 ]

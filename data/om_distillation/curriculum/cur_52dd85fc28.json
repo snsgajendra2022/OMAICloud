@@ -1,0 +1,50 @@
+{
+  "step": "94.11",
+  "curriculum_id": "cur_52dd85fc28",
+  "topic": "testing and observability",
+  "domain": "software",
+  "count": 5,
+  "questions": [
+    {
+      "id": "q_24e202c4",
+      "question": "What is testing and observability and when should you use it?",
+      "domain": "software",
+      "level": "foundational",
+      "topic": "testing and observability",
+      "priority": 1
+    },
+    {
+      "id": "q_98d5414a",
+      "question": "How do you test and observe a testing and observability system?",
+      "domain": "software",
+      "level": "intermediate",
+      "topic": "testing and observability",
+      "priority": 2
+    },
+    {
+      "id": "q_1bb8bc5a",
+      "question": "How would you harden testing and observability for security and compliance?",
+      "domain": "software",
+      "level": "advanced",
+      "topic": "testing and observability",
+      "priority": 3
+    },
+    {
+      "id": "q_f9cb1c01",
+      "question": "Define SLOs, queues, and rollback strategy for a testing and observability platform.",
+      "domain": "software",
+      "level": "systems",
+      "topic": "testing and observability",
+      "priority": 4
+    },
+    {
+      "id": "q_cf87379f",
+      "question": "Create an end-to-end roadmap to ship testing and observability across teams.",
+      "domain": "software",
+      "level": "systems",
+      "topic": "testing and observability",
+      "priority": 4
+    }
+  ],
+  "created_at": "2026-09-10T14:28:31Z"
+}

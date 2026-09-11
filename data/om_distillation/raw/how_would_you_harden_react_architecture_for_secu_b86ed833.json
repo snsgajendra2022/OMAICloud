@@ -1,0 +1,13 @@
+{
+  "run_id": "how_would_you_harden_react_architecture_for_secu_b86ed833",
+  "task": "How would you harden React architecture for security and compliance?",
+  "responses": [
+    {
+      "provider": "mistral:latest",
+      "model": "",
+      "source": "live",
+      "text": "",
+      "error": "too_short"
+    }
+  ]
+}

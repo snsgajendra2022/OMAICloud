@@ -1,0 +1,50 @@
+{
+  "step": "94.11",
+  "curriculum_id": "cur_08466f6cf0",
+  "topic": "Kubernetes and containers",
+  "domain": "devops",
+  "count": 5,
+  "questions": [
+    {
+      "id": "q_2d267bd7",
+      "question": "Explain Kubernetes and containers architecture in plain language.",
+      "domain": "devops",
+      "level": "foundational",
+      "topic": "Kubernetes and containers",
+      "priority": 1
+    },
+    {
+      "id": "q_e91b119d",
+      "question": "How do networking and storage work in Kubernetes and containers?",
+      "domain": "devops",
+      "level": "intermediate",
+      "topic": "Kubernetes and containers",
+      "priority": 2
+    },
+    {
+      "id": "q_5087052a",
+      "question": "Plan multi-cluster Kubernetes and containers with observability and policy controls.",
+      "domain": "devops",
+      "level": "advanced",
+      "topic": "Kubernetes and containers",
+      "priority": 3
+    },
+    {
+      "id": "q_00400ac7",
+      "question": "Create an organization-wide Kubernetes and containers operating model with roles and runbooks.",
+      "domain": "devops",
+      "level": "systems",
+      "topic": "Kubernetes and containers",
+      "priority": 4
+    },
+    {
+      "id": "q_259724d6",
+      "question": "Create an organization-wide Kubernetes and containers operating model with roles and runbooks.",
+      "domain": "devops",
+      "level": "systems",
+      "topic": "Kubernetes and containers",
+      "priority": 4
+    }
+  ],
+  "created_at": "2026-09-10T14:28:31Z"
+}
