@@ -71,9 +71,22 @@ LLM_CATALOG: dict[str, dict[str, Any]] = {
         "name": "DeepSeek",
         "vendor": "DeepSeek",
         "style": "openai",
-        "base_url": "https://api.deepseek.com",
+        "base_url": "https://api.deepseek.com/v1",
         "model": "deepseek-chat",
         "env_keys": ("OM_AI_DEEPSEEK_API_KEY", "DEEPSEEK_API_KEY"),
+    },
+    "openrouter": {
+        "name": "OpenRouter",
+        "vendor": "OpenRouter",
+        "style": "openai",
+        "base_url": "https://openrouter.ai/api/v1",
+        # Sensible default — change via OPENROUTER_MODEL env if needed.
+        "model": "openrouter/auto",
+        "env_keys": ("OM_AI_OPENROUTER_API_KEY", "OPENROUTER_API_KEY"),
+        "extra_headers": {
+            "HTTP-Referer": "https://om.ai",
+            "X-Title": "OM AI",
+        },
     },
     "grok": {
         "name": "Grok",
@@ -116,6 +129,8 @@ def normalize_provider_id(model: str | None) -> str | None:
         "meta": "llama",
         "llama3": "llama",
         "groq": "llama",
+        "openrouter": "openrouter",
+        "or": "openrouter",
     }
     if raw.startswith("om-l") or raw.startswith("om-level"):
         return "om"
@@ -185,6 +200,40 @@ def _normalize_messages(messages: list[dict]) -> list[dict[str, str]]:
     return out
 
 
+def _friendly_llm_http_error(provider_name: str, status_code: int, body: str) -> str:
+    """Turn raw provider HTTP errors into short UI-safe messages."""
+    import json as _json
+
+    msg = ""
+    code = ""
+    try:
+        data = _json.loads(body or "")
+        err = data.get("error") if isinstance(data, dict) else None
+        if isinstance(err, dict):
+            msg = str(err.get("message") or "").strip()
+            code = str(err.get("code") or err.get("type") or "").strip()
+        elif isinstance(err, str):
+            msg = err.strip()
+    except Exception:
+        msg = (body or "").strip()[:200]
+
+    low = f"{msg} {code}".lower()
+    if status_code in {401, 403} or "invalid api key" in low or "authentication" in low:
+        return f"{provider_name}: API key rejected. Paste a valid key in Settings → AI, then click Use."
+    if status_code == 402 or "insufficient balance" in low or "insufficient_quota" in low or "billing" in low:
+        return (
+            f"{provider_name}: account has no credit / insufficient balance. "
+            "Add balance on the provider website, then try again."
+        )
+    if status_code == 429 or "rate limit" in low:
+        return f"{provider_name}: rate limited. Wait a moment and retry."
+    if "model" in low and ("not found" in low or "does not exist" in low or "not support" in low):
+        return f"{provider_name}: model not available for this key/account ({msg or code or status_code})."
+    if msg:
+        return f"{provider_name} error ({status_code}): {msg}"
+    return f"{provider_name} HTTP {status_code}: {(body or '')[:240]}"
+
+
 def chat_via_openai_compat(
     messages: list[dict],
     *,
@@ -194,8 +243,12 @@ def chat_via_openai_compat(
     max_tokens: int = 1024,
     temperature: float = 0.7,
     top_p: float = 1.0,
+    provider_name: str = "External LLM",
+    extra_headers: dict[str, str] | None = None,
 ) -> str:
-    url = f"{base_url.rstrip('/')}/chat/completions"
+    # DeepSeek / OpenAI-compatible hosts accept both .../v1 and bare host.
+    root = base_url.rstrip("/")
+    url = f"{root}/chat/completions"
     payload = {
         "model": model,
         "messages": _normalize_messages(messages),
@@ -207,11 +260,14 @@ def chat_via_openai_compat(
         "Authorization": f"Bearer {api_key}",
         "Content-Type": "application/json",
     }
+    if extra_headers:
+        for k, v in extra_headers.items():
+            if str(v or "").strip():
+                headers[str(k)] = str(v)
     with httpx.Client(timeout=120.0) as client:
         r = client.post(url, json=payload, headers=headers)
         if r.status_code >= 400:
-            detail = r.text[:400]
-            raise RuntimeError(f"External LLM HTTP {r.status_code}: {detail}")
+            raise RuntimeError(_friendly_llm_http_error(provider_name, r.status_code, r.text[:800]))
         data = r.json()
     try:
         return str(data["choices"][0]["message"]["content"])
@@ -286,7 +342,12 @@ def chat_external(
     if not key:
         raise RuntimeError(f"No API key for {meta['name']}")
     model = str(meta.get("model") or provider_id)
+    # Optional per-provider model override, e.g. OPENROUTER_MODEL=anthropic/claude-3.5-sonnet
+    env_model = (os.getenv(f"OM_AI_{provider_id.upper()}_MODEL") or os.getenv(f"{provider_id.upper()}_MODEL") or "").strip()
+    if env_model:
+        model = env_model
     style = meta.get("style") or "openai"
+    name = str(meta.get("name") or provider_id)
     if style == "anthropic":
         text = chat_via_anthropic(
             messages,
@@ -296,6 +357,7 @@ def chat_external(
             temperature=temperature,
         )
     else:
+        extra = meta.get("extra_headers") if isinstance(meta.get("extra_headers"), dict) else None
         text = chat_via_openai_compat(
             messages,
             api_key=key,
@@ -304,8 +366,10 @@ def chat_external(
             max_tokens=max_tokens,
             temperature=temperature,
             top_p=top_p,
+            provider_name=name,
+            extra_headers=extra,
         )
-    return text, str(meta.get("name") or provider_id), str(meta.get("vendor") or "")
+    return text, name, str(meta.get("vendor") or "")
 
 
 def public_catalog(

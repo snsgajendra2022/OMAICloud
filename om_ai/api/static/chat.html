@@ -929,6 +929,7 @@ const state = {
   view:"chat", projects:[], assistants:[], activeProjectId:null, projectFilter:"all", projectSort:"updated", projectQuery:"",
   selectedAssistantId:null, notifications:[], unreadNotifs:0,
   tools:{web:false,code:false}, abort:null, searchQuery:"",
+  _pendingLlmKeys: {},
   convFilter:"all", recognition:null, ttsActive:false,
   navMoreOpen:false, expandedProjects:{},
   sideSections:{pinned:false, projects:true, chats:true},
@@ -2005,11 +2006,12 @@ async function streamCompletion(messages) {
   state.abort = controller;
   const maxTok = Math.max(64, Math.min(2048, Number((state.settings&&state.settings.max_tokens)||256)||256));
   const temp = state.settings ? Number(state.settings.temperature??0.55) : 0.55;
+  const modelId = activeChatModel();
   const res = await fetch("/api/v1/chat/completions", {
     method:"POST", credentials:"include", signal:controller.signal,
     headers:{"Content-Type":"application/json"},
     body:JSON.stringify({
-      model:normalizeModelId(state.model||"OM-L5"), messages,
+      model:modelId, messages,
       max_tokens:maxTok, temperature:temp, stream:true,
       project_id:state.activeProjectId||undefined,
       conversation_id:state.currentId||undefined,
@@ -2026,8 +2028,7 @@ async function streamCompletion(messages) {
     throw new Error(detail);
   }
   const reader = res.body.getReader(), decoder = new TextDecoder();
-  let buffer = "", full = "";
-  // Intent / tools / memory still run server-side; do not animate phase labels in the UI.
+  let buffer = "", full = "", usedBackend = "", streamError = "";
   if (state._rxPhaseTimer) { clearInterval(state._rxPhaseTimer); state._rxPhaseTimer = null; }
   state._rxPhase = "";
   try {
@@ -2043,6 +2044,13 @@ async function streamCompletion(messages) {
       if (payload === "[DONE]") continue;
       try {
         const json = JSON.parse(payload);
+        if (json.error) {
+          const msg = (json.error && (json.error.message || json.error)) || "Chat failed";
+          streamError = typeof msg === "string" ? msg : JSON.stringify(msg);
+          continue;
+        }
+        if (json.om_backend) usedBackend = String(json.om_backend);
+        if (json.om_provider) state._lastProvider = String(json.om_provider);
         const delta = json.choices && json.choices[0] && json.choices[0].delta;
         if (delta && typeof delta.content === "string") {
           full += delta.content;
@@ -2050,19 +2058,23 @@ async function streamCompletion(messages) {
           if (last && last.role === "assistant") last.content = full;
           updateStreamBubble(full);
         }
-        // Keep the user's OM-L1…L5 selection; do not let stream model overwrite the picker.
-        if (json.model) {
-          const mid = normalizeModelId(json.model);
-          if (/^OM-L[1-5]$/i.test(mid) && mid !== normalizeModelId(state.model)) {
-            // Only sync when server reports a different valid OM level (settings race).
-            // Prefer keeping the in-composer selection during an active send.
-          }
+        if (json.model && isExternalModelId(json.model)) {
+          state._lastStreamModel = String(json.model);
         }
       } catch (_) {}
     }
   }
   } finally {
     if (state._rxPhaseTimer) { clearInterval(state._rxPhaseTimer); state._rxPhaseTimer = null; }
+  }
+  if (streamError) throw new Error(streamError);
+  state._lastBackend = usedBackend || "";
+  if (!String(full || "").trim()) {
+    throw new Error(
+      isExternalModelId(modelId)
+        ? ("No reply from "+modelId+". Check API key in Settings → AI, then click Use.")
+        : ("No reply from "+modelId+". Try again or switch model.")
+    );
   }
   return full;
 }
@@ -2086,7 +2098,8 @@ async function sendPrompt(text) {
   const reqMsgs = buildRequestMessages();
   try {
     const reply = await streamCompletion(reqMsgs);
-    const clean = String(reply||"").trim()||"Hello — I'm OM. How can I help you?";
+    const clean = String(reply||"").trim();
+    if (!clean) throw new Error("Empty model reply");
     const last = state.messages[state.messages.length-1];
     if (last && last.role === "assistant") {
       last.content = clean;
@@ -2197,7 +2210,11 @@ async function loadConversation(id, opts) {
   if (data.project_id && data.model) { /* noop */ }
   if (data.project_id) {
     const proj = state.projects.find(p => p.id === data.project_id);
-    if (proj && proj.model) state.model = normalizeModelId(proj.model);
+    // Do not overwrite an active external LLM (DeepSeek/GPT/…) with a project OM level.
+    const settingsDefault = (state.settings && state.settings.default_model) || "";
+    if (proj && proj.model && !(isExternalModelId(state.model) || isExternalModelId(settingsDefault))) {
+      state.model = normalizeModelId(proj.model);
+    }
   }
   updateTopTitle(); setView("chat",true);
   renderConvList(); renderMessages();
@@ -2226,29 +2243,34 @@ function renderModels() {
     return id && !/^OM-L[1-5]$/i.test(id) && !/^(OM-1\.0|om-1\.0)$/i.test(id);
   });
   const list = evo.concat(extras);
-  state.model = normalizeModelId(state.model);
+  state.model = isExternalModelId(state.model) ? String(state.model).toLowerCase() : normalizeModelId(state.model);
   list.forEach(m => {
     const id = m.id||m;
+    const idNorm = isExternalModelId(id) ? String(id).toLowerCase() : normalizeModelId(id);
     const b = document.createElement("button"); b.type = "button";
-    b.className = id === state.model ? "active":"";
+    b.className = idNorm === state.model || String(id).toLowerCase() === String(state.model).toLowerCase() ? "active":"";
     b.textContent = m.name||id;
     b.addEventListener("click", async () => {
-      state.model = normalizeModelId(id);
+      state.model = isExternalModelId(id) ? String(id).toLowerCase() : normalizeModelId(id);
       els.modelBtn.innerHTML = escapeHtml(m.name||id)+svg("chevD",14);
       updateComposerChip();
       els.modelDrop.classList.remove("open");
       await api("/v1/settings",{method:"PATCH",body:JSON.stringify({default_model:state.model})},{success:"Default model updated"});
       // Keep active project model in sync when chatting inside a project.
-      if (state.activeProjectId) {
+      if (state.activeProjectId && !isExternalModelId(state.model)) {
         await api("/v1/projects/"+encodeURIComponent(state.activeProjectId),{
           method:"PATCH", body:JSON.stringify({model:state.model})
         },{error:false});
       }
+      if (state.settings) state.settings.default_model = state.model;
       renderModels();
     });
     els.modelDrop.appendChild(b);
   });
-  const cur = list.find(m => (m.id||m) === state.model)||list[0];
+  const cur = list.find(m => {
+    const id = m.id||m;
+    return id === state.model || String(id).toLowerCase() === String(state.model).toLowerCase();
+  })||list[0];
   els.modelBtn.innerHTML = escapeHtml((cur&&(cur.name||cur.id))||state.model)+svg("chevD",14);
   const pill = $("omLevelPill");
   if (pill) {
@@ -2258,7 +2280,7 @@ function renderModels() {
       const m = String(state.model || "").match(/L([1-5])/i);
       if (m) n = Number(m[1]);
     }
-    pill.textContent = (n >= 1 && n <= 5) ? ("OM-L" + n) : String(state.model || "OM-L5");
+    pill.textContent = (n >= 1 && n <= 5) ? ("OM-L" + n) : String((cur && cur.name) || state.model || "OM-L5");
   }
   updateComposerChip();
 }
@@ -2276,6 +2298,31 @@ function normalizeModelId(id) {
   const m = low.match(/^om-?l([1-5])(?:\.0)?$/);
   if (m) return "OM-L" + m[1];
   return raw;
+}
+
+/** External provider ids used by Settings → AI (gpt, deepseek, …). */
+function isExternalModelId(id) {
+  const raw = String(id || "").trim().toLowerCase();
+  if (!raw) return false;
+  if (/^om-l[1-5]$/.test(raw)) return false;
+  if (/^om-?1(\.0)?$/.test(raw) || raw === "om" || raw === "om_native") return false;
+  return ["gpt","claude","gemini","llama","mistral","qwen","deepseek","openrouter","grok"].includes(raw);
+}
+
+/** Model id actually sent to /api/v1/chat/completions. */
+function activeChatModel() {
+  const fromState = normalizeModelId(state.model || "");
+  const fromSettings = normalizeModelId((state.settings && state.settings.default_model) || "");
+  // Prefer an enabled external default from Settings so keys actually get used.
+  if (isExternalModelId(fromSettings)) {
+    const providers = (state.settings && state.settings.llm_providers) || {};
+    const keysSet = (state.settings && state.settings.llm_api_keys_set) || {};
+    const pid = fromSettings.toLowerCase();
+    if (providers[pid] !== false && keysSet[pid]) return pid;
+    if (providers[pid]) return pid;
+  }
+  if (isExternalModelId(fromState)) return fromState.toLowerCase();
+  return fromState || "OM-L5";
 }
 
 /** Levels 1–5 for pickers (exclude duplicate OM-1.0 alias + external). */
@@ -2308,11 +2355,15 @@ async function loadModelsCatalog() {
   if (res.ok && data) {
     state.catalog = data.models || [];
     state.models = evolutionModelList();
-    if (data.default_model) state.model = normalizeModelId(data.default_model);
+    if (data.default_model) {
+      state.model = isExternalModelId(data.default_model)
+        ? String(data.default_model).toLowerCase()
+        : normalizeModelId(data.default_model);
+    }
   } else {
     state.models = evolutionModelList();
   }
-  state.model = normalizeModelId(state.model);
+  if (!isExternalModelId(state.model)) state.model = normalizeModelId(state.model);
   renderModels();
 }
 
@@ -2504,33 +2555,37 @@ async function loadSearchView() {
     const box = $("searchResults");
     if (!q) { box.innerHTML = emptyPanel("Start typing","Search chats, files, projects, assistants, and more.").outerHTML; return; }
     box.innerHTML = skeletons(3);
-    const { res, data } = await api("/v1/search?q="+encodeURIComponent(q),{},{error:false});
-    if (!res.ok) { box.innerHTML = '<div class="empty-panel"><p>Search failed. Try again.</p></div>'; return; }
-    const results = (data && data.results)||{};
-    box.innerHTML = "";
-    const sections = [
-      ["conversations","Chats"],["projects","Projects"],["assistants","Assistants"],
-      ["files","Files"],["library","Library"],["prompts","Prompts"],["memories","Memories"],
-    ];
-    let any = false;
-    sections.forEach(([key, label]) => {
-      const items = results[key]||[]; if (!items.length) return; any = true;
-      const g = document.createElement("div"); g.className = "search-group";
-      g.innerHTML = "<h4>"+escapeHtml(label)+"</h4>";
-      items.forEach(item => {
-        const hit = document.createElement("div"); hit.className = "search-hit";
-        hit.innerHTML = '<span class="tag">'+escapeHtml(label.slice(0,-1))+"</span><strong></strong><span></span>";
-        hit.querySelector("strong").textContent = item.title||item.name||item.id||"Item";
-        hit.querySelector("span").textContent   = item.description||item.content||item.body||fmtDate(item.updated_at||item.created_at);
-        hit.addEventListener("click", () => {
-          if (key==="conversations"&&item.id) loadConversation(item.id);
-          else setView(key==="memories"?"memory":key);
+    try {
+      const { res, data } = await api("/v1/search?q="+encodeURIComponent(q),{},{error:false});
+      if (!res.ok) { box.innerHTML = '<div class="empty-panel"><p>Search failed. Try again.</p></div>'; return; }
+      const results = (data && data.results)||{};
+      box.innerHTML = "";
+      const sections = [
+        ["conversations","Chats"],["projects","Projects"],["assistants","Assistants"],
+        ["files","Files"],["library","Library"],["prompts","Prompts"],["memories","Memories"],
+      ];
+      let any = false;
+      sections.forEach(([key, label]) => {
+        const items = results[key]||[]; if (!items.length) return; any = true;
+        const g = document.createElement("div"); g.className = "search-group";
+        g.innerHTML = "<h4>"+escapeHtml(label)+"</h4>";
+        items.forEach(item => {
+          const hit = document.createElement("div"); hit.className = "search-hit";
+          hit.innerHTML = '<span class="tag">'+escapeHtml(label.slice(0,-1))+"</span><strong></strong><span class=\"search-hit-meta\"></span>";
+          hit.querySelector("strong").textContent = item.title||item.name||item.id||"Item";
+          hit.querySelector(".search-hit-meta").textContent = item.description||item.content||item.body||fmtDate(item.updated_at||item.created_at);
+          hit.addEventListener("click", () => {
+            if (key==="conversations"&&item.id) loadConversation(item.id);
+            else setView(key==="memories"?"memory":key);
+          });
+          g.appendChild(hit);
         });
-        g.appendChild(hit);
+        box.appendChild(g);
       });
-      box.appendChild(g);
-    });
-    if (!any) box.appendChild(emptyPanel("No results",'Nothing matched "'+q+'".'));
+      if (!any) box.appendChild(emptyPanel("No results",'Nothing matched "'+q+'".'));
+    } catch (_) {
+      box.innerHTML = '<div class="empty-panel"><p>Search failed. Try again.</p></div>';
+    }
   };
   input.addEventListener("keydown", e => { if (e.key==="Enter") run(); });
   let t; input.addEventListener("input", () => { clearTimeout(t); t = setTimeout(run,300); });
@@ -4238,6 +4293,7 @@ async function loadSettingsTab(tab) {
     const llmOn = s.llm_enabled !== false;
     const providers = s.llm_providers || {};
     const keysSet = s.llm_api_keys_set || {};
+    const keysEnv = s.llm_api_keys_env || {};
     const activeId = normalizeModelId(s.default_model || state.model || "OM-L5");
     const LLM_CATALOG = [
       { id: "OM-L1", name: "OM Level 1 · Chatbot", vendor: "OM AI", owned: true },
@@ -4252,9 +4308,20 @@ async function loadSettingsTab(tab) {
       { id: "mistral", name: "Mistral", vendor: "Mistral AI", hint: "MISTRAL_API_KEY" },
       { id: "qwen", name: "Qwen", vendor: "Alibaba", hint: "DASHSCOPE_API_KEY" },
       { id: "deepseek", name: "DeepSeek", vendor: "DeepSeek", hint: "DEEPSEEK_API_KEY" },
+      { id: "openrouter", name: "OpenRouter", vendor: "OpenRouter", hint: "OPENROUTER_API_KEY" },
       { id: "grok", name: "Grok", vendor: "xAI", hint: "XAI_API_KEY" },
     ];
-    const isActive = (id) => normalizeModelId(id) === activeId || String(id).toLowerCase() === String(activeId).toLowerCase();
+    const isActive = (id) => {
+      const a = String(activeId || "").toLowerCase();
+      const b = String(id || "").toLowerCase();
+      return normalizeModelId(id) === normalizeModelId(activeId) || a === b;
+    };
+    const keyPlaceholder = (p) => {
+      if (keysSet[p.id] && !keysEnv[p.id]) return "✓ Key saved in Settings — paste only to replace";
+      if (keysEnv[p.id]) return "Using env "+(p.hint||"API key")+" — paste here to store in Settings";
+      if (keysSet[p.id]) return "✓ Key available — paste only to replace";
+      return "Paste API key to use "+p.name;
+    };
     const providerRows = LLM_CATALOG.map(p => {
       const on = p.owned ? true : !!providers[p.id];
       const hasKey = p.owned || !!keysSet[p.id];
@@ -4262,16 +4329,19 @@ async function loadSettingsTab(tab) {
       if (isActive(p.id)) badge = '<span class="llm-provider-badge owned">In use</span>';
       else if (on && hasKey) badge = '<span class="llm-provider-badge on">Ready</span>';
       else if (on) badge = '<span class="llm-provider-badge warn">Needs API key</span>';
+      const keyStatus = (!p.owned && hasKey)
+        ? '<div class="llm-key-status" style="font-size:12px;color:var(--ok,#16a34a);margin:4px 0 0">'+(keysEnv[p.id] ? "Key loaded from environment" : "Key saved for this account")+"</div>"
+        : "";
       return '<div class="llm-provider-row" data-llm="'+p.id+'">'+
         '<div class="llm-provider-meta"><div class="llm-provider-name">'+escapeHtml(p.name)+badge+"</div>"+
-        '<div class="llm-provider-vendor">'+escapeHtml(p.vendor)+(p.hint ? " · key: "+escapeHtml(p.hint) : "")+"</div></div>"+
+        '<div class="llm-provider-vendor">'+escapeHtml(p.vendor)+(p.hint ? " · key: "+escapeHtml(p.hint) : "")+"</div>"+keyStatus+"</div>"+
         '<div class="llm-provider-actions">'+
-        '<button type="button" class="llm-use-btn'+(isActive(p.id)?" active":"")+'" data-use="'+p.id+'"'+(p.owned || (on && hasKey) ? "" : " disabled")+'>Use</button>'+
+        '<button type="button" class="llm-use-btn'+(isActive(p.id)?" active":"")+'" data-use="'+p.id+'"'+(p.owned || hasKey ? "" : " disabled")+'>Use</button>'+
         (p.owned
           ? '<label class="sw-wrap"><input type="checkbox" class="aiLlmProvider" data-provider="'+p.id+'" checked disabled title="OM level — always available"/><span class="sw-track"></span><span class="sw-thumb"></span></label>'
           : '<label class="sw-wrap"><input type="checkbox" class="aiLlmProvider" data-provider="'+p.id+'"'+(on?" checked":"")+'/><span class="sw-track"></span><span class="sw-thumb"></span></label>')+
         "</div>"+
-        (p.owned ? "" : '<div class="llm-key-row'+(on?" show":"")+'" data-key-for="'+p.id+'"><input type="password" class="aiLlmKey" data-provider="'+p.id+'" autocomplete="off" placeholder="'+(hasKey?"API key saved — paste new key to replace":"Paste API key to use "+p.name)+'"/></div>')+
+        (p.owned ? "" : '<div class="llm-key-row'+(on?" show":"")+'" data-key-for="'+p.id+'"><input type="password" class="aiLlmKey" data-provider="'+p.id+'" autocomplete="off" placeholder="'+escapeHtml(keyPlaceholder(p))+'"/></div>')+
         "</div>";
     }).join("");
     const form = document.createElement("form"); form.className = "form-grid"; form.id = "aiSettingsForm";
@@ -4284,7 +4354,7 @@ async function loadSettingsTab(tab) {
       '<label class="sw-wrap"><input type="checkbox" id="aiLlmOnly" name="llm_only"'+(s.llm_only?" checked":"")+'/><span class="sw-track"></span><span class="sw-thumb"></span></label></div>'+
       '<div id="aiLlmProvidersBox" class="llm-provider-box">'+
       "<h4>OM Levels 1–5 + external LLMs</h4>"+
-      '<p class="llm-hint">Pick OM-L1 … OM-L5 for local chat levels, or enable an external model with an API key, then Save.</p>'+
+      '<p class="llm-hint">Enable a provider, paste its API key, click Use (saves immediately), or Save. Chat will call that model.</p>'+
       providerRows+
       "</div>"+
       '<div id="aiLayerSwitches">'+
@@ -4321,7 +4391,8 @@ async function loadSettingsTab(tab) {
         const useBtn = row && row.querySelector(".llm-use-btn");
         if (keyRow) keyRow.classList.toggle("show", !!inp.checked && !isOwnedLevel(id));
         const hasKey = isOwnedLevel(id) || !!(keysSet[id]) || !!(row && row.querySelector(".aiLlmKey") && row.querySelector(".aiLlmKey").value);
-        if (useBtn && !isOwnedLevel(id)) useBtn.disabled = !(inp.checked && hasKey);
+        // Allow Use as soon as a key exists (typed / saved / env); Use will enable the toggle.
+        if (useBtn && !isOwnedLevel(id)) useBtn.disabled = !hasKey;
         const nameEl = row && row.querySelector(".llm-provider-name");
         if (!nameEl) return;
         let badge = nameEl.querySelector(".llm-provider-badge");
@@ -4338,23 +4409,55 @@ async function loadSettingsTab(tab) {
         btn.classList.toggle("active", normalizeModelId(id) === active || String(id).toLowerCase() === String(active).toLowerCase());
       });
     };
-    form.addEventListener("click", e => {
+    form.addEventListener("click", async e => {
       const btn = e.target && e.target.closest && e.target.closest(".llm-use-btn");
       if (!btn || btn.disabled) return;
       e.preventDefault();
       const id = btn.getAttribute("data-use");
-      const modelId = isOwnedLevel(id) ? normalizeModelId(id) : id;
+      const modelId = isOwnedLevel(id) ? normalizeModelId(id) : String(id || "").toLowerCase();
       const dm = $("aiDefaultModel");
       if (dm) dm.value = modelId;
       state.model = modelId;
+      const payload = { default_model: modelId, llm_enabled: true };
+      if (!isOwnedLevel(id)) {
+        payload.llm_providers = { [id]: true };
+        const keyInp = form.querySelector('.aiLlmKey[data-provider="'+id+'"]');
+        const typed = (keyInp && String(keyInp.value || "").trim())
+          || ((state._pendingLlmKeys && state._pendingLlmKeys[id]) || "");
+        if (typed) payload.llm_api_keys = { [id]: typed };
+        const toggle = form.querySelector('.aiLlmProvider[data-provider="'+id+'"]');
+        if (toggle) toggle.checked = true;
+      }
+      const { res, data } = await api("/v1/settings",{method:"PATCH",body:JSON.stringify(payload)},{success:modelId+" is active for chat"});
+      if (res.ok && data && data.settings) {
+        state.settings = data.settings;
+        Object.assign(keysSet, data.settings.llm_api_keys_set || {});
+        Object.assign(keysEnv, data.settings.llm_api_keys_env || {});
+        if (state._pendingLlmKeys) delete state._pendingLlmKeys[id];
+        if (!isOwnedLevel(id) && !(data.settings.llm_api_keys_set || {})[id]) {
+          toast("Key missing — paste API key then click Use again","error");
+        }
+        await loadModelsCatalog();
+        renderModels();
+        updateComposerChip && updateComposerChip();
+        loadSettingsTab("ai");
+        return;
+      }
       syncLlmUi();
-      toast(modelId+" selected — click Save","success");
     });
     form.addEventListener("change", e => {
       if (e.target && (e.target.id === "aiLlmEnabled" || e.target.id === "aiLlmOnly" || e.target.classList.contains("aiLlmProvider") || e.target.classList.contains("aiLlmKey"))) syncLlmUi();
     });
     form.addEventListener("input", e => {
-      if (e.target && e.target.classList.contains("aiLlmKey")) syncLlmUi();
+      if (e.target && e.target.classList.contains("aiLlmKey")) {
+        const pid = e.target.getAttribute("data-provider");
+        const v = String(e.target.value || "").trim();
+        if (!state._pendingLlmKeys) state._pendingLlmKeys = {};
+        // Stash typed keys — browsers often clear password inputs on submit.
+        if (pid && v) state._pendingLlmKeys[pid] = v;
+        else if (pid && !v) delete state._pendingLlmKeys[pid];
+        syncLlmUi();
+      }
     });
     form.addEventListener("submit", async e => {
       e.preventDefault();
@@ -4364,11 +4467,16 @@ async function loadSettingsTab(tab) {
         llm_providers[inp.getAttribute("data-provider")] = !!inp.checked;
       });
       llm_providers.om = true;
-      const llm_api_keys = {};
+      const llm_api_keys = Object.assign({}, state._pendingLlmKeys || {});
       form.querySelectorAll(".aiLlmKey").forEach(inp => {
+        const pid = inp.getAttribute("data-provider");
         const v = String(inp.value||"").trim();
-        if (v) llm_api_keys[inp.getAttribute("data-provider")] = v;
+        if (v) llm_api_keys[pid] = v;
       });
+      let defaultModel = String(fd.get("default_model")||state.model||"OM-L5").trim();
+      if (isExternalModelId(defaultModel)) defaultModel = defaultModel.toLowerCase();
+      else defaultModel = normalizeModelId(defaultModel);
+      if (isExternalModelId(defaultModel)) llm_providers[defaultModel] = true;
       const payload = {
         llm_enabled: !!$("aiLlmEnabled").checked,
         llm_only: !!$("aiLlmOnly").checked,
@@ -4378,19 +4486,30 @@ async function loadSettingsTab(tab) {
         agent_brain_enabled: !!$("aiAgent").checked,
         llm_providers,
         llm_api_keys,
-        default_model: normalizeModelId(String(fd.get("default_model")||state.model||"OM-L5")),
+        default_model: defaultModel,
         temperature: parseFloat(fd.get("temperature")),
         max_tokens: parseInt(fd.get("max_tokens"), 10),
       };
       const { res: r2, data: d2 } = await api("/v1/settings",{method:"PATCH",body:JSON.stringify(payload)},{success:"AI settings saved — model ready"});
       if (r2.ok && d2) {
         state.settings = d2.settings;
-        state.model = normalizeModelId(d2.settings.default_model||state.model);
+        state.model = isExternalModelId(d2.settings.default_model)
+          ? String(d2.settings.default_model).toLowerCase()
+          : normalizeModelId(d2.settings.default_model||state.model);
         Object.assign(keysSet, d2.settings.llm_api_keys_set||{});
-        form.querySelectorAll(".aiLlmKey").forEach(inp => { inp.value = ""; inp.placeholder = "API key saved — paste new key to replace"; });
+        Object.assign(keysEnv, d2.settings.llm_api_keys_env||{});
+        Object.keys(llm_api_keys).forEach(pid => {
+          if ((d2.settings.llm_api_keys_set || {})[pid] && state._pendingLlmKeys) {
+            delete state._pendingLlmKeys[pid];
+          }
+        });
+        const missing = Object.keys(llm_api_keys).filter(pid => !(d2.settings.llm_api_keys_set || {})[pid]);
+        if (missing.length) toast("Key not stored for: "+missing.join(", ")+" — paste again and Save","error");
+        else if (Object.keys(llm_api_keys).length) toast("API key saved","success");
         await loadModelsCatalog();
         renderModels();
-        syncLlmUi();
+        updateComposerChip && updateComposerChip();
+        loadSettingsTab("ai");
       }
     });
     box.appendChild(form);

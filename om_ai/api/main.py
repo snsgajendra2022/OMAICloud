@@ -899,6 +899,14 @@ def _serve_tokens_ui():
     return _serve_static_html("tokens.html")
 
 
+@app.get("/.well-known/appspecific/com.chrome.devtools.json", include_in_schema=False)
+def chrome_devtools_well_known():
+    """Chrome DevTools probe — return empty JSON so logs stay clean (not an app feature)."""
+    from fastapi.responses import JSONResponse
+
+    return JSONResponse({}, status_code=200)
+
+
 @app.get("/", tags=["UI"])
 def ui_home():
     """Entry point: login first. Chat lives at /chat after sign-in."""

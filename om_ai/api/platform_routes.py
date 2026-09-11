@@ -160,13 +160,51 @@ def global_search(
 
         cstore = get_bound_conversation_store()
         if cstore is not None and q.strip() and (not type or type.lower() in {"", "conversations", "chats"}):
-            convs = cstore.list_conversations(ctx.tenant_id, actor=ctx.actor, limit=100)
             ql = q.lower()
-            results["conversations"] = [
-                c
-                for c in convs
-                if ql in str(c.get("title") or "").lower()
-            ][:20]
+            # Prefer SQL (title + message body) when the store exposes a connection.
+            matched: list[dict[str, Any]] = []
+            conn = getattr(cstore, "_conn", None)
+            if conn is not None:
+                like = f"%{q}%"
+                rows = conn.execute(
+                    """
+                    SELECT c.id, c.title, c.updated_at, c.created_at, c.project_id,
+                           (
+                             SELECT m.content FROM chat_messages m
+                             WHERE m.conversation_id = c.id
+                               AND (m.content LIKE ? OR c.title LIKE ?)
+                             ORDER BY m.created_at DESC LIMIT 1
+                           ) AS snippet
+                    FROM conversations c
+                    WHERE c.tenant_id = ? AND c.actor = ?
+                      AND COALESCE(c.archived, 0) = 0
+                      AND (
+                        c.title LIKE ?
+                        OR EXISTS (
+                          SELECT 1 FROM chat_messages m
+                          WHERE m.conversation_id = c.id AND m.content LIKE ?
+                        )
+                      )
+                    ORDER BY c.updated_at DESC
+                    LIMIT 20
+                    """,
+                    (like, like, ctx.tenant_id, ctx.actor, like, like),
+                ).fetchall()
+                for r in rows:
+                    item = dict(r)
+                    snip = str(item.pop("snippet", None) or "").strip()
+                    if snip and ql not in str(item.get("title") or "").lower():
+                        item["description"] = snip[:180]
+                    matched.append(item)
+            else:
+                convs = cstore.list_conversations(ctx.tenant_id, actor=ctx.actor)
+                for c in convs:
+                    item = c.to_dict() if hasattr(c, "to_dict") else dict(c)
+                    if ql in str(item.get("title") or "").lower():
+                        matched.append(item)
+                    if len(matched) >= 20:
+                        break
+            results["conversations"] = matched
         else:
             results.setdefault("conversations", [])
     except Exception:

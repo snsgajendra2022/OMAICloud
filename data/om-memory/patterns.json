@@ -583,5 +583,32 @@
     "category": "general",
     "metadata": {},
     "created_at": "2026-09-10T09:35:07.303666"
+  },
+  {
+    "question": "I want to answer clearly, but that draft wasn\u2019t reliable. Please rephrase your question in a short sentence.",
+    "answer": "I want to answer clearly, but that draft wasn\u2019t reliable. Please rephrase your question in a short sentence.",
+    "score": 1.0,
+    "success": false,
+    "category": "general",
+    "metadata": {},
+    "created_at": "2026-09-11T10:04:12.511397"
+  },
+  {
+    "question": "what are you ding",
+    "answer": "OM could not generate a reliable response.",
+    "score": 0.7,
+    "success": false,
+    "category": "general",
+    "metadata": {},
+    "created_at": "2026-09-11T10:07:06.946050"
+  },
+  {
+    "question": "get .env in om",
+    "answer": "OM could not generate a reliable response.",
+    "score": 0.7,
+    "success": false,
+    "category": "general",
+    "metadata": {},
+    "created_at": "2026-09-11T10:10:27.549023"
   }
 ]

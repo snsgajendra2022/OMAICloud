@@ -532,5 +532,23 @@
     "answer": "Hello \u2014 I\u2019m OM. What should we work on?",
     "intent": "conversation",
     "score": 100.0
+  },
+  {
+    "question": "I want to answer clearly, but that draft wasn\u2019t reliable. Please rephrase your question in a short sentence.",
+    "answer": "I want to answer clearly, but that draft wasn\u2019t reliable. Please rephrase your question in a short sentence.",
+    "intent": "conversation",
+    "score": 10.0
+  },
+  {
+    "question": "get .env in om",
+    "answer": "## Understanding\nOM-style cognitive OS around the LLM\n\nTopic `OM-style cognitive OS around the LLM` in domain `history`. Era Generative AI Era (2020\u20132026) key ideas: Tokenizer \u2192 embedding \u2192 attention \u2192 layers \u2192 output, Pretrain / SFT / RLHF / DPO, RAG + tools + agents. Apply OM mission: transform information into intelligence. Skill focus: architecture.\n\n## Analysis\nAngle: **OM agent playbook**. Difficulty: **advanced**. Skill focus: **architecture**. Place this in the 1600\u20132026 knowledge arc (era frame 2020\u20132026) and connect to adjacent domains when useful.\n\n## Architecture\nOM cognitive path: Understanding \u2192 Reasoning \u2192 Planning \u2192 Agents/Tools \u2192 Validation. Knowledge Brain retrieves domain facts; Reasoning Engine applies first principles; never conflate research horizons with 2026 production.\n\n## Implementation\n1) State assumptions for year 2026.\n2) Give concrete steps, interfaces, or checklists.\n3) If coding: Technology \u00b7 File structure \u00b7 Tests \u00b7 Deployment notes.\n4) Example id `2399",
+    "intent": "unclear",
+    "score": 100.0
+  },
+  {
+    "question": "what are you doing",
+    "answer": "knowledge:\nI\u2019m doing well, thanks. How can I help?",
+    "intent": "explanation",
+    "score": 100.0
   }
 ]

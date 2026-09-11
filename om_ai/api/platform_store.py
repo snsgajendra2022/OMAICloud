@@ -778,6 +778,7 @@ class PlatformStore:
                 "mistral": False,
                 "qwen": False,
                 "deepseek": False,
+                "openrouter": False,
                 "grok": False,
             },
             "llm_api_keys": {},
@@ -817,11 +818,19 @@ class PlatformStore:
         s = self.get_settings(tenant_id, actor)
         out = dict(s)
         raw_keys = dict(out.pop("llm_api_keys", None) or {})
+        # Stored keys only (what the user pasted in Settings).
         keys_set = {k: bool(str(v or "").strip()) for k, v in raw_keys.items()}
+        # Also mark env-backed keys so Use works without re-paste, but keep
+        # a separate map so the UI can say "from environment".
+        keys_env = {}
         for pid in EXTERNAL_IDS:
-            if resolve_api_key(pid, raw_keys):
+            stored = bool(str(raw_keys.get(pid) or "").strip())
+            env_ok = bool(resolve_api_key(pid, {}))
+            if stored or env_ok:
                 keys_set[pid] = True
+            keys_env[pid] = bool(env_ok and not stored)
         out["llm_api_keys_set"] = keys_set
+        out["llm_api_keys_env"] = keys_env
         return out
 
     def update_settings(self, tenant_id: str, actor: str, patch: dict[str, Any]) -> dict[str, Any]:
@@ -844,6 +853,17 @@ class PlatformStore:
                 merged_keys[str(k)] = val
             patch["llm_api_keys"] = merged_keys
         merged = {**current, **patch}
+        # If user selects an external model as default, auto-enable that provider.
+        try:
+            from om_ai.runtime.external_llms import LLM_CATALOG, normalize_provider_id
+
+            pid = normalize_provider_id(str(merged.get("default_model") or ""))
+            if pid and pid != "om" and pid in LLM_CATALOG and not LLM_CATALOG[pid].get("owned"):
+                providers = dict(merged.get("llm_providers") or {})
+                providers[pid] = True
+                merged["llm_providers"] = providers
+        except Exception:
+            pass
         merged.pop("llm_api_keys_set", None)
         now = _utc()
         with self._lock:
