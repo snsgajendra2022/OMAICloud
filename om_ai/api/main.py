@@ -884,6 +884,9 @@ class CreateTokenRequest(BaseModel):
     name: str = Field(..., min_length=1, max_length=64)
     role: str = "operator"
     tenant_id: str = "default"
+    # ["*"] / ["all"] = every model; or pick OM-L1…OM-L5 / openrouter / deepseek / …
+    allowed_models: list[str] | str | None = Field(default_factory=lambda: ["*"])
+    default_model: str | None = None
 
 
 def _serve_static_html(name: str):
@@ -1004,15 +1007,26 @@ def create_token(
             role=role,
             tenant_id=req.tenant_id or ctx.tenant_id,
             owner_actor=ctx.actor,
+            allowed_models=req.allowed_models,
         )
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
+    # Preferred client model hint (does not restrict beyond allowed_models).
+    if req.default_model:
+        dm = str(req.default_model).strip()
+        created.setdefault("usage", {}).setdefault("env", {})["OPENAI_MODEL"] = dm
+        created["default_model"] = dm
     _audit(
         "token.create",
         ctx.actor,
         ctx.tenant_id,
         resource="/v1/tokens",
-        detail={"name": req.name, "role": role, "id": created["id"]},
+        detail={
+            "name": req.name,
+            "role": role,
+            "id": created["id"],
+            "allowed_models": created.get("allowed_models"),
+        },
     )
     return created
 

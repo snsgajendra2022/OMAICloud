@@ -38,7 +38,7 @@
       backdrop-filter: blur(10px); display: flex; align-items: center; gap: 12px; padding: 0 20px;
       position: sticky; top: 0; z-index: 10;
     }
-    .brand { display: flex; align-items: center; gap: 10px; text-decoration: none; color: inherit; font-weight: 700; }
+    .brand { display: flex; align-items: center; gap: 8px; text-decoration: none; color: inherit; font-weight: 700; }
     .mark {
       width: 28px; height: 28px; border-radius: 8px;
       background: linear-gradient(145deg,#1f2937,#111827); color: #fff;
@@ -57,12 +57,11 @@
     .btn-primary:disabled { opacity: .5; cursor: not-allowed; }
     .btn-danger { color: var(--err); border-color: #FECACA; background: #FEF2F2; }
     .btn-danger:hover { background: #FEE2E2; }
-    .btn-ghost { background: transparent; }
     .btn-sm { padding: 6px 10px; font-size: 12px; }
-    .wrap { width: min(880px, 100%); margin: 0 auto; padding: 28px 20px 56px; }
+    .wrap { width: min(920px, 100%); margin: 0 auto; padding: 28px 20px 56px; }
     .hero { margin-bottom: 22px; }
     h1 { margin: 0 0 6px; font-size: 28px; letter-spacing: -0.03em; }
-    .sub { margin: 0; color: var(--muted); font-size: 14px; line-height: 1.55; max-width: 62ch; }
+    .sub { margin: 0; color: var(--muted); font-size: 14px; line-height: 1.55; max-width: 70ch; }
     .card {
       background: var(--panel); border: 1px solid var(--border); border-radius: 16px;
       padding: 20px; margin-bottom: 16px; box-shadow: 0 8px 24px rgba(17,24,39,.04);
@@ -70,8 +69,9 @@
     .card-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
     .card h2 { margin: 0; font-size: 16px; }
     .card .hint { margin: 4px 0 0; color: var(--muted); font-size: 13px; }
-    .grid { display: grid; grid-template-columns: 1.4fr 0.9fr auto; gap: 12px; align-items: end; }
-    @media (max-width: 720px) { .grid { grid-template-columns: 1fr; } }
+    .grid { display: grid; grid-template-columns: 1.2fr 0.8fr 1fr 1fr auto; gap: 12px; align-items: end; }
+    @media (max-width: 900px) { .grid { grid-template-columns: 1fr 1fr; } }
+    @media (max-width: 560px) { .grid { grid-template-columns: 1fr; } }
     label { display: block; font-size: 12px; font-weight: 650; color: var(--muted); margin-bottom: 6px; }
     input, select {
       width: 100%; border: 1px solid var(--border); border-radius: 10px;
@@ -88,11 +88,12 @@
     .secret.show { display: block; }
     .secret strong { display: block; font-size: 13.5px; margin-bottom: 8px; }
     .secret-row { display: flex; gap: 8px; align-items: stretch; flex-wrap: wrap; }
-    .secret code, .prefix-code {
+    .secret code, .prefix-code, .snippet {
       flex: 1; min-width: 0; display: block; padding: 11px 12px; border-radius: 10px;
       background: #fff; border: 1px solid var(--border); word-break: break-all;
       font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12.5px;
     }
+    .snippet { white-space: pre-wrap; margin-top: 10px; color: #1e293b; }
     .list { display: flex; flex-direction: column; gap: 10px; }
     .key-card {
       border: 1px solid var(--border); border-radius: 14px; padding: 14px 16px;
@@ -120,6 +121,16 @@
       transition: .18s ease; pointer-events: none; z-index: 50;
     }
     .toast.show { opacity: 1; transform: translateY(0); }
+    .ready-box { margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--border); }
+    .ready-box h3 { margin: 0 0 8px; font-size: 13px; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
+    .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+    .chip {
+      border: 1px solid var(--border); background: #fff; border-radius: 999px;
+      padding: 5px 10px; font-size: 12px; font-weight: 650; color: var(--text);
+    }
+    .chip.warn { color: #92400e; background: #fffbeb; border-color: #fde68a; }
+    .chip.ok { color: #166534; background: #ecfdf5; border-color: #a7f3d0; }
+    .note { margin: 8px 0 0; font-size: 12.5px; color: var(--muted); line-height: 1.45; }
     @media (max-width: 640px) {
       .key-card { grid-template-columns: 1fr; }
       .key-actions { justify-content: flex-start; }
@@ -130,58 +141,98 @@
   <header class="top">
     <a class="brand" href="/chat"><span class="mark" aria-hidden="true">OM</span> OM</a>
     <nav>
+      <a href="/chat#settings">Settings · AI</a>
       <a href="/chat">← Back to chat</a>
-      </nav>
+    </nav>
   </header>
 
   <main class="wrap">
     <div class="hero">
       <h1>API Keys</h1>
-      <p class="sub">Create machine tokens for scripts, SDKs, and OpenAI-compatible clients. The full secret is shown only once after create.</p>
+      <p class="sub">Create machine tokens for scripts, SDKs, and OpenAI-compatible clients. Pick which models the key can call (or <strong>All</strong>). The full secret is shown only once after create.</p>
+    </div>
+
+    <section class="card">
+      <div class="card-head">
+        <div>
+          <h2>Models you can use</h2>
+          <p class="hint">From Settings → AI. External models need a provider key saved there. Your API token authenticates to OM; provider keys stay in OM.</p>
         </div>
+      </div>
+      <div class="chips" id="readyChips"><span class="chip">Loading…</span></div>
+      <p class="note" id="readyNote"></p>
+    </section>
 
     <section class="card">
       <div class="card-head">
         <div>
           <h2>Create key</h2>
-          <p class="hint">Pick a name and role, then copy the secret immediately.</p>
+          <p class="hint">Name + role + model scope. Then copy the secret immediately.</p>
         </div>
       </div>
       <div class="grid">
-              <div>
+        <div>
           <label for="tokenName">Name</label>
           <input id="tokenName" maxlength="64" placeholder="mac-cli" autocomplete="off" />
-              </div>
-                <div>
+        </div>
+        <div>
           <label for="tokenRole">Role</label>
-                  <select id="tokenRole">
-                    <option value="agent">agent</option>
+          <select id="tokenRole">
+            <option value="agent">agent</option>
             <option value="operator">operator</option>
-                    <option value="viewer">viewer</option>
-                  </select>
-                </div>
+            <option value="viewer">viewer</option>
+          </select>
+        </div>
+        <div>
+          <label for="tokenModels">Allowed models</label>
+          <select id="tokenModels">
+            <option value="*">All models</option>
+            <option value="OM-L1">OM-L1 · Chatbot</option>
+            <option value="OM-L2">OM-L2 · Reasoner</option>
+            <option value="OM-L3" selected>OM-L3 · Agent</option>
+            <option value="OM-L4">OM-L4 · Innovator</option>
+            <option value="OM-L5">OM-L5 · Organization Matrix</option>
+            <option value="openrouter">openrouter</option>
+            <option value="deepseek">deepseek</option>
+            <option value="gpt">gpt</option>
+            <option value="claude">claude</option>
+            <option value="gemini">gemini</option>
+            <option value="llama">llama</option>
+            <option value="mistral">mistral</option>
+            <option value="qwen">qwen</option>
+            <option value="grok">grok</option>
+          </select>
+        </div>
+        <div>
+          <label for="defaultModel">Default OPENAI_MODEL</label>
+          <select id="defaultModel">
+            <option value="OM-L3">OM-L3</option>
+          </select>
+        </div>
         <button type="button" class="btn btn-primary" id="createBtn">Create key</button>
-              </div>
+      </div>
       <div class="msg" id="msg"></div>
       <div class="secret" id="secretBox">
         <strong>Copy this key now — it will not be shown again.</strong>
         <div class="secret-row">
           <code id="secretValue"></code>
           <button type="button" class="btn btn-primary" id="copyBtn">Copy key</button>
-              </div>
+        </div>
+        <pre class="snippet" id="envSnippet"></pre>
+        <button type="button" class="btn btn-sm" id="copyEnvBtn" style="margin-top:8px">Copy OpenAI env block</button>
       </div>
-            </section>
+    </section>
 
     <section class="card">
       <div class="card-head">
         <div>
           <h2>Your keys</h2>
-          <p class="hint">Full secrets are never stored in plain text. Copy the prefix for reference, or create a new key if you lost the secret.</p>
-              </div>
-          </div>
+          <p class="hint">Full secrets are never stored in plain text. Each key shows its allowed models.</p>
+        </div>
+      </div>
       <div class="list" id="listBox"><div class="empty">Loading…</div></div>
-      </section>
-    </main>
+    </section>
+  </main>
 
   <div class="toast" id="toast"></div>
 
@@ -193,6 +244,8 @@
     const listBox = $("listBox");
     const toastEl = $("toast");
     let toastTimer = null;
+    let catalog = [];
+    let settings = {};
 
     function setMsg(text, ok) {
       msg.textContent = text || "";
@@ -204,15 +257,15 @@
       toastEl.classList.add("show");
       clearTimeout(toastTimer);
       toastTimer = setTimeout(() => toastEl.classList.remove("show"), 1800);
-      }
+    }
 
-      function escapeHtml(s) {
+    function escapeHtml(s) {
       return String(s)
-          .replace(/&/g, "&amp;")
-          .replace(/</g, "&lt;")
-          .replace(/>/g, "&gt;")
-          .replace(/"/g, "&quot;");
-      }
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+    }
 
     async function copyText(text, okLabel) {
       const value = String(text || "");
@@ -240,6 +293,26 @@
       }
     }
 
+    function modelLabel(id) {
+      const raw = String(id || "");
+      if (raw === "*" || raw.toLowerCase() === "all") return "All models";
+      return raw;
+    }
+
+    function syncDefaultModelOptions() {
+      const allowed = $("tokenModels").value;
+      const def = $("defaultModel");
+      const options = [];
+      if (allowed === "*") {
+        options.push("OM-L1","OM-L2","OM-L3","OM-L4","OM-L5","openrouter","deepseek","gpt","claude","gemini","llama","mistral","qwen","grok");
+      } else {
+        options.push(allowed);
+      }
+      const prev = def.value;
+      def.innerHTML = options.map(id => '<option value="'+escapeHtml(id)+'">'+escapeHtml(id)+"</option>").join("");
+      def.value = options.includes(prev) ? prev : options[0];
+    }
+
     async function ensureSession() {
       const res = await fetch("/v1/auth/me", { credentials: "include" });
       if (res.status === 401) {
@@ -249,36 +322,100 @@
       return res.ok;
     }
 
+    async function loadReadyModels() {
+      const chips = $("readyChips");
+      const note = $("readyNote");
+      try {
+        const [catRes, setRes] = await Promise.all([
+          fetch("/v1/models/catalog", { credentials: "include" }),
+          fetch("/v1/settings", { credentials: "include" }),
+        ]);
+        const cat = await catRes.json().catch(() => ({}));
+        const set = await setRes.json().catch(() => ({}));
+        catalog = cat.models || [];
+        settings = set.settings || set || {};
+        const keysSet = settings.llm_api_keys_set || {};
+        const providers = settings.llm_providers || {};
+        const items = [];
+        ["OM-L1","OM-L2","OM-L3","OM-L4","OM-L5"].forEach(id => {
+          items.push({ id, ok: true, label: id });
+        });
+        ["openrouter","deepseek","gpt","claude","gemini","llama","mistral","qwen","grok"].forEach(id => {
+          const on = !!providers[id];
+          const keyed = !!keysSet[id];
+          items.push({
+            id,
+            ok: on && keyed,
+            label: id + (on && keyed ? " · ready" : on ? " · needs key" : " · off"),
+          });
+        });
+        chips.innerHTML = items.map(it =>
+          '<span class="chip '+(it.ok?"ok":"warn")+'">'+escapeHtml(it.label)+"</span>"
+        ).join("");
+        const def = settings.default_model || cat.default_model || "OM-L5";
+        note.textContent = "Account default model: " + def + ". External models need Settings → AI key + Use.";
+        // Prefer ready external in create dropdown order
+        const sel = $("tokenModels");
+        [...sel.options].forEach(opt => {
+          if (opt.value === "*" || opt.value.startsWith("OM-L")) return;
+          const hit = items.find(i => i.id === opt.value);
+          if (hit && hit.ok) opt.textContent = opt.value + " · ready";
+        });
+      } catch (e) {
+        chips.innerHTML = '<span class="chip warn">Could not load model status</span>';
+        note.textContent = String(e.message || e);
+      }
+    }
+
+    function buildEnvSnippet(token, model) {
+      const base = location.origin + "/api/v1";
+      return [
+        "OPENAI_BASE_URL=" + base,
+        "OPENAI_API_KEY=" + token,
+        "OPENAI_MODEL=" + model,
+      ].join("\n");
+    }
+
     async function createToken() {
       setMsg("", true);
       secretBox.classList.remove("show");
       const name = $("tokenName").value.trim();
       const role = $("tokenRole").value;
+      const allowed = $("tokenModels").value || "*";
+      const defaultModel = $("defaultModel").value || (allowed === "*" ? "OM-L3" : allowed);
       if (!name) { setMsg("Token name is required", false); return; }
       $("createBtn").disabled = true;
       try {
         const res = await fetch("/v1/tokens", {
-            method: "POST",
+          method: "POST",
           credentials: "include",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ name, role, tenant_id: "default" }),
+          body: JSON.stringify({
+            name,
+            role,
+            tenant_id: "default",
+            allowed_models: allowed === "*" ? ["*"] : [allowed],
+            default_model: defaultModel,
+          }),
         });
         const data = await res.json().catch(() => ({}));
-          if (!res.ok) {
+        if (!res.ok) {
           const detail = data.detail || data.error || ("HTTP " + res.status);
           throw new Error(typeof detail === "string" ? detail : JSON.stringify(detail));
         }
         const secret = data.token || "";
         if (!secret) throw new Error("Server did not return an API key.");
         secretValue.textContent = secret;
+        const modelHint = (data.usage && data.usage.env && data.usage.env.OPENAI_MODEL) || defaultModel;
+        $("envSnippet").textContent = buildEnvSnippet(secret, modelHint);
         secretBox.classList.add("show");
         $("tokenName").value = "";
-        setMsg("API key created — copy it now", true);
+        setMsg("API key created — models: " + modelLabel(allowed) + " — copy it now", true);
         await copyText(secret, "Key copied");
         await listTokens();
-        } catch (e) {
+      } catch (e) {
         setMsg(String(e.message || e), false);
-        } finally {
+      } finally {
         $("createBtn").disabled = false;
       }
     }
@@ -286,6 +423,8 @@
     function keyCard(t) {
       const active = !!t.active;
       const prefix = String(t.prefix || "");
+      const allowed = Array.isArray(t.allowed_models) ? t.allowed_models : ["*"];
+      const modelsText = allowed.map(modelLabel).join(", ");
       const el = document.createElement("div");
       el.className = "key-card";
       el.innerHTML =
@@ -294,12 +433,14 @@
           '<div class="key-meta">' +
             '<span class="badge blue"></span>' +
             '<span class="badge ' + (active ? "ok" : "off") + '">' + (active ? "active" : "revoked") + "</span>" +
+            '<span class="badge gray"></span>' +
             '<code class="prefix-code" style="flex:0 1 auto;padding:4px 8px;font-size:12px"></code>' +
           "</div>" +
         "</div>" +
         '<div class="key-actions"></div>';
       el.querySelector("h3").textContent = t.name || "Untitled key";
       el.querySelector(".badge.blue").textContent = t.role || "agent";
+      el.querySelector(".badge.gray").textContent = modelsText;
       el.querySelector(".prefix-code").textContent = prefix ? (prefix + "…") : "—";
 
       const actions = el.querySelector(".key-actions");
@@ -320,33 +461,33 @@
         actions.appendChild(revokeBtn);
       }
       return el;
-      }
+    }
 
-      async function listTokens() {
-        try {
+    async function listTokens() {
+      try {
         const res = await fetch("/v1/tokens", { credentials: "include" });
         const data = await res.json().catch(() => ({}));
         if (!res.ok) {
           const detail = data.detail || ("HTTP " + res.status);
           throw new Error(typeof detail === "string" ? detail : JSON.stringify(detail));
         }
-          const tokens = data.tokens || [];
+        const tokens = data.tokens || [];
         listBox.innerHTML = "";
-          if (!tokens.length) {
+        if (!tokens.length) {
           listBox.innerHTML = '<div class="empty"><strong>No API keys yet</strong>Create one above to authenticate scripts and clients.</div>';
-            return;
-          }
-        tokens.forEach(t => listBox.appendChild(keyCard(t)));
-        } catch (e) {
-        listBox.innerHTML = '<div class="empty"><strong>Could not load keys</strong>' + escapeHtml(String(e.message || e)) + "</div>";
+          return;
         }
+        tokens.forEach(t => listBox.appendChild(keyCard(t)));
+      } catch (e) {
+        listBox.innerHTML = '<div class="empty"><strong>Could not load keys</strong>' + escapeHtml(String(e.message || e)) + "</div>";
       }
+    }
 
-      async function revokeToken(id) {
+    async function revokeToken(id) {
       if (!id || !confirm("Revoke this API key? Apps using it will stop working.")) return;
-        try {
+      try {
         const res = await fetch("/v1/tokens/" + encodeURIComponent(id), {
-            method: "DELETE",
+          method: "DELETE",
           credentials: "include",
         });
         const data = await res.json().catch(() => ({}));
@@ -356,8 +497,8 @@
         }
         setMsg("Key revoked", true);
         toast("Key revoked");
-          await listTokens();
-        } catch (e) {
+        await listTokens();
+      } catch (e) {
         setMsg(String(e.message || e), false);
       }
     }
@@ -366,12 +507,15 @@
     $("tokenName").addEventListener("keydown", e => {
       if (e.key === "Enter") { e.preventDefault(); createToken(); }
     });
+    $("tokenModels").addEventListener("change", syncDefaultModelOptions);
     $("copyBtn").addEventListener("click", () => copyText(secretValue.textContent || "", "Key copied"));
+    $("copyEnvBtn").addEventListener("click", () => copyText($("envSnippet").textContent || "", "Env copied"));
 
     (async function boot() {
       const ok = await ensureSession();
-        if (!ok) return;
-      await listTokens();
+      if (!ok) return;
+      syncDefaultModelOptions();
+      await Promise.all([loadReadyModels(), listTokens()]);
     })();
   </script>
 </body>

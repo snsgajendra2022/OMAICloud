@@ -11,6 +11,7 @@ Keys are scoped per account (owner_actor + tenant_id).
 from __future__ import annotations
 
 import hashlib
+import json
 import logging
 import os
 import secrets
@@ -32,6 +33,37 @@ def _utc_now() -> str:
 
 def _hash_token(token: str) -> str:
     return hashlib.sha256(token.encode("utf-8")).hexdigest()
+
+
+def _normalize_allowed_models(raw: list[str] | str | None) -> list[str]:
+    """Normalize to a list of model ids; ['*'] means all models."""
+    if raw is None:
+        return ["*"]
+    if isinstance(raw, str):
+        s = raw.strip().lower()
+        if not s or s in {"*", "all", "any"}:
+            return ["*"]
+        parts = [p.strip().lower() for p in s.replace(";", ",").split(",") if p.strip()]
+        return parts or ["*"]
+    out: list[str] = []
+    for item in raw:
+        v = str(item or "").strip().lower()
+        if not v:
+            continue
+        if v in {"*", "all", "any"}:
+            return ["*"]
+        out.append(v)
+    return out or ["*"]
+
+
+def _parse_allowed_models_json(raw: str | None) -> list[str]:
+    if not raw:
+        return ["*"]
+    try:
+        data = json.loads(raw)
+    except Exception:
+        return _normalize_allowed_models(raw)
+    return _normalize_allowed_models(data)
 
 
 @dataclass
@@ -78,6 +110,7 @@ class TokenStore:
                     prefix TEXT NOT NULL,
                     tenant_id TEXT NOT NULL DEFAULT 'default',
                     owner_actor TEXT NOT NULL DEFAULT '',
+                    allowed_models TEXT NOT NULL DEFAULT '["*"]',
                     created_at TEXT NOT NULL,
                     revoked_at TEXT,
                     last_used_at TEXT
@@ -91,6 +124,10 @@ class TokenStore:
             if "owner_actor" not in cols:
                 self._conn.execute(
                     "ALTER TABLE api_tokens ADD COLUMN owner_actor TEXT NOT NULL DEFAULT ''"
+                )
+            if "allowed_models" not in cols:
+                self._conn.execute(
+                    "ALTER TABLE api_tokens ADD COLUMN allowed_models TEXT NOT NULL DEFAULT '[\"*\"]'"
                 )
             # Migrate away from global UNIQUE(name) if the old table is still in place.
             self._migrate_unique_name_constraint()
@@ -165,6 +202,7 @@ class TokenStore:
         tenant_id: str = "default",
         *,
         owner_actor: str = "",
+        allowed_models: list[str] | str | None = None,
     ) -> dict:
         name = (name or "").strip()
         if not name:
@@ -177,6 +215,8 @@ class TokenStore:
         owner = (owner_actor or "").strip()
         if not owner:
             raise ValueError("owner_actor is required")
+        models = _normalize_allowed_models(allowed_models)
+        models_json = json.dumps(models)
 
         token = secrets.token_urlsafe(32)
         token_id = secrets.token_hex(8)
@@ -187,8 +227,8 @@ class TokenStore:
                 self._conn.execute(
                     """
                     INSERT INTO api_tokens
-                    (id, name, role, token_hash, prefix, tenant_id, owner_actor, created_at)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                    (id, name, role, token_hash, prefix, tenant_id, owner_actor, allowed_models, created_at)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
                     """,
                     (
                         token_id,
@@ -198,6 +238,7 @@ class TokenStore:
                         prefix,
                         tenant_id or "default",
                         owner,
+                        models_json,
                         created,
                     ),
                 )
@@ -205,6 +246,7 @@ class TokenStore:
             except sqlite3.IntegrityError as exc:
                 raise ValueError(f"token name already exists: {name}") from exc
 
+        default_model = "OM-L3" if "*" in models else models[0]
         return {
             "id": token_id,
             "name": name,
@@ -212,6 +254,7 @@ class TokenStore:
             "tenant_id": tenant_id or "default",
             "owner_actor": owner,
             "prefix": prefix,
+            "allowed_models": models,
             "created_at": created,
             "token": token,  # shown once
             "label": f"{name} ({role})",
@@ -219,9 +262,9 @@ class TokenStore:
                 "header": f"Authorization: Bearer {token}",
                 "alt_header": f"X-OM-API-Key: {token}",
                 "env": {
-                    "OM_API_KEY": token,
-                    "OM_API_BASE": "http://127.0.0.1:8080/api/v1",
-                    "OM_MODEL": os.getenv("OM_AI_MODEL_ID", "om:free"),
+                    "OPENAI_API_KEY": token,
+                    "OPENAI_BASE_URL": "http://127.0.0.1:8090/api/v1",
+                    "OPENAI_MODEL": default_model,
                 },
             },
             "note": "Save the token now. It will not be shown again.",
@@ -249,28 +292,35 @@ class TokenStore:
         where = (" WHERE " + " AND ".join(clauses)) if clauses else ""
         sql = (
             "SELECT id, name, role, prefix, tenant_id, owner_actor, created_at, "
-            "revoked_at, last_used_at FROM api_tokens"
+            "revoked_at, last_used_at, allowed_models FROM api_tokens"
             + where
             + " ORDER BY created_at DESC"
         )
         with self._lock:
             rows = self._conn.execute(sql, params).fetchall()
-        return [
-            {
-                "id": r["id"],
-                "name": r["name"],
-                "role": r["role"],
-                "label": f"{r['name']} ({r['role']})",
-                "prefix": r["prefix"],
-                "tenant_id": r["tenant_id"],
-                "owner_actor": r["owner_actor"] if "owner_actor" in r.keys() else "",
-                "created_at": r["created_at"],
-                "revoked_at": r["revoked_at"],
-                "last_used_at": r["last_used_at"],
-                "active": r["revoked_at"] is None,
-            }
-            for r in rows
-        ]
+        out = []
+        for r in rows:
+            keys = r.keys()
+            allowed = _parse_allowed_models_json(
+                r["allowed_models"] if "allowed_models" in keys else '["*"]'
+            )
+            out.append(
+                {
+                    "id": r["id"],
+                    "name": r["name"],
+                    "role": r["role"],
+                    "label": f"{r['name']} ({r['role']})",
+                    "prefix": r["prefix"],
+                    "tenant_id": r["tenant_id"],
+                    "owner_actor": r["owner_actor"] if "owner_actor" in keys else "",
+                    "allowed_models": allowed,
+                    "created_at": r["created_at"],
+                    "revoked_at": r["revoked_at"],
+                    "last_used_at": r["last_used_at"],
+                    "active": r["revoked_at"] is None,
+                }
+            )
+        return out
 
     def revoke(
         self,
@@ -323,7 +373,7 @@ class TokenStore:
         digest = _hash_token(raw_token)
         with self._lock:
             row = self._conn.execute(
-                "SELECT id, name, role, tenant_id, owner_actor, revoked_at "
+                "SELECT id, name, role, tenant_id, owner_actor, revoked_at, allowed_models "
                 "FROM api_tokens WHERE token_hash=?",
                 (digest,),
             ).fetchone()
@@ -333,7 +383,11 @@ class TokenStore:
             name = row["name"]
             role = row["role"]
             tenant_id = row["tenant_id"]
-            owner_actor = row["owner_actor"] if "owner_actor" in row.keys() else ""
+            keys = row.keys()
+            owner_actor = row["owner_actor"] if "owner_actor" in keys else ""
+            allowed_models = _parse_allowed_models_json(
+                row["allowed_models"] if "allowed_models" in keys else '["*"]'
+            )
             try:
                 self._conn.execute(
                     "UPDATE api_tokens SET last_used_at=? WHERE id=?",
@@ -352,6 +406,7 @@ class TokenStore:
             "role": role,
             "tenant_id": tenant_id,
             "owner_actor": owner_actor,
+            "allowed_models": allowed_models,
         }
 
 

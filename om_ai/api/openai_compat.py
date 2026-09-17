@@ -422,6 +422,15 @@ async def chat_completions(
     req: ChatCompletionsRequest,
     ctx: TenantContext = Depends(require_permission("model.generate")),
 ):
+    if not ctx.allows_model(req.model):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail=(
+                f"Model '{req.model}' is not allowed for this API key. "
+                f"Allowed: {', '.join(ctx.allowed_models) or '*'}. "
+                "Create a new key with Model = All, or pick an allowed model."
+            ),
+        )
     messages = _messages_to_dicts(req.messages)
     max_new = int(req.max_tokens) if req.max_tokens is not None else None
     temperature = float(req.temperature) if req.temperature is not None else None

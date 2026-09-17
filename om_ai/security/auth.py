@@ -53,9 +53,41 @@ class TenantContext:
     actor: str = "anonymous"
     role: str = "viewer"
     request_id: str = field(default_factory=lambda: uuid.uuid4().hex)
+    # API token model scope: ["*"] / ["all"] = any model; else allow-list of ids.
+    allowed_models: list[str] = field(default_factory=lambda: ["*"])
+    auth_source: str = ""
+    token_id: str = ""
+    token_name: str = ""
 
     def has_permission(self, permission: str) -> bool:
         return rbac.can(self.role, permission)
+
+    def allows_model(self, model: str | None) -> bool:
+        """Return True if this auth context may request ``model``."""
+        allowed = [str(x or "").strip().lower() for x in (self.allowed_models or []) if str(x or "").strip()]
+        if not allowed or "*" in allowed or "all" in allowed:
+            return True
+        raw = str(model or "").strip().lower()
+        if not raw:
+            return True
+        if raw in allowed:
+            return True
+        # OM-Lx aliases map to om / themselves
+        if raw.startswith("om-l") and ("om-l1" in allowed or "om" in allowed or any(a.startswith("om-l") for a in allowed)):
+            if raw in allowed:
+                return True
+            # if any specific OM level listed, require exact match (already checked)
+            if any(a.startswith("om-l") for a in allowed):
+                return raw in allowed
+        try:
+            from om_ai.runtime.external_llms import normalize_provider_id
+
+            pid = normalize_provider_id(raw)
+            if pid and pid in allowed:
+                return True
+        except Exception:
+            pass
+        return False
 
 
 _current_tenant: ContextVar[TenantContext] = ContextVar(
@@ -169,6 +201,8 @@ class APIKeyAuth:
                     "tenant_id": rec["tenant_id"],
                     "source": "db",
                     "id": rec["id"],
+                    "owner_actor": rec.get("owner_actor") or "",
+                    "allowed_models": rec.get("allowed_models") or ["*"],
                 }
         except Exception:
             # Never treat a token-store glitch as a hard crash; env keys already
@@ -238,13 +272,23 @@ def _resolve_context_from_request(request) -> TenantContext:
     source = info.get("source", "key")
     if source == "session" and info.get("id"):
         actor = f"user:{info['id']}"
+    elif source == "db" and info.get("owner_actor"):
+        # Machine tokens inherit the creating account so Settings → AI keys apply.
+        actor = str(info["owner_actor"])
     else:
         actor = f"{source}:{info.get('name', raw_key[:6])}…"
+    allowed = info.get("allowed_models") or ["*"]
+    if not isinstance(allowed, list):
+        allowed = ["*"]
     ctx = TenantContext(
         tenant_id=request.headers.get("X-Tenant-Id", info.get("tenant_id", "default")),
         actor=actor,
         role=info["role"],
         request_id=request_id,
+        allowed_models=[str(x) for x in allowed],
+        auth_source=str(source or ""),
+        token_id=str(info.get("id") or ""),
+        token_name=str(info.get("name") or ""),
     )
     set_current_tenant(ctx)
     return ctx
