@@ -8,6 +8,10 @@ from .models import (
     PreferenceExample,
     ProvenanceRecord,
 )
+from .curriculum_engine import (
+    CurriculumEngine,
+    CurriculumItem,
+)
 
 from .knowledge_sampler import (
     KnowledgeSampler,
@@ -28,4 +32,8 @@ __all__ = [
     "ProvenanceRecord",
 
     "KnowledgeSampler",
+
+    "CurriculumEngine",
+    
+    "CurriculumItem",
 ]

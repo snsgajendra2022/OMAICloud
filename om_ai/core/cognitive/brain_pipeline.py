@@ -68,6 +68,8 @@ from om_ai.context import ContextEngine
 from om_ai.understanding.query_kind import is_coding_task, is_greeting, query_kind
 from om_ai.understanding.language_brain import detect_language
 from om_ai.agents.collaboration import AgentCollaborationPlanner, AgentCoordinator
+from om_ai.core.knowledge_brain import KnowledgeBrain
+from om_ai.core.research_intelligence import ResearchPipeline
 
 MAX_RESPONSE_RETRIES = 2
 
@@ -107,6 +109,9 @@ class OMCognitiveBrain:
         self.user_intelligence = UserIntelligenceEngine()
         self.context_engine = ContextEngine()
         self.roadmap = OMRoadmapStack()
+        self.knowledge_brain = KnowledgeBrain()
+        self.research_pipeline = ResearchPipeline()
+
 
     @staticmethod
     def _plan_list(state: Any) -> list[Any]:
