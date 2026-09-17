@@ -1,0 +1,13 @@
+{
+  "run_id": "explain_kubernetes_architecture_a9d6fe87",
+  "task": "Explain Kubernetes architecture",
+  "responses": [
+    {
+      "provider": "openrouter",
+      "model": "",
+      "source": "live",
+      "text": "",
+      "error": "too_short"
+    }
+  ]
+}

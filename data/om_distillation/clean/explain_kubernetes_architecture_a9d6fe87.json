@@ -1,0 +1,30 @@
+{
+  "run_id": "explain_kubernetes_architecture_a9d6fe87",
+  "task": "Explain Kubernetes architecture",
+  "teachers": [
+    "openrouter"
+  ],
+  "responses": [
+    {
+      "provider": "openrouter",
+      "ok": false,
+      "text": "",
+      "model": "",
+      "vendor": "",
+      "error": "too_short",
+      "source": "live",
+      "raw": "",
+      "cleaned": "",
+      "verification": {
+        "ok": false,
+        "issues": [
+          "too_short"
+        ]
+      }
+    }
+  ],
+  "ok_count": 0,
+  "live_count": 0,
+  "mock_count": 0,
+  "stage": "cleaned_verified"
+}
