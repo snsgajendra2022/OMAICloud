@@ -8,7 +8,7 @@ from .solution_planner import SolutionPlanner
 from .chain_reasoner import ChainReasoner
 
 
-class ReasoningEngine:
+class AdvancedReasoningEngine:
     def __init__(self) -> None:
         self.analyzer = ProblemAnalyzer()
         self.planner = SolutionPlanner()
@@ -41,3 +41,8 @@ class ReasoningEngine:
             "final_reasoning": deep.get("final_reasoning"),
             "status": "reasoning_completed",
         }
+
+
+# Backward-compatible alias used by brain_pipeline / older callers.
+ReasoningEngine = AdvancedReasoningEngine
+

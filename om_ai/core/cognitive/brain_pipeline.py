@@ -70,7 +70,16 @@ from om_ai.understanding.language_brain import detect_language
 from om_ai.agents.collaboration import AgentCollaborationPlanner, AgentCoordinator
 from om_ai.core.knowledge_brain import KnowledgeBrain
 from om_ai.core.research_intelligence import ResearchPipeline
+from om_ai.core.long_context import LongContextEngine
+from om_ai.core.advanced_reasoning import AdvancedReasoningEngine
+from om_ai.core.agent_civilization import (
+    CivilizationEngine
+)
 
+
+from om_ai.core.autonomous_research import (
+    AutonomousResearchEngine
+)
 MAX_RESPONSE_RETRIES = 2
 
 
@@ -111,6 +120,10 @@ class OMCognitiveBrain:
         self.roadmap = OMRoadmapStack()
         self.knowledge_brain = KnowledgeBrain()
         self.research_pipeline = ResearchPipeline()
+        self.long_context = LongContextEngine()
+        self.advanced_reasoning_engine = AdvancedReasoningEngine()
+        self.civilization = CivilizationEngine()
+        self.autonomous_research = AutonomousResearchEngine()
 
 
     @staticmethod
@@ -151,6 +164,11 @@ class OMCognitiveBrain:
         stages: list[str] = []
         meta: dict[str, Any] = {"flow": "om-brain-v87"}
         research_state = None
+        research = None
+        caller_knowledge = knowledge
+        request_context: dict[str, Any] = dict(context or {})
+        long_context_pack: dict[str, Any] = {}
+        advanced_reasoning: dict[str, Any] = {}
 
         # 0) Language detection
         stages.append("language")
@@ -159,6 +177,48 @@ class OMCognitiveBrain:
         except Exception:
             language = "en"
         meta["language"] = language
+
+        # Knowledge Brain → ResearchPipeline when internal knowledge is missing
+        stages.append("knowledge_brain")
+        try:
+            knowledge = self.knowledge_brain.analyze(message)
+        except Exception as exc:
+            from om_ai.core.knowledge_brain import KnowledgeContext
+
+            knowledge = KnowledgeContext(query=message, knowledge_found=False)
+            meta["knowledge_brain"] = {"error": str(exc), "knowledge_found": False}
+        else:
+            meta["knowledge_brain"] = {
+                "knowledge_found": bool(getattr(knowledge, "knowledge_found", False)),
+                "confidence": float(getattr(knowledge, "confidence", 0) or 0),
+                "concepts": list(getattr(knowledge, "concepts", []) or []),
+                "source": str(getattr(knowledge, "source", "internal") or "internal"),
+            }
+
+        if not getattr(knowledge, "knowledge_found", False):
+            stages.append("research_pipeline")
+            try:
+                research = self.research_pipeline.run(message)
+                meta["research_pipeline"] = (
+                    research if isinstance(research, dict) else {"result": research}
+                )
+            except Exception as exc:
+                research = None
+                meta["research_pipeline"] = {"error": str(exc)}
+
+        kb_result = knowledge
+        if caller_knowledge is not None:
+            knowledge = caller_knowledge
+        elif getattr(kb_result, "knowledge_found", False):
+            knowledge = {
+                "source": "knowledge_brain",
+                "concepts": list(getattr(kb_result, "concepts", []) or []),
+                "confidence": float(getattr(kb_result, "confidence", 0) or 0),
+                "matched_nodes": list(getattr(kb_result, "matched_nodes", []) or []),
+                "knowledge_found": True,
+            }
+        else:
+            knowledge = None
 
         # Early refuse meaningless / corrupted-content requests
         if self.garbage_detector.is_nonsense_request(message):
@@ -192,7 +252,7 @@ class OMCognitiveBrain:
 
             understanding = UnderstandingEngine().understand(
                 message,
-                context=context or {},
+                context=request_context,
             )
         except Exception as exc:
             understanding = {
@@ -218,7 +278,11 @@ class OMCognitiveBrain:
             freshness = {"requires_research": False, "signals": [], "error": str(exc)}
         meta["freshness"] = freshness
 
-        if freshness.get("requires_research") or freshness.get("needs_research"):
+        if (
+            freshness.get("requires_research")
+            or freshness.get("needs_research")
+            or bool((research or {}).get("research_required"))
+        ):
             stages.append("research")
             try:
                 research_state = self.research_engine.research(
@@ -230,6 +294,7 @@ class OMCognitiveBrain:
                     "sources": len(getattr(research_state, "sources", []) or []),
                     "confidence": getattr(research_state, "confidence", 0),
                     "citations": list(getattr(research_state, "citations", []) or []),
+                    "from_knowledge_gap": bool((research or {}).get("research_required")),
                 }
             except Exception as exc:
                 research_state = None
@@ -243,7 +308,7 @@ class OMCognitiveBrain:
                 message,
                 knowledge=knowledge,
                 memory=memory,
-                context=context or {},
+                context=request_context,
             )
             meta["roadmap"] = {
                 "status": self.roadmap.status(),
@@ -342,6 +407,8 @@ class OMCognitiveBrain:
         raw_context: list[Any] = [knowledge, memory]
         if research_summary:
             raw_context.append(research_summary)
+        if isinstance(research, dict) and research.get("task") is not None:
+            raw_context.append({"research_task": research.get("task")})
         roadmap_blob = (roadmap_pack or {}).get("context_blob")
         if roadmap_blob:
             raw_context.append(roadmap_blob)
@@ -357,6 +424,52 @@ class OMCognitiveBrain:
         except Exception:
             clean_context = filtered
         meta["context_intelligence"] = {"kept": len(clean_context or [])}
+
+        # Before generating response: long-context + advanced reasoning
+        stages.append("long_context")
+        try:
+            context = self.long_context.process(message)
+            long_context_pack = context if isinstance(context, dict) else {"related_context": context}
+            meta["long_context"] = {
+                "context_available": bool(long_context_pack.get("context_available")),
+                "related": len(list(long_context_pack.get("related_context") or [])),
+            }
+            related = long_context_pack.get("related_context")
+            if related:
+                clean_context = list(clean_context or []) + [related]
+        except Exception as exc:
+            long_context_pack = {}
+            meta["long_context"] = {"error": str(exc)}
+
+        stages.append("advanced_reasoning")
+        try:
+            reasoning = self.advanced_reasoning_engine.reason(message)
+            advanced_reasoning = reasoning if isinstance(reasoning, dict) else {"result": reasoning}
+            meta["advanced_reasoning"] = {
+                "analysis": advanced_reasoning.get("analysis"),
+                "plan": advanced_reasoning.get("plan"),
+            }
+            adv_plan = advanced_reasoning.get("plan")
+            if isinstance(adv_plan, list) and adv_plan:
+                merged_plan = list(
+                    dict.fromkeys(list(reasoning_out.get("plan") or []) + [str(x) for x in adv_plan])
+                )
+                reasoning_out = {
+                    **reasoning_out,
+                    "plan": merged_plan,
+                    "advanced": advanced_reasoning,
+                }
+            elif advanced_reasoning:
+                reasoning_out = {**reasoning_out, "advanced": advanced_reasoning}
+            meta["reasoning"] = {
+                "status": reasoning_out.get("status"),
+                "plan": reasoning_out.get("plan"),
+                "mode": (roadmap_pack.get("advanced_reasoning") or {}).get("mode"),
+                "advanced": True,
+            }
+        except Exception as exc:
+            advanced_reasoning = {}
+            meta["advanced_reasoning"] = {"error": str(exc)}
 
         # 7) OM Native Model
         stages.append("om_native_model")
@@ -517,6 +630,7 @@ class OMCognitiveBrain:
         if not quality.get("approved"):
             if intent_name in {"conversation", "greeting", "casual_conversation"}:
                 answer = self._safe_fallback(message, intent_name)
+                self._store_long_context_turn(message, answer, meta)
                 return {
                     "answer": answer,
                     "status": "ok_fallback",
@@ -525,9 +639,11 @@ class OMCognitiveBrain:
                     "reasoning": reasoning_out,
                     "coding": coding_out,
                     "research": meta.get("research"),
+                    "long_context": long_context_pack or meta.get("long_context"),
+                    "advanced_reasoning": advanced_reasoning or meta.get("advanced_reasoning"),
                     "response_state": response_state,
                     "response_plan": meta.get("response_plan"),
-                    "stages": stages + ["answer"],
+                    "stages": stages + ["answer", "long_context_store"],
                     "meta": meta,
                     "intent": understanding,
                     "technology": {
@@ -546,6 +662,7 @@ class OMCognitiveBrain:
                 except Exception:
                     research_answer = ""
                 if research_answer:
+                    self._store_long_context_turn(message, research_answer, meta)
                     return {
                         "answer": research_answer,
                         "status": "ok_research_fallback",
@@ -554,26 +671,32 @@ class OMCognitiveBrain:
                         "reasoning": reasoning_out,
                         "coding": coding_out,
                         "research": meta.get("research"),
+                        "long_context": long_context_pack or meta.get("long_context"),
+                        "advanced_reasoning": advanced_reasoning or meta.get("advanced_reasoning"),
                         "response_state": response_state,
                         "response_plan": meta.get("response_plan"),
-                        "stages": stages + ["answer"],
+                        "stages": stages + ["answer", "long_context_store"],
                         "meta": meta,
                         "intent": understanding,
                         "technology": {
                             "frameworks": meta["coding"].get("frameworks") or [],
                         },
                     }
+            fail_answer = "OM could not generate a reliable response."
+            self._store_long_context_turn(message, fail_answer, meta)
             return {
-                "answer": "OM could not generate a reliable response.",
+                "answer": fail_answer,
                 "status": "generation_failed",
                 "quality": quality,
                 "understanding": understanding,
                 "reasoning": reasoning_out,
                 "coding": coding_out,
                 "research": meta.get("research"),
+                "long_context": long_context_pack or meta.get("long_context"),
+                "advanced_reasoning": advanced_reasoning or meta.get("advanced_reasoning"),
                 "response_state": response_state,
                 "response_plan": meta.get("response_plan"),
-                "stages": stages,
+                "stages": stages + ["long_context_store"],
                 "meta": meta,
                 "intent": understanding,
                 "technology": {
@@ -650,6 +773,10 @@ class OMCognitiveBrain:
         except Exception as exc:
             meta["roadmap_learn"] = {"error": str(exc)}
 
+        # After response: persist turn into long-context memory
+        stages.append("long_context_store")
+        self._store_long_context_turn(message, answer, meta)
+
         return {
             "answer": answer,
             "status": "ok",
@@ -657,6 +784,8 @@ class OMCognitiveBrain:
             "reasoning": reasoning_out,
             "coding": coding_out,
             "research": meta.get("research"),
+            "long_context": long_context_pack or meta.get("long_context"),
+            "advanced_reasoning": advanced_reasoning or meta.get("advanced_reasoning"),
             "response_state": response_state,
             "response_plan": meta.get("response_plan"),
             "quality": quality,
@@ -820,6 +949,14 @@ Research:
             return ""
         except Exception:
             return ""
+
+    def _store_long_context_turn(self, message: str, answer: str, meta: dict[str, Any]) -> None:
+        try:
+            self.long_context.store("user", message)
+            self.long_context.store("assistant", answer)
+            meta["long_context_store"] = {"stored": True}
+        except Exception as exc:
+            meta["long_context_store"] = {"error": str(exc)}
 
     def _safe_fallback(self, message: str, intent_name: str) -> str:
         if intent_name == "conversation" or is_greeting(message):

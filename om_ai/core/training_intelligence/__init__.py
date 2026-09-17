@@ -16,6 +16,15 @@ from .curriculum_engine import (
 from .knowledge_sampler import (
     KnowledgeSampler,
 )
+
+from .training_engine import (
+    TrainingIntelligenceEngine
+)
+
+
+from .training_task import (
+    TrainingTask
+)
 __all__ = [
     "TrainingIntelligenceConfig",
 
@@ -36,4 +45,7 @@ __all__ = [
     "CurriculumEngine",
     
     "CurriculumItem",
+    "TrainingIntelligenceEngine",
+
+    "TrainingTask"
 ]

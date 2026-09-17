@@ -25,7 +25,14 @@ from .improvement_event import (
     ImprovementEvent
 )
 
+from om_ai.core.training_intelligence import (
+    TrainingIntelligenceEngine
+)
 
+from om_ai.core.checkpoint_intelligence import (
+    Checkpoint,
+    CheckpointManager
+)
 
 class ContinuousImprovementEngine:
     """
@@ -44,6 +51,10 @@ class ContinuousImprovementEngine:
         self.tracker = ImprovementTracker()
 
         self.cycles = ImprovementCycleManager()
+
+        self.training_engine = TrainingIntelligenceEngine()
+
+        self.checkpoint_manager = CheckpointManager()
 
 
 
@@ -98,6 +109,28 @@ class ContinuousImprovementEngine:
             plan
         )
 
+        training = self.training_engine.create_training(
+
+                capability="reasoning",
+
+                score=0.42
+
+            )
+            
+        checkpoint = Checkpoint(
+
+            version="OM-1.1",
+
+            path="checkpoints/om-1.1",
+
+            score=0.82
+
+        )
+
+
+        result = self.checkpoint_manager.process(
+            checkpoint
+        )
 
         return {
 
@@ -107,6 +140,10 @@ class ContinuousImprovementEngine:
 
             "plan": plan,
 
-            "cycle": cycle
+            "cycle": cycle,
+
+            "training": training,
+
+            "checkpoint": result
 
         }
