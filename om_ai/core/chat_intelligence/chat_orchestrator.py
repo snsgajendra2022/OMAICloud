@@ -256,12 +256,12 @@ class ChatOrchestrator:
                 draft = str(solution["answer"])
             elif intent.intent == "debugging":
                 draft = str(solution["answer"])
-        if not draft:
-            draft = (
-                "I can help with that. "
-                "Share a bit more detail (goal, error text, or stack) "
-                "and I’ll give a concrete answer."
-            )
+            if not draft:
+                    draft = (
+                        "I can help with that. "
+                        "Share a bit more detail (goal, error text, or stack) "
+                        "and I’ll give a concrete answer."
+                    )
 
         # 6) Optimize
         stages.append("optimize")

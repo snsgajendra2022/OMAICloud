@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>OM Companion</title>
+  <style>
+    :root {
+      --bg0: #0b1020;
+      --bg1: #121a33;
+      --text: #e8eefc;
+      --muted: #9aa8c7;
+      --accent: #6ea8ff;
+      --ok: #5ddea8;
+      --warn: #f0c674;
+    }
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0; height: 100%;
+      font-family: "Avenir Next", "Segoe UI", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(1200px 600px at 50% -10%, #1b2b55 0%, transparent 60%),
+        linear-gradient(180deg, var(--bg0), var(--bg1));
+    }
+    .shell {
+      min-height: 100%;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      padding: 20px 24px 16px;
+      max-width: 920px;
+      margin: 0 auto;
+    }
+    header {
+      display: flex; justify-content: space-between; align-items: center;
+      letter-spacing: 0.04em;
+    }
+    header strong { font-size: 1.1rem; }
+    header a { color: var(--muted); text-decoration: none; }
+    .stage {
+      display: grid; place-items: center; text-align: center; gap: 18px;
+      padding: 24px 12px;
+    }
+    .avatar {
+      width: min(280px, 70vw); height: min(280px, 70vw);
+      border-radius: 50%;
+      background:
+        radial-gradient(circle at 35% 30%, #dce8ff, #6ea8ff 45%, #243965 75%);
+      box-shadow: 0 0 0 8px rgba(110,168,255,0.12), 0 30px 80px rgba(0,0,0,0.35);
+      position: relative;
+      transition: transform .25s ease, filter .25s ease;
+    }
+    .avatar[data-state="listening"] { filter: saturate(1.2) brightness(1.05); }
+    .avatar[data-state="thinking"] { animation: pulse 1.4s ease-in-out infinite; }
+    .avatar[data-state="speaking"] { transform: scale(1.03); }
+    .avatar[data-state="waiting_permission"] { filter: hue-rotate(25deg); }
+    @keyframes pulse { 50% { transform: scale(1.04); } }
+    .mouth {
+      position: absolute; left: 50%; bottom: 28%;
+      width: 42px; height: 10px; margin-left: -21px;
+      border-radius: 0 0 20px 20px;
+      background: rgba(20,28,48,0.55);
+      transform-origin: center top;
+    }
+    .status-dot {
+      display: inline-flex; align-items: center; gap: 8px;
+      color: var(--muted); font-size: 0.95rem;
+    }
+    .status-dot i {
+      width: 10px; height: 10px; border-radius: 50%; background: var(--ok);
+      box-shadow: 0 0 12px var(--ok);
+    }
+    .reply {
+      max-width: 34rem; margin: 0 auto;
+      font-size: 1.25rem; line-height: 1.45; min-height: 3.2em;
+    }
+    .activity {
+      color: var(--muted); font-size: 0.9rem; min-height: 1.2em;
+    }
+    .controls {
+      display: flex; flex-wrap: wrap; gap: 10px; justify-content: center;
+      padding: 12px 0 8px;
+    }
+    button, .chip {
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.04);
+      color: var(--text); border-radius: 999px;
+      padding: 10px 16px; cursor: pointer; font: inherit;
+    }
+    button.primary { background: rgba(110,168,255,0.22); border-color: rgba(110,168,255,0.45); }
+    .composer {
+      display: grid; grid-template-columns: 1fr auto; gap: 10px;
+      margin-top: 8px;
+    }
+    .composer input {
+      width: 100%; border-radius: 14px; border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(0,0,0,0.25); color: var(--text);
+      padding: 14px 16px; font: inherit;
+    }
+    .timeline {
+      margin-top: 8px; color: var(--muted); font-size: 0.85rem;
+      max-height: 90px; overflow: auto;
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <header>
+      <strong>OM</strong>
+      <a href="/chat">Chat UI</a>
+    </header>
+
+    <main class="stage">
+      <div class="avatar" id="avatar" data-state="idle">
+        <div class="mouth" id="mouth"></div>
+      </div>
+      <div class="status-dot"><i id="dot"></i><span id="stateLabel">Starting</span></div>
+      <p class="reply" id="reply">“Hello — I’m OM. What should we work on?”</p>
+      <p class="activity" id="activity"></p>
+      <div class="timeline" id="timeline"></div>
+    </main>
+
+    <footer>
+      <div class="controls">
+        <button class="primary" id="btnStart">Start session</button>
+        <button id="btnMute">Mute</button>
+        <button id="btnInterrupt">Stop speaking</button>
+        <button id="btnMemory">Memory</button>
+        <button id="btnPerms">Permissions</button>
+      </div>
+      <form class="composer" id="form">
+        <input id="input" placeholder="Type or say: Hey OM …" autocomplete="off" />
+        <button class="primary" type="submit">Send</button>
+      </form>
+    </footer>
+  </div>
+  <script>
+    const els = {
+      avatar: document.getElementById('avatar'),
+      mouth: document.getElementById('mouth'),
+      stateLabel: document.getElementById('stateLabel'),
+      reply: document.getElementById('reply'),
+      activity: document.getElementById('activity'),
+      timeline: document.getElementById('timeline'),
+      input: document.getElementById('input'),
+      form: document.getElementById('form'),
+    };
+    let sessionId = null;
+    let muted = false;
+    let speaking = false;
+    let lipTimer = null;
+
+    function setState(state) {
+      const s = (state || 'idle').toLowerCase();
+      els.avatar.dataset.state = s.includes('listen') ? 'listening'
+        : s.includes('think') || s.includes('understand') || s.includes('generat') ? 'thinking'
+        : s.includes('speak') ? 'speaking'
+        : s.includes('permission') ? 'waiting_permission'
+        : 'idle';
+      els.stateLabel.textContent = state || 'Idle';
+      if (els.avatar.dataset.state === 'speaking') startLip(); else stopLip();
+    }
+
+    function startLip() {
+      speaking = true;
+      stopLip();
+      lipTimer = setInterval(() => {
+        const open = 8 + Math.random() * 18;
+        els.mouth.style.height = open + 'px';
+      }, 80);
+    }
+    function stopLip() {
+      speaking = false;
+      if (lipTimer) clearInterval(lipTimer);
+      lipTimer = null;
+      els.mouth.style.height = '10px';
+    }
+
+    function pushActivity(items) {
+      if (!items || !items.length) return;
+      els.activity.textContent = items.join(' · ');
+      const line = document.createElement('div');
+      line.textContent = items.join(' → ');
+      els.timeline.prepend(line);
+    }
+
+    async function api(path, opts={}) {
+      const res = await fetch('/api/companion' + path, {
+        headers: { 'Content-Type': 'application/json', ...(opts.headers||{}) },
+        ...opts,
+      });
+      if (!res.ok) throw new Error(await res.text());
+      return res.json();
+    }
+
+    async function startSession() {
+      const data = await api('/session', { method: 'POST', body: '{}' });
+      sessionId = data.session_id;
+      setState((data.status && data.status.status) || 'READY');
+      pushActivity(['Session ready']);
+    }
+
+    async function sendText(text) {
+      setState('UNDERSTANDING');
+      const data = await api('/message', {
+        method: 'POST',
+        body: JSON.stringify({ text, session_id: sessionId }),
+      });
+      if (data.activities) pushActivity(data.activities);
+      if (data.answer) {
+        els.reply.textContent = '“' + data.answer + '”';
+        setState(data.state || 'SPEAKING');
+        setTimeout(() => setState(data.state || 'LISTENING'), 1200);
+      } else if (data.waiting_for_wake) {
+        setState('LISTENING_FOR_WAKE_WORD');
+        els.reply.textContent = 'Listening for “Hey OM”…';
+      }
+      return data;
+    }
+
+    document.getElementById('btnStart').onclick = () => startSession().catch(e => alert(e.message));
+    document.getElementById('btnMute').onclick = async () => {
+      muted = !muted;
+      await api(muted ? '/mute' : '/unmute', { method: 'POST', body: '{}' });
+      document.getElementById('btnMute').textContent = muted ? 'Unmute' : 'Mute';
+      setState(muted ? 'MUTED' : 'LISTENING');
+    };
+    document.getElementById('btnInterrupt').onclick = () => api('/interrupt', { method: 'POST', body: '{}' }).then(() => setState('INTERRUPTED'));
+    document.getElementById('btnMemory').onclick = async () => {
+      const m = await api('/memory');
+      alert(JSON.stringify(m, null, 2).slice(0, 1800));
+    };
+    document.getElementById('btnPerms').onclick = async () => {
+      const p = await api('/permissions');
+      alert(JSON.stringify(p, null, 2));
+    };
+    els.form.onsubmit = async (e) => {
+      e.preventDefault();
+      const text = els.input.value.trim();
+      if (!text) return;
+      els.input.value = '';
+      if (!sessionId) await startSession();
+      try { await sendText(text); } catch (err) { alert(err.message); }
+    };
+
+    // Autostart text session
+    startSession().catch(() => setState('ERROR'));
+  </script>
+</body>
+</html>

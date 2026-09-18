@@ -1928,6 +1928,11 @@ def main():
     s.add_argument("--reload", action="store_true")
     s.set_defaults(func=serve)
 
+    # OM Companion Runtime (voice + brain + actions) — via cli_commands (not om_ai/cli/)
+    from om_ai.cli_commands.companion_commands import register_companion_parser
+
+    register_companion_parser(sp)
+
     doc = sp.add_parser("doctor", help="Full OM system diagnostics health report")
     doc.add_argument("--json", action="store_true", help="Print JSON report")
     doc.set_defaults(func=doctor)

@@ -23,7 +23,14 @@ dependencies = [
 dev = ["pytest>=8.0", "ruff>=0.6"]
 deepSpeed = ["deepspeed>=0.15"]
 vision = ["pillow>=10.0"]
-voice = ["soundfile>=0.12"]
+voice = [
+  "soundfile>=0.12",
+  "sounddevice>=0.4.6",
+  "faster-whisper>=1.0.0",
+]
+companion = [
+  "om-ai-operating-brain[voice]",
+]
 
 [project.scripts]
 om-ai = "om_ai.cli:main"

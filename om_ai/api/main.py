@@ -177,6 +177,16 @@ bind_engine(
 )
 app.include_router(openai_router)
 
+# OM Companion Runtime API (voice / avatar / actions)
+try:
+    from om_ai.api.companion import router as companion_router
+
+    app.include_router(companion_router)
+except Exception as _companion_exc:  # pragma: no cover
+    import logging as _logging
+
+    _logging.getLogger(__name__).warning("companion router not loaded: %s", _companion_exc)
+
 # Optional auto-load of local OM checkpoint (never pulls external LLMs)
 _AUTOLOAD = os.getenv("OM_AI_AUTOLOAD", "0") == "1"
 _AUTO_CONFIG = os.getenv("OM_AI_CONFIG", "").strip()
@@ -935,6 +945,13 @@ def register_page():
 def chat_ui():
     """Chat console — only useful after account sign-in."""
     return _serve_static_html("chat.html")
+
+
+@app.get("/companion", tags=["UI"])
+@app.get("/ui/companion", tags=["UI"])
+def companion_ui():
+    """OM Companion avatar-first interface."""
+    return _serve_static_html("companion/index.html")
 
 
 @app.get("/ui/tokens", tags=["UI"])
