@@ -72,6 +72,150 @@ def run_chat_pipeline(
     if prefer_planning:
         meta["level_prefer_planning"] = True
 
+    # ── 0. STEP 26 OM Chat Intelligence Core (front door) ─────────────
+    # User → Understand → Remember → Plan → Solve → Improve → Answer
+    # Greetings / social never hit the small raw model.
+    stages.append("step26_chat_intelligence")
+    chat_intel: dict[str, Any] = {}
+    try:
+        from om_ai.core.chat_intelligence import run_chat_intelligence
+
+        hist = []
+        for m in messages or []:
+            if not isinstance(m, dict):
+                continue
+            role = str(m.get("role") or "").lower()
+            content = str(m.get("content") or "").strip()
+            if role in {"user", "assistant", "system"} and content:
+                hist.append({"role": role, "content": content[:2000]})
+
+        chat_intel = run_chat_intelligence(
+            q,
+            history=hist,
+            tenant_id=tenant_id,
+            actor=actor,
+            model_context="",
+            extra={
+                "project_id": project_id,
+                "project_instructions": project_instructions,
+            },
+        ) or {}
+        meta["chat_intelligence"] = {
+            "intent": (chat_intel.get("intent") or {}),
+            "strategy": (chat_intel.get("plan") or {}).get("strategy")
+            or (chat_intel.get("meta") or {}).get("strategy"),
+            "stages": list(chat_intel.get("stages") or []),
+            "needs_model": bool(chat_intel.get("needs_model", True)),
+            "social": bool((chat_intel.get("meta") or {}).get("social")),
+            "quality": (chat_intel.get("meta") or {}).get("quality"),
+            "confidence": (chat_intel.get("meta") or {}).get("confidence"),
+        }
+        ci_answer = str(chat_intel.get("answer") or "").strip()
+        # Early return for greetings / identity / thanks — ChatGPT-like UX
+        if ci_answer and not chat_intel.get("needs_model", True):
+            stages.append("response")
+            return {
+                "answer": ci_answer if ci_answer.endswith("\n") else ci_answer + "\n",
+                "stages": stages,
+                "meta": meta,
+                "language": {"language": "en", "response_language": "en"},
+                "intent": chat_intel.get("intent") or {"intent": "conversation"},
+                "chat_intelligence": chat_intel,
+            }
+        # Seed structured solution / plan into later stages
+        ci_blob = str(chat_intel.get("context_blob") or "").strip()
+        sol = chat_intel.get("solution") or {}
+        if isinstance(sol, dict) and sol.get("answer"):
+            meta["chat_intelligence_solution"] = str(sol.get("answer") or "")[:2000]
+        if ci_blob:
+            meta["chat_intelligence_context"] = ci_blob[:1200]
+        if chat_intel.get("system_hint"):
+            meta["chat_intelligence_hint"] = str(chat_intel.get("system_hint"))[:500]
+    except Exception as exc:
+        logger.debug("chat intelligence skipped: %s", exc)
+        meta["chat_intelligence"] = {"error": str(exc)}
+
+    # ── 0b. STEP 24 OM Brain Router ───────────────────────────────────
+    # User → OM Brain → Fusion → Research → Knowledge → Agents → Response
+    stages.append("step24_brain_router")
+    step24: dict[str, Any] = {}
+    try:
+        from om_ai.core.brain_router import run_om_brain_router
+
+        step24 = run_om_brain_router(
+            q,
+            context={
+                "tenant_id": tenant_id,
+                "actor": actor,
+                "project_id": project_id,
+                "project_instructions": project_instructions,
+                "chat_intelligence": meta.get("chat_intelligence"),
+            },
+        ) or {}
+        meta["step24"] = {
+            "models": list(step24.get("models") or []),
+            "knowledge_found": bool(step24.get("knowledge_found")),
+            "research_used": bool(step24.get("research_used")),
+            "agents": [
+                (a.get("type") if isinstance(a, dict) else str(a))
+                for a in (step24.get("agents") or [])
+            ],
+            "step26": (step24.get("meta") or {}).get("step26"),
+        }
+        blob = str(step24.get("context_blob") or "").strip()
+        if blob:
+            # Seed internal notes early; later stages append more.
+            meta["step24_context"] = blob[:1200]
+    except Exception as exc:
+        logger.debug("step24 brain router skipped: %s", exc)
+        meta["step24"] = {"error": str(exc)}
+
+    # ── 0b. STEP 26 Autonomous Agent Runtime (reuse STEP 24 pack when present)
+    stages.append("step26_agent_runtime")
+    step26: dict[str, Any] = {}
+    try:
+        nested = (meta.get("step24") or {}).get("step26")
+        if isinstance(nested, dict) and nested:
+            step26 = {
+                "goal": nested.get("goal"),
+                "agents": list(nested.get("agents") or []),
+                "meta": {"step": 26, "source": "step24"},
+                "stages": ["agent_runtime", "from_step24"],
+                "context_blob": "",
+                "results": [],
+            }
+            meta["step26"] = {
+                "agents": list(step26.get("agents") or []),
+                "goal": step26.get("goal"),
+                "source": "step24",
+            }
+        else:
+            from om_ai.core.agent_runtime import run_agent_runtime
+
+            step26 = run_agent_runtime(
+                q,
+                context={
+                    "tenant_id": tenant_id,
+                    "actor": actor,
+                    "project_id": project_id,
+                    "project_instructions": project_instructions,
+                },
+            ) or {}
+            meta["step26"] = {
+                "agents": list(step26.get("agents") or []),
+                "goal": step26.get("goal"),
+                "plan": step26.get("plan"),
+                "result_count": len(step26.get("results") or []),
+                "stages": list(step26.get("stages") or []),
+                "source": "direct",
+            }
+            blob26 = str(step26.get("context_blob") or "").strip()
+            if blob26:
+                meta["step26_context"] = blob26[:1200]
+    except Exception as exc:
+        logger.debug("step26 agent runtime skipped: %s", exc)
+        meta["step26"] = {"error": str(exc)}
+
     # ── 1. Language Manager (+ meaning) ───────────────────────────────
     stages.append("language")
     lang_pack: dict[str, Any] = {
@@ -343,6 +487,21 @@ def run_chat_pipeline(
             }
         else:
             meta["helpful_defaults"] = {"used": False}
+
+        # Prefer Chat Intelligence solution for debugging / structured asks
+        ci_sol = str(meta.get("chat_intelligence_solution") or "").strip()
+        ci_intent = str(((meta.get("chat_intelligence") or {}).get("intent") or {}).get("intent") or "")
+        if ci_sol and (
+            ci_intent in {"debugging", "coding", "howto", "comparison", "explain"}
+            or len(ci_sol) > len(preferred_draft or "")
+        ):
+            if not preferred_draft or ci_intent == "debugging" or len(ci_sol) >= 80:
+                preferred_draft = ci_sol
+                meta["helpful_defaults"] = {
+                    "used": True,
+                    "chars": len(preferred_draft),
+                    "source": "chat_intelligence",
+                }
     except Exception as exc:
         meta["live_knowledge"] = {"error": str(exc)}
         meta["helpful_defaults"] = {"error": str(exc)}
@@ -521,6 +680,21 @@ def run_chat_pipeline(
     stash = str(meta.get("live_context_stash") or "").strip()
     if stash and not skip_kb:
         internal_context = (internal_context + "\n" + stash).strip()
+    step24_ctx = str(meta.get("step24_context") or "").strip()
+    if step24_ctx and not skip_kb:
+        internal_context = (internal_context + "\n" + step24_ctx).strip()
+    step26_ctx = str(meta.get("step26_context") or "").strip()
+    if step26_ctx and not skip_kb:
+        internal_context = (internal_context + "\n" + step26_ctx).strip()
+    ci_sol = str(meta.get("chat_intelligence_solution") or "").strip()
+    if ci_sol and not skip_kb:
+        internal_context = (internal_context + "\n" + ci_sol).strip()
+    ci_ctx = str(meta.get("chat_intelligence_context") or "").strip()
+    if ci_ctx and not skip_kb:
+        internal_context = (internal_context + "\n" + ci_ctx).strip()
+    ci_hint = str(meta.get("chat_intelligence_hint") or "").strip()
+    if ci_hint and not skip_kb:
+        internal_context = (internal_context + "\n" + ci_hint).strip()
     if prefer_planning and not skip_kb and len(q) > 40:
         internal_context = (
             internal_context
@@ -788,19 +962,55 @@ def run_chat_pipeline(
             or (draft or "").strip().lower() == q.lower()
         )
         if bad:
-            recovered = preferred_draft or (build_real_answer(q, prefer_coding=True) or "")
+            recovered = (
+                str(meta.get("chat_intelligence_solution") or "").strip()
+                or preferred_draft
+                or (build_real_answer(q, prefer_coding=True) or "")
+            )
             recovered = (recovered or "").strip()
             if recovered and is_safe_public_answer(recovered) and not looks_like_genesis_template(recovered) and not is_garbled_generation(recovered):
                 draft = recovered
-                meta["final_recover"] = "preferred_or_real_answer"
+                meta["final_recover"] = "chat_intelligence_or_preferred"
             else:
-                draft = (
-                    "I couldn’t produce a clear answer for that. "
-                    "Please ask again in one short sentence."
-                )
-                meta["final_recover"] = "clarify"
+                try:
+                    from om_ai.core.chat_intelligence import CorrectionEngine
+
+                    fixed = CorrectionEngine().correct(
+                        q,
+                        draft,
+                        solution={"answer": str(meta.get("chat_intelligence_solution") or "")},
+                        intent=str(((meta.get("chat_intelligence") or {}).get("intent") or {}).get("intent") or ""),
+                    )
+                    draft = str(fixed.get("answer") or draft)
+                    meta["final_recover"] = fixed.get("reason") or "correction_engine"
+                except Exception:
+                    meta["final_recover"] = "clarify"
     except Exception as exc:
         meta["final_recover"] = {"error": str(exc)}
+
+    # Chat Intelligence post-pass: optimize + safety on final draft
+    try:
+        from om_ai.core.chat_intelligence import ResponseOptimizer, SafetyFilter
+
+        intent_name = str(
+            ((meta.get("chat_intelligence") or {}).get("intent") or {}).get("intent")
+            or ((meta.get("intent") or {}).get("intent") if isinstance(meta.get("intent"), dict) else "")
+            or "chat"
+        )
+        opt = ResponseOptimizer().optimize(
+            draft,
+            message=q,
+            intent=intent_name,
+            fallback=str(meta.get("chat_intelligence_solution") or preferred_draft or ""),
+        )
+        draft = str(opt.get("answer") or draft)
+        draft = SafetyFilter().filter(draft).get("answer") or draft
+        meta["chat_intelligence_final"] = {
+            "optimized": bool(opt.get("changed")),
+            "report": opt.get("report"),
+        }
+    except Exception as exc:
+        meta["chat_intelligence_final"] = {"error": str(exc)}
 
     # ── 8. Memory write (store clean reply only) ─────────────────────
     stages.append("memory_write")

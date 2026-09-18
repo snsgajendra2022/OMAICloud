@@ -17,14 +17,22 @@ def run_cognitive_brain(
     knowledge: Any = None,
     native_chat: Any = None,
 ) -> dict[str, Any]:
-    """Run OMCognitiveBrain.process with a real user question (never at import)."""
+    """Run OMCognitiveBrain.generate (STEP 24 path) with process() fallback."""
     from om_ai.core.cognitive.brain_pipeline import OMCognitiveBrain
 
-    return OMCognitiveBrain().process(
-        question,
-        knowledge=knowledge,
-        native_chat=native_chat,
-    )
+    brain = OMCognitiveBrain()
+    try:
+        return brain.generate(
+            question,
+            knowledge=knowledge,
+            native_chat=native_chat,
+        )
+    except Exception:
+        return brain.process(
+            question,
+            knowledge=knowledge,
+            native_chat=native_chat,
+        )
 
 
 def _env_float(name: str, default: float) -> float:

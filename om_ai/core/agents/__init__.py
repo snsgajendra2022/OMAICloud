@@ -31,6 +31,7 @@ from .memory_agent import MemoryAgent
 from .knowledge_agent import KnowledgeAgent
 from .security_agent import SecurityAgent
 from .quality_agent import QualityAgent
+from .collaboration_engine import CollaborationEngine
 
 
 __all__ = [

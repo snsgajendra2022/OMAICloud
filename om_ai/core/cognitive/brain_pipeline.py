@@ -75,7 +75,9 @@ from om_ai.core.advanced_reasoning import AdvancedReasoningEngine
 from om_ai.core.agent_civilization import (
     CivilizationEngine
 )
-
+from om_ai.core.conversation_intelligence import (
+    ConversationEngine
+)
 
 from om_ai.core.autonomous_research import (
     AutonomousResearchEngine
@@ -124,6 +126,21 @@ class OMCognitiveBrain:
         self.advanced_reasoning_engine = AdvancedReasoningEngine()
         self.civilization = CivilizationEngine()
         self.autonomous_research = AutonomousResearchEngine()
+        self.conversation_engine = ConversationEngine()
+        self.brain_router = None
+        self.agent_runtime = None
+        try:
+            from om_ai.core.brain_router import OMBrainRouter
+
+            self.brain_router = OMBrainRouter()
+        except Exception:
+            self.brain_router = None
+        try:
+            from om_ai.core.agent_runtime import OMAutonomousAgentRuntime
+
+            self.agent_runtime = OMAutonomousAgentRuntime()
+        except Exception:
+            self.agent_runtime = None
 
 
     @staticmethod
@@ -169,6 +186,8 @@ class OMCognitiveBrain:
         request_context: dict[str, Any] = dict(context or {})
         long_context_pack: dict[str, Any] = {}
         advanced_reasoning: dict[str, Any] = {}
+        step24_pack: dict[str, Any] = {}
+        step26_pack: dict[str, Any] = {}
 
         # 0) Language detection
         stages.append("language")
@@ -178,10 +197,154 @@ class OMCognitiveBrain:
             language = "en"
         meta["language"] = language
 
+        # Social / greeting short-circuit (Chat Intelligence Core)
+        stages.append("conversation_intelligence")
+        try:
+            from om_ai.core.chat_intelligence import run_chat_intelligence
+
+            ci = run_chat_intelligence(
+                message,
+                history=list(request_context.get("history") or [])
+                if isinstance(request_context.get("history"), list)
+                else None,
+                extra=request_context,
+            )
+            if isinstance(ci, dict) and ci.get("answer") and not ci.get("needs_model", True):
+                answer = str(ci.get("answer") or "").strip()
+                if answer:
+                    meta["conversation_intelligence"] = {
+                        "handled": True,
+                        "source": "chat_intelligence",
+                    }
+                    meta["chat_intelligence"] = ci.get("meta") or {}
+                    self._store_long_context_turn(message, answer, meta)
+                    return {
+                        "answer": answer,
+                        "status": "ok",
+                        "understanding": {
+                            "intent": "conversation",
+                            "domain": "social",
+                            "confidence": 0.95,
+                        },
+                        "reasoning": {},
+                        "coding": {},
+                        "research": None,
+                        "response_state": None,
+                        "response_plan": {
+                            "intent": "conversation",
+                            "response_type": "direct",
+                            "plan": [],
+                        },
+                        "quality": {"approved": True, "score": 1.0, "issues": []},
+                        "stages": stages + ["answer", "long_context_store"],
+                        "meta": meta,
+                        "intent": ci.get("intent") or {"intent": "conversation"},
+                        "technology": {"frameworks": []},
+                    }
+            conversation = self.conversation_engine.process(message)
+            if isinstance(conversation, dict) and conversation.get("handled"):
+                answer = str(conversation.get("response") or "").strip()
+                if answer:
+                    meta["conversation_intelligence"] = {"handled": True}
+                    self._store_long_context_turn(message, answer, meta)
+                    return {
+                        "answer": answer,
+                        "status": "ok",
+                        "understanding": {
+                            "intent": "conversation",
+                            "domain": "social",
+                            "confidence": 0.95,
+                        },
+                        "reasoning": {},
+                        "coding": {},
+                        "research": None,
+                        "response_state": None,
+                        "response_plan": {
+                            "intent": "conversation",
+                            "response_type": "direct",
+                            "plan": [],
+                        },
+                        "quality": {"approved": True, "score": 1.0, "issues": []},
+                        "stages": stages + ["answer", "long_context_store"],
+                        "meta": meta,
+                        "intent": {"intent": "conversation"},
+                        "technology": {"frameworks": []},
+                    }
+            meta["conversation_intelligence"] = {"handled": False}
+            if isinstance(ci, dict):
+                meta["chat_intelligence"] = {
+                    "intent": ci.get("intent"),
+                    "plan": (ci.get("plan") or {}).get("strategy"),
+                    "solution": bool((ci.get("solution") or {}).get("solved")),
+                }
+                sol = str((ci.get("solution") or {}).get("answer") or "").strip()
+                if sol:
+                    meta["chat_intelligence_solution"] = sol[:2000]
+        except Exception as exc:
+            meta["conversation_intelligence"] = {"error": str(exc)}
+
+        # STEP 24 — OM Brain Router (Fusion → Research → Knowledge → Agents → Response)
+        stages.append("step24_brain_router")
+        try:
+            if self.brain_router is not None:
+                step24_pack = self.brain_router.run(message, context=request_context) or {}
+            else:
+                from om_ai.core.brain_router import run_om_brain_router
+
+                step24_pack = run_om_brain_router(message, context=request_context) or {}
+            meta["step24"] = {
+                "models": list(step24_pack.get("models") or []),
+                "knowledge_found": bool(step24_pack.get("knowledge_found")),
+                "research_used": bool(step24_pack.get("research_used")),
+                "agents": [
+                    (a.get("type") if isinstance(a, dict) else str(a))
+                    for a in (step24_pack.get("agents") or [])
+                ],
+                "stages": list(step24_pack.get("stages") or []),
+            }
+            # Prefer router knowledge when caller did not supply knowledge.
+            if caller_knowledge is None and step24_pack.get("knowledge_found") and step24_pack.get("knowledge") is not None:
+                knowledge = step24_pack.get("knowledge")
+            # Prefer nested STEP 26 pack from brain router when available.
+            nested26 = (step24_pack.get("meta") or {}).get("step26")
+            if isinstance(nested26, dict) and nested26:
+                step26_pack = {
+                    "goal": nested26.get("goal"),
+                    "agents": list(nested26.get("agents") or []),
+                    "meta": {"step": 26, "source": "step24"},
+                    "context_blob": "",
+                }
+                meta["step26"] = nested26
+        except Exception as exc:
+            step24_pack = {}
+            meta["step24"] = {"error": str(exc)}
+
+        # STEP 26 — Autonomous Agent Runtime (fallback if not nested in STEP 24)
+        if not meta.get("step26"):
+            stages.append("step26_agent_runtime")
+            try:
+                if self.agent_runtime is not None:
+                    step26_pack = self.agent_runtime.run(message, context=request_context) or {}
+                else:
+                    from om_ai.core.agent_runtime import run_agent_runtime
+
+                    step26_pack = run_agent_runtime(message, context=request_context) or {}
+                meta["step26"] = {
+                    "agents": list(step26_pack.get("agents") or []),
+                    "goal": step26_pack.get("goal"),
+                    "plan": step26_pack.get("plan"),
+                    "result_count": len(step26_pack.get("results") or []),
+                    "stages": list(step26_pack.get("stages") or []),
+                }
+            except Exception as exc:
+                step26_pack = {}
+                meta["step26"] = {"error": str(exc)}
+
         # Knowledge Brain → ResearchPipeline when internal knowledge is missing
         stages.append("knowledge_brain")
         try:
-            knowledge = self.knowledge_brain.analyze(message)
+            if knowledge is None or not getattr(knowledge, "knowledge_found", False):
+                knowledge = self.knowledge_brain.analyze(message)
         except Exception as exc:
             from om_ai.core.knowledge_brain import KnowledgeContext
 
@@ -409,6 +572,12 @@ class OMCognitiveBrain:
             raw_context.append(research_summary)
         if isinstance(research, dict) and research.get("task") is not None:
             raw_context.append({"research_task": research.get("task")})
+        step24_blob = str((step24_pack or {}).get("context_blob") or "").strip()
+        if step24_blob:
+            raw_context.append(step24_blob)
+        step26_blob = str((step26_pack or {}).get("context_blob") or "").strip()
+        if step26_blob:
+            raw_context.append(step26_blob)
         roadmap_blob = (roadmap_pack or {}).get("context_blob")
         if roadmap_blob:
             raw_context.append(roadmap_blob)

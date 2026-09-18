@@ -1,0 +1,44 @@
+{
+  "step": 84,
+  "patterns": [
+    {
+      "pattern": "hello",
+      "count": 2,
+      "weight": 0.2
+    }
+  ],
+  "knowledge": [
+    {
+      "concept": "hello",
+      "summary": "Recurring concept 'hello' (weight=0.20)",
+      "type": "pattern"
+    }
+  ],
+  "dataset": [
+    {
+      "type": "sft",
+      "messages": [
+        {
+          "role": "user",
+          "content": "hello how are you"
+        },
+        {
+          "role": "assistant",
+          "content": "Hello \u2014 I\u2019m OM. How can I help you?"
+        }
+      ],
+      "score": 1.0
+    }
+  ],
+  "evaluation": {
+    "examples": 1,
+    "sft": 1,
+    "dpo": 0,
+    "ready_for_training": true
+  },
+  "plan": [
+    "Add successful turn to SFT buffer",
+    "Update pattern knowledge store"
+  ],
+  "ts": 1789652154
+}

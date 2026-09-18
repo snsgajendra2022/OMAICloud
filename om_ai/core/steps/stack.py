@@ -3,6 +3,9 @@ from __future__ import annotations
 
 from typing import Any
 
+from .step24_brain_router import Step24BrainRouter, run_om_brain_router
+from .step26_agent_runtime import Step26AgentRuntime, run_agent_runtime
+from .step26_chat_intelligence import Step26ChatIntelligence, run_chat_intelligence
 from .step83_continuous_learning import ContinuousLearningIntelligence
 from .step84_advanced_learning import AdvancedLearningIntelligence
 from .step85_agent_civilization import AgentCivilization
@@ -17,9 +20,12 @@ from .step94_teacher_distillation import TeacherDistillationIntelligence
 
 
 class OMRoadmapStack:
-    """Complete STEPs 83–94 intelligence layer for OMCognitiveBrain."""
+    """Complete STEPs 24/26 + 83–94 intelligence layer for OMCognitiveBrain."""
 
     def __init__(self) -> None:
+        self.brain_router = Step24BrainRouter()
+        self.chat_intelligence = Step26ChatIntelligence()
+        self.agent_runtime = Step26AgentRuntime()
         self.continuous = ContinuousLearningIntelligence()
         self.advanced_learning = AdvancedLearningIntelligence()
         self.civilization = AgentCivilization()
@@ -45,6 +51,61 @@ class OMRoadmapStack:
         if isinstance(context.get("history"), list):
             prior = context["history"]
         mem_items = memory if isinstance(memory, list) else ([memory] if memory else [])
+
+        # STEP 26 Chat Intelligence Core first (conversation brain)
+        chat_intel: dict[str, Any] = {}
+        try:
+            chat_intel = run_chat_intelligence(
+                message,
+                history=prior if isinstance(prior, list) else None,
+                extra=context,
+            ) or {}
+        except Exception as exc:
+            chat_intel = {"meta": {"error": str(exc)}, "context_blob": ""}
+
+        # Early social answers from Chat Intelligence
+        if (
+            isinstance(chat_intel, dict)
+            and chat_intel.get("answer")
+            and not chat_intel.get("needs_model", True)
+        ):
+            return {
+                "step26_chat": chat_intel,
+                "step24": {},
+                "step26": {},
+                "long_context": {},
+                "advanced_reasoning": {},
+                "knowledge_brain": {},
+                "global_knowledge": {},
+                "civilization": None,
+                "collaboration": None,
+                "context_blob": str(chat_intel.get("answer") or ""),
+                "early_answer": str(chat_intel.get("answer") or ""),
+            }
+
+        # STEP 24 unified brain router
+        step24: dict[str, Any] = {}
+        try:
+            step24 = run_om_brain_router(message, context=context) or {}
+        except Exception as exc:
+            step24 = {"meta": {"error": str(exc)}, "context_blob": ""}
+
+        # STEP 26 agent runtime — reuse pack from STEP 24 when present
+        step26: dict[str, Any] = {}
+        try:
+            nested = ((step24 or {}).get("meta") or {}).get("step26")
+            if isinstance(nested, dict) and nested.get("goal"):
+                step26 = {
+                    "goal": nested.get("goal"),
+                    "agents": list(nested.get("agents") or []),
+                    "context_blob": "",
+                    "meta": {"step": 26, "source": "step24"},
+                    "stages": ["agent_runtime", "from_step24"],
+                }
+            else:
+                step26 = run_agent_runtime(message, context=context) or {}
+        except Exception as exc:
+            step26 = {"meta": {"error": str(exc)}, "context_blob": ""}
 
         long_ctx = self.long_context.process(
             message, memory_items=mem_items, prior_turns=prior
@@ -75,6 +136,9 @@ class OMRoadmapStack:
             collab = self.collaboration.collaborate(message)
 
         return {
+            "step26_chat": chat_intel,
+            "step24": step24,
+            "step26": step26,
             "long_context": long_ctx,
             "advanced_reasoning": reasoning,
             "knowledge_brain": knowledge_pack,
@@ -83,6 +147,10 @@ class OMRoadmapStack:
             "collaboration": collab,
             "context_blob": "\n\n".join(
                 [
+                    str((chat_intel or {}).get("context_blob") or ""),
+                    str(((chat_intel or {}).get("solution") or {}).get("answer") or ""),
+                    str((step24 or {}).get("context_blob") or ""),
+                    str((step26 or {}).get("context_blob") or ""),
                     str((long_ctx or {}).get("context") or ""),
                     str((knowledge_pack or {}).get("context") or ""),
                     str((global_pack or {}).get("context") or ""),
@@ -117,6 +185,9 @@ class OMRoadmapStack:
 
     def status(self) -> dict[str, str]:
         return {
+            "24_brain_router": "complete",
+            "26_chat_intelligence": "complete",
+            "26_agent_runtime": "complete",
             "83_continuous_learning": "complete",
             "84_advanced_learning": "complete",
             "85_agent_civilization": "complete",

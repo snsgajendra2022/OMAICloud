@@ -3,7 +3,7 @@
   "stage": "sft",
   "model": "OM-1.0",
   "data_buffer": "/Users/gajendrarawat/Downloads/om-ai-operating-brain 3/data/om-memory/advanced_learning/training_buffer.jsonl",
-  "examples": 31,
+  "examples": 105,
   "pipeline": [
     "collect_experiences",
     "filter_quality",

@@ -1,5 +1,8 @@
-"""OM STEPs 83–94 roadmap intelligence."""
+"""OM STEPs 24/26 + 83–94 roadmap intelligence."""
 from .stack import OMRoadmapStack
+from .step24_brain_router import Step24BrainRouter, run_om_brain_router
+from .step26_agent_runtime import Step26AgentRuntime, run_agent_runtime
+from .step26_chat_intelligence import Step26ChatIntelligence, run_chat_intelligence
 from .step83_continuous_learning import ContinuousLearningIntelligence
 from .step84_advanced_learning import AdvancedLearningIntelligence
 from .step85_agent_civilization import AgentCivilization
@@ -15,6 +18,12 @@ from .step94_teacher_distillation import TeacherDistillationIntelligence
 
 __all__ = [
     "OMRoadmapStack",
+    "Step24BrainRouter",
+    "run_om_brain_router",
+    "Step26AgentRuntime",
+    "run_agent_runtime",
+    "Step26ChatIntelligence",
+    "run_chat_intelligence",
     "ContinuousLearningIntelligence",
     "AdvancedLearningIntelligence",
     "AgentCivilization",

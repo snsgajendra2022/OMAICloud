@@ -550,5 +550,17 @@
     "answer": "knowledge:\nI\u2019m doing well, thanks. How can I help?",
     "intent": "explanation",
     "score": 100.0
+  },
+  {
+    "question": "I couldn\u2019t produce a clear answer for that. Please ask again in one short sentence.",
+    "answer": "I couldn\u2019t produce a clear answer for that. Please ask again in one short sentence.",
+    "intent": "unclear",
+    "score": 10.0
+  },
+  {
+    "question": "good morning",
+    "answer": "Hello \u2014 I\u2019m OM. What should we work on?",
+    "intent": "conversation",
+    "score": 100.0
   }
 ]
