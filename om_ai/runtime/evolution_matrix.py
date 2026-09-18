@@ -18,50 +18,50 @@ from typing import Any
 EVOLUTION_MODELS: list[dict[str, Any]] = [
     {
         "id": "OM-L1",
-        "name": "OM Level 1 · Chatbot",
+        "name": "OM Pulse · Chat",
         "kind": "evolution",
         "level": 1.0,
-        "description": "Fluent chat — live OM-1.0 native + tools.",
+        "description": "Fast, friendly OM chat — clear replies with live OM-1.0 native.",
         "temperature": 0.7,
         "context_length": 256,
         "max_tokens": 256,
     },
     {
         "id": "OM-L2",
-        "name": "OM Level 2 · Reasoner",
+        "name": "OM Mind · Reason",
         "kind": "evolution",
         "level": 2.0,
-        "description": "Chain-of-thought for hard questions; normal chat stays native.",
+        "description": "Deep OM reasoning — step-by-step thinking for hard questions.",
         "temperature": 0.4,
         "context_length": 256,
         "max_tokens": 320,
     },
     {
         "id": "OM-L3",
-        "name": "OM Level 3 · Agent",
+        "name": "OM Forge · Agent",
         "kind": "evolution",
         "level": 3.0,
-        "description": "Sandbox agent for math/code goals; greetings use native chat.",
+        "description": "Action OM — tools, code, and tasks to get work done.",
         "temperature": 0.5,
         "context_length": 256,
         "max_tokens": 320,
     },
     {
         "id": "OM-L4",
-        "name": "OM Level 4 · Innovator",
+        "name": "OM Nova · Create",
         "kind": "evolution",
         "level": 4.0,
-        "description": "Hypothesis scaffold for research-style prompts.",
+        "description": "Creative OM — research, options, and fresh solutions.",
         "temperature": 0.55,
         "context_length": 256,
         "max_tokens": 320,
     },
     {
         "id": "OM-L5",
-        "name": "OM Level 5 · Organization Matrix",
+        "name": "OM Matrix · Orchestrate",
         "kind": "evolution",
         "level": 5.0,
-        "description": "Goal-tree matrix for enterprise objectives; normal chat uses OM native.",
+        "description": "Org-scale OM — goals, roles, and coordinated multi-step plans.",
         "temperature": 0.5,
         "context_length": 512,
         "max_tokens": 512,
@@ -198,7 +198,7 @@ def level_runtime_profile(model: str | None) -> dict[str, Any]:
                 "prefer_reasoning": False,
                 "prefer_planning": False,
                 "system_hint": (
-                    "OM Level 1 · Chatbot mode: keep replies short, clear, and conversational. "
+                    "OM Pulse · Chat mode: keep replies short, clear, and conversational. "
                     "Answer directly without long plans or tool narration."
                 ),
             }
@@ -212,7 +212,7 @@ def level_runtime_profile(model: str | None) -> dict[str, Any]:
                 "prefer_research": False,
                 "prefer_planning": False,
                 "system_hint": (
-                    "OM Level 2 · Reasoner mode: think step-by-step for hard questions. "
+                    "OM Mind · Reason mode: think step-by-step for hard questions. "
                     "Separate facts from assumptions, then give a clear final answer."
                 ),
             }
@@ -226,7 +226,7 @@ def level_runtime_profile(model: str | None) -> dict[str, Any]:
                 "prefer_research": False,
                 "prefer_planning": False,
                 "system_hint": (
-                    "OM Level 3 · Agent mode: break the request into actions. "
+                    "OM Forge · Agent mode: break the request into actions. "
                     "Use tools/code/math when helpful and report concrete results."
                 ),
             }
@@ -240,7 +240,7 @@ def level_runtime_profile(model: str | None) -> dict[str, Any]:
                 "prefer_tools": False,
                 "prefer_planning": False,
                 "system_hint": (
-                    "OM Level 4 · Innovator mode: explore useful options and novel angles. "
+                    "OM Nova · Create mode: explore useful options and novel angles. "
                     "Offer a practical recommendation plus one creative alternative when relevant."
                 ),
             }
@@ -254,7 +254,7 @@ def level_runtime_profile(model: str | None) -> dict[str, Any]:
                 "prefer_reasoning": True,
                 "prefer_research": True,
                 "system_hint": (
-                    "OM Level 5 · Organization Matrix mode: for complex work, organize by goals, "
+                    "OM Matrix · Orchestrate mode: for complex work, organize by goals, "
                     "roles, and sequenced steps. Keep normal chat natural."
                 ),
             }
@@ -272,10 +272,10 @@ def catalog_models(*, settings: dict[str, Any] | None = None) -> list[dict[str, 
     out.append(
         {
             "id": "OM-1.0",
-            "name": "OM-1.0 Native (alias → Level 1)",
+            "name": "OM-1.0 Native (alias → OM Pulse)",
             "kind": "native",
             "level": 1.0,
-            "description": "Legacy id; routes to Level 1 live native chat.",
+            "description": "Legacy id; routes to OM Pulse · Chat (OM-L1).",
             "temperature": settings.get("temperature", 0.7),
             "context_length": 256,
             "max_tokens": 256,

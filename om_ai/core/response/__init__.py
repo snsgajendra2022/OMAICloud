@@ -22,6 +22,12 @@ from .response_formatter import (
 from .self_critic import SelfCritic
 from .context_filter import ContextFilter
 from .response_memory import ResponseMemory
+from .answer_structure import AnswerStructure
+from .explanation_engine import ExplanationEngine
+from .code_response_engine import CodeResponseEngine
+from .fact_checker import FactChecker
+from .answer_improvement import AnswerImprovement
+from .response_intelligence import ResponseIntelligence, run_response_intelligence
 
 __all__ = [
     "format_response",
@@ -49,4 +55,11 @@ __all__ = [
     "SelfCritic",
     "ContextFilter",
     "ResponseMemory",
+    "AnswerStructure",
+    "ExplanationEngine",
+    "CodeResponseEngine",
+    "FactChecker",
+    "AnswerImprovement",
+    "ResponseIntelligence",
+    "run_response_intelligence",
 ]

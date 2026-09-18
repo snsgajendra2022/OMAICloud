@@ -411,6 +411,69 @@ def _om_native_chat_reply_body(
     if intel.direct_reply:
         return intel.direct_reply, info_base
 
+    # ── STEP 30 ChatGPT-like Brain Controller (preferred front door) ─
+    if _env_on("OM_CHATGPT_RUNTIME", "1"):
+        try:
+            from om_ai.core.chatgpt_runtime import run_chatgpt_runtime
+
+            hist = []
+            for m in messages or []:
+                if isinstance(m, dict) and m.get("content"):
+                    hist.append(
+                        {
+                            "role": str(m.get("role") or "user"),
+                            "content": str(m.get("content") or "")[:2000],
+                        }
+                    )
+
+            def _model_gen(prompt: str, context: str = "") -> str:
+                if not native_ready or not callable(native_chat):
+                    return ""
+                try:
+                    from om_ai.runtime.chat_orchestrator import build_chat_messages
+
+                    msgs = build_chat_messages(
+                        prompt,
+                        system=(context or "You are OM AI. Reply helpfully.")[:2000],
+                        history=hist,
+                    )
+                    return str(native_chat(msgs, **(kwargs or {})) or "")
+                except Exception:
+                    try:
+                        return str(native_chat(prompt) or "")
+                    except Exception:
+                        return ""
+
+            crt = run_chatgpt_runtime(
+                user_text,
+                history=hist,
+                tenant_id=tenant_id or "default",
+                actor=actor or "",
+                model_generate=_model_gen if native_ready else None,
+                extra={
+                    "project_id": project_id,
+                    "project_instructions": project_instructions or "",
+                },
+            )
+            ans = str(crt.get("answer") or "").strip()
+            if ans and not ResponseEcho.check(user_text, ans):
+                info_crt = ChatBackendInfo(
+                    backend=info.backend,
+                    model=info.model,
+                    detail="chatgpt_runtime_step30",
+                    provider=info.provider,
+                    live_knowledge={
+                        "intelligence": intel.meta,
+                        "chatgpt_runtime": crt.get("meta") or {},
+                        "stages": crt.get("stages") or [],
+                        "source": crt.get("source"),
+                        "evolution_level": evolution_level,
+                    },
+                )
+                return ans if ans.endswith("\n") else ans + "\n", info_crt
+        except Exception as exc:
+            logger.debug("chatgpt_runtime skipped: %s", exc)
+
     # ── Upgraded chat pipeline ───────────────────────────────────────
     # Language → Intent → Reasoning → Model → Language Check → Final
     if _env_on("OM_CHAT_PIPELINE", "1"):

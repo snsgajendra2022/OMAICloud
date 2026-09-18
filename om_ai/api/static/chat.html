@@ -2337,11 +2337,11 @@ function evolutionModelList() {
   });
   if (fromCat.length) return fromCat;
   return [
-    {id:"OM-L1", name:"OM Level 1 · Chatbot", level:1},
-    {id:"OM-L2", name:"OM Level 2 · Reasoner", level:2},
-    {id:"OM-L3", name:"OM Level 3 · Agent", level:3},
-    {id:"OM-L4", name:"OM Level 4 · Innovator", level:4},
-    {id:"OM-L5", name:"OM Level 5 · Organization Matrix", level:5},
+    {id:"OM-L1", name:"OM Pulse · Chat", level:1},
+    {id:"OM-L2", name:"OM Mind · Reason", level:2},
+    {id:"OM-L3", name:"OM Forge · Agent", level:3},
+    {id:"OM-L4", name:"OM Nova · Create", level:4},
+    {id:"OM-L5", name:"OM Matrix · Orchestrate", level:5},
   ];
 }
 
@@ -4300,11 +4300,11 @@ async function loadSettingsTab(tab) {
     const keysEnv = s.llm_api_keys_env || {};
     const activeId = normalizeModelId(s.default_model || state.model || "OM-L5");
     const LLM_CATALOG = [
-      { id: "OM-L1", name: "OM Level 1 · Chatbot", vendor: "OM AI", owned: true },
-      { id: "OM-L2", name: "OM Level 2 · Reasoner", vendor: "OM AI", owned: true },
-      { id: "OM-L3", name: "OM Level 3 · Agent", vendor: "OM AI", owned: true },
-      { id: "OM-L4", name: "OM Level 4 · Innovator", vendor: "OM AI", owned: true },
-      { id: "OM-L5", name: "OM Level 5 · Organization Matrix", vendor: "OM AI", owned: true },
+      { id: "OM-L1", name: "OM Pulse · Chat", vendor: "OM AI", owned: true },
+      { id: "OM-L2", name: "OM Mind · Reason", vendor: "OM AI", owned: true },
+      { id: "OM-L3", name: "OM Forge · Agent", vendor: "OM AI", owned: true },
+      { id: "OM-L4", name: "OM Nova · Create", vendor: "OM AI", owned: true },
+      { id: "OM-L5", name: "OM Matrix · Orchestrate", vendor: "OM AI", owned: true },
       { id: "gpt", name: "GPT", vendor: "OpenAI", hint: "OPENAI_API_KEY" },
       { id: "claude", name: "Claude", vendor: "Anthropic", hint: "ANTHROPIC_API_KEY" },
       { id: "gemini", name: "Gemini", vendor: "Google", hint: "GOOGLE_API_KEY" },
@@ -4357,7 +4357,7 @@ async function loadSettingsTab(tab) {
       '<div class="toggle-row"><div><div class="toggle-label">LLM only</div><div class="toggle-sub">Direct model replies — skip agent, RAG, and live knowledge</div></div>'+
       '<label class="sw-wrap"><input type="checkbox" id="aiLlmOnly" name="llm_only"'+(s.llm_only?" checked":"")+'/><span class="sw-track"></span><span class="sw-thumb"></span></label></div>'+
       '<div id="aiLlmProvidersBox" class="llm-provider-box">'+
-      "<h4>OM Levels 1–5 + external LLMs</h4>"+
+      "<h4>OM Pulse → Matrix + external LLMs</h4>"+
       '<p class="llm-hint">Enable a provider, paste its API key, click Use (saves immediately), or Save. Chat will call that model.</p>'+
       providerRows+
       "</div>"+

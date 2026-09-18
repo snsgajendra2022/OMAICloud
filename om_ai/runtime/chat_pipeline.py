@@ -1012,6 +1012,58 @@ def run_chat_pipeline(
     except Exception as exc:
         meta["chat_intelligence_final"] = {"error": str(exc)}
 
+    # STEP 27 — Response Intelligence Upgrade
+    try:
+        from om_ai.core.response.response_intelligence import run_response_intelligence
+
+        intent_name = str(
+            ((meta.get("chat_intelligence") or {}).get("intent") or {}).get("intent")
+            or "chat"
+        )
+        strategy = str(
+            ((meta.get("chat_intelligence") or {}).get("strategy") or "")
+        )
+        ri = run_response_intelligence(q, draft, intent=intent_name, strategy=strategy)
+        if ri.get("answer"):
+            draft = str(ri["answer"])
+        meta["response_intelligence"] = {
+            "kind": ri.get("kind"),
+            "strategy": ri.get("strategy"),
+            "improved": ri.get("improved"),
+        }
+    except Exception as exc:
+        meta["response_intelligence"] = {"error": str(exc)}
+
+    # STEP 29 — Continuous learning observe (non-blocking)
+    try:
+        from om_ai.core.continuous_learning import run_continuous_learning
+
+        learn = run_continuous_learning(
+            q,
+            draft,
+            quality=(meta.get("response_intelligence") or {}).get("fact_check")
+            if isinstance((meta.get("response_intelligence") or {}).get("fact_check"), dict)
+            else meta.get("chat_intelligence_final", {}).get("report"),
+        )
+        meta["continuous_learning"] = {
+            "observed": bool(learn.get("observed")),
+            "failed": bool(((learn.get("observed") or {}).get("analysis") or {}).get("failed")),
+        }
+    except Exception as exc:
+        meta["continuous_learning"] = {"error": str(exc)}
+
+    # STEP 31 — Tool intelligence hint (metadata only unless tools forced)
+    try:
+        from om_ai.core.tool_intelligence import run_tool_intelligence
+
+        tools = run_tool_intelligence(q)
+        meta["tool_intelligence"] = {
+            "needs_tools": tools.get("needs_tools"),
+            "tools": tools.get("tools"),
+        }
+    except Exception as exc:
+        meta["tool_intelligence"] = {"error": str(exc)}
+
     # ── 8. Memory write (store clean reply only) ─────────────────────
     stages.append("memory_write")
     if memory is not None:
