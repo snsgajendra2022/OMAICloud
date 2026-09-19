@@ -11,15 +11,20 @@ This repository is **working software** (architecture, trainers, agents, API). I
 - Local OM-1.0 smoke/long checkpoints prove the native pipeline; they are **not** frontier capability
 - No fabricated benchmark leaderboard scores are claimed
 
-See `docs/IMPLEMENTATION_STATUS.md`, `docs/EXTERNAL_ASSETS_REQUIRED.md`, **`docs/OM_FOUNDATION_UPGRADE_V1.md`**, **`docs/OM_COMPLETION_ROADMAP.md`**, **`docs/OM_AI_GENESIS_PLATFORM_V1.md`**, **`docs/OM_KNOWLEDGE_BRAIN_1600_2026.md`**, **`docs/PROJECT_GENESIS_JARVIS.md`**, **`docs/OM10_GENESIS_CORPUS_SPEC.md`**, **`docs/OM10_GENESIS_TRAINING.md`**, **`docs/OWN_MODEL_MILESTONE1.md`**, **`docs/OWN_INTELLIGENCE_ROADMAP.md`**, **`docs/RESPONSE_EXPERIENCE.md`**, and **`docs/JARVIS_OPERATING_INTELLIGENCE.md`**.
+See `docs/IMPLEMENTATION_STATUS.md`, `docs/EXTERNAL_ASSETS_REQUIRED.md`, **`docs/OM_FOUNDATION_UPGRADE_V1.md`**, **`docs/OM_COMPLETION_ROADMAP.md`**, **`docs/OM_AI_GENESIS_PLATFORM_V1.md`**, **`docs/OM_KNOWLEDGE_BRAIN_1600_2026.md`**, **`docs/PROJECT_GENESIS_JARVIS.md`**, **`docs/OM10_GENESIS_CORPUS_SPEC.md`**, **`docs/OM10_GENESIS_TRAINING.md`**, **`docs/OWN_MODEL_MILESTONE1.md`**, **`docs/OWN_INTELLIGENCE_ROADMAP.md`**, **`docs/RESPONSE_EXPERIENCE.md`**, **`docs/JARVIS_OPERATING_INTELLIGENCE.md`**, **`docs/COMPANION_PAGE.md`**, and **`docs/COMPANION_UPGRADE_51_60.md`**, **`docs/OM_JARVIS_MASTER_PLAN.md`** (Jarvis-class STEPs 100–112).
 
 ## Quick start (OM-1.0 native)
 
 ```bash
 python3 -m venv .venv
 source .venv/bin/activate
-om-ai serve --host 127.0.0.1 --port 8080
 pip install -e '.[dev]'
+
+# Jarvis companion
+om-ai start
+# → http://127.0.0.1:8767/companion
+
+om-ai serve --host 127.0.0.1 --port 8080
 
 # Optional: short smoke train (creates a real OM checkpoint)
 om-ai train-om1 --config configs/om-1.0-local.json --steps 20

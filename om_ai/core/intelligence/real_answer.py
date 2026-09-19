@@ -159,8 +159,8 @@ def from_helpful_defaults(q: str) -> str | None:
         vowels = sum(1 for c in letters if c in "aeiou")
         if vowels / max(len(letters), 1) < 0.25:
             return (
-                "I couldn’t understand that message. "
-                "Please rephrase your question in plain words."
+                "I couldn’t catch that clearly. "
+                "Say it again naturally — I’m listening."
             )
 
     if re.search(r"\breact\b", low) and re.search(

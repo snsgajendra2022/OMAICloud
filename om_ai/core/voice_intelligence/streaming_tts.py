@@ -45,7 +45,12 @@ class StreamingTTS:
                 import shutil
 
                 if shutil.which("say") and not self._cancel.is_set():
-                    self._proc = subprocess.Popen(["say", text])
+                    cmd = ["say", "-r", str(getattr(self.synth, "_rate", 175))]
+                    voice = getattr(self.synth, "_voice", None)
+                    if voice:
+                        cmd.extend(["-v", voice])
+                    cmd.append(text)
+                    self._proc = subprocess.Popen(cmd)
                     self._proc.wait()
                 else:
                     self.synth.synthesize(text)

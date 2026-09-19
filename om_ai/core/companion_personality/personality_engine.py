@@ -39,7 +39,7 @@ class CompanionPersonalityEngine:
         tone = self.tone.resolve(profile, affect)
         rel = self.relationship.assess(history=history)
         hint = self.style.system_hint(
-            profile, tone, conversation_mode=conversation_mode
+            profile, tone, conversation_mode=conversation_mode, voice_mode=True
         )
         return {
             "profile": profile.to_dict(),
@@ -48,6 +48,7 @@ class CompanionPersonalityEngine:
             "relationship": rel,
             "system_hint": hint,
             "expression": self.expression.expression_meta(affect, tone),
+            "voice_mode": True,
         }
 
     def finalize(
@@ -56,7 +57,12 @@ class CompanionPersonalityEngine:
         pack: dict[str, Any],
         *,
         conversation_mode: str = "assist",
+        user_message: str = "",
+        voice_mode: bool = True,
     ) -> str:
         return self.style.wrap_answer(
-            answer, conversation_mode=conversation_mode or pack.get("conversation_mode", "assist")
+            answer,
+            conversation_mode=conversation_mode or pack.get("conversation_mode", "assist"),
+            voice_mode=voice_mode,
+            user_message=user_message,
         )

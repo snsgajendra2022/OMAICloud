@@ -21,7 +21,7 @@ class CompanionConfig:
     actions_enabled: bool = True
     always_ready: bool = True
     bind_host: str = "127.0.0.1"
-    bind_port: int = 8080
+    bind_port: int = 8765
     text_only: bool = False
     no_avatar: bool = False
 
@@ -38,7 +38,7 @@ class CompanionConfig:
             actions_enabled=_on("OM_COMPANION_ACTIONS_ENABLED", "1"),
             always_ready=_on("OM_COMPANION_ALWAYS_READY", "1"),
             bind_host=(os.getenv("OM_COMPANION_BIND_HOST") or "127.0.0.1").strip(),
-            bind_port=int(os.getenv("OM_COMPANION_BIND_PORT") or os.getenv("PORT") or "8080"),
+            bind_port=int(os.getenv("OM_COMPANION_BIND_PORT") or os.getenv("PORT") or "8765"),
         )
         for k, v in overrides.items():
             if hasattr(cfg, k) and v is not None:

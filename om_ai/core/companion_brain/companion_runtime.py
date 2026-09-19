@@ -105,7 +105,7 @@ class CompanionRuntime:
         if not q:
             activities.append(_PUBLIC_ACTIVITIES["listen"])
             return {
-                "answer": "I'm here — tell me what's on your mind.",
+                "answer": "I'm here — go ahead.",
                 "handled": True,
                 "activities": activities,
                 "semantic": {
@@ -118,6 +118,52 @@ class CompanionRuntime:
                     "requires_action": False,
                     "requires_clarification": False,
                     "confidence": 1.0,
+                },
+                "meta": meta,
+                "session": session.to_dict(),
+            }
+
+        # Fast social presence (voice) — feel human before routing to the model
+        from om_ai.core.companion_personality.voice_presence import (
+            jarvis_system_hint,
+            shape_for_speech,
+            social_spoken_reply,
+            is_garbage_spoken,
+            rescue_spoken,
+            detect_speech_locale,
+        )
+
+        social = social_spoken_reply(q)
+        if social:
+            session.bump_turn()
+            self.turns.record(session.session_id, "user", q, intent="social")
+            self.turns.record(session.session_id, "assistant", social, intent="social")
+            affect_quick = self.affect.build(
+                q,
+                {
+                    "intent": "social",
+                    "confidence": 0.95,
+                    "conversation_mode": "social",
+                },
+                history=self.conversations.history_for(session, external=history),
+            )
+            return {
+                "answer": social,
+                "spoken": social,
+                "heard": q,
+                "handled": True,
+                "feeling": (affect_quick.get("affect") or {}).get("label") or "warm",
+                "affect": affect_quick.get("affect"),
+                "expression": affect_quick.get("expression"),
+                "activities": activities + ["Present with you"],
+                "semantic": {
+                    "intent": "social",
+                    "goal": "connect",
+                    "domain": "social",
+                    "conversation_mode": "social",
+                    "requires_model": False,
+                    "requires_action": False,
+                    "confidence": 0.95,
                 },
                 "meta": meta,
                 "session": session.to_dict(),
@@ -182,11 +228,16 @@ class CompanionRuntime:
         meta["strategy"] = strat
 
         ctx_parts = [
+            jarvis_system_hint(
+                conversation_mode=str(semantic.get("conversation_mode") or "assist"),
+                locale=detect_speech_locale(q),
+            ),
             str(personality_pack.get("system_hint") or ""),
             str(human_ctx.get("context_blob") or ""),
             str(knowledge.get("blob") or ""),
             str(reasoning.get("hint") or ""),
             model_context or "",
+            "Speak out loud to the user. Keep the reply short and human.",
         ]
         merged_context = "\n".join(p for p in ctx_parts if p).strip()[:3500]
 
@@ -206,17 +257,26 @@ class CompanionRuntime:
             },
         )
         answer = str(gen.get("answer") or "").strip()
-        if not answer:
-            answer = (
-                "I want to help — could you share a bit more detail "
-                "so I can give a useful answer?"
-            )
+        if not answer or is_garbage_spoken(answer):
+            answer = rescue_spoken(q, answer)
 
         answer = self.personality.finalize(
             answer,
             personality_pack,
             conversation_mode=str(semantic.get("conversation_mode") or "assist"),
+            user_message=q,
+            voice_mode=True,
         )
+        if is_garbage_spoken(answer):
+            answer = rescue_spoken(q, answer)
+        voice_pack = shape_for_speech(answer, user_message=q)
+        answer = str(voice_pack.get("spoken") or answer)
+        if is_garbage_spoken(answer):
+            answer = rescue_spoken(q, answer)
+            voice_pack = shape_for_speech(answer, user_message=q)
+
+        affect = (personality_pack.get("affect") or {}) if isinstance(personality_pack, dict) else {}
+        expression = personality_pack.get("expression") if isinstance(personality_pack, dict) else None
 
         session.bump_turn()
         self.turns.record(session.session_id, "user", q, intent=intent.intent)
@@ -230,15 +290,16 @@ class CompanionRuntime:
             project_key=session.project_id,
             confidence=float(semantic.get("confidence") or 0),
         )
-        self.memory.remember_turn(
-            session_key=session.session_key,
-            user_key=session.user_key,
-            role="assistant",
-            content=answer,
-            intent=intent.intent,
-            project_key=session.project_id,
-            confidence=float(semantic.get("confidence") or 0),
-        )
+        if not is_garbage_spoken(answer):
+            self.memory.remember_turn(
+                session_key=session.session_key,
+                user_key=session.user_key,
+                role="assistant",
+                content=answer,
+                intent=intent.intent,
+                project_key=session.project_id,
+                confidence=float(semantic.get("confidence") or 0),
+            )
 
         updated_history = self.turns.append_to_history(hist, "user", q)
         updated_history = self.turns.append_to_history(
@@ -247,10 +308,15 @@ class CompanionRuntime:
 
         return {
             "answer": answer,
+            "spoken": answer,
+            "spoken_tts": voice_pack.get("spoken_tts") or answer,
+            "heard": q,
             "handled": True,
             "activities": activities,
             "semantic": semantic,
             "intent": intent.to_dict(),
+            "feeling": affect.get("label") or "neutral",
+            "affect": affect,
             "meta": {
                 **meta,
                 "interrupt": interrupt,
@@ -259,11 +325,13 @@ class CompanionRuntime:
                     "hits": len(recall.get("hits") or []),
                 },
                 "source": gen.get("source"),
+                "voice_trimmed": voice_pack.get("trimmed"),
+                "locale": voice_pack.get("locale"),
             },
             "plan": plan,
             "session": session.to_dict(),
             "history": updated_history,
-            "expression": personality_pack.get("expression"),
+            "expression": expression,
             "system_hint": personality_pack.get("system_hint"),
             "status": self.status(),
         }

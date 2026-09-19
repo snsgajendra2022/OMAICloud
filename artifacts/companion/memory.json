@@ -1087,6 +1087,2246 @@
           "role": "assistant",
           "confidence": 0.6
         }
+      },
+      {
+        "id": "a0848f8f35554576",
+        "kind": "episodic",
+        "content": "hey om",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-18T08:14:10.891279+00:00",
+        "updated_at": "2026-09-18T08:14:10.891281+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "greeting",
+          "role": "user",
+          "confidence": 0.97
+        }
+      },
+      {
+        "id": "e889ee389dc04d2b",
+        "kind": "episodic",
+        "content": "Hello! I'm OM. How can I help you today?",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-18T08:14:10.893175+00:00",
+        "updated_at": "2026-09-18T08:14:10.893176+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "greeting",
+          "role": "assistant",
+          "confidence": 0.97
+        }
+      },
+      {
+        "id": "aa1fd444d8f14ef6",
+        "kind": "episodic",
+        "content": "what is the new task today to work you",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-18T08:14:24.105347+00:00",
+        "updated_at": "2026-09-18T08:14:24.105348+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "explain",
+          "role": "user",
+          "confidence": 0.84
+        }
+      },
+      {
+        "id": "76e82e3f0e794e64",
+        "kind": "episodic",
+        "content": "**the new task today to work you** — plain-language explanation\n\nthe new task today to work you is best understood by: (1) what it is, (2) why people use it, (3) a simple example.\n\nAsk for a deeper dive, analogy, or code sample if you want more.",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-18T08:14:24.106268+00:00",
+        "updated_at": "2026-09-18T08:14:24.106270+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "explain",
+          "role": "assistant",
+          "confidence": 0.84
+        }
+      },
+      {
+        "id": "1546e3cd5321411e",
+        "kind": "episodic",
+        "content": "this is not good reply",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-18T08:14:35.984879+00:00",
+        "updated_at": "2026-09-18T08:14:35.984880+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "followup",
+          "role": "user",
+          "confidence": 0.8
+        }
+      },
+      {
+        "id": "85381a257f744e2a",
+        "kind": "episodic",
+        "content": "I want to help — could you rephrase that in one short sentence?",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-18T08:14:35.987505+00:00",
+        "updated_at": "2026-09-18T08:14:35.987506+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "followup",
+          "role": "assistant",
+          "confidence": 0.8
+        }
+      },
+      {
+        "id": "cf44caec1e404503",
+        "kind": "episodic",
+        "content": "hiii",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-18T08:20:20.742584+00:00",
+        "updated_at": "2026-09-18T08:20:20.742585+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "5285aac00cb24e1a",
+        "kind": "episodic",
+        "content": "I want to help — could you rephrase that in one short sentence?",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-18T08:20:20.744457+00:00",
+        "updated_at": "2026-09-18T08:20:20.744458+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "605a7cda90fd4fa3",
+        "kind": "episodic",
+        "content": "hey how are you",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-18T14:10:45.654403+00:00",
+        "updated_at": "2026-09-18T14:10:45.654407+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "greeting",
+          "role": "user",
+          "confidence": 0.97
+        }
+      },
+      {
+        "id": "290e980390f446ea",
+        "kind": "episodic",
+        "content": "Hey — I'm OM. What are you working on?",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-18T14:10:45.719969+00:00",
+        "updated_at": "2026-09-18T14:10:45.719971+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "greeting",
+          "role": "assistant",
+          "confidence": 0.97
+        }
+      },
+      {
+        "id": "677e28a56e1049e9",
+        "kind": "episodic",
+        "content": "hello can you see me",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-18T14:11:21.636915+00:00",
+        "updated_at": "2026-09-18T14:11:21.636917+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "greeting",
+          "role": "user",
+          "confidence": 0.97
+        }
+      },
+      {
+        "id": "9f6bd5f9446243db",
+        "kind": "episodic",
+        "content": "Hello! I'm OM. How can I help you today?",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-18T14:11:21.639764+00:00",
+        "updated_at": "2026-09-18T14:11:21.639766+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "greeting",
+          "role": "assistant",
+          "confidence": 0.97
+        }
+      },
+      {
+        "id": "0fb8245d416c45b5",
+        "kind": "episodic",
+        "content": "start the work create",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-18T14:11:31.251373+00:00",
+        "updated_at": "2026-09-18T14:11:31.251375+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "c11e9b4201604bd2",
+        "kind": "episodic",
+        "content": "I want to help — could you rephrase that in one short sentence?",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-18T14:11:31.252107+00:00",
+        "updated_at": "2026-09-18T14:11:31.252108+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "66385c362f5345f2",
+        "kind": "episodic",
+        "content": "do you know my project",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-18T14:11:39.072892+00:00",
+        "updated_at": "2026-09-18T14:11:39.072894+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "cfc47256658a49d7",
+        "kind": "episodic",
+        "content": "I want to help — could you rephrase that in one short sentence?",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-18T14:11:39.076610+00:00",
+        "updated_at": "2026-09-18T14:11:39.076612+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "bb212cc4e07842c6",
+        "kind": "episodic",
+        "content": "open my estimated project CTS therapist",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-18T14:11:51.003433+00:00",
+        "updated_at": "2026-09-18T14:11:51.003434+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "011da2bce0794063",
+        "kind": "episodic",
+        "content": "I want to help — could you rephrase that in one short sentence?",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-18T14:11:51.004301+00:00",
+        "updated_at": "2026-09-18T14:11:51.004302+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "a2a7416d9baa466d",
+        "kind": "episodic",
+        "content": "which model you can use",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-18T14:12:06.574475+00:00",
+        "updated_at": "2026-09-18T14:12:06.574495+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "178a563926c64164",
+        "kind": "episodic",
+        "content": "I want to help — could you rephrase that in one short sentence?",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-18T14:12:06.583186+00:00",
+        "updated_at": "2026-09-18T14:12:06.583188+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "185d1e67f23c4cc8",
+        "kind": "episodic",
+        "content": "ok thank you",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-18T14:12:24.965909+00:00",
+        "updated_at": "2026-09-18T14:12:24.965918+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "followup",
+          "role": "user",
+          "confidence": 0.8
+        }
+      },
+      {
+        "id": "af619ac437954c23",
+        "kind": "episodic",
+        "content": "I want to help — could you rephrase that in one short sentence?",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-18T14:12:24.979994+00:00",
+        "updated_at": "2026-09-18T14:12:24.980001+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "followup",
+          "role": "assistant",
+          "confidence": 0.8
+        }
+      },
+      {
+        "id": "3fee885574434b0c",
+        "kind": "episodic",
+        "content": "can you fix your animations",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-18T14:13:08.143411+00:00",
+        "updated_at": "2026-09-18T14:13:08.143412+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "question",
+          "role": "user",
+          "confidence": 0.75
+        }
+      },
+      {
+        "id": "62b2577f102e40bb",
+        "kind": "episodic",
+        "content": "I want to help — could you rephrase that in one short sentence?",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-18T14:13:08.151746+00:00",
+        "updated_at": "2026-09-18T14:13:08.151747+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "question",
+          "role": "assistant",
+          "confidence": 0.75
+        }
+      },
+      {
+        "id": "944de993c69d4664",
+        "kind": "episodic",
+        "content": "open my email in this browser",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-18T14:13:22.547568+00:00",
+        "updated_at": "2026-09-18T14:13:22.547570+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "a860a74a356647d3",
+        "kind": "episodic",
+        "content": "I want to help — could you rephrase that in one short sentence?",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-18T14:13:22.548457+00:00",
+        "updated_at": "2026-09-18T14:13:22.548458+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "e1b76f6696724068",
+        "kind": "episodic",
+        "content": "open this browser",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-18T14:13:44.741863+00:00",
+        "updated_at": "2026-09-18T14:13:44.741864+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "519a85150e474b7e",
+        "kind": "episodic",
+        "content": "I want to help — could you rephrase that in one short sentence?",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-18T14:13:44.743999+00:00",
+        "updated_at": "2026-09-18T14:13:44.744000+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "c998b8fe64c442d7",
+        "kind": "episodic",
+        "content": "do you have any ID",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-18T14:14:27.407630+00:00",
+        "updated_at": "2026-09-18T14:14:27.407632+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "bc4cb2936ca24431",
+        "kind": "episodic",
+        "content": "I want to help — could you rephrase that in one short sentence?",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-18T14:14:27.413582+00:00",
+        "updated_at": "2026-09-18T14:14:27.413583+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "e97332d837c9417d",
+        "kind": "episodic",
+        "content": "why you can say same sentence As multiple time",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-18T14:14:36.895548+00:00",
+        "updated_at": "2026-09-18T14:14:36.895552+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "explain",
+          "role": "user",
+          "confidence": 0.84
+        }
+      },
+      {
+        "id": "e1bbe36ddf2546c0",
+        "kind": "episodic",
+        "content": "**why you can say same sentence As multiple time** — plain-language explanation\n\nwhy you can say same sentence As multiple time is best understood by: (1) what it is, (2) why people use it, (3) a simple example.\n\nAsk for a deeper dive, analogy, or code sample if you want more.",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-18T14:14:36.904412+00:00",
+        "updated_at": "2026-09-18T14:14:36.904413+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "explain",
+          "role": "assistant",
+          "confidence": 0.84
+        }
+      },
+      {
+        "id": "d4264088d10447a9",
+        "kind": "episodic",
+        "content": "Tum",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-18T14:15:29.510573+00:00",
+        "updated_at": "2026-09-18T14:15:29.510575+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "e66b46634e3a434b",
+        "kind": "episodic",
+        "content": "I want to help — could you rephrase that in one short sentence?",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-18T14:15:29.513757+00:00",
+        "updated_at": "2026-09-18T14:15:29.513762+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "66a607e02a9f4705",
+        "kind": "episodic",
+        "content": "Tum Is Tarah Baat kyon kar rahi ho",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-18T14:15:36.870071+00:00",
+        "updated_at": "2026-09-18T14:15:36.870083+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "e466ab4c7bc745c1",
+        "kind": "episodic",
+        "content": "I want to help — could you rephrase that in one short sentence?",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-18T14:15:36.871913+00:00",
+        "updated_at": "2026-09-18T14:15:36.871915+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "53ecde8dad3a46e6",
+        "kind": "episodic",
+        "content": "kya Tumhen Hindi Aati Hai",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-18T14:15:44.579244+00:00",
+        "updated_at": "2026-09-18T14:15:44.579245+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "6e01b86e76014de4",
+        "kind": "episodic",
+        "content": "I want to help — could you rephrase that in one short sentence?",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-18T14:15:44.583178+00:00",
+        "updated_at": "2026-09-18T14:15:44.583180+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "04e0a163e80c4b70",
+        "kind": "episodic",
+        "content": "open cursor and open your ects p",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-18T14:16:15.477337+00:00",
+        "updated_at": "2026-09-18T14:16:15.477339+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "6dae5cf04fe8445b",
+        "kind": "episodic",
+        "content": "I want to help — could you rephrase that in one short sentence?",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-18T14:16:15.480001+00:00",
+        "updated_at": "2026-09-18T14:16:15.480003+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "5bcbac55acbd4fdd",
+        "kind": "episodic",
+        "content": "can you open cursor",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-18T14:16:26.618553+00:00",
+        "updated_at": "2026-09-18T14:16:26.618555+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "question",
+          "role": "user",
+          "confidence": 0.75
+        }
+      },
+      {
+        "id": "afe1d729b10541cf",
+        "kind": "episodic",
+        "content": "I want to help — could you rephrase that in one short sentence?",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-18T14:16:26.619874+00:00",
+        "updated_at": "2026-09-18T14:16:26.619875+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "question",
+          "role": "assistant",
+          "confidence": 0.75
+        }
+      },
+      {
+        "id": "646e1a316d0e420c",
+        "kind": "episodic",
+        "content": "my disk is almost full can you clear how and clear this",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-18T14:16:39.225609+00:00",
+        "updated_at": "2026-09-18T14:16:39.225610+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "1afa5409386943cb",
+        "kind": "episodic",
+        "content": "I want to help — could you rephrase that in one short sentence?",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-18T14:16:39.226515+00:00",
+        "updated_at": "2026-09-18T14:16:39.226517+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "afa8ad8809b94620",
+        "kind": "episodic",
+        "content": "no",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-18T14:16:49.039354+00:00",
+        "updated_at": "2026-09-18T14:16:49.039355+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "followup",
+          "role": "user",
+          "confidence": 0.8
+        }
+      },
+      {
+        "id": "ee6e9739f0074f7d",
+        "kind": "episodic",
+        "content": "I want to help — could you rephrase that in one short sentence?",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-18T14:16:49.044429+00:00",
+        "updated_at": "2026-09-18T14:16:49.044431+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "followup",
+          "role": "assistant",
+          "confidence": 0.8
+        }
+      },
+      {
+        "id": "65877a24d8124871",
+        "kind": "episodic",
+        "content": "aur ismein kya hai",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-18T14:18:58.691130+00:00",
+        "updated_at": "2026-09-18T14:18:58.691131+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "ca2c80ea9aef489a",
+        "kind": "episodic",
+        "content": "I want to help — could you rephrase that in one short sentence?",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-18T14:18:58.696318+00:00",
+        "updated_at": "2026-09-18T14:18:58.696340+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "93227bc001114baa",
+        "kind": "episodic",
+        "content": "hello mera naam Rohit Rawat hai",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-18T14:19:37.045990+00:00",
+        "updated_at": "2026-09-18T14:19:37.045993+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "greeting",
+          "role": "user",
+          "confidence": 0.97
+        }
+      },
+      {
+        "id": "26d77a18046744b0",
+        "kind": "episodic",
+        "content": "Hello! I'm OM. How can I help you today?",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-18T14:19:37.049048+00:00",
+        "updated_at": "2026-09-18T14:19:37.049050+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "greeting",
+          "role": "assistant",
+          "confidence": 0.97
+        }
+      },
+      {
+        "id": "3b98ff1fe7114aa8",
+        "kind": "episodic",
+        "content": "kya Ham Ghar chal Sakte is time",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-18T14:19:45.920981+00:00",
+        "updated_at": "2026-09-18T14:19:45.920983+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "8a7f183f31704c71",
+        "kind": "episodic",
+        "content": "I want to help — could you rephrase that in one short sentence?",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-18T14:19:45.926995+00:00",
+        "updated_at": "2026-09-18T14:19:45.926997+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "5ff8a12081194adc",
+        "kind": "episodic",
+        "content": "han bhai bolo kaise ho",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-18T14:21:04.169149+00:00",
+        "updated_at": "2026-09-18T14:21:04.169151+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "83379e2971d846b3",
+        "kind": "episodic",
+        "content": "I want to help — could you rephrase that in one short sentence?",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-18T14:21:04.172154+00:00",
+        "updated_at": "2026-09-18T14:21:04.172158+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "a229226448f140b4",
+        "kind": "episodic",
+        "content": "kya",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-18T14:22:13.973013+00:00",
+        "updated_at": "2026-09-18T14:22:13.973015+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "297b83deb1564d0f",
+        "kind": "episodic",
+        "content": "I want to help — could you rephrase that in one short sentence?",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-18T14:22:13.974530+00:00",
+        "updated_at": "2026-09-18T14:22:13.974531+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "7b5a1a70cac049ac",
+        "kind": "episodic",
+        "content": "kya hua",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-18T14:23:55.381498+00:00",
+        "updated_at": "2026-09-18T14:23:55.381500+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "af70086a77324f6a",
+        "kind": "episodic",
+        "content": "I want to help — could you rephrase that in one short sentence?",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-18T14:23:55.392895+00:00",
+        "updated_at": "2026-09-18T14:23:55.392896+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "8ea38a48447d451c",
+        "kind": "episodic",
+        "content": "change your voice",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-18T14:24:08.077263+00:00",
+        "updated_at": "2026-09-18T14:24:08.077272+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "46b3491296624ea0",
+        "kind": "episodic",
+        "content": "I want to help — could you rephrase that in one short sentence?",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-18T14:24:08.081781+00:00",
+        "updated_at": "2026-09-18T14:24:08.081783+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "6acc49028d2c4cc9",
+        "kind": "episodic",
+        "content": "again change",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-18T14:24:23.808022+00:00",
+        "updated_at": "2026-09-18T14:24:23.808025+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "e41231cd7d2047c9",
+        "kind": "episodic",
+        "content": "I want to help — could you rephrase that in one short sentence?",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-18T14:24:23.814268+00:00",
+        "updated_at": "2026-09-18T14:24:23.814270+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "c434518738c94852",
+        "kind": "episodic",
+        "content": "today to work you",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-18T14:25:04.503940+00:00",
+        "updated_at": "2026-09-18T14:25:04.503942+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "ca349ebf4a884e87",
+        "kind": "episodic",
+        "content": "I want to help — could you rephrase that in one short sentence?",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-18T14:25:04.508672+00:00",
+        "updated_at": "2026-09-18T14:25:04.508676+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "68c4062b0d2a4143",
+        "kind": "episodic",
+        "content": "can you open screenshot",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-18T14:25:12.832497+00:00",
+        "updated_at": "2026-09-18T14:25:12.832498+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "question",
+          "role": "user",
+          "confidence": 0.75
+        }
+      },
+      {
+        "id": "5cc9287691774bad",
+        "kind": "episodic",
+        "content": "I want to help — could you rephrase that in one short sentence?",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-18T14:25:12.833813+00:00",
+        "updated_at": "2026-09-18T14:25:12.833815+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "question",
+          "role": "assistant",
+          "confidence": 0.75
+        }
+      },
+      {
+        "id": "5c372afdac034cb0",
+        "kind": "episodic",
+        "content": "can you see this",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-18T14:25:27.020952+00:00",
+        "updated_at": "2026-09-18T14:25:27.020953+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "question",
+          "role": "user",
+          "confidence": 0.75
+        }
+      },
+      {
+        "id": "cac6e97233e94731",
+        "kind": "episodic",
+        "content": "I want to help — could you rephrase that in one short sentence?",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-18T14:25:27.021981+00:00",
+        "updated_at": "2026-09-18T14:25:27.021982+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "question",
+          "role": "assistant",
+          "confidence": 0.75
+        }
+      },
+      {
+        "id": "f1b600fe08cd4987",
+        "kind": "episodic",
+        "content": "kya tum real tarike se baat kar sakte ho",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-18T14:26:38.147378+00:00",
+        "updated_at": "2026-09-18T14:26:38.147380+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "02f45ed511df48af",
+        "kind": "episodic",
+        "content": "I want to help — could you rephrase that in one short sentence?",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-18T14:26:38.151603+00:00",
+        "updated_at": "2026-09-18T14:26:38.151604+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "5f53b9c891fd420b",
+        "kind": "episodic",
+        "content": "क्या तुम्हें हिंदी आती है",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-18T14:39:30.108927+00:00",
+        "updated_at": "2026-09-18T14:39:30.108928+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "30d077d9b0b74e0a",
+        "kind": "episodic",
+        "content": "I'm with you — say that again in your own words and I'll take it from there.",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-18T14:39:30.122694+00:00",
+        "updated_at": "2026-09-18T14:39:30.122696+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "02b7b19edf424c22",
+        "kind": "episodic",
+        "content": "क्या तुम्हें हिंदी आती है",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-18T14:39:52.236020+00:00",
+        "updated_at": "2026-09-18T14:39:52.236022+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "30e051e3b2f5470e",
+        "kind": "episodic",
+        "content": "I'm with you — say that again in your own words and I'll take it from there.",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-18T14:39:52.237656+00:00",
+        "updated_at": "2026-09-18T14:39:52.237657+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "82059eac9c964e3b",
+        "kind": "episodic",
+        "content": "क्या तुम्हें हिंदी आती है",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-18T14:40:08.041937+00:00",
+        "updated_at": "2026-09-18T14:40:08.041938+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "1d4448ee4ec34f54",
+        "kind": "episodic",
+        "content": "I'm with you — say that again in your own words and I'll take it from there.",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-18T14:40:08.045245+00:00",
+        "updated_at": "2026-09-18T14:40:08.045246+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "0459df6b8db3499b",
+        "kind": "episodic",
+        "content": "क्या तुम्हें हिंदी आती है",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-18T14:40:29.310206+00:00",
+        "updated_at": "2026-09-18T14:40:29.310208+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "20990063e829488a",
+        "kind": "episodic",
+        "content": "I'm with you — say that again in your own words and I'll take it from there.",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-18T14:40:29.315539+00:00",
+        "updated_at": "2026-09-18T14:40:29.315540+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "fb3ecc6e853c4204",
+        "kind": "episodic",
+        "content": "क्या कहना चाहते हो",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-18T14:40:29.369622+00:00",
+        "updated_at": "2026-09-18T14:40:29.369624+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "6d7eac88fe534764",
+        "kind": "episodic",
+        "content": "I'm with you — say that again in your own words and I'll take it from there.",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-18T14:40:29.372209+00:00",
+        "updated_at": "2026-09-18T14:40:29.372210+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "00353f2e3e2e4eea",
+        "kind": "episodic",
+        "content": "connect",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-19T09:53:06.135900+00:00",
+        "updated_at": "2026-09-19T09:53:06.135901+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "ecc9ef7d3a8649c5",
+        "kind": "episodic",
+        "content": "I'm with you. Tell me what you need. I'll handle it.",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-19T09:53:06.140167+00:00",
+        "updated_at": "2026-09-19T09:53:06.140168+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "4936973a938e4708",
+        "kind": "episodic",
+        "content": "OM I have a problem",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-19T10:00:13.544703+00:00",
+        "updated_at": "2026-09-19T10:00:13.544705+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "a874629abc804f1d",
+        "kind": "episodic",
+        "content": "I'm with you, Sir. Tell me what you need. I'll handle it.",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-19T10:00:13.546101+00:00",
+        "updated_at": "2026-09-19T10:00:13.546103+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "2673d8751a434af8",
+        "kind": "episodic",
+        "content": "OM I have a problem",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-19T10:00:41.917566+00:00",
+        "updated_at": "2026-09-19T10:00:41.917568+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "6714a6503f3446d8",
+        "kind": "episodic",
+        "content": "I'm with you, Sir. Tell me what you need. I'll handle it.",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-19T10:00:41.919844+00:00",
+        "updated_at": "2026-09-19T10:00:41.919846+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "b42bbc830fb74a40",
+        "kind": "episodic",
+        "content": "OM I have a problem",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-19T10:01:24.134051+00:00",
+        "updated_at": "2026-09-19T10:01:24.134053+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "fcab0ac6d3c54838",
+        "kind": "episodic",
+        "content": "I'm with you, Sir. Tell me what you need. I'll handle it.",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-19T10:01:24.134953+00:00",
+        "updated_at": "2026-09-19T10:01:24.134954+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "1136f9fa39e140f0",
+        "kind": "episodic",
+        "content": "kal mujhe yaad dilana ki project complete karna hai",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-19T10:12:26.453202+00:00",
+        "updated_at": "2026-09-19T10:12:26.453204+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "139fb827efec4acf",
+        "kind": "episodic",
+        "content": "Samajh gaya sir. Main aapke saath hoon — boliye clearly kya chahiye, main kar deta hoon. Kya priority hai?",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-19T10:12:26.455374+00:00",
+        "updated_at": "2026-09-19T10:12:26.455375+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "c1b2b74dbde5446d",
+        "kind": "episodic",
+        "content": "kal mujhe yaad dilana ki project complete karna hai",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-19T10:12:57.439909+00:00",
+        "updated_at": "2026-09-19T10:12:57.439912+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "14d5dce7d9ef4295",
+        "kind": "episodic",
+        "content": "Samajh gaya sir. Main aapke saath hoon — boliye clearly kya chahiye, main kar deta hoon. Kya priority hai?",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-19T10:12:57.441554+00:00",
+        "updated_at": "2026-09-19T10:12:57.441556+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "a082b9f928ad4030",
+        "kind": "episodic",
+        "content": "OM I had a bad day",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-19T10:19:56.358177+00:00",
+        "updated_at": "2026-09-19T10:19:56.358179+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "35b03435ade34d51",
+        "kind": "episodic",
+        "content": "I'm with you, Sir. Tell me what you need. I'll handle it.",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-19T10:19:56.359124+00:00",
+        "updated_at": "2026-09-19T10:19:56.359125+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "3ddf644b38a645f9",
+        "kind": "episodic",
+        "content": "OM check my project and find why response quality is bad",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-19T10:20:39.971686+00:00",
+        "updated_at": "2026-09-19T10:20:39.971687+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "explain",
+          "role": "user",
+          "confidence": 0.84
+        }
+      },
+      {
+        "id": "7d17906a406c4e27",
+        "kind": "episodic",
+        "content": "OM check my project and find why response quality is bad. plain-language explanation OM check my project and find why response quality is bad is best understood by: (1) what it is, (2) why people use it, (3) a simple example. Ask for a deeper dive, analogy, or code sample if you want more.",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-19T10:20:39.972860+00:00",
+        "updated_at": "2026-09-19T10:20:39.972861+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "explain",
+          "role": "assistant",
+          "confidence": 0.84
+        }
+      },
+      {
+        "id": "eb53dd7e46fc4bab",
+        "kind": "episodic",
+        "content": "OM check my project and find why response quality is bad",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-19T10:20:42.574725+00:00",
+        "updated_at": "2026-09-19T10:20:42.574726+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "explain",
+          "role": "user",
+          "confidence": 0.84
+        }
+      },
+      {
+        "id": "f84a040beee84a5e",
+        "kind": "episodic",
+        "content": "OM check my project and find why response quality is bad. plain-language explanation OM check my project and find why response quality is bad is best understood by: (1) what it is, (2) why people use it, (3) a simple example. Ask for a deeper dive, analogy, or code sample if you want more.",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-19T10:20:42.575627+00:00",
+        "updated_at": "2026-09-19T10:20:42.575629+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "explain",
+          "role": "assistant",
+          "confidence": 0.84
+        }
+      },
+      {
+        "id": "d22b866aabbb44ed",
+        "kind": "episodic",
+        "content": "hello kya hua",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-19T10:24:53.284573+00:00",
+        "updated_at": "2026-09-19T10:24:53.284577+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "greeting",
+          "role": "user",
+          "confidence": 0.97
+        }
+      },
+      {
+        "id": "c251b3395ed74afd",
+        "kind": "episodic",
+        "content": "Samajh gaya sir. Main aapke saath hoon — boliye clearly kya chahiye, main kar deta hoon. Kya priority hai?",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-19T10:24:53.287723+00:00",
+        "updated_at": "2026-09-19T10:24:53.287729+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "greeting",
+          "role": "assistant",
+          "confidence": 0.97
+        }
+      },
+      {
+        "id": "02880732ace04028",
+        "kind": "episodic",
+        "content": "create project",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-19T10:25:07.669973+00:00",
+        "updated_at": "2026-09-19T10:25:07.669975+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "58b668d1497a4193",
+        "kind": "episodic",
+        "content": "I'm with you, Sir. Tell me what you need. I'll handle it.",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-19T10:25:07.670879+00:00",
+        "updated_at": "2026-09-19T10:25:07.670880+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "6ad15cf0733542e0",
+        "kind": "episodic",
+        "content": "ects",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-19T10:25:21.983115+00:00",
+        "updated_at": "2026-09-19T10:25:21.983117+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "968c9a51a352458b",
+        "kind": "episodic",
+        "content": "I'm with you, Sir. Tell me what you need. I'll handle it.",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-19T10:25:21.985401+00:00",
+        "updated_at": "2026-09-19T10:25:21.985403+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "6759fa08b01b4741",
+        "kind": "episodic",
+        "content": "open karsar",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-19T10:25:37.172050+00:00",
+        "updated_at": "2026-09-19T10:25:37.172052+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "9c51483ea5034205",
+        "kind": "episodic",
+        "content": "I'm with you, Sir. Tell me what you need. I'll handle it.",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-19T10:25:37.172998+00:00",
+        "updated_at": "2026-09-19T10:25:37.172999+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "cd28d3ef17a84dbd",
+        "kind": "episodic",
+        "content": "discuss",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-19T10:25:46.189849+00:00",
+        "updated_at": "2026-09-19T10:25:46.189851+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "73b12e0eb4cb4811",
+        "kind": "episodic",
+        "content": "I'm with you, Sir. Tell me what you need. I'll handle it.",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-19T10:25:46.191621+00:00",
+        "updated_at": "2026-09-19T10:25:46.191622+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "f7db1213f66549cd",
+        "kind": "episodic",
+        "content": "open karsar",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-19T10:25:59.844576+00:00",
+        "updated_at": "2026-09-19T10:25:59.844577+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "458dec3ecf934e5b",
+        "kind": "episodic",
+        "content": "I'm with you, Sir. Tell me what you need. I'll handle it.",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-19T10:25:59.845527+00:00",
+        "updated_at": "2026-09-19T10:25:59.845528+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "7821a0bbad3e4fdc",
+        "kind": "episodic",
+        "content": "Kuchh prashn",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-19T10:26:43.775323+00:00",
+        "updated_at": "2026-09-19T10:26:43.775325+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "bbd54142d45d4fba",
+        "kind": "episodic",
+        "content": "I'm with you, Sir. Tell me what you need. I'll handle it.",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-19T10:26:43.777692+00:00",
+        "updated_at": "2026-09-19T10:26:43.777694+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
       }
     ]
   },

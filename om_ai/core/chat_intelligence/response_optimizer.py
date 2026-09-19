@@ -65,9 +65,17 @@ class ResponseOptimizer:
             if "pipeline_leak" in report["issues"] or "gibberish" in report["issues"]:
                 improved = (fallback or "").strip() or improved
             if "empty" in report["issues"] or "echo" in report["issues"]:
-                improved = (fallback or "").strip() or (
-                    "I want to help — could you rephrase that in one short sentence?"
-                )
+                improved = (fallback or "").strip()
+                if not improved:
+                    try:
+                        from om_ai.core.companion_personality.voice_presence import (
+                            rescue_spoken,
+                        )
+
+                        improved = rescue_spoken(message)
+                    except Exception:
+                        improved = "I'm with you. Go ahead — I'm listening."
+
 
         final_report = self.evaluate(improved, message=message, intent=intent)
         return {

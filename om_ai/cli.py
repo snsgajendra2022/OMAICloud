@@ -1924,7 +1924,7 @@ def main():
 
     s = sp.add_parser("serve")
     s.add_argument("--host", default="127.0.0.1")
-    s.add_argument("--port", type=int, default=8080)
+    s.add_argument("--port", type=int, default=8765)
     s.add_argument("--reload", action="store_true")
     s.set_defaults(func=serve)
 

@@ -317,7 +317,11 @@ def _audit(
 # Rate-limit middleware
 # ---------------------------------------------------------------------------
 
-
+@app.get("/companion", tags=["UI"])
+@app.get("/ui/companion", tags=["UI"])
+async def companion_ui():
+    return _serve_static_html("companion/index.html")
+    
 @app.middleware("http")
 async def _rate_limit_middleware(request: Request, call_next):
     # OM_AI_RATE_LIMIT=0 disables global rate limiting (local dev default).

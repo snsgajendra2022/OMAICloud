@@ -867,8 +867,8 @@ def run_chat_pipeline(
                 meta["quality_reject"] = "unsafe_or_garble"
             else:
                 draft = (
-                    "I want to answer clearly, but that draft wasn’t reliable. "
-                    "Please rephrase your question in a short sentence."
+                    "I'm with you — that last draft wasn't solid. "
+                    "Tell me what you need in your own words and I'll take it from there."
                 )
                 meta["quality_reject"] = "unsafe_or_garble"
     except Exception:

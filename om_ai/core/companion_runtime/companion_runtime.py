@@ -35,6 +35,7 @@ class CompanionRuntime:
         self.security = None
         self.realtime = None
         self.personality = None
+        self.os = None  # STEP 60 Companion OS
 
     def _emit(self, event_type: str, payload: dict[str, Any] | None = None) -> None:
         if self.realtime is None:
@@ -136,10 +137,25 @@ class CompanionRuntime:
             self.registry.register("devices", self.devices)
             self.registry.register("security", self.security)
 
+            # STEP 60 — Companion OS (presence / convo / voice / avatar / memory / …)
+            try:
+                from om_ai.core.companion_os import get_companion_os
+
+                self.os = get_companion_os()
+                self.registry.register("companion_os", self.os)
+            except Exception as exc:
+                logger.warning("companion_os init: %s", exc)
+                self.os = None
+
             self._started = True
             self.lifecycle = Lifecycle.RUNNING
             banner = self.status_banner()
             banner["voice_start"] = voice_start
+            if self.os is not None:
+                try:
+                    banner["companion_os"] = self.os.status()
+                except Exception:
+                    pass
             if (
                 self.config.avatar_enabled
                 and not self.config.no_avatar
@@ -225,6 +241,25 @@ class CompanionRuntime:
 
         semantic = brain_out.get("semantic") or {}
         answer = str(brain_out.get("answer") or "").strip()
+        spoken = str(brain_out.get("spoken") or answer).strip()
+        spoken_tts = str(brain_out.get("spoken_tts") or spoken).strip()
+
+        # Final spoken presence pass (Jarvis cadence)
+        try:
+            from om_ai.core.companion_personality.voice_presence import (
+                shape_for_speech,
+                is_garbage_spoken,
+                rescue_spoken,
+            )
+
+            if is_garbage_spoken(spoken):
+                spoken = rescue_spoken(user_text, spoken)
+            pack = shape_for_speech(spoken, user_message=user_text)
+            spoken = str(pack.get("spoken") or spoken)
+            spoken_tts = str(pack.get("spoken_tts") or spoken)
+            answer = spoken
+        except Exception:
+            pass
 
         # Permission-sensitive actions
         planned = None
@@ -255,12 +290,52 @@ class CompanionRuntime:
                 )
 
         if not answer:
-            answer = "I'm here — how can I help?"
+            answer = "I'm with you. Go ahead."
+            spoken = answer
+            spoken_tts = answer
+
+        # STEP 60 — Companion OS enrichment (presence, continuous convo, memory, avatar…)
+        os_pack: dict[str, Any] = {}
+        try:
+            if self.os is None:
+                from om_ai.core.companion_os import get_companion_os
+
+                self.os = get_companion_os()
+            os_pack = self.os.enrich_turn(
+                user_text,
+                answer=answer,
+                speaking=False,
+                affect=brain_out.get("affect") if isinstance(brain_out.get("affect"), dict) else None,
+            )
+            if os_pack.get("answer"):
+                answer = str(os_pack["answer"])
+                spoken = str(os_pack.get("spoken") or answer)
+                spoken_tts = spoken
+            presence_mode = str(
+                ((os_pack.get("presence") or {}).get("presence") or {}).get("mode") or ""
+            )
+            if presence_mode:
+                activities.append(f"Presence · {presence_mode}")
+                self._emit("presence.state", os_pack.get("presence") or {})
+            for label in os_pack.get("activity") or []:
+                if label and label not in activities:
+                    activities.append(str(label))
+            if os_pack.get("avatar"):
+                self._emit("avatar.state", os_pack["avatar"])
+            if os_pack.get("om_avatar"):
+                self._emit("avatar.state", os_pack["om_avatar"])
+            if os_pack.get("consciousness"):
+                self._emit("consciousness", os_pack["consciousness"])
+        except Exception as exc:
+            logger.debug("companion_os enrich failed: %s", exc)
 
         # Memory write (non-sensitive)
         if self.memory is not None and self.config.memory_enabled:
             try:
-                self.memory.remember_turn(user_text, answer)
+                from om_ai.core.companion_personality.voice_presence import is_garbage_spoken
+
+                if not is_garbage_spoken(answer):
+                    self.memory.remember_turn(user_text, answer)
             except Exception:
                 try:
                     if hasattr(self.memory, "add_episode"):
@@ -275,50 +350,127 @@ class CompanionRuntime:
         except Exception:
             pass
 
-        self.voice.speak(answer)
+        # Browser companion speaks via /tts — avoid double-speak from macOS say here
+        if not self.config.text_only:
+            try:
+                self.voice.speak(spoken)
+            except Exception:
+                pass
         self._emit("avatar.state", {"state": "speaking"})
         try:
             self.voice.session.add_turn("assistant", answer)
         except Exception:
             pass
+
+        presence_mode = str(
+            ((os_pack.get("presence") or {}).get("presence") or {}).get("mode") or self.voice.state.value
+        )
         return {
             "answer": answer,
+            "spoken": spoken,
+            "spoken_tts": spoken_tts,
+            "heard": user_text,
+            "feeling": brain_out.get("feeling") or (brain_out.get("affect") or {}).get("label"),
+            "affect": brain_out.get("affect"),
+            "expression": (os_pack.get("presence") or {}).get("expression") or brain_out.get("expression"),
+            "presence": (os_pack.get("presence") or {}).get("presence"),
+            "avatar": os_pack.get("om_avatar") or os_pack.get("avatar"),
+            "conversation": os_pack.get("conversation"),
+            "learning": os_pack.get("learning"),
+            "human_memory": os_pack.get("human_memory"),
+            "autonomous": os_pack.get("autonomous"),
+            "action": os_pack.get("action"),
+            "consciousness": os_pack.get("consciousness"),
+            "vision": os_pack.get("vision"),
+            "background": os_pack.get("background"),
+            "memory_line": "You are working on OM AI",
             "activities": activities,
             "semantic": semantic,
             "session": self.voice.session.to_dict(),
-            "state": self.voice.state.value,
+            "state": presence_mode or self.voice.state.value,
             "trace_id": self.context.trace_id,
+            "speak_client": True,
+            "os_step": 112,
         }
 
     def _run_brain(self, text: str, history: list[dict[str, Any]]) -> dict[str, Any]:
+        model_generate = self._model_generate_fn()
         if self.brain is not None:
             for meth in ("run", "handle", "process", "turn"):
                 fn = getattr(self.brain, meth, None)
                 if callable(fn):
                     try:
-                        out = fn(text, history=history)
+                        out = fn(
+                            text,
+                            history=history,
+                            model_generate=model_generate,
+                        )
                         if isinstance(out, dict) and (out.get("answer") is not None or out.get("semantic")):
                             return out
                     except TypeError:
                         try:
-                            out = fn(text)
+                            out = fn(text, history=history)
                             if isinstance(out, dict):
                                 return out
+                        except TypeError:
+                            try:
+                                out = fn(text)
+                                if isinstance(out, dict):
+                                    return out
+                            except Exception:
+                                pass
                         except Exception:
                             pass
                     except Exception as exc:
                         logger.debug("brain.%s failed: %s", meth, exc)
         try:
             from om_ai.core.companion_brain import run_companion_brain
-            return run_companion_brain(text, history=history)
+            return run_companion_brain(
+                text, history=history, model_generate=model_generate
+            )
         except Exception:
             from om_ai.core.chatgpt_runtime import run_chatgpt_runtime
-            pack = run_chatgpt_runtime(text, history=history)
+            pack = run_chatgpt_runtime(
+                text, history=history, model_generate=model_generate
+            )
             return {
                 "answer": pack.get("answer") or "",
                 "semantic": (pack.get("chat_intelligence") or {}).get("intent") or {},
                 "activities": ["Preparing answer"],
             }
+
+    def _model_generate_fn(self):
+        """Best-effort native model hook for real conversational answers."""
+        try:
+            from om_ai.api import main as api_main
+
+            nb = getattr(api_main, "native_backend", None)
+            if nb is None:
+                return None
+            ready = bool(getattr(nb, "loaded", False) and getattr(nb, "_trained", False))
+            chat = getattr(nb, "chat", None)
+            if not ready or not callable(chat):
+                return None
+
+            def _gen(prompt: str, context: str = "") -> str:
+                try:
+                    from om_ai.runtime.chat_orchestrator import build_chat_messages
+
+                    msgs = build_chat_messages(
+                        prompt,
+                        system=(context or "You are OM — warm voice companion. Reply briefly and human.")[:2000],
+                        history=[],
+                    )
+                    return str(chat(msgs) or "")
+                except Exception:
+                    try:
+                        return str(chat(prompt) or "")
+                    except Exception:
+                        return ""
+
+            return _gen
+        except Exception:
+            return None
 
     def _update_session_context(self, text: str) -> None:
         assert self.voice is not None
@@ -552,7 +704,7 @@ class CompanionRuntime:
         checks.append({"name": "tts", "status": "PASS" if StreamingTTS().synth.ready else "WARN", "detail": StreamingTTS().status()})
         checks.append({"name": "wake_word", "status": "PASS", "detail": WakeWordEngine(self.config.wake_word).status()})
         checks.append({"name": "memory_db", "status": "PASS", "detail": str(root / "artifacts" / "companion")})
-        checks.append({"name": "api_port", "status": "PASS", "detail": str(self.config.bind_port)})
+        checks.append({"name": "api_port", "status": "PASS", "detail": f"{self.config.bind_host}:{self.config.bind_port}"})
         ui = root / "om_ai" / "api" / "static" / "companion" / "index.html"
         checks.append({"name": "frontend", "status": "PASS" if ui.is_file() else "WARN", "detail": str(ui)})
         return {"checks": checks, "ok": all(c["status"] in {"PASS", "WARN"} for c in checks)}

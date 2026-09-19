@@ -3,248 +3,990 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>OM Companion</title>
+  <title>OM</title>
   <style>
     :root {
-      --bg0: #0b1020;
-      --bg1: #121a33;
-      --text: #e8eefc;
-      --muted: #9aa8c7;
-      --accent: #6ea8ff;
-      --ok: #5ddea8;
-      --warn: #f0c674;
+      --ink: #e8f4ff;
+      --muted: #7fa0b8;
+      --line: rgba(117,213,227,0.22);
+      --cyan: #75d5e3;
+      --cyan-bright: #b8f4ff;
+      --cyan-dim: rgba(117,213,227,0.35);
+      --gold: #d4af37;
+      --ok: #5ee0a8;
+      --danger: #ff7b7b;
+      --bg: #050a10;
     }
     * { box-sizing: border-box; }
     html, body {
       margin: 0; height: 100%;
-      font-family: "Avenir Next", "Segoe UI", sans-serif;
-      color: var(--text);
+      color: var(--ink);
+      font-family: "Avenir Next", "SF Pro Display", "Segoe UI", sans-serif;
       background:
-        radial-gradient(1200px 600px at 50% -10%, #1b2b55 0%, transparent 60%),
-        linear-gradient(180deg, var(--bg0), var(--bg1));
+        radial-gradient(ellipse 70% 55% at 50% 42%, rgba(20,60,90,0.45), transparent 70%),
+        radial-gradient(circle at 50% 50%, #0a1520 0%, var(--bg) 70%);
+      overflow: hidden;
     }
     .shell {
-      min-height: 100%;
+      height: 100%;
       display: grid;
-      grid-template-rows: auto 1fr auto;
-      padding: 20px 24px 16px;
-      max-width: 920px;
+      grid-template-rows: auto 1fr;
+      max-width: 980px;
       margin: 0 auto;
+      padding: 18px 22px 28px;
     }
     header {
-      display: flex; justify-content: space-between; align-items: center;
-      letter-spacing: 0.04em;
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      z-index: 2;
     }
-    header strong { font-size: 1.1rem; }
-    header a { color: var(--muted); text-decoration: none; }
+    .brand {
+      font-size: clamp(2rem, 5vw, 3.2rem);
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      line-height: 1;
+      color: var(--cyan-bright);
+      text-shadow: 0 0 24px rgba(117,213,227,0.45);
+    }
+    .hint { color: var(--muted); font-size: 0.85rem; }
     .stage {
-      display: grid; place-items: center; text-align: center; gap: 18px;
-      padding: 24px 12px;
-    }
-    .avatar {
-      width: min(280px, 70vw); height: min(280px, 70vw);
-      border-radius: 50%;
-      background:
-        radial-gradient(circle at 35% 30%, #dce8ff, #6ea8ff 45%, #243965 75%);
-      box-shadow: 0 0 0 8px rgba(110,168,255,0.12), 0 30px 80px rgba(0,0,0,0.35);
+      display: grid;
+      place-items: center;
+      text-align: center;
+      gap: 12px;
       position: relative;
-      transition: transform .25s ease, filter .25s ease;
     }
-    .avatar[data-state="listening"] { filter: saturate(1.2) brightness(1.05); }
-    .avatar[data-state="thinking"] { animation: pulse 1.4s ease-in-out infinite; }
-    .avatar[data-state="speaking"] { transform: scale(1.03); }
-    .avatar[data-state="waiting_permission"] { filter: hue-rotate(25deg); }
-    @keyframes pulse { 50% { transform: scale(1.04); } }
-    .mouth {
-      position: absolute; left: 50%; bottom: 28%;
-      width: 42px; height: 10px; margin-left: -21px;
-      border-radius: 0 0 20px 20px;
-      background: rgba(20,28,48,0.55);
-      transform-origin: center top;
+    /* —— Jarvis HUD —— */
+    .orb-wrap {
+      position: relative;
+      width: min(420px, 86vw);
+      height: min(420px, 86vw);
+      display: grid;
+      place-items: center;
+      user-select: none;
     }
-    .status-dot {
-      display: inline-flex; align-items: center; gap: 8px;
-      color: var(--muted); font-size: 0.95rem;
+    .hud-aura {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      width: 116%;
+      height: 116%;
+      border-radius: 50%;
+      pointer-events: none;
+      opacity: 0.95;
+      z-index: 0;
     }
-    .status-dot i {
-      width: 10px; height: 10px; border-radius: 50%; background: var(--ok);
-      box-shadow: 0 0 12px var(--ok);
+    .hud-svg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      overflow: visible;
+      filter: drop-shadow(0 0 6px rgba(117,213,227,0.55)) drop-shadow(0 0 18px rgba(117,213,227,0.25));
     }
-    .reply {
-      max-width: 34rem; margin: 0 auto;
-      font-size: 1.25rem; line-height: 1.45; min-height: 3.2em;
+    .hud-spin-cw { animation: spinCW 28s linear infinite; transform-origin: 50% 50%; }
+    .hud-spin-ccw { animation: spinCCW 38s linear infinite; transform-origin: 50% 50%; }
+    .hud-spin-fast { animation: spinCW 14s linear infinite; transform-origin: 50% 50%; }
+    .hud-pulse { animation: hudPulse 2.8s ease-in-out infinite; }
+    @keyframes spinCW { to { transform: rotate(360deg); } }
+    @keyframes spinCCW { to { transform: rotate(-360deg); } }
+    @keyframes hudPulse {
+      0%, 100% { opacity: 0.75; }
+      50% { opacity: 1; }
     }
-    .activity {
-      color: var(--muted); font-size: 0.9rem; min-height: 1.2em;
+    .orb {
+      position: relative;
+      width: 52%;
+      height: 52%;
+      border-radius: 50%;
+      z-index: 2;
+      background: radial-gradient(circle at 50% 50%, #0a141c 0%, #050c14 65%, #02060a 100%);
+      box-shadow:
+        0 0 0 1.5px rgba(220,245,255,0.95),
+        0 0 22px rgba(117,213,227,0.65),
+        0 0 48px rgba(117,213,227,0.28),
+        inset 0 0 40px rgba(117,213,227,0.1);
+      overflow: hidden;
     }
-    .controls {
-      display: flex; flex-wrap: wrap; gap: 10px; justify-content: center;
-      padding: 12px 0 8px;
+    .orb-core {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      display: block;
     }
-    button, .chip {
-      border: 1px solid rgba(255,255,255,0.12);
-      background: rgba(255,255,255,0.04);
-      color: var(--text); border-radius: 999px;
-      padding: 10px 16px; cursor: pointer; font: inherit;
+    .orb-wrap[data-state="listening"] .orb {
+      box-shadow:
+        0 0 0 2px rgba(184,244,255,0.95),
+        0 0 22px rgba(117,213,227,0.7),
+        0 0 55px rgba(117,213,227,0.35),
+        inset 0 0 36px rgba(117,213,227,0.18);
     }
-    button.primary { background: rgba(110,168,255,0.22); border-color: rgba(110,168,255,0.45); }
-    .composer {
-      display: grid; grid-template-columns: 1fr auto; gap: 10px;
-      margin-top: 8px;
+    .orb-wrap[data-state="thinking"] .hud-svg { animation-duration: 0.01s; filter: drop-shadow(0 0 10px rgba(117,213,227,0.8)); }
+    .orb-wrap[data-state="thinking"] .hud-spin-cw { animation-duration: 8s; }
+    .orb-wrap[data-state="thinking"] .hud-spin-ccw { animation-duration: 11s; }
+    .orb-wrap[data-state="speaking"] .orb {
+      transform: scale(1.04);
+      box-shadow:
+        0 0 0 2px #fff,
+        0 0 28px rgba(255,255,255,0.55),
+        0 0 60px rgba(117,213,227,0.5),
+        inset 0 0 40px rgba(255,255,255,0.15);
     }
-    .composer input {
-      width: 100%; border-radius: 14px; border: 1px solid rgba(255,255,255,0.12);
-      background: rgba(0,0,0,0.25); color: var(--text);
-      padding: 14px 16px; font: inherit;
+    .orb-wrap[data-state="muted"] { filter: grayscale(0.55) brightness(0.65); }
+    .status {
+      display: inline-flex; align-items: center; gap: 10px;
+      color: var(--muted); letter-spacing: 0.14em; text-transform: uppercase;
+      font-size: 0.75rem;
     }
-    .timeline {
-      margin-top: 8px; color: var(--muted); font-size: 0.85rem;
-      max-height: 90px; overflow: auto;
+    .status i {
+      width: 8px; height: 8px; border-radius: 50%; background: var(--cyan);
+      box-shadow: 0 0 12px var(--cyan);
     }
+    .status[data-mode="muted"] i { background: var(--danger); box-shadow: 0 0 12px var(--danger); }
+    .said {
+      max-width: 36rem;
+      font-size: clamp(1.1rem, 2.3vw, 1.45rem);
+      line-height: 1.4;
+      min-height: 2.8em;
+      margin: 0;
+      color: #d7eef8;
+    }
+    .said::before {
+      content: "OM";
+      display: block;
+      font-size: 0.72rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--cyan);
+      margin-bottom: 6px;
+      opacity: 0.85;
+    }
+    .heard {
+      color: #b8d4e4;
+      font-size: 1.02rem;
+      min-height: 1.3em;
+      margin: 0;
+      max-width: 36rem;
+    }
+    .heard:empty { display: none; }
+    .feeling {
+      color: var(--gold);
+      font-size: 0.78rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      min-height: 1em;
+      opacity: 0.9;
+    }
+    .feeling:empty { display: none; }
+    .activity { color: var(--muted); font-size: 0.82rem; min-height: 1.1em; opacity: 0.85; }
+    .memory-line {
+      color: rgba(212, 175, 55, 0.85);
+      font-size: 0.78rem;
+      letter-spacing: 0.04em;
+      margin: 0.35rem 0 0;
+      opacity: 0.9;
+    }
+    .enable-once {
+      margin-top: 4px; border: 0; border-radius: 999px;
+      padding: 14px 26px; font: inherit; font-size: 1rem;
+      color: #041018;
+      background: linear-gradient(180deg, #c8f2fa, var(--cyan));
+      box-shadow: 0 0 28px rgba(117,213,227,0.4);
+      cursor: pointer;
+    }
+    .enable-once.hidden { display: none; }
+    .live-pill {
+      display: none;
+      align-items: center; gap: 8px;
+      color: var(--cyan-bright);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      font-size: 0.78rem;
+      text-shadow: 0 0 12px rgba(117,213,227,0.5);
+    }
+    .live-pill.on { display: inline-flex; }
+    .perm {
+      display: none; gap: 10px; align-items: center; justify-content: center;
+      padding: 10px 14px; border-radius: 16px;
+      border: 1px solid rgba(212,175,55,0.4);
+      background: rgba(212,175,55,0.08); color: #ffe7b0; max-width: 34rem;
+    }
+    .perm.show { display: flex; flex-wrap: wrap; }
+    .perm button {
+      border: 1px solid rgba(255,255,255,0.2);
+      background: rgba(255,255,255,0.08);
+      color: var(--ink); border-radius: 999px;
+      padding: 8px 14px; font: inherit; cursor: pointer;
+    }
+    .mic-help {
+      display: none; max-width: 34rem; text-align: left;
+      padding: 14px 16px; border-radius: 16px;
+      border: 1px solid rgba(255,123,123,0.35);
+      background: rgba(255,80,80,0.08); color: #ffd0d0;
+      font-size: 0.9rem; line-height: 1.45;
+    }
+    .mic-help.show { display: block; }
+    .mic-help strong { color: #fff; }
+    .mic-help code {
+      background: rgba(0,0,0,0.35); padding: 1px 6px;
+      border-radius: 6px; font-size: 0.82rem;
+    }
+    .mic-help ol { margin: 8px 0 0; padding-left: 1.2rem; }
+    .wave {
+      display: flex; gap: 3px; height: 18px; align-items: flex-end; justify-content: center;
+      opacity: 0; transition: opacity .2s;
+    }
+    .wave.on { opacity: 1; }
+    .wave span {
+      width: 3px; height: 6px; border-radius: 2px;
+      background: var(--cyan);
+      box-shadow: 0 0 8px var(--cyan);
+      animation: bar 0.7s ease-in-out infinite;
+    }
+    .wave span:nth-child(2) { animation-delay: .1s; }
+    .wave span:nth-child(3) { animation-delay: .2s; }
+    .wave span:nth-child(4) { animation-delay: .3s; }
+    .wave span:nth-child(5) { animation-delay: .15s; }
+    @keyframes bar { 50% { height: 18px; } }
   </style>
 </head>
 <body>
   <div class="shell">
     <header>
-      <strong>OM</strong>
-      <a href="/chat">Chat UI</a>
+      <div class="brand">OM</div>
+      <div class="hint" id="privacyHint">Personal companion · always listening</div>
     </header>
 
     <main class="stage">
-      <div class="avatar" id="avatar" data-state="idle">
-        <div class="mouth" id="mouth"></div>
+      <div class="orb-wrap" id="orbWrap" data-state="idle">
+        <canvas class="hud-aura" id="auraCanvas"></canvas>
+        <svg class="hud-svg" viewBox="0 0 400 400" aria-hidden="true">
+          <defs>
+            <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#b8f4ff"/>
+              <stop offset="45%" stop-color="#75d5e3"/>
+              <stop offset="100%" stop-color="#3a9bb0"/>
+            </linearGradient>
+            <filter id="softGlow" x="-40%" y="-40%" width="180%" height="180%">
+              <feGaussianBlur stdDeviation="2.2" result="b"/>
+              <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+            </filter>
+          </defs>
+          <!-- outermost tick ring -->
+          <g class="hud-spin-ccw" filter="url(#softGlow)">
+            <circle cx="200" cy="200" r="188" fill="none" stroke="rgba(117,213,227,0.28)" stroke-width="1"/>
+            <circle cx="200" cy="200" r="188" fill="none" stroke="#75d5e3" stroke-width="2.5"
+              stroke-dasharray="2 6 2 6 14 8 2 6 2 6 2 6 28 10" stroke-linecap="butt" opacity="0.85"/>
+            <g stroke="#75d5e3" stroke-width="1.2" opacity="0.7">
+              <line x1="200" y1="8" x2="200" y2="18"/><line x1="200" y1="382" x2="200" y2="392"/>
+              <line x1="8" y1="200" x2="18" y2="200"/><line x1="382" y1="200" x2="392" y2="200"/>
+            </g>
+          </g>
+          <!-- segmented primary band -->
+          <g class="hud-spin-cw" filter="url(#softGlow)">
+            <circle cx="200" cy="200" r="168" fill="none" stroke="rgba(117,213,227,0.12)" stroke-width="22"/>
+            <circle cx="200" cy="200" r="168" fill="none" stroke="url(#ringGrad)" stroke-width="16"
+              stroke-dasharray="100 18" stroke-linecap="butt" opacity="0.92"/>
+            <circle cx="200" cy="200" r="168" fill="none" stroke="rgba(184,244,255,0.35)" stroke-width="3"
+              stroke-dasharray="4 10 4 10 40 14" opacity="0.9"/>
+            <!-- gold accent arc (bottom-left like reference) -->
+            <path d="M 95 268 A 168 168 0 0 0 132 310" fill="none" stroke="#d4af37" stroke-width="5"
+              stroke-linecap="round" opacity="0.95"/>
+            <path d="M 88 255 A 168 168 0 0 0 95 268" fill="none" stroke="#f0d878" stroke-width="2.5" opacity="0.8"/>
+          </g>
+          <!-- mid detail ring -->
+          <g class="hud-spin-fast" filter="url(#softGlow)">
+            <circle cx="200" cy="200" r="142" fill="none" stroke="rgba(117,213,227,0.45)" stroke-width="1.5"
+              stroke-dasharray="1 3 1 3 8 5"/>
+            <circle cx="200" cy="200" r="136" fill="none" stroke="#75d5e3" stroke-width="2"
+              stroke-dasharray="28 8 6 8 28 8 6 8" opacity="0.75"/>
+            <!-- block markers -->
+            <rect x="196" y="54" width="8" height="6" rx="1" fill="#75d5e3" opacity="0.85"/>
+            <rect x="196" y="340" width="8" height="6" rx="1" fill="#75d5e3" opacity="0.85"/>
+            <rect x="54" y="196" width="6" height="8" rx="1" fill="#75d5e3" opacity="0.85"/>
+            <rect x="340" y="196" width="6" height="8" rx="1" fill="#75d5e3" opacity="0.7"/>
+          </g>
+          <!-- inner thin rings -->
+          <g class="hud-pulse" filter="url(#softGlow)">
+            <circle cx="200" cy="200" r="118" fill="none" stroke="rgba(184,244,255,0.55)" stroke-width="1.5"/>
+            <circle cx="200" cy="200" r="112" fill="none" stroke="rgba(117,213,227,0.35)" stroke-width="1"
+              stroke-dasharray="2 4"/>
+            <circle cx="200" cy="200" r="104" fill="none" stroke="rgba(184,244,255,0.7)" stroke-width="1.2"/>
+          </g>
+        </svg>
+        <div class="orb" id="orb">
+          <canvas class="orb-core" id="coreCanvas"></canvas>
+        </div>
       </div>
-      <div class="status-dot"><i id="dot"></i><span id="stateLabel">Starting</span></div>
-      <p class="reply" id="reply">“Hello — I’m OM. What should we work on?”</p>
-      <p class="activity" id="activity"></p>
-      <div class="timeline" id="timeline"></div>
-    </main>
 
-    <footer>
-      <div class="controls">
-        <button class="primary" id="btnStart">Start session</button>
-        <button id="btnMute">Mute</button>
-        <button id="btnInterrupt">Stop speaking</button>
-        <button id="btnMemory">Memory</button>
-        <button id="btnPerms">Permissions</button>
+      <div class="status" id="statusRow"><i></i><span id="stateLabel">Starting</span></div>
+      <div class="wave" id="wave"><span></span><span></span><span></span><span></span><span></span></div>
+      <div class="live-pill" id="livePill"><span>●</span> Always listening — just speak</div>
+      <p class="heard" id="heard"></p>
+      <p class="feeling" id="feeling"></p>
+      <p class="said" id="reply">I’m OM. Enabling always-on listening…</p>
+      <p class="memory-line" id="memoryLine">Memory · You are working on OM AI</p>
+      <p class="activity" id="activity"></p>
+
+      <!-- Browsers require ONE user gesture the first time only -->
+      <button class="enable-once" id="btnEnable" type="button">Enable always-on listening</button>
+
+      <div class="mic-help" id="micHelp">
+        <strong>Microphone blocked</strong>
+        <div id="micHelpBody"></div>
       </div>
-      <form class="composer" id="form">
-        <input id="input" placeholder="Type or say: Hey OM …" autocomplete="off" />
-        <button class="primary" type="submit">Send</button>
-      </form>
-    </footer>
+
+      <div class="perm" id="permBox">
+        <span id="permText">Permission needed</span>
+        <button type="button" id="btnYes">Allow</button>
+        <button type="button" id="btnNo">Deny</button>
+      </div>
+    </main>
   </div>
+
   <script>
     const els = {
-      avatar: document.getElementById('avatar'),
-      mouth: document.getElementById('mouth'),
+      orbWrap: document.getElementById('orbWrap'),
+      coreCanvas: document.getElementById('coreCanvas'),
+      auraCanvas: document.getElementById('auraCanvas'),
       stateLabel: document.getElementById('stateLabel'),
+      statusRow: document.getElementById('statusRow'),
       reply: document.getElementById('reply'),
+      heard: document.getElementById('heard'),
+      feeling: document.getElementById('feeling'),
       activity: document.getElementById('activity'),
-      timeline: document.getElementById('timeline'),
-      input: document.getElementById('input'),
-      form: document.getElementById('form'),
+      memoryLine: document.getElementById('memoryLine'),
+      wave: document.getElementById('wave'),
+      btnEnable: document.getElementById('btnEnable'),
+      livePill: document.getElementById('livePill'),
+      permBox: document.getElementById('permBox'),
+      permText: document.getElementById('permText'),
+      micHelp: document.getElementById('micHelp'),
+      micHelpBody: document.getElementById('micHelpBody'),
+      privacyHint: document.getElementById('privacyHint'),
     };
+
     let sessionId = null;
     let muted = false;
+    let alwaysOn = false;
+    let listening = false;
     let speaking = false;
-    let lipTimer = null;
+    let busy = false;
+    let micReady = false;
+    let micStream = null;
+    let energyBoost = 0;
+    let recognition = null;
+    let audioEl = null;
+    let pendingPermissionId = null;
+    let pendingGreeting = null;
+    let restartTimer = null;
+    let bargeAnalyser = null;
+    let bargeCtx = null;
+    let bargeRaf = 0;
+    let lastBargeAt = 0;
 
-    function setState(state) {
-      const s = (state || 'idle').toLowerCase();
-      els.avatar.dataset.state = s.includes('listen') ? 'listening'
-        : s.includes('think') || s.includes('understand') || s.includes('generat') ? 'thinking'
-        : s.includes('speak') ? 'speaking'
-        : s.includes('permission') ? 'waiting_permission'
-        : 'idle';
-      els.stateLabel.textContent = state || 'Idle';
-      if (els.avatar.dataset.state === 'speaking') startLip(); else stopLip();
+    /* —— White emission particle core (Jarvis HUD) —— */
+    const core = { particles: [], raf: 0, w: 0, h: 0, ctx: null };
+    const aura = { particles: [], raf: 0, w: 0, h: 0, ctx: null };
+
+    function resizeCanvases() {
+      const orb = document.getElementById('orb');
+      const wrap = els.orbWrap;
+      if (orb && els.coreCanvas) {
+        const r = orb.getBoundingClientRect();
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+        core.w = Math.max(1, Math.floor(r.width));
+        core.h = Math.max(1, Math.floor(r.height));
+        els.coreCanvas.width = core.w * dpr;
+        els.coreCanvas.height = core.h * dpr;
+        core.ctx = els.coreCanvas.getContext('2d');
+        core.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        seedCoreParticles();
+      }
+      if (wrap && els.auraCanvas) {
+        const r = wrap.getBoundingClientRect();
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+        aura.w = Math.max(1, Math.floor(r.width * 1.16));
+        aura.h = Math.max(1, Math.floor(r.height * 1.16));
+        els.auraCanvas.width = aura.w * dpr;
+        els.auraCanvas.height = aura.h * dpr;
+        els.auraCanvas.style.width = aura.w + 'px';
+        els.auraCanvas.style.height = aura.h + 'px';
+        aura.ctx = els.auraCanvas.getContext('2d');
+        aura.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        seedAuraParticles();
+      }
     }
 
-    function startLip() {
-      speaking = true;
-      stopLip();
-      lipTimer = setInterval(() => {
-        const open = 8 + Math.random() * 18;
-        els.mouth.style.height = open + 'px';
-      }, 80);
-    }
-    function stopLip() {
-      speaking = false;
-      if (lipTimer) clearInterval(lipTimer);
-      lipTimer = null;
-      els.mouth.style.height = '10px';
+    function seedCoreParticles() {
+      const n = 720;
+      const cx = core.w / 2, cy = core.h / 2;
+      const maxR = Math.min(cx, cy) * 0.96;
+      core.particles = [];
+      for (let i = 0; i < n; i++) {
+        const a = Math.random() * Math.PI * 2;
+        // bias toward rim for bright white emission ring
+        const rimBias = Math.pow(Math.random(), 0.35);
+        const rr = rimBias * maxR;
+        core.particles.push({
+          x: cx + Math.cos(a) * rr,
+          y: cy + Math.sin(a) * rr,
+          vx: (Math.random() - 0.5) * 0.28,
+          vy: (Math.random() - 0.5) * 0.28,
+          r: 0.45 + Math.random() * 1.65,
+          a: 0.4 + Math.random() * 0.6,
+          bright: Math.random() > 0.55,
+        });
+      }
     }
 
-    function pushActivity(items) {
+    function seedAuraParticles() {
+      const n = 140;
+      const cx = aura.w / 2, cy = aura.h / 2;
+      const inner = Math.min(cx, cy) * 0.64;
+      const outer = Math.min(cx, cy) * 0.99;
+      aura.particles = [];
+      for (let i = 0; i < n; i++) {
+        const a = Math.random() * Math.PI * 2;
+        const rr = inner + Math.random() * (outer - inner);
+        aura.particles.push({
+          x: cx + Math.cos(a) * rr,
+          y: cy + Math.sin(a) * rr,
+          vx: (Math.random() - 0.5) * 0.15,
+          vy: (Math.random() - 0.5) * 0.15,
+          r: 0.4 + Math.random() * 1.5,
+          a: 0.12 + Math.random() * 0.5,
+        });
+      }
+    }
+
+    function tickCore() {
+      if (!core.ctx || !core.w) return;
+      const ctx = core.ctx;
+      const cx = core.w / 2, cy = core.h / 2;
+      const maxR = Math.min(cx, cy) * 0.96;
+      const boost = 1 + energyBoost;
+      ctx.clearRect(0, 0, core.w, core.h);
+      const g = ctx.createRadialGradient(cx, cy, maxR * 0.05, cx, cy, maxR);
+      g.addColorStop(0, 'rgba(255,255,255,0.06)');
+      g.addColorStop(0.45, 'rgba(184,244,255,0.07)');
+      g.addColorStop(0.82, 'rgba(117,213,227,0.05)');
+      g.addColorStop(1, 'rgba(5,10,16,0)');
+      ctx.fillStyle = g;
+      ctx.fillRect(0, 0, core.w, core.h);
+      for (const p of core.particles) {
+        p.x += p.vx * boost;
+        p.y += p.vy * boost;
+        const dx = p.x - cx, dy = p.y - cy;
+        const d = Math.sqrt(dx * dx + dy * dy) || 1;
+        if (d > maxR) {
+          const a = Math.random() * Math.PI * 2;
+          const rr = Math.pow(Math.random(), 0.35) * maxR;
+          p.x = cx + Math.cos(a) * rr;
+          p.y = cy + Math.sin(a) * rr;
+        }
+        p.vx += (-dy / d) * 0.0035 * boost;
+        p.vy += (dx / d) * 0.0035 * boost;
+        p.vx *= 0.992; p.vy *= 0.992;
+        const rim = Math.min(1, d / maxR);
+        const alpha = p.a * (0.35 + rim * 0.7) * (0.8 + energyBoost * 0.45);
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r * (0.95 + energyBoost * 0.4), 0, Math.PI * 2);
+        ctx.fillStyle = p.bright
+          ? `rgba(255,255,255,${Math.min(1, alpha)})`
+          : `rgba(210,242,255,${Math.min(0.95, alpha * 0.9)})`;
+        ctx.fill();
+      }
+      // bright white rim emission
+      ctx.beginPath();
+      ctx.arc(cx, cy, maxR * 0.985, 0, Math.PI * 2);
+      ctx.strokeStyle = `rgba(255,255,255,${0.45 + energyBoost * 0.4})`;
+      ctx.lineWidth = 1.8 + energyBoost * 1.2;
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.arc(cx, cy, maxR * 0.97, 0, Math.PI * 2);
+      ctx.strokeStyle = `rgba(180,235,255,${0.25 + energyBoost * 0.2})`;
+      ctx.lineWidth = 4 + energyBoost;
+      ctx.stroke();
+      // gentle energy decay
+      if (energyBoost > 0 && els.orbWrap.dataset.state !== 'speaking') {
+        energyBoost = Math.max(0, energyBoost - 0.012);
+      }
+      core.raf = requestAnimationFrame(tickCore);
+    }
+
+    function tickAura() {
+      if (!aura.ctx || !aura.w) return;
+      const ctx = aura.ctx;
+      const cx = aura.w / 2, cy = aura.h / 2;
+      const inner = Math.min(cx, cy) * 0.58;
+      const outer = Math.min(cx, cy) * 0.99;
+      ctx.clearRect(0, 0, aura.w, aura.h);
+      for (const p of aura.particles) {
+        p.x += p.vx;
+        p.y += p.vy;
+        const dx = p.x - cx, dy = p.y - cy;
+        const d = Math.sqrt(dx * dx + dy * dy) || 1;
+        if (d < inner || d > outer) {
+          const a = Math.random() * Math.PI * 2;
+          const rr = inner + Math.random() * (outer - inner);
+          p.x = cx + Math.cos(a) * rr;
+          p.y = cy + Math.sin(a) * rr;
+        }
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(180,235,255,${p.a})`;
+        ctx.fill();
+      }
+      aura.raf = requestAnimationFrame(tickAura);
+    }
+
+    function startHud() {
+      resizeCanvases();
+      cancelAnimationFrame(core.raf);
+      cancelAnimationFrame(aura.raf);
+      tickCore();
+      tickAura();
+    }
+
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const isLocal = /^(localhost|127\.0\.0\.1)$/i.test(location.hostname);
+
+    function setState(state, presenceMode) {
+      const s = String(state || 'idle').toLowerCase();
+      let mode = 'idle';
+      if (muted) mode = 'muted';
+      else if (s.includes('speak')) mode = 'speaking';
+      else if (s.includes('think') || s.includes('understand') || s.includes('generat') || s.includes('plan') || s.includes('transcrib') || s.includes('remember')) mode = 'thinking';
+      else if (s.includes('listen') || alwaysOn) mode = 'listening';
+      else if (s.includes('permission')) mode = 'waiting_permission';
+      else if (['attentive','curious','focused','concerned','excited','confused','waiting','explaining','silent_listening'].includes(s)) {
+        mode = (s === 'excited' || s === 'explaining') ? 'speaking' : (s === 'silent_listening' || s === 'attentive' ? 'listening' : 'thinking');
+      }
+      els.orbWrap.dataset.state = mode;
+      if (presenceMode) els.orbWrap.dataset.presence = String(presenceMode).toLowerCase();
+      else if (s && s !== mode) els.orbWrap.dataset.presence = s;
+      const presenceLabel = (els.orbWrap.dataset.presence || mode || state || 'Idle').replace(/_/g, ' ');
+      els.stateLabel.textContent = muted ? 'MUTED' : (alwaysOn && mode === 'listening' && !els.orbWrap.dataset.presence ? 'ALWAYS LISTENING' : presenceLabel.toUpperCase());
+      els.statusRow.dataset.mode = muted ? 'muted' : '';
+      els.wave.classList.toggle('on', mode === 'listening' || mode === 'speaking');
+      els.livePill.classList.toggle('on', alwaysOn && !muted);
+      if (mode === 'speaking') startEnergy(); else if (mode !== 'listening') stopEnergy();
+      else energyBoost = Math.max(energyBoost, 0.25);
+    }
+
+    function startEnergy() {
+      energyBoost = 1.2;
+    }
+    function stopEnergy() {
+      /* decay handled in tickCore */
+      if (energyBoost < 0.35) energyBoost = 0.35;
+    }
+
+    window.addEventListener('resize', resizeCanvases);
+    startHud();
+
+    function showActivity(items) {
       if (!items || !items.length) return;
-      els.activity.textContent = items.join(' · ');
-      const line = document.createElement('div');
-      line.textContent = items.join(' → ');
-      els.timeline.prepend(line);
+      els.activity.textContent = items.slice(0, 6).map((x) => '✓ ' + String(x)).join('  ');
     }
 
-    async function api(path, opts={}) {
+    function showMicBlocked(reason) {
+      alwaysOn = false;
+      els.btnEnable.classList.remove('hidden');
+      els.livePill.classList.remove('on');
+      els.micHelp.classList.add('show');
+      els.micHelpBody.innerHTML =
+        '<ol>' +
+        '<li>Open in <strong>Chrome</strong> or <strong>Safari</strong>:<br><code>' + location.href + '</code></li>' +
+        '<li>Allow microphone when asked (only once)</li>' +
+        '<li>macOS: System Settings → Privacy &amp; Security → Microphone → enable browser</li>' +
+        '</ol>' +
+        (reason ? '<p style="margin:8px 0 0">Detail: <code>' + reason + '</code></p>' : '');
+      els.activity.textContent = 'Need microphone once — then OM stays open';
+      setState('IDLE');
+    }
+
+    function hideMicHelp() { els.micHelp.classList.remove('show'); }
+
+    async function api(path, opts = {}) {
       const res = await fetch('/api/companion' + path, {
-        headers: { 'Content-Type': 'application/json', ...(opts.headers||{}) },
+        headers: { 'Content-Type': 'application/json', ...(opts.headers || {}) },
         ...opts,
       });
       if (!res.ok) throw new Error(await res.text());
       return res.json();
     }
 
+    async function ensureMicPermission() {
+      if (!window.isSecureContext && !isLocal) {
+        showMicBlocked('insecure-context');
+        throw new Error('insecure');
+      }
+      if (!navigator.mediaDevices?.getUserMedia) {
+        showMicBlocked('getUserMedia-unavailable');
+        throw new Error('no-media');
+      }
+      if (micReady && micStream?.active) return micStream;
+      try {
+        if (micStream) micStream.getTracks().forEach((t) => t.stop());
+        micStream = await navigator.mediaDevices.getUserMedia({
+          audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true },
+        });
+        micReady = true;
+        hideMicHelp();
+        startBargeMonitor(micStream);
+        return micStream;
+      } catch (err) {
+        micReady = false;
+        showMicBlocked(err?.name || err?.message || 'not-allowed');
+        throw err;
+      }
+    }
+
+    function startBargeMonitor(stream) {
+      try {
+        if (bargeCtx) return;
+        bargeCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const src = bargeCtx.createMediaStreamSource(stream);
+        bargeAnalyser = bargeCtx.createAnalyser();
+        bargeAnalyser.fftSize = 512;
+        src.connect(bargeAnalyser);
+        const data = new Uint8Array(bargeAnalyser.frequencyBinCount);
+        const tick = () => {
+          bargeRaf = requestAnimationFrame(tick);
+          if (!speaking || muted || busy) return;
+          bargeAnalyser.getByteTimeDomainData(data);
+          let sum = 0;
+          for (let i = 0; i < data.length; i++) {
+            const v = (data[i] - 128) / 128;
+            sum += v * v;
+          }
+          const rms = Math.sqrt(sum / data.length);
+          const now = performance.now();
+          // User starts talking over OM → barge-in
+          if (rms > 0.08 && now - lastBargeAt > 900) {
+            lastBargeAt = now;
+            stopSpeakingLocal();
+            setState('INTERRUPTED');
+            scheduleListen(80);
+          }
+        };
+        tick();
+      } catch (_) {}
+    }
+
     async function startSession() {
       const data = await api('/session', { method: 'POST', body: '{}' });
       sessionId = data.session_id;
-      setState((data.status && data.status.status) || 'READY');
-      pushActivity(['Session ready']);
-    }
-
-    async function sendText(text) {
-      setState('UNDERSTANDING');
-      const data = await api('/message', {
-        method: 'POST',
-        body: JSON.stringify({ text, session_id: sessionId }),
-      });
-      if (data.activities) pushActivity(data.activities);
-      if (data.answer) {
-        els.reply.textContent = '“' + data.answer + '”';
-        setState(data.state || 'SPEAKING');
-        setTimeout(() => setState(data.state || 'LISTENING'), 1200);
-      } else if (data.waiting_for_wake) {
-        setState('LISTENING_FOR_WAKE_WORD');
-        els.reply.textContent = 'Listening for “Hey OM”…';
+      if (data.greeting) {
+        els.reply.textContent = data.greeting;
+        pendingGreeting = data.greeting;
       }
       return data;
     }
 
-    document.getElementById('btnStart').onclick = () => startSession().catch(e => alert(e.message));
-    document.getElementById('btnMute').onclick = async () => {
-      muted = !muted;
-      await api(muted ? '/mute' : '/unmute', { method: 'POST', body: '{}' });
-      document.getElementById('btnMute').textContent = muted ? 'Unmute' : 'Mute';
-      setState(muted ? 'MUTED' : 'LISTENING');
+    function stopSpeakingLocal() {
+      speaking = false;
+      if (window.speechSynthesis) window.speechSynthesis.cancel();
+      if (audioEl) { try { audioEl.pause(); } catch (_) {} audioEl = null; }
+      api('/interrupt', { method: 'POST', body: '{}' }).catch(() => {});
+    }
+
+    function scheduleListen(ms = 250) {
+      if (restartTimer) clearTimeout(restartTimer);
+      restartTimer = setTimeout(() => {
+        if (alwaysOn && !muted && !busy && !speaking) startListening(true);
+      }, ms);
+    }
+
+    async function speak(text) {
+      const say = String(text || '').trim();
+      if (!say || muted) {
+        setState('LISTENING');
+        scheduleListen(200);
+        return;
+      }
+      stopSpeakingLocal();
+      speaking = true;
+      setState('SPEAKING');
+      // Keep recognition alive for barge-in where possible
+      try {
+        const res = await fetch('/api/companion/tts', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text: say }),
+        });
+        if (res.ok) {
+          const blob = await res.blob();
+          const url = URL.createObjectURL(blob);
+          audioEl = new Audio(url);
+          // Calm Jarvis playback — slightly under 1.0 feels less "read aloud"
+          audioEl.playbackRate = 0.88;
+          audioEl.preservesPitch = true;
+          await new Promise((resolve, reject) => {
+            audioEl.onended = resolve;
+            audioEl.onerror = reject;
+            audioEl.play().catch(reject);
+          });
+          URL.revokeObjectURL(url);
+          speaking = false;
+          setState('LISTENING');
+          scheduleListen(350);
+          return;
+        }
+      } catch (_) {}
+
+      if (window.speechSynthesis) {
+        await new Promise((resolve) => {
+          const u = new SpeechSynthesisUtterance(say.replace(/\[\[slnc\s+\d+\]\]/gi, ' … '));
+          u.rate = 0.78;
+          u.pitch = 0.88;
+          const voices = speechSynthesis.getVoices();
+          const preferred =
+            voices.find(v => /daniel/i.test(v.name)) ||
+            voices.find(v => /en-GB/i.test(v.lang) && /male|daniel|oliver|arthur/i.test(v.name)) ||
+            voices.find(v => /en-GB/i.test(v.lang)) ||
+            voices.find(v => /rishi|moira|samantha/i.test(v.name)) ||
+            voices.find(v => /^en/i.test(v.lang));
+          if (preferred) u.voice = preferred;
+          u.onend = resolve;
+          u.onerror = resolve;
+          speechSynthesis.speak(u);
+        });
+      }
+      speaking = false;
+      setState('LISTENING');
+      scheduleListen(200);
+    }
+
+    async function handleTurn(text) {
+      const q = String(text || '').trim();
+      if (!q || busy) return;
+      // Ignore tiny noise fragments
+      if (q.length < 2) return;
+      busy = true;
+      stopSpeakingLocal();
+      els.heard.textContent = 'You said: ' + q;
+      if (els.feeling) els.feeling.textContent = '';
+      setState('UNDERSTANDING');
+      try {
+        if (!sessionId) await startSession();
+        const data = await api('/message', {
+          method: 'POST',
+          body: JSON.stringify({ text: q, session_id: sessionId, speak: true }),
+        });
+        if (data.activities) showActivity(data.activities);
+        if (data.memory_line && els.memoryLine) {
+          els.memoryLine.textContent = 'Memory · ' + data.memory_line;
+        } else if (data.human_memory && els.memoryLine) {
+          const proj = (((data.human_memory || {}).projects || {}).active)
+            || (((data.human_memory || {}).semantic || {}).active_project)
+            || 'OM AI';
+          els.memoryLine.textContent = 'Memory · You are working on ' + proj;
+        }
+        if (data.heard) els.heard.textContent = 'You said: ' + data.heard;
+        if (els.feeling && (data.feeling || (data.affect && data.affect.label))) {
+          const feel = data.feeling || data.affect.label;
+          els.feeling.textContent = 'Feeling · ' + String(feel).replace(/_/g, ' ');
+        }
+        const presenceMode = (data.presence && data.presence.mode) || data.state || '';
+        if (presenceMode) setState(presenceMode, presenceMode);
+        if (data.permission && data.permission.requires_approval) {
+          pendingPermissionId = data.permission.permission_id;
+          const ask = data.spoken || data.answer || data.permission.prompt || 'Do you want me to allow that?';
+          els.permText.textContent = ask;
+          els.permBox.classList.add('show');
+          els.reply.textContent = ask;
+          setState('WAITING_FOR_PERMISSION');
+          await speak(data.spoken_tts || ask);
+          return;
+        }
+        els.permBox.classList.remove('show');
+        pendingPermissionId = null;
+        const answer = data.spoken || data.answer || '';
+        const display = String(answer).replace(/\[\[slnc\s+\d+\]\]/gi, ' ').replace(/\s+/g, ' ').trim();
+        if (display) {
+          els.reply.textContent = display;
+          await speak(data.spoken_tts || answer);
+        } else {
+          setState('LISTENING');
+          scheduleListen(150);
+        }
+      } catch (err) {
+        els.reply.textContent = 'I missed that — say it again.';
+        setState('ERROR');
+        console.error(err);
+        scheduleListen(400);
+      } finally {
+        busy = false;
+      }
+    }
+
+    function ensureRecognition() {
+      if (!SpeechRecognition) return null;
+      if (recognition) return recognition;
+      recognition = new SpeechRecognition();
+      recognition.continuous = true;      // always-on
+      recognition.interimResults = true;
+      // en-IN: English + Hinglish. Forced hi-IN turns English into Devanagari phonetics
+      // (e.g. "what are you doing" → "व्हाट आर यू डूइंग") and breaks replies.
+      const nav = (navigator.language || '').toLowerCase();
+      recognition.lang = nav.startsWith('hi') ? 'hi-IN' : 'en-IN';
+      recognition.maxAlternatives = 3;
+
+      recognition.onstart = () => {
+        listening = true;
+        setState('LISTENING');
+        els.activity.textContent = 'Speak anytime — no click needed';
+      };
+
+      recognition.onresult = (event) => {
+        let interim = '';
+        let finalText = '';
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+          // Prefer Latin transcript if alternatives include English (hi-IN quirk)
+          let chunk = event.results[i][0].transcript;
+          if (event.results[i].length > 1) {
+            for (let a = 0; a < event.results[i].length; a++) {
+              const alt = event.results[i][a].transcript || '';
+              if (/[A-Za-z]/.test(alt) && !/[\u0900-\u097F]/.test(alt)) {
+                chunk = alt;
+                break;
+              }
+            }
+          }
+          if (event.results[i].isFinal) finalText += chunk;
+          else interim += chunk;
+        }
+        if (interim) els.heard.textContent = interim;
+        if (finalText && !busy) {
+          // If OM is speaking, barge-in
+          if (speaking) stopSpeakingLocal();
+          handleTurn(finalText);
+        }
+      };
+
+      recognition.onerror = (e) => {
+        listening = false;
+        if (e.error === 'not-allowed' || e.error === 'service-not-allowed') {
+          showMicBlocked(e.error);
+          return;
+        }
+        // no-speech / aborted are normal in continuous mode — keep going
+        if (alwaysOn && !muted && e.error !== 'aborted') {
+          scheduleListen(400);
+        }
+      };
+
+      recognition.onend = () => {
+        listening = false;
+        // Instantly reopen ears — Jarvis style
+        if (alwaysOn && !muted) scheduleListen(120);
+      };
+      return recognition;
+    }
+
+    async function startListening(silent) {
+      if (!alwaysOn || muted || busy) return;
+      try {
+        await ensureMicPermission();
+      } catch (_) {
+        return;
+      }
+      const rec = ensureRecognition();
+      if (!rec) {
+        els.activity.textContent = 'This browser has no speech engine — use Chrome or Safari';
+        return;
+      }
+      try {
+        if (!listening) rec.start();
+        if (!silent) setState('LISTENING');
+      } catch (_) {
+        // InvalidStateError if already started
+        scheduleListen(500);
+      }
+    }
+
+    function stopListening() {
+      if (restartTimer) clearTimeout(restartTimer);
+      if (recognition) {
+        try { recognition.onend = null; recognition.stop(); } catch (_) {}
+        // rebind onend for next create
+        recognition = null;
+      }
+      listening = false;
+    }
+
+    async function enableAlwaysOn() {
+      try {
+        await ensureMicPermission();
+        alwaysOn = true;
+        els.btnEnable.classList.add('hidden');
+        els.privacyHint.textContent = 'Always listening · just speak';
+        els.livePill.classList.add('on');
+        hideMicHelp();
+        if (pendingGreeting) {
+          const g = pendingGreeting;
+          pendingGreeting = null;
+          await speak(g);
+        } else {
+          els.reply.textContent = 'I’m listening. Talk to me anytime.';
+          await startListening();
+        }
+      } catch (_) {}
+    }
+
+    async function micAlreadyGranted() {
+      try {
+        if (!navigator.permissions?.query) return false;
+        const st = await navigator.permissions.query({ name: 'microphone' });
+        return st.state === 'granted';
+      } catch (_) {
+        return false;
+      }
+    }
+
+    document.getElementById('btnEnable').onclick = () => enableAlwaysOn();
+
+    document.getElementById('btnYes').onclick = async () => {
+      if (!pendingPermissionId) return;
+      const data = await api('/permissions/' + pendingPermissionId + '/approve', { method: 'POST', body: '{}' });
+      els.permBox.classList.remove('show');
+      els.reply.textContent = data.answer || 'Done.';
+      await speak(data.answer || 'Done.');
     };
-    document.getElementById('btnInterrupt').onclick = () => api('/interrupt', { method: 'POST', body: '{}' }).then(() => setState('INTERRUPTED'));
-    document.getElementById('btnMemory').onclick = async () => {
-      const m = await api('/memory');
-      alert(JSON.stringify(m, null, 2).slice(0, 1800));
-    };
-    document.getElementById('btnPerms').onclick = async () => {
-      const p = await api('/permissions');
-      alert(JSON.stringify(p, null, 2));
-    };
-    els.form.onsubmit = async (e) => {
-      e.preventDefault();
-      const text = els.input.value.trim();
-      if (!text) return;
-      els.input.value = '';
-      if (!sessionId) await startSession();
-      try { await sendText(text); } catch (err) { alert(err.message); }
+    document.getElementById('btnNo').onclick = async () => {
+      if (!pendingPermissionId) return;
+      const data = await api('/permissions/' + pendingPermissionId + '/deny', { method: 'POST', body: '{}' });
+      els.permBox.classList.remove('show');
+      els.reply.textContent = data.answer || 'Cancelled.';
+      await speak(data.answer || 'Cancelled.');
     };
 
-    // Autostart text session
-    startSession().catch(() => setState('ERROR'));
+    // Boot: if mic already allowed, go always-on with zero click
+    startSession()
+      .then(async () => {
+        const granted = await micAlreadyGranted();
+        if (granted) {
+          els.btnEnable.classList.add('hidden');
+          await enableAlwaysOn();
+        } else {
+          setState('READY');
+          els.reply.textContent = 'One Allow for the mic — then I stay open. No more clicking.';
+          els.activity.textContent = 'Required once by the browser, then always listening';
+          els.btnEnable.textContent = 'Enable always-on listening';
+        }
+      })
+      .catch((e) => {
+        setState('ERROR');
+        els.reply.textContent = 'Open http://127.0.0.1:8765/companion in Chrome/Safari';
+        els.activity.textContent = String(e.message || e);
+      });
   </script>
 </body>
 </html>
