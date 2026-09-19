@@ -2,18 +2,11 @@
 OM Voice Presence Engine
 
 Dynamic spoken conversation layer.
-
-No hardcoded conversation replies.
-
-Responsibilities:
-- Detect language
-- Detect emotion (style signal only)
-- Apply OM personality (system prompt for the brain)
-- Convert brain text response for voice
-- Prepare TTS style
+Never speak internal agent / pipeline chrome.
 """
 from __future__ import annotations
 
+import re
 from typing import Any
 
 from .conversation_presence import ConversationPresence
@@ -24,6 +17,18 @@ from .response_adapter import ResponseAdapter
 from .speech_style import SpeechStyle
 
 _ENGINE: VoicePresenceEngine | None = None
+
+_INTERNAL_LEAK = re.compile(
+    r"(?is)("
+    r"agent\s*\[|agent\s*goal\s*\[|collaboration\s*:|"
+    r"knowledge investigation required|retrieve context|"
+    r"retrieve information|research:\s*knowledge|"
+    r"\[layered\]|\[decision\]|\[workflow\]|"
+    r"self-critique|pipeline trace|om-ai brain power|"
+    r"heuristic foundation path|context_blob|"
+    r"trace_id|internal_context|stage[s]?\s*:"
+    r")"
+)
 
 
 class VoicePresenceEngine:
@@ -49,17 +54,17 @@ class VoicePresenceEngine:
         personality = self.personality.profile(context)
         presence = self.presence.on_user(emotion)
 
+        cleaned = strip_internal_chrome(response)
         adapted = self.adapter.adapt(
-            response,
+            cleaned,
             locale=locale,
             emotion=emotion,
             personality=personality,
         )
         spoken = adapted["spoken"]
 
-        # Soft fail-safe only when brain produced nothing usable — not a mini chatbot
         if is_garbage_spoken(spoken):
-            spoken = soft_listening_fallback(locale=locale)
+            spoken = soft_listening_fallback(locale=locale, user_message=user_message)
             adapted = self.adapter.adapt(
                 spoken,
                 locale=locale,
@@ -95,8 +100,6 @@ def get_voice_presence() -> VoicePresenceEngine:
     return _ENGINE
 
 
-# —— Back-compat helpers used across companion runtime / API ——
-
 def normalize_heard_text(text: str) -> str:
     return get_voice_presence().language.normalize_heard(text)
 
@@ -121,7 +124,6 @@ def shape_for_speech(
     """Adapt brain answer for speech (controller entry used by routes/runtime)."""
     pack = get_voice_presence().analyze(user_message, answer)
     spoken = str(pack.get("spoken") or "")
-    # Honor legacy length caps without inventing new content
     if max_chars and len(spoken) > max_chars:
         spoken = spoken[: max_chars - 1].rsplit(" ", 1)[0]
         if spoken and spoken[-1] not in ".!?।":
@@ -137,9 +139,37 @@ def social_spoken_reply(user_message: str) -> str | None:
     return None
 
 
+def strip_internal_chrome(text: str) -> str:
+    """Remove agent / pipeline dump lines from a reply."""
+    t = (text or "").strip()
+    if not t:
+        return ""
+    if _INTERNAL_LEAK.search(t):
+        # Drop whole dump — never read internal agent notes aloud
+        return ""
+    # Strip leftover debug prefixes if mixed into a longer reply
+    lines = []
+    for line in t.splitlines():
+        low = line.strip().lower()
+        if not low:
+            continue
+        if low.startswith(("agent[", "agent goal[", "collaboration:", "routing →")):
+            continue
+        if "knowledge investigation required" in low:
+            continue
+        if "retrieve context" in low or "retrieve information" in low:
+            continue
+        lines.append(line.strip())
+    return " ".join(lines).strip()
+
+
 def is_garbage_spoken(answer: str) -> bool:
     low = (answer or "").strip().lower()
     if not low:
+        return True
+    if _INTERNAL_LEAK.search(low):
+        return True
+    if low.count("agent[") >= 1:
         return True
     bad = (
         "rephrase",
@@ -164,6 +194,12 @@ def is_garbage_spoken(answer: str) -> bool:
         "couldn't understand that message",
         "couldn’t understand that message",
         "please ask again",
+        "plain-language explanation",
+        "best understood by",
+        "ask for a deeper dive",
+        "knowledge investigation required",
+        "retrieve context",
+        "retrieve information",
     )
     if any(b in low for b in bad):
         return True
@@ -173,13 +209,19 @@ def is_garbage_spoken(answer: str) -> bool:
 
 
 def soft_listening_fallback(*, locale: str = "en", user_message: str = "") -> str:
-    """Minimal presence when the brain returns unusable text — not intent matching."""
-    if locale == "hi":
-        return rescue_spoken(user_message)
-    return rescue_spoken(user_message)
+    """Minimal presence when the brain returns unusable text — not a script bank."""
+    q = (user_message or "").strip().lower()
+    if locale == "hi" or any(ch for ch in q if "\u0900" <= ch <= "\u097F"):
+        if any(w in q for w in ("ruk", "stop", "band", "cancel")):
+            return "Theek hai — ruk gaya."
+        return "Haan, boliye."
+    if any(w in q for w in ("stop", "cancel", "quiet", "enough", "mute")):
+        return "Okay — stopped."
+    return "I'm here."
 
 
 def rescue_spoken(user_message: str, bad_answer: str = "") -> str:
-    """Legacy name — soft listening fallback only (no keyword conversation)."""
+    """Soft listening fallback when spoken text is unusable."""
+    del bad_answer
     locale = detect_speech_locale(user_message)
-    return soft_listening_fallback(locale=locale)
+    return soft_listening_fallback(locale=locale, user_message=user_message)

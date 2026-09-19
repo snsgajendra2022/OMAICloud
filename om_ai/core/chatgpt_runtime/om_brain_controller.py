@@ -68,30 +68,54 @@ class OMBrainController:
         except Exception as exc:
             meta["chat_intelligence"] = {"error": str(exc)}
 
-        # 2) Brain router (fusion/research/knowledge/agents)
-        stages.append("brain_router")
-        brain: dict[str, Any] = {}
-        try:
-            from om_ai.core.brain_router import run_om_brain_router
-
-            brain = run_om_brain_router(q, context={"history": history or [], **(extra or {})}) or {}
-            meta["brain_router"] = {
-                "models": brain.get("models"),
-                "research_used": brain.get("research_used"),
-                "knowledge_found": brain.get("knowledge_found"),
-            }
-        except Exception as exc:
-            meta["brain_router"] = {"error": str(exc)}
-
         extra_d = dict(extra or {})
         voice_mode = bool(extra_d.get("voice_mode") or extra_d.get("skip_canned_social"))
+
+        # 2) Brain router — text/dev path only. Voice never speaks agent dumps.
+        stages.append("brain_router")
+        brain: dict[str, Any] = {}
+        if not voice_mode:
+            try:
+                from om_ai.core.brain_router import run_om_brain_router
+
+                brain = run_om_brain_router(q, context={"history": history or [], **extra_d}) or {}
+                meta["brain_router"] = {
+                    "models": brain.get("models"),
+                    "research_used": brain.get("research_used"),
+                    "knowledge_found": brain.get("knowledge_found"),
+                }
+            except Exception as exc:
+                meta["brain_router"] = {"error": str(exc)}
+        else:
+            meta["brain_router"] = {"skipped": "voice_mode"}
+
         draft = str(chat.get("answer") or "").strip()
+        try:
+            from om_ai.core.companion_personality.voice_presence import (
+                is_garbage_spoken,
+                strip_internal_chrome,
+            )
+
+            draft = strip_internal_chrome(draft)
+            if is_garbage_spoken(draft):
+                draft = ""
+        except Exception:
+            pass
+
         if not voice_mode:
             sol = str((chat.get("solution") or {}).get("answer") or "").strip()
             if sol and (not draft or len(sol) > len(draft)):
                 draft = sol
-            if brain.get("context_blob") and not draft:
-                draft = str(brain.get("context_blob") or "")[:1500]
+            # Never promote agent context_blob to user-facing answer
+            fusion = ""
+            if isinstance(brain.get("fusion"), dict):
+                fusion = str((brain.get("fusion") or {}).get("answer") or "").strip()
+            if fusion and (not draft or len(fusion) > len(draft)):
+                draft = fusion
+            brain_ans = str(brain.get("answer") or "").strip()
+            if brain_ans and not draft:
+                draft = brain_ans
+
 
         # 3) Response Intelligence
         stages.append("response_intelligence")

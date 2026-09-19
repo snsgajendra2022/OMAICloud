@@ -211,19 +211,61 @@ class CompanionRuntime:
         self.context.trace_id = str(uuid.uuid4())
         self._emit("brain.started", {"text": (text or "")[:120]})
 
-        # Cancellation / stop commands
+        # Cancellation / stop commands — never run brain or TTS on these
         low = (text or "").strip().lower()
-        if low in {"stop", "cancel", "cancel that", "don't do that", "mute"}:
-            if low == "mute":
+        low = re.sub(r"[^\w\s']+", " ", low)
+        low = " ".join(low.split())
+        stop_phrases = {
+            "stop",
+            "cancel",
+            "cancel that",
+            "don't do that",
+            "dont do that",
+            "mute",
+            "quiet",
+            "enough",
+            "shut up",
+            "be quiet",
+            "ruk",
+            "ruko",
+            "ruk jao",
+            "band karo",
+            "band kar",
+            "chup",
+            "chup raho",
+            "bas",
+            "bas karo",
+        }
+        if low in stop_phrases or low.startswith("stop ") or low.startswith("cancel "):
+            if "mute" in low:
                 self.voice.mute()
-                return {"answer": "Muted.", "activities": ["Muted microphone"], "state": self.voice.state.value}
+                return {
+                    "answer": "Muted.",
+                    "spoken": "Muted.",
+                    "spoken_tts": "Muted.",
+                    "activities": ["Muted microphone"],
+                    "state": "MUTED",
+                    "speak_client": False,
+                    "interrupted": True,
+                }
             self.voice.interrupt_speech()
             if self.agents and hasattr(self.agents, "cancel"):
                 try:
                     self.agents.cancel()
                 except Exception:
                     pass
-            return {"answer": "Stopped.", "activities": ["Cancelled active work"], "state": self.voice.state.value}
+            msg = "Okay — stopped."
+            if any(w in low for w in ("ruk", "band", "chup", "bas")):
+                msg = "Theek hai — ruk gaya."
+            return {
+                "answer": msg,
+                "spoken": msg,
+                "spoken_tts": msg,
+                "activities": ["Cancelled"],
+                "state": "LISTENING",
+                "speak_client": False,
+                "interrupted": True,
+            }
 
         ingested = self.voice.ingest_text(text)
         if ingested.get("wake_only"):
@@ -261,16 +303,25 @@ class CompanionRuntime:
         spoken = str(brain_out.get("spoken") or answer).strip()
         spoken_tts = str(brain_out.get("spoken_tts") or spoken).strip()
 
-        # Brain already shaped speech. Rescue only if the spoken line is unusable.
+        # Brain already shaped speech. Never speak internal agent / pipeline chrome.
         try:
             from om_ai.core.companion_personality.voice_presence import (
                 is_garbage_spoken,
                 rescue_spoken,
+                strip_internal_chrome,
+                shape_for_speech,
             )
 
-            if is_garbage_spoken(spoken):
+            answer = strip_internal_chrome(answer)
+            spoken = strip_internal_chrome(spoken) or answer
+            if is_garbage_spoken(spoken) or is_garbage_spoken(answer):
                 spoken = rescue_spoken(user_text, spoken)
+                answer = spoken
                 spoken_tts = spoken
+            else:
+                pack = shape_for_speech(spoken, user_message=user_text)
+                spoken = str(pack.get("spoken") or spoken)
+                spoken_tts = str(pack.get("spoken_tts") or spoken)
                 answer = spoken
         except Exception:
             pass
@@ -324,6 +375,22 @@ class CompanionRuntime:
                 answer = str(os_pack["answer"])
                 spoken = str(os_pack.get("spoken") or answer)
                 spoken_tts = str(os_pack.get("spoken_tts") or spoken)
+            try:
+                from om_ai.core.companion_personality.voice_presence import (
+                    is_garbage_spoken,
+                    rescue_spoken,
+                    strip_internal_chrome,
+                )
+
+                answer = strip_internal_chrome(answer)
+                spoken = strip_internal_chrome(spoken) or answer
+                spoken_tts = strip_internal_chrome(spoken_tts) or spoken
+                if is_garbage_spoken(spoken) or is_garbage_spoken(answer):
+                    spoken = rescue_spoken(user_text, spoken)
+                    answer = spoken
+                    spoken_tts = spoken
+            except Exception:
+                pass
             presence_mode = str(
                 ((os_pack.get("presence") or {}).get("presence") or {}).get("mode") or ""
             )
@@ -520,14 +587,23 @@ class CompanionRuntime:
                 )
                 text = str(reply or "").strip()
                 try:
+                    from om_ai.core.companion_personality.voice_presence import (
+                        is_garbage_spoken,
+                        strip_internal_chrome,
+                    )
                     from om_ai.core.intelligence.real_answer import (
                         looks_like_static_reply,
                         build_real_answer,
                     )
 
-                    if (not text) or looks_like_static_reply(text):
+                    text = strip_internal_chrome(text)
+                    if (not text) or is_garbage_spoken(text) or looks_like_static_reply(text):
                         real = (build_real_answer(prompt) or "").strip()
-                        if real and not looks_like_static_reply(real):
+                        if (
+                            real
+                            and not is_garbage_spoken(real)
+                            and not looks_like_static_reply(real)
+                        ):
                             return real
                         return ""
                 except Exception:

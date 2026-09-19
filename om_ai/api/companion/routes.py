@@ -265,7 +265,11 @@ def companion_message(body: MessageBody) -> dict[str, Any]:
             rt.voice.interrupt_speech()
         except Exception:
             pass
-    out["speak_client"] = True
+    # Stop / interrupt turns must not re-trigger client TTS
+    if out.get("interrupted") or out.get("speak_client") is False or body.speak is False:
+        out["speak_client"] = False
+    else:
+        out["speak_client"] = True
     out["session_id"] = rt.context.session_id
     return out
 

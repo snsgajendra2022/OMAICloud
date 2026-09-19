@@ -71,7 +71,9 @@ _PIPELINE_DUMP = re.compile(
     r"passed:\s*true|score:\s*0\.|confidence:\s*0\.|"
     r"##\s+knowledge brain|##\s+connected systems|##\s+cross-lingual|"
     r"##\s+memory\b|\[layered\]|\[decision\]|\[workflow\]|"
-    r"om ai foundation sample|physics mechanics energy)"
+    r"om ai foundation sample|physics mechanics energy|"
+    r"agent\s*\[|agent\s*goal\s*\[|collaboration\s*:|"
+    r"knowledge investigation required|retrieve context|retrieve information)"
 )
 
 

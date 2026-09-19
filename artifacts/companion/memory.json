@@ -89,486 +89,6 @@
     ],
     "default:anon": [
       {
-        "id": "7bfe4b3bae154956",
-        "kind": "episodic",
-        "content": "delete this folder now",
-        "scope": "session",
-        "key": "default:anon",
-        "created_at": "2026-09-18T08:01:08.498357+00:00",
-        "updated_at": "2026-09-18T08:01:08.498358+00:00",
-        "tags": [
-          "turn",
-          "user"
-        ],
-        "sensitivity": "normal",
-        "source": "companion",
-        "meta": {
-          "intent": "chat",
-          "role": "user",
-          "confidence": 0.6
-        }
-      },
-      {
-        "id": "91ad02601c214823",
-        "kind": "episodic",
-        "content": "I want to help — could you rephrase that in one short sentence?",
-        "scope": "session",
-        "key": "default:anon",
-        "created_at": "2026-09-18T08:01:08.499068+00:00",
-        "updated_at": "2026-09-18T08:01:08.499069+00:00",
-        "tags": [
-          "turn",
-          "assistant"
-        ],
-        "sensitivity": "normal",
-        "source": "companion",
-        "meta": {
-          "intent": "chat",
-          "role": "assistant",
-          "confidence": 0.6
-        }
-      },
-      {
-        "id": "61dffe3e4d184cd3",
-        "kind": "episodic",
-        "content": "I'm working on the OM project.",
-        "scope": "session",
-        "key": "default:anon",
-        "created_at": "2026-09-18T08:01:11.478972+00:00",
-        "updated_at": "2026-09-18T08:01:11.478973+00:00",
-        "tags": [
-          "turn",
-          "user"
-        ],
-        "sensitivity": "normal",
-        "source": "companion",
-        "meta": {
-          "intent": "chat",
-          "role": "user",
-          "confidence": 0.6
-        }
-      },
-      {
-        "id": "556e0c1a4b024496",
-        "kind": "episodic",
-        "content": "I want to help — could you rephrase that in one short sentence?",
-        "scope": "session",
-        "key": "default:anon",
-        "created_at": "2026-09-18T08:01:11.479825+00:00",
-        "updated_at": "2026-09-18T08:01:11.479826+00:00",
-        "tags": [
-          "turn",
-          "assistant"
-        ],
-        "sensitivity": "normal",
-        "source": "companion",
-        "meta": {
-          "intent": "chat",
-          "role": "assistant",
-          "confidence": 0.6
-        }
-      },
-      {
-        "id": "69fed2e9a93f4353",
-        "kind": "episodic",
-        "content": "Open it.",
-        "scope": "session",
-        "key": "default:anon",
-        "created_at": "2026-09-18T08:01:11.481087+00:00",
-        "updated_at": "2026-09-18T08:01:11.481089+00:00",
-        "tags": [
-          "turn",
-          "user"
-        ],
-        "sensitivity": "normal",
-        "source": "companion",
-        "meta": {
-          "intent": "chat",
-          "role": "user",
-          "confidence": 0.6
-        }
-      },
-      {
-        "id": "736a98d26cd94a58",
-        "kind": "episodic",
-        "content": "I want to help — could you rephrase that in one short sentence?",
-        "scope": "session",
-        "key": "default:anon",
-        "created_at": "2026-09-18T08:01:11.481606+00:00",
-        "updated_at": "2026-09-18T08:01:11.481607+00:00",
-        "tags": [
-          "turn",
-          "assistant"
-        ],
-        "sensitivity": "normal",
-        "source": "companion",
-        "meta": {
-          "intent": "chat",
-          "role": "assistant",
-          "confidence": 0.6
-        }
-      },
-      {
-        "id": "b0800cb2b892453b",
-        "kind": "episodic",
-        "content": "I'm working on the OM project.",
-        "scope": "session",
-        "key": "default:anon",
-        "created_at": "2026-09-18T08:03:33.823095+00:00",
-        "updated_at": "2026-09-18T08:03:33.823096+00:00",
-        "tags": [
-          "turn",
-          "user"
-        ],
-        "sensitivity": "normal",
-        "source": "companion",
-        "meta": {
-          "intent": "chat",
-          "role": "user",
-          "confidence": 0.6
-        }
-      },
-      {
-        "id": "568911d287374d52",
-        "kind": "episodic",
-        "content": "I want to help — could you rephrase that in one short sentence?",
-        "scope": "session",
-        "key": "default:anon",
-        "created_at": "2026-09-18T08:03:33.823984+00:00",
-        "updated_at": "2026-09-18T08:03:33.823986+00:00",
-        "tags": [
-          "turn",
-          "assistant"
-        ],
-        "sensitivity": "normal",
-        "source": "companion",
-        "meta": {
-          "intent": "chat",
-          "role": "assistant",
-          "confidence": 0.6
-        }
-      },
-      {
-        "id": "facaa66fea5d4e52",
-        "kind": "episodic",
-        "content": "Open it.",
-        "scope": "session",
-        "key": "default:anon",
-        "created_at": "2026-09-18T08:03:33.903643+00:00",
-        "updated_at": "2026-09-18T08:03:33.903644+00:00",
-        "tags": [
-          "turn",
-          "user"
-        ],
-        "sensitivity": "normal",
-        "source": "companion",
-        "meta": {
-          "intent": "chat",
-          "role": "user",
-          "confidence": 0.6
-        }
-      },
-      {
-        "id": "5e52920eb8b144a5",
-        "kind": "episodic",
-        "content": "I want to help — could you rephrase that in one short sentence?",
-        "scope": "session",
-        "key": "default:anon",
-        "created_at": "2026-09-18T08:03:33.904255+00:00",
-        "updated_at": "2026-09-18T08:03:33.904256+00:00",
-        "tags": [
-          "turn",
-          "assistant"
-        ],
-        "sensitivity": "normal",
-        "source": "companion",
-        "meta": {
-          "intent": "chat",
-          "role": "assistant",
-          "confidence": 0.6
-        }
-      },
-      {
-        "id": "46e179ac321d4cc2",
-        "kind": "episodic",
-        "content": "delete this folder now",
-        "scope": "session",
-        "key": "default:anon",
-        "created_at": "2026-09-18T08:03:34.225014+00:00",
-        "updated_at": "2026-09-18T08:03:34.225015+00:00",
-        "tags": [
-          "turn",
-          "user"
-        ],
-        "sensitivity": "normal",
-        "source": "companion",
-        "meta": {
-          "intent": "chat",
-          "role": "user",
-          "confidence": 0.6
-        }
-      },
-      {
-        "id": "1cc44ef3fc2e4f58",
-        "kind": "episodic",
-        "content": "I want to help — could you rephrase that in one short sentence?",
-        "scope": "session",
-        "key": "default:anon",
-        "created_at": "2026-09-18T08:03:34.225773+00:00",
-        "updated_at": "2026-09-18T08:03:34.225774+00:00",
-        "tags": [
-          "turn",
-          "assistant"
-        ],
-        "sensitivity": "normal",
-        "source": "companion",
-        "meta": {
-          "intent": "chat",
-          "role": "assistant",
-          "confidence": 0.6
-        }
-      },
-      {
-        "id": "e17b9401c0cb4cdd",
-        "kind": "episodic",
-        "content": "hello",
-        "scope": "session",
-        "key": "default:anon",
-        "created_at": "2026-09-18T08:03:47.187495+00:00",
-        "updated_at": "2026-09-18T08:03:47.187496+00:00",
-        "tags": [
-          "turn",
-          "user"
-        ],
-        "sensitivity": "normal",
-        "source": "companion",
-        "meta": {
-          "intent": "greeting",
-          "role": "user",
-          "confidence": 0.97
-        }
-      },
-      {
-        "id": "14abc152ef1f4b6b",
-        "kind": "episodic",
-        "content": "Hi! Nice to meet you. What can I do for you?",
-        "scope": "session",
-        "key": "default:anon",
-        "created_at": "2026-09-18T08:03:47.188258+00:00",
-        "updated_at": "2026-09-18T08:03:47.188259+00:00",
-        "tags": [
-          "turn",
-          "assistant"
-        ],
-        "sensitivity": "normal",
-        "source": "companion",
-        "meta": {
-          "intent": "greeting",
-          "role": "assistant",
-          "confidence": 0.97
-        }
-      },
-      {
-        "id": "7e1bb5e5ed584192",
-        "kind": "episodic",
-        "content": "hi",
-        "scope": "session",
-        "key": "default:anon",
-        "created_at": "2026-09-18T08:03:47.207668+00:00",
-        "updated_at": "2026-09-18T08:03:47.207669+00:00",
-        "tags": [
-          "turn",
-          "user"
-        ],
-        "sensitivity": "normal",
-        "source": "companion",
-        "meta": {
-          "intent": "greeting",
-          "role": "user",
-          "confidence": 0.97
-        }
-      },
-      {
-        "id": "10a0faa4151b4516",
-        "kind": "episodic",
-        "content": "Hi! Nice to meet you. What can I do for you?",
-        "scope": "session",
-        "key": "default:anon",
-        "created_at": "2026-09-18T08:03:47.208351+00:00",
-        "updated_at": "2026-09-18T08:03:47.208352+00:00",
-        "tags": [
-          "turn",
-          "assistant"
-        ],
-        "sensitivity": "normal",
-        "source": "companion",
-        "meta": {
-          "intent": "greeting",
-          "role": "assistant",
-          "confidence": 0.97
-        }
-      },
-      {
-        "id": "3ad4405a406e419c",
-        "kind": "episodic",
-        "content": "good morning",
-        "scope": "session",
-        "key": "default:anon",
-        "created_at": "2026-09-18T08:03:47.215417+00:00",
-        "updated_at": "2026-09-18T08:03:47.215419+00:00",
-        "tags": [
-          "turn",
-          "user"
-        ],
-        "sensitivity": "normal",
-        "source": "companion",
-        "meta": {
-          "intent": "morning",
-          "role": "user",
-          "confidence": 0.97
-        }
-      },
-      {
-        "id": "c204d1909502474f",
-        "kind": "episodic",
-        "content": "Good morning! How can I help you today?",
-        "scope": "session",
-        "key": "default:anon",
-        "created_at": "2026-09-18T08:03:47.216313+00:00",
-        "updated_at": "2026-09-18T08:03:47.216314+00:00",
-        "tags": [
-          "turn",
-          "assistant"
-        ],
-        "sensitivity": "normal",
-        "source": "companion",
-        "meta": {
-          "intent": "morning",
-          "role": "assistant",
-          "confidence": 0.97
-        }
-      },
-      {
-        "id": "acfcd3943a884650",
-        "kind": "episodic",
-        "content": "delete this folder now",
-        "scope": "session",
-        "key": "default:anon",
-        "created_at": "2026-09-18T08:03:47.517003+00:00",
-        "updated_at": "2026-09-18T08:03:47.517004+00:00",
-        "tags": [
-          "turn",
-          "user"
-        ],
-        "sensitivity": "normal",
-        "source": "companion",
-        "meta": {
-          "intent": "chat",
-          "role": "user",
-          "confidence": 0.6
-        }
-      },
-      {
-        "id": "87f2fa574e974465",
-        "kind": "episodic",
-        "content": "I want to help — could you rephrase that in one short sentence?",
-        "scope": "session",
-        "key": "default:anon",
-        "created_at": "2026-09-18T08:03:47.517672+00:00",
-        "updated_at": "2026-09-18T08:03:47.517674+00:00",
-        "tags": [
-          "turn",
-          "assistant"
-        ],
-        "sensitivity": "normal",
-        "source": "companion",
-        "meta": {
-          "intent": "chat",
-          "role": "assistant",
-          "confidence": 0.6
-        }
-      },
-      {
-        "id": "a0848f8f35554576",
-        "kind": "episodic",
-        "content": "hey om",
-        "scope": "session",
-        "key": "default:anon",
-        "created_at": "2026-09-18T08:14:10.891279+00:00",
-        "updated_at": "2026-09-18T08:14:10.891281+00:00",
-        "tags": [
-          "turn",
-          "user"
-        ],
-        "sensitivity": "normal",
-        "source": "companion",
-        "meta": {
-          "intent": "greeting",
-          "role": "user",
-          "confidence": 0.97
-        }
-      },
-      {
-        "id": "e889ee389dc04d2b",
-        "kind": "episodic",
-        "content": "Hello! I'm OM. How can I help you today?",
-        "scope": "session",
-        "key": "default:anon",
-        "created_at": "2026-09-18T08:14:10.893175+00:00",
-        "updated_at": "2026-09-18T08:14:10.893176+00:00",
-        "tags": [
-          "turn",
-          "assistant"
-        ],
-        "sensitivity": "normal",
-        "source": "companion",
-        "meta": {
-          "intent": "greeting",
-          "role": "assistant",
-          "confidence": 0.97
-        }
-      },
-      {
-        "id": "aa1fd444d8f14ef6",
-        "kind": "episodic",
-        "content": "what is the new task today to work you",
-        "scope": "session",
-        "key": "default:anon",
-        "created_at": "2026-09-18T08:14:24.105347+00:00",
-        "updated_at": "2026-09-18T08:14:24.105348+00:00",
-        "tags": [
-          "turn",
-          "user"
-        ],
-        "sensitivity": "normal",
-        "source": "companion",
-        "meta": {
-          "intent": "explain",
-          "role": "user",
-          "confidence": 0.84
-        }
-      },
-      {
-        "id": "76e82e3f0e794e64",
-        "kind": "episodic",
-        "content": "**the new task today to work you** — plain-language explanation\n\nthe new task today to work you is best understood by: (1) what it is, (2) why people use it, (3) a simple example.\n\nAsk for a deeper dive, analogy, or code sample if you want more.",
-        "scope": "session",
-        "key": "default:anon",
-        "created_at": "2026-09-18T08:14:24.106268+00:00",
-        "updated_at": "2026-09-18T08:14:24.106270+00:00",
-        "tags": [
-          "turn",
-          "assistant"
-        ],
-        "sensitivity": "normal",
-        "source": "companion",
-        "meta": {
-          "intent": "explain",
-          "role": "assistant",
-          "confidence": 0.84
-        }
-      },
-      {
         "id": "1546e3cd5321411e",
         "kind": "episodic",
         "content": "this is not good reply",
@@ -4086,6 +3606,486 @@
           "intent": "chat",
           "role": "assistant",
           "confidence": 0.6
+        }
+      },
+      {
+        "id": "c879bf754b364fee",
+        "kind": "episodic",
+        "content": "hello tum dusri Jagah move kar sakte ho",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-19T13:54:52.775407+00:00",
+        "updated_at": "2026-09-19T13:54:52.775408+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "greeting",
+          "role": "user",
+          "confidence": 0.97
+        }
+      },
+      {
+        "id": "cc5fc2e638e64984",
+        "kind": "episodic",
+        "content": "I can help with that. Share one more detail (goal, error, or constraint) and I will give a concrete answer.",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-19T13:54:52.776468+00:00",
+        "updated_at": "2026-09-19T13:54:52.776469+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "greeting",
+          "role": "assistant",
+          "confidence": 0.97
+        }
+      },
+      {
+        "id": "3e59ee7598144c78",
+        "kind": "episodic",
+        "content": "you can complete my task this is not testing this is the production ready code and u r my assistant so you can handle everything in my system okay got my phone",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-19T13:55:32.895345+00:00",
+        "updated_at": "2026-09-19T13:55:32.895349+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "58646bdf056c4828",
+        "kind": "episodic",
+        "content": "I can help with that. Share one more detail (goal, error, or constraint) and I will give a concrete answer.",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-19T13:55:32.896901+00:00",
+        "updated_at": "2026-09-19T13:55:32.896903+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "8b0c3e3d990347f5",
+        "kind": "episodic",
+        "content": "do you have create any proceed and processing fees",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-19T13:55:45.642627+00:00",
+        "updated_at": "2026-09-19T13:55:45.642646+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "7631763cc1764b70",
+        "kind": "episodic",
+        "content": "I can help with that. Share one more detail (goal, error, or constraint) and I will give a concrete answer.",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-19T13:55:45.643951+00:00",
+        "updated_at": "2026-09-19T13:55:45.643952+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "309d98f809854aad",
+        "kind": "episodic",
+        "content": "I want Jarvis voice",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-19T13:55:53.594041+00:00",
+        "updated_at": "2026-09-19T13:55:53.594043+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "8097b729de474df1",
+        "kind": "episodic",
+        "content": "I'm here.",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-19T13:55:53.595394+00:00",
+        "updated_at": "2026-09-19T13:55:53.595396+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "a7916cc581c148a2",
+        "kind": "episodic",
+        "content": "I want Jarvis voice",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-19T13:56:21.047712+00:00",
+        "updated_at": "2026-09-19T13:56:21.047713+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "045abd8b9f4c4f5b",
+        "kind": "episodic",
+        "content": "I'm here.",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-19T13:56:21.048679+00:00",
+        "updated_at": "2026-09-19T13:56:21.048680+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "5d4fe85b727641b6",
+        "kind": "episodic",
+        "content": "hello good morning",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-19T14:07:29.704234+00:00",
+        "updated_at": "2026-09-19T14:07:29.704235+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "morning",
+          "role": "user",
+          "confidence": 0.97
+        }
+      },
+      {
+        "id": "fd2a1e54fdc14a2c",
+        "kind": "episodic",
+        "content": "I'm here.",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-19T14:07:29.706400+00:00",
+        "updated_at": "2026-09-19T14:07:29.706402+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "morning",
+          "role": "assistant",
+          "confidence": 0.97
+        }
+      },
+      {
+        "id": "af0a013098434b82",
+        "kind": "episodic",
+        "content": "hello kya hua",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-19T14:08:27.270492+00:00",
+        "updated_at": "2026-09-19T14:08:27.270494+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "greeting",
+          "role": "user",
+          "confidence": 0.97
+        }
+      },
+      {
+        "id": "d564401e1c9b4adc",
+        "kind": "episodic",
+        "content": "Haan, boliye.",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-19T14:08:27.272280+00:00",
+        "updated_at": "2026-09-19T14:08:27.272281+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "greeting",
+          "role": "assistant",
+          "confidence": 0.97
+        }
+      },
+      {
+        "id": "d0ca3e0ee84c46ce",
+        "kind": "episodic",
+        "content": "Kuchh ho gaya kya",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-19T14:08:32.248615+00:00",
+        "updated_at": "2026-09-19T14:08:32.248616+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "aef52903188e4340",
+        "kind": "episodic",
+        "content": "Haan, boliye.",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-19T14:08:32.249483+00:00",
+        "updated_at": "2026-09-19T14:08:32.249484+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "4734fa5bf1424146",
+        "kind": "episodic",
+        "content": "to Fir start Karte Hain Ham yah Apna Om Apne system Mein implement karte hain theek hai",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-19T14:08:51.214825+00:00",
+        "updated_at": "2026-09-19T14:08:51.214829+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "howto",
+          "role": "user",
+          "confidence": 0.85
+        }
+      },
+      {
+        "id": "8f1416ec44ff44f4",
+        "kind": "episodic",
+        "content": "Here's a step-by-step plan for: to Fir start Karte Hain Ham yah Apna Om Apne system Mein implement karte hain theek hai 1. Define the goal and success criteria. 2.",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-19T14:08:51.218109+00:00",
+        "updated_at": "2026-09-19T14:08:51.218112+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "howto",
+          "role": "assistant",
+          "confidence": 0.85
+        }
+      },
+      {
+        "id": "23d9bb8ab0904f3f",
+        "kind": "episodic",
+        "content": "then how it is you can continue by me",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-19T14:09:03.324145+00:00",
+        "updated_at": "2026-09-19T14:09:03.324146+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "followup",
+          "role": "user",
+          "confidence": 0.8
+        }
+      },
+      {
+        "id": "f497b128dbc54a6a",
+        "kind": "episodic",
+        "content": "I'm here.",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-19T14:09:03.325221+00:00",
+        "updated_at": "2026-09-19T14:09:03.325222+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "followup",
+          "role": "assistant",
+          "confidence": 0.8
+        }
+      },
+      {
+        "id": "2f7debf98dfd4bbb",
+        "kind": "episodic",
+        "content": "then complete this improve this ending my system",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-19T14:09:16.919136+00:00",
+        "updated_at": "2026-09-19T14:09:16.919137+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "followup",
+          "role": "user",
+          "confidence": 0.8
+        }
+      },
+      {
+        "id": "55df88a0ba454da6",
+        "kind": "episodic",
+        "content": "I'm here.",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-19T14:09:16.920250+00:00",
+        "updated_at": "2026-09-19T14:09:16.920251+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "followup",
+          "role": "assistant",
+          "confidence": 0.8
+        }
+      },
+      {
+        "id": "624611b1ecb64135",
+        "kind": "episodic",
+        "content": "hello hello hello kya kar rahe ho",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-19T14:09:48.523596+00:00",
+        "updated_at": "2026-09-19T14:09:48.523598+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "greeting",
+          "role": "user",
+          "confidence": 0.97
+        }
+      },
+      {
+        "id": "65c85e40e2454670",
+        "kind": "episodic",
+        "content": "Haan, boliye.",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-19T14:09:48.525474+00:00",
+        "updated_at": "2026-09-19T14:09:48.525475+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "greeting",
+          "role": "assistant",
+          "confidence": 0.97
         }
       }
     ]

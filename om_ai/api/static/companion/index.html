@@ -733,10 +733,24 @@
       return data;
     }
 
+    let speakGen = 0;
+    let turnGen = 0;
+
+    function isStopCommand(text) {
+      const t = String(text || '').toLowerCase().replace(/[^\w\s']/g, ' ').replace(/\s+/g, ' ').trim();
+      if (!t) return false;
+      const exact = new Set([
+        'stop','cancel','cancel that','mute','quiet','enough','shut up','be quiet',
+        'ruk','ruko','ruk jao','band karo','band kar','chup','chup raho','bas','bas karo'
+      ]);
+      return exact.has(t) || t.startsWith('stop ') || t.startsWith('cancel ') || t === 'ruk ja';
+    }
+
     function stopSpeakingLocal() {
+      speakGen += 1;
       speaking = false;
       if (window.speechSynthesis) window.speechSynthesis.cancel();
-      if (audioEl) { try { audioEl.pause(); } catch (_) {} audioEl = null; }
+      if (audioEl) { try { audioEl.pause(); audioEl.src = ''; } catch (_) {} audioEl = null; }
       if (lipRaf) { cancelAnimationFrame(lipRaf); lipRaf = 0; }
       if (window.OMPresence3D) {
         try { window.OMPresence3D.setSpeaking(false, 0); } catch (_) {}
@@ -798,6 +812,7 @@
         return;
       }
       stopSpeakingLocal();
+      const myGen = speakGen;
       speaking = true;
       setState('SPEAKING');
       const emo = emotion || 'calm';
@@ -807,6 +822,7 @@
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ text: say, emotion: emo, presence: 'speaking' }),
         });
+        if (myGen !== speakGen) return;
         if (res.ok) {
           let lipsPlan = null;
           const lipsHdr = res.headers.get('X-OM-Lips');
@@ -826,16 +842,16 @@
               }
             } catch (_) {}
           }
+          if (myGen !== speakGen) return;
           const blob = await res.blob();
+          if (myGen !== speakGen) return;
           const url = URL.createObjectURL(blob);
           audioEl = new Audio(url);
-          // Server (Aman) already paces — keep near 1.0; tiny emotion nudge only
           const hdrRate = Number(res.headers.get('X-OM-Playback-Rate') || '');
           let playRate = Number.isFinite(hdrRate) && hdrRate > 0.85 && hdrRate < 1.2
             ? hdrRate
             : 1.0;
           if (emo === 'excited') playRate = Math.min(1.06, Math.max(1.0, playRate));
-          // Do not slow soft/concerned — that made Aman drag
           audioEl.playbackRate = playRate;
           if ('preservesPitch' in audioEl) audioEl.preservesPitch = true;
           driveLipsFromAudio(audioEl, lipsPlan);
@@ -845,6 +861,7 @@
             audioEl.play().catch(reject);
           });
           URL.revokeObjectURL(url);
+          if (myGen !== speakGen) return;
           speaking = false;
           if (lipRaf) { cancelAnimationFrame(lipRaf); lipRaf = 0; }
           if (window.OMPresence3D) {
@@ -856,6 +873,7 @@
         }
       } catch (_) {}
 
+      if (myGen !== speakGen) return;
       if (window.speechSynthesis) {
         if (window.OMPresence3D) {
           try { window.OMPresence3D.setSpeaking(true, 0.25); } catch (_) {}
@@ -865,7 +883,6 @@
           const u = new SpeechSynthesisUtterance(
             say.replace(/\[\[(slnc|rate|pbas|volm)[^\]]*\]\]/gi, ' ').replace(/\s+/g, ' ').trim()
           );
-          // Clear Indian male pace — never drag below natural
           u.rate = emo === 'excited' ? 1.08 : (emo === 'soft' || emo === 'concerned' ? 0.96 : 1.02);
           u.pitch = emo === 'excited' ? 1.05 : (emo === 'soft' ? 0.95 : 1.0);
           const voices = speechSynthesis.getVoices();
@@ -882,6 +899,7 @@
           speechSynthesis.speak(u);
         });
       }
+      if (myGen !== speakGen) return;
       speaking = false;
       if (window.OMPresence3D) {
         try { window.OMPresence3D.setSpeaking(false, 0); } catch (_) {}
@@ -892,9 +910,28 @@
 
     async function handleTurn(text) {
       const q = String(text || '').trim();
-      if (!q || busy) return;
+      if (!q) return;
+      // Stop must always win — even mid-speech / mid-brain
+      if (isStopCommand(q)) {
+        turnGen += 1;
+        stopSpeakingLocal();
+        busy = false;
+        els.heard.textContent = 'You said: ' + q;
+        els.reply.textContent = /ruk|band|chup|bas/i.test(q) ? 'Theek hai — ruk gaya.' : 'Okay — stopped.';
+        setState('LISTENING');
+        try {
+          await api('/message', {
+            method: 'POST',
+            body: JSON.stringify({ text: q, session_id: sessionId, speak: false }),
+          });
+        } catch (_) {}
+        scheduleListen(120);
+        return;
+      }
+      if (busy) return;
       // Ignore tiny noise fragments
       if (q.length < 2) return;
+      const myTurn = ++turnGen;
       busy = true;
       stopSpeakingLocal();
       els.heard.textContent = 'You said: ' + q;
@@ -906,6 +943,13 @@
           method: 'POST',
           body: JSON.stringify({ text: q, session_id: sessionId, speak: true }),
         });
+        if (myTurn !== turnGen) return;
+        if (data.interrupted || data.speak_client === false) {
+          els.reply.textContent = data.spoken || data.answer || 'Okay — stopped.';
+          setState('LISTENING');
+          scheduleListen(120);
+          return;
+        }
         if (data.activities) showActivity(data.activities);
         if (data.memory_line && els.memoryLine) {
           els.memoryLine.textContent = 'Memory · ' + data.memory_line;
@@ -941,20 +985,30 @@
           .replace(/\*\*/g, '')
           .replace(/\s+/g, ' ')
           .trim();
+        // Never show / speak internal agent dumps in the HUD
+        const internal = /agent\s*\[|agent\s*goal|collaboration\s*:|knowledge investigation|retrieve context|retrieve information/i.test(display);
+        if (internal) {
+          els.reply.textContent = "I'm here.";
+          setState('LISTENING');
+          scheduleListen(150);
+          return;
+        }
         if (display) {
           els.reply.textContent = display;
+          if (myTurn !== turnGen) return;
           await speak(data.spoken_tts || answer, data.feeling || (data.affect && data.affect.label) || 'calm');
         } else {
           setState('LISTENING');
           scheduleListen(150);
         }
       } catch (err) {
+        if (myTurn !== turnGen) return;
         els.reply.textContent = 'I missed that — say it again.';
         setState('ERROR');
         console.error(err);
         scheduleListen(400);
       } finally {
-        busy = false;
+        if (myTurn === turnGen) busy = false;
       }
     }
 
@@ -995,10 +1049,15 @@
           else interim += chunk;
         }
         if (interim) els.heard.textContent = interim;
-        if (finalText && !busy) {
-          // If OM is speaking, barge-in
+        if (finalText) {
+          const cleaned = String(finalText).trim();
+          if (isStopCommand(cleaned)) {
+            handleTurn(cleaned);
+            return;
+          }
+          // Barge-in while OM is speaking
           if (speaking) stopSpeakingLocal();
-          handleTurn(finalText);
+          if (!busy) handleTurn(cleaned);
         }
       };
 
