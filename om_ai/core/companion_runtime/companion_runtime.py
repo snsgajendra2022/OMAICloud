@@ -36,6 +36,7 @@ class CompanionRuntime:
         self.realtime = None
         self.personality = None
         self.os = None  # STEP 60 Companion OS
+        self._in_handle_text = False
 
     def _emit(self, event_type: str, payload: dict[str, Any] | None = None) -> None:
         if self.realtime is None:
@@ -119,14 +120,14 @@ class CompanionRuntime:
                 logger.warning("brain init: %s", exc)
                 self.brain = None
 
-            # Voice
+            # Voice — native STT finals call brain via _on_final_transcript
             from om_ai.core.voice_intelligence import VoiceRuntime
             self.voice = VoiceRuntime(
                 wake_phrase=self.config.wake_word,
                 text_only=self.config.text_only,
                 wake_word_enabled=self.config.wake_word_enabled and not self.config.text_only,
                 on_event=lambda et, payload: self._emit(et, payload),
-                on_final_transcript=lambda text, session: None,
+                on_final_transcript=self._on_final_transcript,
             )
             voice_start = self.voice.start()
             self.registry.register("voice", self.voice)
@@ -204,7 +205,22 @@ class CompanionRuntime:
             self.lifecycle = Lifecycle.STOPPED
             return {"ok": True, "lifecycle": self.lifecycle.value}
 
-    def handle_text(self, text: str, *, history: list[dict[str, Any]] | None = None) -> dict[str, Any]:
+    def _on_final_transcript(self, text: str, session: Any) -> None:
+        """Native mic path: ingest already ran — continue into brain without re-ingest."""
+        if self._in_handle_text:
+            return
+        try:
+            self.handle_text(text, already_ingested=True)
+        except Exception as exc:
+            logger.warning("native transcript turn failed: %s", exc)
+
+    def handle_text(
+        self,
+        text: str,
+        *,
+        history: list[dict[str, Any]] | None = None,
+        already_ingested: bool = False,
+    ) -> dict[str, Any]:
         if not self._started:
             self.start()
         assert self.voice is not None
@@ -267,92 +283,164 @@ class CompanionRuntime:
                 "interrupted": True,
             }
 
-        ingested = self.voice.ingest_text(text)
-        if ingested.get("wake_only"):
-            reply = ingested.get("prompt") or "Yes?"
-            self.voice.speak(reply)
-            self._emit("avatar.state", {"state": "attentive"})
-            return {"answer": reply, "activities": ["Wake detected"], "wake": True, "session": ingested.get("session")}
+        if already_ingested:
+            ingested = {"ok": True, "text": (text or "").strip()}
+        else:
+            self._in_handle_text = True
+            try:
+                ingested = self.voice.ingest_text(text)
+            finally:
+                # Keep flag True until end of turn so on_final_transcript no-ops
+                pass
 
-        if ingested.get("permission_response"):
-            return self._resolve_permission(ingested)
-
-        if not ingested.get("ok"):
-            reason = ingested.get("reason")
-            if reason == "waiting_for_wake":
-                return {
-                    "answer": "",
-                    "waiting_for_wake": True,
-                    "activities": ["Listening for wake word"],
-                    "state": self.voice.state.value,
-                }
-            return {"answer": "", "error": reason, "state": self.voice.state.value}
-
-        user_text = str(ingested.get("text") or text)
-        hist = history or list(self.voice.session.history)
-        self._update_session_context(user_text)
-
-        # Action intent via brain semantic + action planner
-        brain_out = self._run_brain(user_text, hist)
-        activities = list(brain_out.get("activities") or ["Understanding request"])
-        for a in activities:
-            self._emit("brain.activity", {"activity": a})
-
-        semantic = brain_out.get("semantic") or {}
-        answer = str(brain_out.get("answer") or "").strip()
-        spoken = str(brain_out.get("spoken") or answer).strip()
-        spoken_tts = str(brain_out.get("spoken_tts") or spoken).strip()
-
-        # Brain already shaped speech. Never speak internal agent / pipeline chrome.
         try:
-            from om_ai.core.companion_personality.voice_presence import (
-                is_garbage_spoken,
-                rescue_spoken,
-                strip_internal_chrome,
-                shape_for_speech,
-            )
+            if ingested.get("wake_only"):
+                reply = ingested.get("prompt") or "Ji sir, kahiye?"
+                self.voice.speak(reply)
+                self._emit("avatar.state", {"state": "attentive"})
+                return {"answer": reply, "activities": ["Wake detected"], "wake": True, "session": ingested.get("session")}
 
-            answer = strip_internal_chrome(answer)
-            spoken = strip_internal_chrome(spoken) or answer
-            if is_garbage_spoken(spoken) or is_garbage_spoken(answer):
-                spoken = rescue_spoken(user_text, spoken)
-                answer = spoken
-                spoken_tts = spoken
-            else:
-                pack = shape_for_speech(spoken, user_message=user_text)
-                spoken = str(pack.get("spoken") or spoken)
-                spoken_tts = str(pack.get("spoken_tts") or spoken)
-                answer = spoken
-        except Exception:
-            pass
+            if ingested.get("permission_response"):
+                return self._resolve_permission(ingested)
 
-        # Permission-sensitive actions
-        planned = None
-        if self.config.actions_enabled and self.actions is not None:
-            if semantic.get("requires_action") or self._looks_like_action(user_text):
-                planned = self._plan_action(user_text, semantic)
-        if planned:
-            self._emit("action.planned", planned)
-            decision = self._permission_gate(planned)
-            if decision.get("requires_approval"):
-                self.voice.session.pending_permission_id = decision.get("permission_id")
-                self.voice.session.pending_action = planned
-                msg = decision.get("prompt") or "Permission required. Say yes to allow, or no to cancel."
-                self.voice.speak(msg)
-                self._emit("permission.required", decision)
-                return {
-                    "answer": msg,
-                    "activities": activities + ["Waiting for permission"],
-                    "permission": decision,
-                    "semantic": semantic,
-                    "state": "WAITING_FOR_PERMISSION",
-                }
-            if decision.get("allowed"):
-                result = self._execute_action(planned)
-                activities.append("Executed action" if result.get("ok") else "Action failed")
-                answer = result.get("message") or (
-                    "Done." if result.get("ok") else "That didn't work."
+            if not ingested.get("ok"):
+                reason = ingested.get("reason")
+                if reason == "waiting_for_wake":
+                    return {
+                        "answer": "",
+                        "waiting_for_wake": True,
+                        "activities": ["Listening for wake word"],
+                        "state": self.voice.state.value,
+                    }
+                return {"answer": "", "error": reason, "state": self.voice.state.value}
+
+            user_text = str(ingested.get("text") or text)
+            hist = history or list(self.voice.session.history)
+            self._update_session_context(user_text)
+            return self._continue_turn(user_text, hist)
+        finally:
+            if not already_ingested:
+                self._in_handle_text = False
+
+    def _continue_turn(self, user_text: str, hist: list[dict[str, Any]]) -> dict[str, Any]:
+        assert self.voice is not None
+
+        activities: list[str] = []
+        semantic: dict[str, Any] = {}
+        answer = ""
+        spoken = ""
+        spoken_tts = ""
+        action_handled = False
+        brain_out: dict[str, Any] = {}
+
+        # —— Actions FIRST (skip heavy LLM when OS intent is clear) ——
+        if self.config.actions_enabled and (self.devices is not None or self.actions is not None):
+            if self._looks_like_action(user_text):
+                planned = self._plan_action(user_text, {})
+                if planned:
+                    self._emit("action.planned", planned)
+                    activities.append("Running action")
+                    decision = self._permission_gate(planned)
+                    if decision.get("requires_approval"):
+                        self.voice.session.pending_permission_id = decision.get("permission_id")
+                        self.voice.session.pending_action = planned
+                        msg = decision.get("prompt") or "Permission required. Say yes to allow, or no to cancel."
+                        self._record_assistant(msg)
+                        self._emit("permission.required", decision)
+                        return {
+                            "answer": msg,
+                            "spoken": msg,
+                            "spoken_tts": msg,
+                            "activities": activities + ["Waiting for permission"],
+                            "permission": decision,
+                            "semantic": {"requires_action": True, "intent": "action_request"},
+                            "state": "WAITING_FOR_PERMISSION",
+                            "speak_client": True,
+                        }
+                    if decision.get("allowed"):
+                        result = self._execute_action(planned)
+                        activities.append("Executed action" if result.get("ok") else "Action failed")
+                        answer = str(
+                            result.get("message")
+                            or planned.get("speak_ok")
+                            or ("Done." if result.get("ok") else "That didn't work.")
+                        )
+                        spoken = answer
+                        spoken_tts = answer
+                        semantic = {
+                            "requires_action": True,
+                            "intent": "action_request",
+                            "domain": "action",
+                        }
+                        action_handled = True
+
+        # —— Brain for normal conversation (or soft fallback after failed action) ——
+        if not action_handled:
+            brain_out = self._run_brain(user_text, hist)
+            activities = list(brain_out.get("activities") or ["Understanding request"]) + activities
+            for a in activities:
+                self._emit("brain.activity", {"activity": a})
+
+            semantic = brain_out.get("semantic") or {}
+            answer = str(brain_out.get("answer") or "").strip()
+            spoken = str(brain_out.get("spoken") or answer).strip()
+            spoken_tts = str(brain_out.get("spoken_tts") or spoken).strip()
+
+            # Brain already shaped speech. Never speak internal agent / pipeline chrome.
+            try:
+                from om_ai.core.companion_personality.voice_presence import (
+                    is_garbage_spoken,
+                    rescue_spoken,
+                    strip_internal_chrome,
+                    shape_for_speech,
                 )
+
+                answer = strip_internal_chrome(answer)
+                spoken = strip_internal_chrome(spoken) or answer
+                if is_garbage_spoken(spoken) or is_garbage_spoken(answer):
+                    spoken = rescue_spoken(user_text, spoken)
+                    answer = spoken
+                    spoken_tts = spoken
+                else:
+                    pack = shape_for_speech(spoken, user_message=user_text)
+                    spoken = str(pack.get("spoken") or spoken)
+                    spoken_tts = str(pack.get("spoken_tts") or spoken)
+                    answer = spoken
+            except Exception:
+                pass
+
+            # Secondary action pass (semantic-marked, rare)
+            if (
+                self.config.actions_enabled
+                and (self.devices is not None or self.actions is not None)
+                and semantic.get("requires_action")
+                and self._looks_like_action(user_text)
+            ):
+                planned = self._plan_action(user_text, semantic)
+                if planned:
+                    self._emit("action.planned", planned)
+                    decision = self._permission_gate(planned)
+                    if decision.get("requires_approval"):
+                        self.voice.session.pending_permission_id = decision.get("permission_id")
+                        self.voice.session.pending_action = planned
+                        msg = decision.get("prompt") or "Permission required. Say yes to allow, or no to cancel."
+                        self._record_assistant(msg)
+                        self._emit("permission.required", decision)
+                        return {
+                            "answer": msg,
+                            "activities": activities + ["Waiting for permission"],
+                            "permission": decision,
+                            "semantic": semantic,
+                            "state": "WAITING_FOR_PERMISSION",
+                        }
+                    if decision.get("allowed"):
+                        result = self._execute_action(planned)
+                        activities.append("Executed action" if result.get("ok") else "Action failed")
+                        answer = result.get("message") or (
+                            "Done." if result.get("ok") else "That didn't work."
+                        )
+                        spoken = answer
+                        spoken_tts = answer
 
         if not answer:
             spoken = spoken or ""
@@ -365,11 +453,12 @@ class CompanionRuntime:
                 from om_ai.core.companion_os import get_companion_os
 
                 self.os = get_companion_os()
+            affect_out = brain_out.get("affect") if isinstance(brain_out.get("affect"), dict) else None
             os_pack = self.os.enrich_turn(
                 user_text,
                 answer=answer,
                 speaking=False,
-                affect=brain_out.get("affect") if isinstance(brain_out.get("affect"), dict) else None,
+                affect=affect_out,
             )
             if os_pack.get("answer"):
                 answer = str(os_pack["answer"])
@@ -406,19 +495,25 @@ class CompanionRuntime:
         except Exception as exc:
             logger.debug("companion_os enrich failed: %s", exc)
 
-        # Memory write (non-sensitive)
-        if self.memory is not None and self.config.memory_enabled:
+        # Memory: brain already wrote when LLM ran — write for action-only turns
+        sk, uk = self._identity_keys()
+        if self.memory is not None and self.config.memory_enabled and action_handled:
             try:
                 from om_ai.core.companion_personality.voice_presence import is_garbage_spoken
 
                 if not is_garbage_spoken(answer):
-                    self.memory.remember_turn(user_text, answer)
+                    self.memory.remember_turn(
+                        session_key=sk, user_key=uk, role="user", content=user_text
+                    )
+                    self.memory.remember_turn(
+                        session_key=sk, user_key=uk, role="assistant", content=answer
+                    )
             except Exception:
-                try:
-                    if hasattr(self.memory, "add_episode"):
-                        self.memory.add_episode(user_text, answer)
-                except Exception:
-                    pass
+                pass
+        try:
+            self._maybe_store_preference(user_text, uk)
+        except Exception:
+            pass
 
         # Continuous learning observe (offline pipeline hook)
         try:
@@ -433,11 +528,16 @@ class CompanionRuntime:
                 self.voice.speak(spoken)
             except Exception:
                 pass
-        self._emit("avatar.state", {"state": "speaking"})
-        try:
-            self.voice.session.add_turn("assistant", answer)
-        except Exception:
-            pass
+        else:
+            self._record_assistant(answer)
+        self._emit("avatar.state", {"state": "speaking", **(os_pack.get("om_avatar") or os_pack.get("avatar") or {})})
+        if not self.config.text_only:
+            try:
+                last = (self.voice.session.history or [])[-1:]
+                if not last or last[0].get("role") != "assistant" or last[0].get("content") != answer:
+                    self.voice.session.add_turn("assistant", answer)
+            except Exception:
+                pass
 
         presence_mode = str(
             ((os_pack.get("presence") or {}).get("presence") or {}).get("mode") or self.voice.state.value
@@ -461,6 +561,7 @@ class CompanionRuntime:
             "vision": os_pack.get("vision"),
             "background": os_pack.get("background"),
             "memory_line": self._memory_line(os_pack, user_text=user_text),
+            "voice_plan": os_pack.get("voice_plan") or brain_out.get("voice_plan"),
             "activities": activities,
             "semantic": semantic,
             "session": self.voice.session.to_dict(),
@@ -470,6 +571,41 @@ class CompanionRuntime:
             "os_step": 112,
         }
 
+    def _identity_keys(self) -> tuple[str, str]:
+        """One session_id + user_key shared by brain memory and outer runtime."""
+        sk = str(getattr(self.context, "session_id", "") or "default")
+        user_ctx: dict[str, Any] = {}
+        try:
+            user_ctx = dict((self.context.meta or {}).get("user_context") or {})
+        except Exception:
+            user_ctx = {}
+        actor = str(
+            user_ctx.get("actor")
+            or user_ctx.get("user_key")
+            or user_ctx.get("name")
+            or "user"
+        ).strip() or "user"
+        # Match ConversationSession.user_key = f"{tenant}:{actor}"
+        uk = str(user_ctx.get("user_key") or f"default:{actor}")
+        try:
+            self.context.meta.setdefault("user_context", user_ctx)
+            self.context.meta["user_context"]["user_key"] = uk
+            self.context.meta["user_context"]["actor"] = actor
+        except Exception:
+            pass
+        return sk, uk
+
+    def _record_assistant(self, text: str) -> None:
+        if not self.voice or not text:
+            return
+        try:
+            hist = list(self.voice.session.history or [])
+            if hist and hist[-1].get("role") == "assistant" and hist[-1].get("content") == text:
+                return
+            self.voice.session.add_turn("assistant", text)
+        except Exception:
+            pass
+
     def _run_brain(self, text: str, history: list[dict[str, Any]]) -> dict[str, Any]:
         model_generate = self._model_generate_fn()
         user_ctx: dict[str, Any] = {}
@@ -477,11 +613,27 @@ class CompanionRuntime:
             user_ctx = dict((self.context.meta or {}).get("user_context") or {})
         except Exception:
             user_ctx = {}
+        sk, uk = self._identity_keys()
+        actor = str(user_ctx.get("actor") or user_ctx.get("name") or "user")
+        hm_blob = ""
+        try:
+            if self.os and getattr(self.os, "human_memory", None):
+                hm = self.os.human_memory
+                if hasattr(hm, "recall_blob"):
+                    hm_blob = str(hm.recall_blob() or "")
+            if not hm_blob:
+                from om_ai.core.human_memory import get_human_memory
+
+                hm_blob = str(get_human_memory().recall_blob() or "")
+        except Exception:
+            hm_blob = ""
         extra = {
             "user_context": user_ctx,
             "user_name": str(user_ctx.get("name") or "").strip(),
+            "user_key": uk,
             "voice_mode": True,
             "skip_canned_social": True,
+            "human_memory_blob": hm_blob[:1500],
         }
         if self.brain is not None:
             for meth in ("run", "handle", "process", "turn"):
@@ -491,6 +643,10 @@ class CompanionRuntime:
                         out = fn(
                             text,
                             history=history,
+                            session_id=sk,
+                            actor=actor,
+                            tenant_id="default",
+                            project_id=str(user_ctx.get("purpose") or ""),
                             model_generate=model_generate,
                             extra=extra,
                         )
@@ -528,6 +684,8 @@ class CompanionRuntime:
             return run_companion_brain(
                 text,
                 history=history,
+                session_id=sk,
+                actor=actor,
                 model_generate=model_generate,
                 extra=extra,
             )
@@ -653,6 +811,37 @@ class CompanionRuntime:
         elif "safari" in low or "chrome" in low or "browser" in low:
             sess.last_app_hint = "Safari"
 
+    def _maybe_store_preference(self, user_text: str, user_key: str) -> None:
+        """Capture simple long-term facts (name / likes) into preference memory."""
+        if self.memory is None or not hasattr(self.memory, "remember_fact"):
+            return
+        low = (user_text or "").strip()
+        m = re.search(
+            r"(?:my name is|i am|i'm|mera naam|main)\s+([A-Za-z\u0900-\u097F]{2,40})",
+            low,
+            re.I,
+        )
+        if m:
+            name = m.group(1).strip(" .,!")
+            if name.lower() not in {"om", "jarvis", "sir", "the", "a", "an"}:
+                try:
+                    self.memory.remember_fact(user_key, "name", name)
+                except Exception:
+                    pass
+            return
+        m2 = re.search(
+            r"(?:i (?:like|love|prefer)|mujhe|pasand)\s+(.+?)(?:\.|$)",
+            low,
+            re.I,
+        )
+        if m2:
+            fact = m2.group(1).strip(" .,!")[:120]
+            if len(fact) >= 3:
+                try:
+                    self.memory.remember_fact(user_key, "preference", fact)
+                except Exception:
+                    pass
+
     def _looks_like_action(self, text: str) -> bool:
         low = (text or "").lower()
         if any(
@@ -665,6 +854,25 @@ class CompanionRuntime:
                 "remove ",
                 "list files",
                 "show files",
+                "youtube",
+                "google ",
+                "browser",
+                "volume",
+                "awaz",
+                "mute",
+                "unmute",
+                "kholo",
+                "khol ",
+                "weather",
+                "mausam",
+                "shutdown",
+                "restart",
+                "calculator",
+                "calc",
+                "notes",
+                "email",
+                "mail",
+                "spotlight",
             )
         ):
             return True
@@ -675,13 +883,148 @@ class CompanionRuntime:
 
     def _plan_action(self, text: str, semantic: dict[str, Any]) -> dict[str, Any] | None:
         from pathlib import Path
+        from urllib.parse import quote_plus
 
         low = (text or "").lower()
         sess = self.voice.session if self.voice else None
         root = Path(__file__).resolve().parents[3]
 
+        # --- Quick apps ---
+        if any(w in low for w in ("calculator", "calc", "hisab")):
+            return {
+                "action": "application.open",
+                "target": "Calculator",
+                "arguments": {"app": "Calculator"},
+                "reason": text[:160],
+                "risk": "LOW_IMPACT",
+                "speak_ok": "Calculator khol raha hoon.",
+            }
+        if any(w in low for w in ("notes", "notepad", "stickies")):
+            app = "Notes"
+            return {
+                "action": "application.open",
+                "target": app,
+                "arguments": {"app": app},
+                "reason": text[:160],
+                "risk": "LOW_IMPACT",
+                "speak_ok": "Notes open kar raha hoon.",
+            }
+        if re.search(r"\b(email|mail|gmail)\b", low):
+            to_m = re.search(r"(?:to|ko)\s+(\S+@\S+)", low)
+            subj_m = re.search(r"(?:subject|vishay)\s+(.+)$", low)
+            addr = to_m.group(1) if to_m else ""
+            subj = quote_plus(subj_m.group(1).strip()[:80]) if subj_m else ""
+            url = f"mailto:{addr}?subject={subj}" if addr else "mailto:"
+            return {
+                "action": "browser.open",
+                "target": url,
+                "arguments": {"url": url},
+                "reason": text[:160],
+                "risk": "LOW_IMPACT",
+                "speak_ok": "Email draft khol raha hoon.",
+            }
+
+        # --- Volume / mute (OS control) ---
+        if re.search(r"\b(mute|unmute|volume|awaz)\b", low) or "awaz" in low:
+            if re.search(r"\bunmute\b", low) or "mute hatao" in low:
+                return {
+                    "action": "system.volume",
+                    "target": "unmute",
+                    "arguments": {"mute": False},
+                    "reason": text[:160],
+                    "risk": "LOW_IMPACT",
+                    "speak_ok": "Unmuted.",
+                }
+            if re.search(r"\bmute\b", low) and "unmute" not in low:
+                return {
+                    "action": "system.volume",
+                    "target": "mute",
+                    "arguments": {"mute": True},
+                    "reason": text[:160],
+                    "risk": "LOW_IMPACT",
+                    "speak_ok": "Muted.",
+                }
+            level = 50
+            if any(w in low for w in ("badhao", "up", "increase", "louder", "zyada", "full", "max")):
+                level = 80
+            elif any(w in low for w in ("kam", "down", "decrease", "lower", "quiet", "soft")):
+                level = 25
+            mvol = re.search(r"(\d{1,3})\s*%?", low)
+            if mvol:
+                level = max(0, min(100, int(mvol.group(1))))
+            return {
+                "action": "system.volume",
+                "target": f"volume:{level}",
+                "arguments": {"level": level},
+                "reason": text[:160],
+                "risk": "LOW_IMPACT",
+                "speak_ok": f"Volume set to {level}.",
+            }
+
+        # --- YouTube / Google / weather (browser) ---
+        if "youtube" in low or "youtu" in low:
+            q = ""
+            mq = re.search(
+                r"(?:youtube(?:\s+(?:par|pe|pe|on))?\s+(?:play|search|khoj|dhundo)?\s*|play\s+)(.+)$",
+                low,
+            )
+            if mq:
+                q = mq.group(1).strip(" .")
+                for junk in ("kholo", "khol", "open", "please", "karo"):
+                    q = q.replace(junk, "").strip()
+            if q and q not in {"kholo", "khol", "open", "please"}:
+                url = f"https://www.youtube.com/results?search_query={quote_plus(q)}"
+            else:
+                url = "https://www.youtube.com"
+            return {
+                "action": "browser.open",
+                "target": url,
+                "arguments": {"url": url},
+                "reason": text[:160],
+                "risk": "LOW_IMPACT",
+                "speak_ok": "YouTube khol raha hoon." if any(c in low for c in ("khol", "karo")) else "Opening YouTube.",
+            }
+
+        if any(w in low for w in ("mausam", "weather", "forecast", "temperature")):
+            url = "https://www.google.com/search?q=" + quote_plus("weather")
+            city_m = re.search(r"(?:in|at|ka|ki)\s+([a-z\u0900-\u097F]{3,40})", low)
+            if city_m:
+                url = "https://www.google.com/search?q=" + quote_plus(f"weather {city_m.group(1)}")
+            return {
+                "action": "browser.open",
+                "target": url,
+                "arguments": {"url": url},
+                "reason": text[:160],
+                "risk": "LOW_IMPACT",
+                "speak_ok": "Mausam check kar raha hoon." if "mausam" in low else "Checking the weather.",
+            }
+
+        if re.search(r"\b(google|search|browser)\b", low) or "search karo" in low:
+            mq = re.search(
+                r"(?:google(?:\s+search)?|search(?:\s+for)?|khoj)\s+(.+)$",
+                low,
+            )
+            q = (mq.group(1).strip(" .") if mq else "").strip()
+            for junk in ("kholo", "khol", "open", "please", "karo", "on google"):
+                q = q.replace(junk, "").strip()
+            if q.lower().startswith("search "):
+                q = q[7:].strip()
+            url = (
+                f"https://www.google.com/search?q={quote_plus(q)}"
+                if q
+                else "https://www.google.com"
+            )
+            return {
+                "action": "browser.open",
+                "target": url,
+                "arguments": {"url": url},
+                "reason": text[:160],
+                "risk": "LOW_IMPACT",
+                "speak_ok": "Searching." if q else "Opening the browser.",
+            }
+
         # Resolve "it" / project references from session context
-        wants_open = bool(re.search(r"\b(open|launch|start)\b", low))
+        wants_open = bool(re.search(r"\b(open|launch|start|kholo|khol)\b", low))
         refers_project = any(
             k in low for k in ("project", "om project", "om-ai", "folder", "it", "that", "this")
         )
@@ -707,12 +1050,12 @@ class CompanionRuntime:
                 "reason": f"User requested: {text[:160]}",
                 "risk": "LOW_IMPACT",
             }
-        if any(w in low for w in ("open ", "launch ", "start ")):
+        if any(w in low for w in ("open ", "launch ", "start ", "kholo", "khol ")):
             target = "Visual Studio Code" if any(
                 x in low for x in ("code", "vs code", "vscode")
             ) else "Finder"
             if "browser" in low or "chrome" in low or "safari" in low:
-                target = "Safari"
+                target = "Safari" if "safari" in low else ("Google Chrome" if "chrome" in low else "Safari")
             return {
                 "action": "application.open",
                 "target": target,
@@ -729,10 +1072,17 @@ class CompanionRuntime:
                 "risk": "READ_ONLY",
             }
         if "delete" in low or "remove" in low:
+            # Refuse empty targets — never plan a destructive delete without a path
+            path_m = re.search(
+                r"(?:delete|remove|erase)\s+(?:file\s+|the\s+)?([~/][^\s]+|\S+\.\w{1,8})",
+                low,
+            )
+            if not path_m:
+                return None
             return {
                 "action": "filesystem.delete",
-                "target": "",
-                "arguments": {"path": ""},
+                "target": path_m.group(1),
+                "arguments": {"path": path_m.group(1)},
                 "reason": text[:160],
                 "risk": "DESTRUCTIVE",
             }
@@ -785,7 +1135,18 @@ class CompanionRuntime:
                         verified = bool(self.agents.verify(planned, out))
                     except Exception:
                         verified = ok
-                payload = {"ok": verified, "result": out, "message": "It's open." if verified and "application.open" in str(planned.get("action")) else ("Completed." if verified else "Action could not be verified.")}
+                payload = {
+                    "ok": verified,
+                    "result": out,
+                    "message": (
+                        planned.get("speak_ok")
+                        or (
+                            "It's open."
+                            if verified and str(planned.get("action", "")).startswith(("application.open", "browser."))
+                            else ("Completed." if verified else "Action could not be verified.")
+                        )
+                    ),
+                }
                 self._emit("action.completed" if verified else "action.failed", payload)
                 return payload
             if self.actions is not None:

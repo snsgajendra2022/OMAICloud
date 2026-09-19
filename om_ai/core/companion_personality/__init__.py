@@ -13,10 +13,14 @@ from .voice_presence import (
     social_spoken_reply,
 )
 
+# Alias used by CompanionRuntime.start()
+PersonalityEngine = CompanionPersonalityEngine
+
 __all__ = [
     "AffectAnalyzer",
     "AffectState",
     "CompanionPersonalityEngine",
+    "PersonalityEngine",
     "PersonalityProfile",
     "VoicePresenceEngine",
     "detect_speech_locale",

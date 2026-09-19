@@ -22,6 +22,7 @@ class CapabilityPolicy:
                 "process.start",
                 "process.stop",
                 "system.notification",
+                "system.volume",
             }
         )
     )

@@ -27,6 +27,7 @@ class DeviceCapabilityRegistry:
         "process.start",
         "process.stop",
         "system.notification",
+        "system.volume",
     )
 
     def __init__(self) -> None:

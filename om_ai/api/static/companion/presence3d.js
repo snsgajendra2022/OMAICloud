@@ -267,6 +267,30 @@
       }
     },
 
+    /** Apply server om_avatar / avatar pack (animation, face, gesture, lips). */
+    applyAvatarState(pack) {
+      if (!pack || typeof pack !== 'object') return;
+      const mode =
+        pack.presence ||
+        pack.mode ||
+        pack.state ||
+        pack.animation ||
+        (pack.expression && pack.expression.presence) ||
+        '';
+      if (mode) this.setPresence(mode);
+      const face = pack.face || pack.expression || {};
+      if (face && typeof face === 'object') {
+        const mood = String(face.mood || face.label || face.emotion || '').toLowerCase();
+        if (mood && !mode) this.setPresence(mood);
+      }
+      const lips = pack.lips || pack.lip_plan || pack.visemes;
+      if (lips) this.applyLipPlan(lips);
+      const gest = String(pack.gesture || pack.pose || '').toLowerCase();
+      if (gest === 'wave' || gest === 'point') this.presence = 'attentive';
+      if (pack.speaking === true) this.speaking = true;
+      if (pack.speaking === false) this.setSpeaking(false, 0);
+    },
+
     /** STEP 4 — drive jaw from viseme plan ({ frames: [{t,jaw}] }) */
     applyLipPlan(lips) {
       this._lipFrames = (lips && lips.frames) ? lips.frames : null;

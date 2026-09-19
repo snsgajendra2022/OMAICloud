@@ -4088,15 +4088,928 @@
           "confidence": 0.97
         }
       }
+    ],
+    "fae02238-1caf-4f65-ba3e-0e3469a459d2": [
+      {
+        "id": "9d2ea31f57bd4fc7",
+        "kind": "episodic",
+        "content": "youtube kholo",
+        "scope": "session",
+        "key": "fae02238-1caf-4f65-ba3e-0e3469a459d2",
+        "created_at": "2026-09-19T14:29:21.974051+00:00",
+        "updated_at": "2026-09-19T14:29:21.974056+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "",
+          "role": "user",
+          "confidence": 0.0
+        }
+      },
+      {
+        "id": "e7d09046c7ac490d",
+        "kind": "episodic",
+        "content": "YouTube khol raha hoon.",
+        "scope": "session",
+        "key": "fae02238-1caf-4f65-ba3e-0e3469a459d2",
+        "created_at": "2026-09-19T14:29:21.976501+00:00",
+        "updated_at": "2026-09-19T14:29:21.976504+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "",
+          "role": "assistant",
+          "confidence": 0.0
+        }
+      },
+      {
+        "id": "af161ff1c36c4e4f",
+        "kind": "episodic",
+        "content": "mera naam Gajendra hai",
+        "scope": "session",
+        "key": "fae02238-1caf-4f65-ba3e-0e3469a459d2",
+        "created_at": "2026-09-19T14:29:22.019692+00:00",
+        "updated_at": "2026-09-19T14:29:22.019693+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "",
+          "role": "user",
+          "confidence": 0.0
+        }
+      },
+      {
+        "id": "a83ab11b995a405f",
+        "kind": "episodic",
+        "content": "Got it, Gajendra Hai. I'll remember that.",
+        "scope": "session",
+        "key": "fae02238-1caf-4f65-ba3e-0e3469a459d2",
+        "created_at": "2026-09-19T14:29:22.020903+00:00",
+        "updated_at": "2026-09-19T14:29:22.020904+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "",
+          "role": "assistant",
+          "confidence": 0.0
+        }
+      },
+      {
+        "id": "302fee283bce489d",
+        "kind": "episodic",
+        "content": "youtube kholo",
+        "scope": "session",
+        "key": "fae02238-1caf-4f65-ba3e-0e3469a459d2",
+        "created_at": "2026-09-19T14:30:06.374142+00:00",
+        "updated_at": "2026-09-19T14:30:06.374144+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "",
+          "role": "user",
+          "confidence": 0.0
+        }
+      },
+      {
+        "id": "ef4baf1660244a58",
+        "kind": "episodic",
+        "content": "YouTube khol raha hoon.",
+        "scope": "session",
+        "key": "fae02238-1caf-4f65-ba3e-0e3469a459d2",
+        "created_at": "2026-09-19T14:30:06.375158+00:00",
+        "updated_at": "2026-09-19T14:30:06.375159+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "",
+          "role": "assistant",
+          "confidence": 0.0
+        }
+      }
+    ],
+    "4d4e1d93-b796-4b07-a191-90a98f5196b4": [
+      {
+        "id": "7503769730294c42",
+        "kind": "episodic",
+        "content": "chalo theek hai karsar main CTS wala Project open",
+        "scope": "session",
+        "key": "4d4e1d93-b796-4b07-a191-90a98f5196b4",
+        "created_at": "2026-09-19T14:31:35.339599+00:00",
+        "updated_at": "2026-09-19T14:31:35.339602+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "df991b8f6087403f",
+        "kind": "episodic",
+        "content": "Haan, boliye.",
+        "scope": "session",
+        "key": "4d4e1d93-b796-4b07-a191-90a98f5196b4",
+        "created_at": "2026-09-19T14:31:35.341853+00:00",
+        "updated_at": "2026-09-19T14:31:35.341856+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "203f4aada7934aa8",
+        "kind": "episodic",
+        "content": "bata sakte ho tum",
+        "scope": "session",
+        "key": "4d4e1d93-b796-4b07-a191-90a98f5196b4",
+        "created_at": "2026-09-19T14:31:48.474862+00:00",
+        "updated_at": "2026-09-19T14:31:48.474863+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "8c8358e7b3884894",
+        "kind": "episodic",
+        "content": "I'm here.",
+        "scope": "session",
+        "key": "4d4e1d93-b796-4b07-a191-90a98f5196b4",
+        "created_at": "2026-09-19T14:31:48.476239+00:00",
+        "updated_at": "2026-09-19T14:31:48.476240+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "237ee4fbac75469a",
+        "kind": "episodic",
+        "content": "okay",
+        "scope": "session",
+        "key": "4d4e1d93-b796-4b07-a191-90a98f5196b4",
+        "created_at": "2026-09-19T14:31:54.443422+00:00",
+        "updated_at": "2026-09-19T14:31:54.443424+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "followup",
+          "role": "user",
+          "confidence": 0.8
+        }
+      },
+      {
+        "id": "a36b72636d8a4a0f",
+        "kind": "episodic",
+        "content": "I'm here.",
+        "scope": "session",
+        "key": "4d4e1d93-b796-4b07-a191-90a98f5196b4",
+        "created_at": "2026-09-19T14:31:54.446066+00:00",
+        "updated_at": "2026-09-19T14:31:54.446067+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "followup",
+          "role": "assistant",
+          "confidence": 0.8
+        }
+      },
+      {
+        "id": "58ee6e2916dd4f72",
+        "kind": "episodic",
+        "content": "shut down",
+        "scope": "session",
+        "key": "4d4e1d93-b796-4b07-a191-90a98f5196b4",
+        "created_at": "2026-09-19T14:31:59.954423+00:00",
+        "updated_at": "2026-09-19T14:31:59.954424+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "f58a0e96738f4fc6",
+        "kind": "episodic",
+        "content": "I'm here.",
+        "scope": "session",
+        "key": "4d4e1d93-b796-4b07-a191-90a98f5196b4",
+        "created_at": "2026-09-19T14:31:59.956039+00:00",
+        "updated_at": "2026-09-19T14:31:59.956040+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "5d70caa32ebd4e4e",
+        "kind": "episodic",
+        "content": "react Kaise",
+        "scope": "session",
+        "key": "4d4e1d93-b796-4b07-a191-90a98f5196b4",
+        "created_at": "2026-09-19T14:32:10.916332+00:00",
+        "updated_at": "2026-09-19T14:32:10.916334+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "f49d13bc56a7483a",
+        "kind": "episodic",
+        "content": "I'm here.",
+        "scope": "session",
+        "key": "4d4e1d93-b796-4b07-a191-90a98f5196b4",
+        "created_at": "2026-09-19T14:32:10.917752+00:00",
+        "updated_at": "2026-09-19T14:32:10.917753+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "4cb5c59632ec4634",
+        "kind": "episodic",
+        "content": "theek hai Wapas a jao",
+        "scope": "session",
+        "key": "4d4e1d93-b796-4b07-a191-90a98f5196b4",
+        "created_at": "2026-09-19T14:32:27.420740+00:00",
+        "updated_at": "2026-09-19T14:32:27.420742+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "f7d850c76de24090",
+        "kind": "episodic",
+        "content": "Haan, boliye.",
+        "scope": "session",
+        "key": "4d4e1d93-b796-4b07-a191-90a98f5196b4",
+        "created_at": "2026-09-19T14:32:27.422185+00:00",
+        "updated_at": "2026-09-19T14:32:27.422186+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "88357ca3ffda4c8b",
+        "kind": "episodic",
+        "content": "aap apni photo to Wapas a jao yahan se",
+        "scope": "session",
+        "key": "4d4e1d93-b796-4b07-a191-90a98f5196b4",
+        "created_at": "2026-09-19T14:32:34.868285+00:00",
+        "updated_at": "2026-09-19T14:32:34.868286+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "11139b38455d4590",
+        "kind": "episodic",
+        "content": "I'm here.",
+        "scope": "session",
+        "key": "4d4e1d93-b796-4b07-a191-90a98f5196b4",
+        "created_at": "2026-09-19T14:32:34.869488+00:00",
+        "updated_at": "2026-09-19T14:32:34.869490+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "0cbf3a63fd7c44e5",
+        "kind": "episodic",
+        "content": "Mujhe to abhi bhi search wala dikhayen",
+        "scope": "session",
+        "key": "4d4e1d93-b796-4b07-a191-90a98f5196b4",
+        "created_at": "2026-09-19T14:32:40.933202+00:00",
+        "updated_at": "2026-09-19T14:32:40.933204+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "9b7e1486a2ca437a",
+        "kind": "episodic",
+        "content": "Haan, boliye.",
+        "scope": "session",
+        "key": "4d4e1d93-b796-4b07-a191-90a98f5196b4",
+        "created_at": "2026-09-19T14:32:40.934295+00:00",
+        "updated_at": "2026-09-19T14:32:40.934296+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "799eebf0f3fd429f",
+        "kind": "episodic",
+        "content": "kya tum apne code Ko Itna improve kar sakte ho ki Tumhen koi bhi command De to Mujhse insanon Ki Tarah baat kar pao",
+        "scope": "session",
+        "key": "4d4e1d93-b796-4b07-a191-90a98f5196b4",
+        "created_at": "2026-09-19T14:33:19.350605+00:00",
+        "updated_at": "2026-09-19T14:33:19.350606+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "98c9d9f2bcb64bf3",
+        "kind": "episodic",
+        "content": "Haan, boliye.",
+        "scope": "session",
+        "key": "4d4e1d93-b796-4b07-a191-90a98f5196b4",
+        "created_at": "2026-09-19T14:33:19.351900+00:00",
+        "updated_at": "2026-09-19T14:33:19.351901+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "3db159ce6c7e48c3",
+        "kind": "episodic",
+        "content": "do you understand my language",
+        "scope": "session",
+        "key": "4d4e1d93-b796-4b07-a191-90a98f5196b4",
+        "created_at": "2026-09-19T14:33:30.596036+00:00",
+        "updated_at": "2026-09-19T14:33:30.596038+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "c95d1e5faab44d79",
+        "kind": "episodic",
+        "content": "I'm here.",
+        "scope": "session",
+        "key": "4d4e1d93-b796-4b07-a191-90a98f5196b4",
+        "created_at": "2026-09-19T14:33:30.597247+00:00",
+        "updated_at": "2026-09-19T14:33:30.597249+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "c7572029a479454e",
+        "kind": "episodic",
+        "content": "Hindi jante ho",
+        "scope": "session",
+        "key": "4d4e1d93-b796-4b07-a191-90a98f5196b4",
+        "created_at": "2026-09-19T14:33:34.972832+00:00",
+        "updated_at": "2026-09-19T14:33:34.972833+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "99e0062344754208",
+        "kind": "episodic",
+        "content": "I'm here.",
+        "scope": "session",
+        "key": "4d4e1d93-b796-4b07-a191-90a98f5196b4",
+        "created_at": "2026-09-19T14:33:34.974403+00:00",
+        "updated_at": "2026-09-19T14:33:34.974404+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "652f5dd91cb641e2",
+        "kind": "episodic",
+        "content": "what are you doing man",
+        "scope": "session",
+        "key": "4d4e1d93-b796-4b07-a191-90a98f5196b4",
+        "created_at": "2026-09-19T14:33:39.724365+00:00",
+        "updated_at": "2026-09-19T14:33:39.724366+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "identity",
+          "role": "user",
+          "confidence": 0.98
+        }
+      },
+      {
+        "id": "0fc7a4a306784984",
+        "kind": "episodic",
+        "content": "I'm here.",
+        "scope": "session",
+        "key": "4d4e1d93-b796-4b07-a191-90a98f5196b4",
+        "created_at": "2026-09-19T14:33:39.725538+00:00",
+        "updated_at": "2026-09-19T14:33:39.725540+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "identity",
+          "role": "assistant",
+          "confidence": 0.98
+        }
+      },
+      {
+        "id": "acd16cf717264d56",
+        "kind": "episodic",
+        "content": "go shutdown I will leave",
+        "scope": "session",
+        "key": "4d4e1d93-b796-4b07-a191-90a98f5196b4",
+        "created_at": "2026-09-19T14:33:45.186420+00:00",
+        "updated_at": "2026-09-19T14:33:45.186422+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "79e954a88c394dcb",
+        "kind": "episodic",
+        "content": "I'm here.",
+        "scope": "session",
+        "key": "4d4e1d93-b796-4b07-a191-90a98f5196b4",
+        "created_at": "2026-09-19T14:33:45.188297+00:00",
+        "updated_at": "2026-09-19T14:33:45.188298+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      }
     ]
   },
   "semantic": {
     "t:u": [],
-    "default:anon": []
+    "default:anon": [],
+    "default": [
+      {
+        "id": "6ed218ae80244ebc",
+        "kind": "semantic",
+        "content": "Gajendra",
+        "scope": "user",
+        "key": "name",
+        "created_at": "2026-09-19T14:29:22.021784+00:00",
+        "updated_at": "2026-09-19T14:29:22.021804+00:00",
+        "tags": [
+          "name"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {}
+      }
+    ],
+    "default:Gajendra": []
   },
   "preferences": {
     "t:u": [],
-    "default:anon": []
+    "default:anon": [],
+    "default:Gajendra": []
   },
-  "project": {}
+  "project": {
+    "ai development": [
+      {
+        "id": "ffb36a2c04934620",
+        "kind": "project",
+        "content": "chalo theek hai karsar main CTS wala Project open",
+        "scope": "project",
+        "key": "ai development",
+        "created_at": "2026-09-19T14:31:35.339621+00:00",
+        "updated_at": "2026-09-19T14:31:35.339624+00:00",
+        "tags": [
+          "turn"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "5cb7b29a9da74a53",
+        "kind": "project",
+        "content": "bata sakte ho tum",
+        "scope": "project",
+        "key": "ai development",
+        "created_at": "2026-09-19T14:31:48.474870+00:00",
+        "updated_at": "2026-09-19T14:31:48.474871+00:00",
+        "tags": [
+          "turn"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "2779ff3bd53740f8",
+        "kind": "project",
+        "content": "okay",
+        "scope": "project",
+        "key": "ai development",
+        "created_at": "2026-09-19T14:31:54.443430+00:00",
+        "updated_at": "2026-09-19T14:31:54.443431+00:00",
+        "tags": [
+          "turn"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "followup",
+          "role": "user",
+          "confidence": 0.8
+        }
+      },
+      {
+        "id": "c2ea610bf96a4c54",
+        "kind": "project",
+        "content": "shut down",
+        "scope": "project",
+        "key": "ai development",
+        "created_at": "2026-09-19T14:31:59.954433+00:00",
+        "updated_at": "2026-09-19T14:31:59.954434+00:00",
+        "tags": [
+          "turn"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "e0a467ba1fb64b4e",
+        "kind": "project",
+        "content": "react Kaise",
+        "scope": "project",
+        "key": "ai development",
+        "created_at": "2026-09-19T14:32:10.916340+00:00",
+        "updated_at": "2026-09-19T14:32:10.916342+00:00",
+        "tags": [
+          "turn"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "725db8a09ea34f7c",
+        "kind": "project",
+        "content": "theek hai Wapas a jao",
+        "scope": "project",
+        "key": "ai development",
+        "created_at": "2026-09-19T14:32:27.420748+00:00",
+        "updated_at": "2026-09-19T14:32:27.420749+00:00",
+        "tags": [
+          "turn"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "dd755ecabec04609",
+        "kind": "project",
+        "content": "aap apni photo to Wapas a jao yahan se",
+        "scope": "project",
+        "key": "ai development",
+        "created_at": "2026-09-19T14:32:34.868292+00:00",
+        "updated_at": "2026-09-19T14:32:34.868293+00:00",
+        "tags": [
+          "turn"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "465412eaf44f4ceb",
+        "kind": "project",
+        "content": "Mujhe to abhi bhi search wala dikhayen",
+        "scope": "project",
+        "key": "ai development",
+        "created_at": "2026-09-19T14:32:40.933210+00:00",
+        "updated_at": "2026-09-19T14:32:40.933211+00:00",
+        "tags": [
+          "turn"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "386cea68113e4a2d",
+        "kind": "project",
+        "content": "kya tum apne code Ko Itna improve kar sakte ho ki Tumhen koi bhi command De to Mujhse insanon Ki Tarah baat kar pao",
+        "scope": "project",
+        "key": "ai development",
+        "created_at": "2026-09-19T14:33:19.350613+00:00",
+        "updated_at": "2026-09-19T14:33:19.350614+00:00",
+        "tags": [
+          "turn"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "490b3763a4fc4d48",
+        "kind": "project",
+        "content": "do you understand my language",
+        "scope": "project",
+        "key": "ai development",
+        "created_at": "2026-09-19T14:33:30.596044+00:00",
+        "updated_at": "2026-09-19T14:33:30.596046+00:00",
+        "tags": [
+          "turn"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "83474d374d414f87",
+        "kind": "project",
+        "content": "Hindi jante ho",
+        "scope": "project",
+        "key": "ai development",
+        "created_at": "2026-09-19T14:33:34.972840+00:00",
+        "updated_at": "2026-09-19T14:33:34.972844+00:00",
+        "tags": [
+          "turn"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "9eef63888ef24178",
+        "kind": "project",
+        "content": "what are you doing man",
+        "scope": "project",
+        "key": "ai development",
+        "created_at": "2026-09-19T14:33:39.724372+00:00",
+        "updated_at": "2026-09-19T14:33:39.724374+00:00",
+        "tags": [
+          "turn"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "identity",
+          "role": "user",
+          "confidence": 0.98
+        }
+      },
+      {
+        "id": "a468ee1cf329464d",
+        "kind": "project",
+        "content": "go shutdown I will leave",
+        "scope": "project",
+        "key": "ai development",
+        "created_at": "2026-09-19T14:33:45.186432+00:00",
+        "updated_at": "2026-09-19T14:33:45.186434+00:00",
+        "tags": [
+          "turn"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      }
+    ]
+  }
 }

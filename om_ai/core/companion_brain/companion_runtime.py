@@ -161,10 +161,27 @@ class CompanionRuntime:
             project_key=session.project_id,
         )
         prefs = recall.get("preferences") or {}
+        # Long-term human_memory blob (episodic / emotional / projects)
+        hm_blob = str((extra or {}).get("human_memory_blob") or "").strip()
+        if not hm_blob:
+            try:
+                from om_ai.core.human_memory import get_human_memory
+
+                hm_blob = str(get_human_memory().recall_blob() or "").strip()
+            except Exception:
+                hm_blob = ""
+        mem_blob = "\n".join(
+            p
+            for p in (
+                str(recall.get("context_blob") or "").strip(),
+                hm_blob[:1200] if hm_blob else "",
+            )
+            if p
+        )
         human_ctx = self.human.build(
             message=q,
             history=hist,
-            memory_blob=str(recall.get("context_blob") or ""),
+            memory_blob=mem_blob,
             preferences=prefs,
         )
 
@@ -174,6 +191,8 @@ class CompanionRuntime:
         meta["personality"] = {
             "affect": personality_pack.get("affect"),
             "expression": personality_pack.get("expression"),
+            "tone": personality_pack.get("tone"),
+            "relationship": personality_pack.get("relationship"),
         }
 
         policy = self.policy.decide(semantic)
@@ -208,13 +227,15 @@ class CompanionRuntime:
                     "purpose": str(((extra or {}).get("user_context") or {}).get("purpose") or ""),
                 }
             ),
+            str(personality_pack.get("system_hint") or ""),
             str(human_ctx.get("context_blob") or ""),
             str(knowledge.get("blob") or ""),
             str(reasoning.get("hint") or ""),
             model_context or "",
             "Speak out loud to the user. Keep the reply short and human. Do not append a canned follow-up question.",
+            "Use remembered facts (name, preferences, recent turns) naturally when relevant.",
         ]
-        merged_context = "\n".join(p for p in ctx_parts if p).strip()[:3500]
+        merged_context = "\n".join(p for p in ctx_parts if p).strip()[:4000]
 
         activities.append(_PUBLIC_ACTIVITIES["respond"])
         gen = self.response.generate(

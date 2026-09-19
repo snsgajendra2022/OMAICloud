@@ -179,9 +179,25 @@ class VoiceRuntime:
                 self._emit("voice.wake", wake)
                 # Strip wake phrase from command if present
                 remainder = q
-                for p in (self.wake.phrase, "hey om", "hi om"):
-                    if remainder.lower().startswith(p):
-                        remainder = remainder[len(p):].strip(" ,.-")
+                for p in (
+                    self.wake.phrase,
+                    "hey om",
+                    "hi om",
+                    "hello om",
+                    "ok om",
+                    "okay om",
+                    "hey jarvis",
+                    "hi jarvis",
+                    "jarvis",
+                    "om",
+                ):
+                    low_r = remainder.lower()
+                    if low_r.startswith(p):
+                        remainder = remainder[len(p) :].strip(" ,.-")
+                        break
+                    # also strip mid-phrase "jarvis, …"
+                    if p in {"jarvis", "om"} and low_r.startswith(p + " "):
+                        remainder = remainder[len(p) :].strip(" ,.-")
                         break
                 self._set_state(CompanionState.LISTENING)
                 if not remainder:

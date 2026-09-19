@@ -105,11 +105,24 @@ class DeviceRuntime:
             str(params.get("message", "")),
         )
 
+    def _handle_system_volume(self, params: dict[str, Any]) -> dict[str, Any]:
+        mute = params.get("mute")
+        level = params.get("level")
+        out = self.system.set_volume(
+            int(level) if level is not None else None,
+            mute=bool(mute) if mute is not None else None,
+        )
+        if isinstance(out, dict) and "ok" not in out:
+            out = {**out, "ok": True}
+        return out if isinstance(out, dict) else {"ok": True, "result": out}
+
 
 def _risk_for_capability(capability: str) -> RiskClass:
     if capability.startswith("filesystem.read") or capability.endswith(".list"):
         return RiskClass.READ_ONLY
-    if capability == "system.notification":
+    if capability in {"system.notification", "system.volume", "browser.open", "browser.navigate"}:
+        return RiskClass.LOW_IMPACT
+    if capability.startswith("application."):
         return RiskClass.LOW_IMPACT
     if capability.startswith("filesystem."):
         if "delete" in capability:

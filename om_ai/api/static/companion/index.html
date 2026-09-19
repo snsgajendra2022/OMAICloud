@@ -399,6 +399,10 @@
     let bargeCtx = null;
     let bargeRaf = 0;
     let lastBargeAt = 0;
+    let turnQueue = [];
+    let chatHistory = [];
+    let companionWs = null;
+    let lastVoicePlan = null;
 
     /* —— White emission particle core (Jarvis HUD) —— */
     const core = { particles: [], raf: 0, w: 0, h: 0, ctx: null };
@@ -719,18 +723,70 @@
     async function startSession() {
       const data = await api('/session', { method: 'POST', body: '{}' });
       sessionId = data.session_id;
+      connectCompanionWs(sessionId);
       if (data.memory_line && els.memoryLine) {
         els.memoryLine.textContent = 'Memory · ' + data.memory_line;
       }
       if (data.user && data.user.name && els.privacyHint) {
         els.privacyHint.textContent = 'Personal companion · ' + data.user.name;
       }
+      if (data.avatar && window.OMPresence3D) {
+        try { window.OMPresence3D.applyAvatarState(data.avatar); } catch (_) {}
+      }
       if (data.greeting) {
         const g = String(data.greeting).replace(/\[\[slnc\s+\d+\]\]/gi, ' ').replace(/\s+/g, ' ').trim();
         els.reply.textContent = g;
         pendingGreeting = data.spoken_tts || data.greeting;
+        pushHistory('assistant', g);
       }
       return data;
+    }
+
+    function connectCompanionWs(sid) {
+      if (!sid || companionWs) return;
+      try {
+        const proto = location.protocol === 'https:' ? 'wss' : 'ws';
+        companionWs = new WebSocket(proto + '://' + location.host + '/api/companion/ws/' + encodeURIComponent(sid));
+        companionWs.onmessage = (ev) => {
+          let msg = null;
+          try { msg = JSON.parse(ev.data); } catch (_) { return; }
+          const et = msg.event_type || msg.type || '';
+          const payload = msg.payload || msg.data || msg;
+          if (et === 'avatar.state' || et === 'presence.state') {
+            if (window.OMPresence3D) {
+              try {
+                if (et === 'avatar.state') window.OMPresence3D.applyAvatarState(payload);
+                else if (payload.presence || payload.mode) {
+                  window.OMPresence3D.setPresence(payload.presence || payload.mode || (payload.presence && payload.presence.mode));
+                }
+              } catch (_) {}
+            }
+            const mode = (payload && (payload.mode || payload.state || (payload.presence && payload.presence.mode))) || '';
+            if (mode && !speaking) setState(mode, mode);
+          }
+          if (et === 'permission.required' && payload) {
+            pendingPermissionId = payload.permission_id;
+            const ask = payload.prompt || 'Allow this action?';
+            els.permText.textContent = ask;
+            els.permBox.classList.add('show');
+          }
+        };
+        companionWs.onclose = () => { companionWs = null; };
+        companionWs.onerror = () => {};
+      } catch (_) {}
+    }
+
+    function pushHistory(role, content) {
+      const c = String(content || '').trim();
+      if (!c) return;
+      chatHistory.push({ role, content: c.slice(0, 2000) });
+      if (chatHistory.length > 24) chatHistory = chatHistory.slice(-24);
+    }
+
+    function flushTurnQueue() {
+      if (busy || speaking || !turnQueue.length) return;
+      const next = turnQueue.shift();
+      if (next) handleTurn(next);
     }
 
     let speakGen = 0;
@@ -804,29 +860,34 @@
       }
     }
 
-    async function speak(text, emotion) {
+    async function speak(text, emotion, voicePlan) {
       const say = String(text || '').trim();
       if (!say || muted) {
         setState('LISTENING');
         scheduleListen(200);
+        flushTurnQueue();
         return;
       }
       stopSpeakingLocal();
       const myGen = speakGen;
       speaking = true;
-      setState('SPEAKING');
-      const emo = emotion || 'calm';
+      setState('SPEAKING', 'speaking');
+      const emo = emotion || (voicePlan && voicePlan.emotion) || 'calm';
       try {
         const res = await fetch('/api/companion/tts', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ text: say, emotion: emo, presence: 'speaking' }),
+          body: JSON.stringify({
+            text: say,
+            emotion: emo,
+            presence: (voicePlan && voicePlan.presence) || 'speaking',
+          }),
         });
         if (myGen !== speakGen) return;
         if (res.ok) {
-          let lipsPlan = null;
+          let lipsPlan = (voicePlan && voicePlan.lips) || null;
           const lipsHdr = res.headers.get('X-OM-Lips');
-          if (lipsHdr) {
+          if (!lipsPlan && lipsHdr) {
             try { lipsPlan = JSON.parse(lipsHdr); } catch (_) {}
           }
           if (!lipsPlan) {
@@ -869,11 +930,17 @@
           }
           setState('LISTENING');
           scheduleListen(350);
+          flushTurnQueue();
           return;
         }
-      } catch (_) {}
+        // Prefer silence over wrong robotic browser voice when Aman TTS fails
+        console.warn('OM TTS failed — status', res.status);
+      } catch (e) {
+        console.warn('OM TTS error', e);
+      }
 
       if (myGen !== speakGen) return;
+      // Soft fallback only if no Aman path — prefer Indian male voices
       if (window.speechSynthesis) {
         if (window.OMPresence3D) {
           try { window.OMPresence3D.setSpeaking(true, 0.25); } catch (_) {}
@@ -914,6 +981,7 @@
       // Stop must always win — even mid-speech / mid-brain
       if (isStopCommand(q)) {
         turnGen += 1;
+        turnQueue = [];
         stopSpeakingLocal();
         busy = false;
         els.heard.textContent = 'You said: ' + q;
@@ -922,13 +990,17 @@
         try {
           await api('/message', {
             method: 'POST',
-            body: JSON.stringify({ text: q, session_id: sessionId, speak: false }),
+            body: JSON.stringify({ text: q, session_id: sessionId, speak: false, history: chatHistory.slice(-12) }),
           });
         } catch (_) {}
         scheduleListen(120);
         return;
       }
-      if (busy) return;
+      if (busy) {
+        // Queue instead of dropping overlapping finals
+        if (turnQueue.length < 3 && turnQueue[turnQueue.length - 1] !== q) turnQueue.push(q);
+        return;
+      }
       // Ignore tiny noise fragments
       if (q.length < 2) return;
       const myTurn = ++turnGen;
@@ -936,14 +1008,21 @@
       stopSpeakingLocal();
       els.heard.textContent = 'You said: ' + q;
       if (els.feeling) els.feeling.textContent = '';
-      setState('UNDERSTANDING');
+      setState('UNDERSTANDING', 'thinking');
+      pushHistory('user', q);
       try {
         if (!sessionId) await startSession();
         const data = await api('/message', {
           method: 'POST',
-          body: JSON.stringify({ text: q, session_id: sessionId, speak: true }),
+          body: JSON.stringify({
+            text: q,
+            session_id: sessionId,
+            speak: true,
+            history: chatHistory.slice(-12),
+          }),
         });
         if (myTurn !== turnGen) return;
+        if (data.session_id) sessionId = data.session_id;
         if (data.interrupted || data.speak_client === false) {
           els.reply.textContent = data.spoken || data.answer || 'Okay — stopped.';
           setState('LISTENING');
@@ -964,6 +1043,9 @@
           const feel = data.feeling || data.affect.label;
           els.feeling.textContent = 'Feeling · ' + String(feel).replace(/_/g, ' ');
         }
+        if (data.avatar && window.OMPresence3D) {
+          try { window.OMPresence3D.applyAvatarState(data.avatar); } catch (_) {}
+        }
         const presenceMode = (data.presence && data.presence.mode) || data.state || '';
         if (presenceMode) setState(presenceMode, presenceMode);
         if (data.permission && data.permission.requires_approval) {
@@ -973,7 +1055,7 @@
           els.permBox.classList.add('show');
           els.reply.textContent = ask;
           setState('WAITING_FOR_PERMISSION');
-          await speak(data.spoken_tts || ask);
+          await speak(data.spoken_tts || ask, data.feeling || 'calm', data.voice_plan);
           return;
         }
         els.permBox.classList.remove('show');
@@ -995,8 +1077,14 @@
         }
         if (display) {
           els.reply.textContent = display;
+          pushHistory('assistant', display);
           if (myTurn !== turnGen) return;
-          await speak(data.spoken_tts || answer, data.feeling || (data.affect && data.affect.label) || 'calm');
+          lastVoicePlan = data.voice_plan || null;
+          await speak(
+            data.spoken_tts || answer,
+            data.feeling || (data.affect && data.affect.label) || 'calm',
+            data.voice_plan
+          );
         } else {
           setState('LISTENING');
           scheduleListen(150);
@@ -1009,6 +1097,7 @@
         scheduleListen(400);
       } finally {
         if (myTurn === turnGen) busy = false;
+        flushTurnQueue();
       }
     }
 
@@ -1058,6 +1147,7 @@
           // Barge-in while OM is speaking
           if (speaking) stopSpeakingLocal();
           if (!busy) handleTurn(cleaned);
+          else if (turnQueue.length < 3) turnQueue.push(cleaned);
         }
       };
 

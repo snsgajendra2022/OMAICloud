@@ -309,3 +309,83 @@
 {"id": "0946e1672f30", "ts": 1789826988.527197, "role": "assistant", "text": "Haan, boliye.", "tags": []}
 {"id": "0d1a9f9e0061", "ts": 1789826988.5276318, "role": "user", "text": "hello hello hello kya kar rahe ho", "tags": []}
 {"id": "795f27728ae0", "ts": 1789826988.5276842, "role": "assistant", "text": "Haan, boliye.", "tags": []}
+{"id": "df123637b0b1", "ts": 1789828161.9684732, "role": "user", "text": "youtube kholo", "tags": []}
+{"id": "000d7dffec71", "ts": 1789828161.9686232, "role": "assistant", "text": "YouTube khol raha hoon.", "tags": []}
+{"id": "d60b376e9a22", "ts": 1789828161.970195, "role": "user", "text": "youtube kholo", "tags": []}
+{"id": "ac7b450302e4", "ts": 1789828161.970369, "role": "assistant", "text": "YouTube khol raha hoon.", "tags": []}
+{"id": "e3dfa9a5a0df", "ts": 1789828162.013898, "role": "user", "text": "mera naam Gajendra hai", "tags": []}
+{"id": "728fb486521d", "ts": 1789828162.01398, "role": "assistant", "text": "Got it, Gajendra Hai. I'll remember that.", "tags": []}
+{"id": "d9e5ddb918be", "ts": 1789828162.014354, "role": "user", "text": "mera naam Gajendra hai", "tags": []}
+{"id": "baea356bd101", "ts": 1789828162.014433, "role": "assistant", "text": "Got it, Gajendra Hai. I'll remember that.", "tags": []}
+{"id": "386bda74e5fe", "ts": 1789828206.3711958, "role": "user", "text": "youtube kholo", "tags": []}
+{"id": "a718345a5725", "ts": 1789828206.371346, "role": "assistant", "text": "YouTube khol raha hoon.", "tags": []}
+{"id": "59afa16836b6", "ts": 1789828206.3720372, "role": "user", "text": "youtube kholo", "tags": []}
+{"id": "9322a4b78cf8", "ts": 1789828206.372101, "role": "assistant", "text": "YouTube khol raha hoon.", "tags": []}
+{"id": "835c1eac820d", "ts": 1789828240.81995, "role": "user", "text": "youtube kholo", "tags": []}
+{"id": "f6a7774dac48", "ts": 1789828240.820093, "role": "assistant", "text": "YouTube khol raha hoon.", "tags": []}
+{"id": "6a68977c720d", "ts": 1789828240.821067, "role": "user", "text": "youtube kholo", "tags": []}
+{"id": "e3aa4864cc2d", "ts": 1789828240.821135, "role": "assistant", "text": "YouTube khol raha hoon.", "tags": []}
+{"id": "454073dfac31", "ts": 1789828269.883551, "role": "user", "text": "Youtube open karna", "tags": []}
+{"id": "4700de721b2f", "ts": 1789828269.883754, "role": "assistant", "text": "Opening YouTube.", "tags": []}
+{"id": "79704bd0eb00", "ts": 1789828269.884244, "role": "user", "text": "Youtube open karna", "tags": []}
+{"id": "7889b4e3d2cc", "ts": 1789828269.8843148, "role": "assistant", "text": "Opening YouTube.", "tags": []}
+{"id": "918b87a69399", "ts": 1789828295.3442712, "role": "user", "text": "chalo theek hai karsar main CTS wala Project open", "tags": []}
+{"id": "cf4dd1dbcb84", "ts": 1789828295.344407, "role": "assistant", "text": "Understood. I will break this into clear steps and proceed carefully.", "tags": []}
+{"id": "ef91d1723f7e", "ts": 1789828295.3452811, "role": "user", "text": "chalo theek hai karsar main CTS wala Project open", "tags": []}
+{"id": "c694359a264b", "ts": 1789828295.345382, "role": "assistant", "text": "Understood. I will break this into clear steps and proceed carefully.", "tags": []}
+{"id": "feac7be3798e", "ts": 1789828298.190748, "role": "user", "text": "hello karsar mein ects wala project open kar do", "tags": []}
+{"id": "f0318be9efa9", "ts": 1789828298.190975, "role": "assistant", "text": "Understood. I will break this into clear steps and proceed carefully.", "tags": []}
+{"id": "19049f127cf2", "ts": 1789828298.191689, "role": "user", "text": "hello karsar mein ects wala project open kar do", "tags": []}
+{"id": "6bafdaaffaf0", "ts": 1789828298.191778, "role": "assistant", "text": "Understood. I will break this into clear steps and proceed carefully.", "tags": []}
+{"id": "5cbde0c4afb0", "ts": 1789828308.4774358, "role": "user", "text": "bata sakte ho tum", "tags": []}
+{"id": "7814d3b6c43f", "ts": 1789828308.4774988, "role": "assistant", "text": "I'm here.", "tags": []}
+{"id": "579dcbd7292a", "ts": 1789828308.477972, "role": "user", "text": "bata sakte ho tum", "tags": []}
+{"id": "4ee2a9b98794", "ts": 1789828308.478015, "role": "assistant", "text": "I'm here.", "tags": []}
+{"id": "d826c14205e8", "ts": 1789828314.447775, "role": "user", "text": "okay", "tags": []}
+{"id": "1ce2f8c5ce2e", "ts": 1789828314.4478452, "role": "assistant", "text": "I'm here.", "tags": []}
+{"id": "cd1b09a4ed79", "ts": 1789828314.4481878, "role": "user", "text": "okay", "tags": []}
+{"id": "d1dfcca84f43", "ts": 1789828314.4482298, "role": "assistant", "text": "I'm here.", "tags": []}
+{"id": "f6f92a976ace", "ts": 1789828319.9572968, "role": "user", "text": "shut down", "tags": []}
+{"id": "c63e602d0422", "ts": 1789828319.9573739, "role": "assistant", "text": "I'm here.", "tags": []}
+{"id": "068e7a056511", "ts": 1789828319.957899, "role": "user", "text": "shut down", "tags": []}
+{"id": "7851f1f8a52e", "ts": 1789828319.957963, "role": "assistant", "text": "I'm here.", "tags": []}
+{"id": "9bd8114a8bb6", "ts": 1789828330.919199, "role": "user", "text": "react Kaise", "tags": []}
+{"id": "42b1cf5876b7", "ts": 1789828330.919328, "role": "assistant", "text": "I'm here.", "tags": []}
+{"id": "638f11f20f31", "ts": 1789828330.9200692, "role": "user", "text": "react Kaise", "tags": []}
+{"id": "4c2316169c35", "ts": 1789828330.920228, "role": "assistant", "text": "I'm here.", "tags": []}
+{"id": "d6a6e1c43cbc", "ts": 1789828336.621313, "role": "user", "text": "Google per search karo rate kya hoti hai", "tags": []}
+{"id": "f94aa50a8784", "ts": 1789828336.62144, "role": "assistant", "text": "Searching.", "tags": []}
+{"id": "780e97eb811c", "ts": 1789828336.621873, "role": "user", "text": "Google per search karo rate kya hoti hai", "tags": []}
+{"id": "1315e84eedc7", "ts": 1789828336.6219242, "role": "assistant", "text": "Searching.", "tags": []}
+{"id": "ccf3c9b2784b", "ts": 1789828347.423389, "role": "user", "text": "theek hai Wapas a jao", "tags": []}
+{"id": "fca9f0105935", "ts": 1789828347.4234612, "role": "assistant", "text": "Haan, boliye.", "tags": []}
+{"id": "02ee0bc3f0e4", "ts": 1789828347.423956, "role": "user", "text": "theek hai Wapas a jao", "tags": []}
+{"id": "f80f8544977d", "ts": 1789828347.4239979, "role": "assistant", "text": "Haan, boliye.", "tags": []}
+{"id": "037ff552ddb5", "ts": 1789828354.870697, "role": "user", "text": "aap apni photo to Wapas a jao yahan se", "tags": []}
+{"id": "85a88980bf7a", "ts": 1789828354.870816, "role": "assistant", "text": "I'm here.", "tags": []}
+{"id": "a67cafab0915", "ts": 1789828354.871325, "role": "user", "text": "aap apni photo to Wapas a jao yahan se", "tags": []}
+{"id": "347cac88d53c", "ts": 1789828354.871383, "role": "assistant", "text": "I'm here.", "tags": []}
+{"id": "a9d5872109d4", "ts": 1789828360.935494, "role": "user", "text": "Mujhe to abhi bhi search wala dikhayen", "tags": []}
+{"id": "7da71bf8aab4", "ts": 1789828360.935575, "role": "assistant", "text": "Haan, boliye.", "tags": []}
+{"id": "7f114bd75d16", "ts": 1789828360.935922, "role": "user", "text": "Mujhe to abhi bhi search wala dikhayen", "tags": []}
+{"id": "54e2ef60a9d9", "ts": 1789828360.9359622, "role": "assistant", "text": "Haan, boliye.", "tags": []}
+{"id": "7b0df4cc803c", "ts": 1789828399.3535948, "role": "user", "text": "kya tum apne code Ko Itna improve kar sakte ho ki Tumhen koi bhi command De to Mujhse insanon Ki Tarah baat kar pao", "tags": []}
+{"id": "1caebbb10841", "ts": 1789828399.353667, "role": "assistant", "text": "Understood. I will break this into clear steps and proceed carefully.", "tags": []}
+{"id": "149e8ce7623d", "ts": 1789828399.354165, "role": "user", "text": "kya tum apne code Ko Itna improve kar sakte ho ki Tumhen koi bhi command De to Mujhse insanon Ki Tarah baat kar pao", "tags": []}
+{"id": "b4bb02924891", "ts": 1789828399.354205, "role": "assistant", "text": "Understood. I will break this into clear steps and proceed carefully.", "tags": []}
+{"id": "6015b288f493", "ts": 1789828410.598473, "role": "user", "text": "do you understand my language", "tags": []}
+{"id": "8057de7e2561", "ts": 1789828410.5985432, "role": "assistant", "text": "I'm here.", "tags": []}
+{"id": "61db536205ab", "ts": 1789828410.59918, "role": "user", "text": "do you understand my language", "tags": []}
+{"id": "44112f8a5671", "ts": 1789828410.599243, "role": "assistant", "text": "I'm here.", "tags": []}
+{"id": "c9a5fc31757c", "ts": 1789828414.976948, "role": "user", "text": "Hindi jante ho", "tags": []}
+{"id": "29bb20300c5b", "ts": 1789828414.977022, "role": "assistant", "text": "I'm here.", "tags": []}
+{"id": "794a67e9f851", "ts": 1789828414.977497, "role": "user", "text": "Hindi jante ho", "tags": []}
+{"id": "86604bf3bc65", "ts": 1789828414.9775538, "role": "assistant", "text": "I'm here.", "tags": []}
+{"id": "97ad299e7189", "ts": 1789828419.726818, "role": "user", "text": "what are you doing man", "tags": []}
+{"id": "1748daa97e5b", "ts": 1789828419.726879, "role": "assistant", "text": "I'm here.", "tags": []}
+{"id": "54efbb2fc075", "ts": 1789828419.7273548, "role": "user", "text": "what are you doing man", "tags": []}
+{"id": "11d1f3901137", "ts": 1789828419.7274072, "role": "assistant", "text": "I'm here.", "tags": []}
+{"id": "a7acdd4df577", "ts": 1789828425.189782, "role": "user", "text": "go shutdown I will leave", "tags": []}
+{"id": "ecac9b3ab18f", "ts": 1789828425.1898618, "role": "assistant", "text": "I'm here.", "tags": []}
+{"id": "77b2f90783b8", "ts": 1789828425.1902442, "role": "user", "text": "go shutdown I will leave", "tags": []}
+{"id": "fc6cc3ef86a9", "ts": 1789828425.190333, "role": "assistant", "text": "I'm here.", "tags": []}

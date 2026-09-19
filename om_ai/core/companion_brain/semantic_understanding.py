@@ -10,10 +10,13 @@ from .goal_engine import GoalEngine
 
 _ACTION_RE = re.compile(
     r"\b("
-    r"open|launch|start|close|quit|"
+    r"open|launch|start|close|quit|kholo|khol|"
     r"delete|remove|erase|"
-    r"list|show|read|write|save|"
-    r"run|execute|install|send|publish|navigate"
+    r"list\s+files|show\s+files|"
+    r"run\s+(?:the\s+)?(?:app|script)|execute|install|send\s+email|publish|navigate|"
+    r"youtube|google|browser|volume|awaz|mute|unmute|"
+    r"weather|mausam|forecast|screenshot|calculator|"
+    r"shutdown|restart|sleep"
     r")\b",
     re.I,
 )
@@ -43,7 +46,7 @@ class SemanticUnderstanding:
             prior = " ".join(str(h.get("content") or "") for h in hist[-4:]).lower()
             if any(k in prior for k in ("project", "folder", "file", "vscode", "code", "open")):
                 action_like = True
-        requires_action = action_like or intent.intent in {"debugging", "howto", "coding"}
+        requires_action = action_like
         requires_clarification = bool(intent.needs_details) and not action_like
         domain = intent.domain or "general"
         if action_like:

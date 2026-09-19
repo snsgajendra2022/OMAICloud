@@ -28,3 +28,18 @@ class SystemController:
             "delivered": False,
             "reason": "notifications not configured for this platform",
         }
+
+    def set_volume(self, level: int | None = None, *, mute: bool | None = None) -> dict[str, Any]:
+        """0–100 output volume, or mute/unmute (macOS / Linux best-effort)."""
+        if self._system == "darwin":
+            if mute is True:
+                return self._cmd.run(["osascript", "-e", "set volume output muted true"])
+            if mute is False:
+                return self._cmd.run(["osascript", "-e", "set volume output muted false"])
+            lvl = max(0, min(100, int(level if level is not None else 50)))
+            return self._cmd.run(["osascript", "-e", f"set volume output volume {lvl}"])
+        if self._system == "linux" and level is not None:
+            lvl = max(0, min(100, int(level)))
+            return self._cmd.run(["amixer", "-D", "pulse", "sset", "Master", f"{lvl}%"])
+        return {"ok": False, "reason": "volume_unsupported"}
+

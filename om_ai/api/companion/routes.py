@@ -258,6 +258,12 @@ def companion_session(body: SessionBody | None = None) -> dict[str, Any]:
 @router.post("/message")
 def companion_message(body: MessageBody) -> dict[str, Any]:
     rt = _ensure_browser_session()
+    # Honor client session so memory / WS / HUD share one identity
+    if body.session_id and str(body.session_id).strip():
+        try:
+            rt.context.session_id = str(body.session_id).strip()
+        except Exception:
+            pass
     out = rt.handle_text(body.text, history=body.history)
     # Prefer browser TTS for lip-sync + no double-speak from macOS say on server
     if rt.voice is not None:
