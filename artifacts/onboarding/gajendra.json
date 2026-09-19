@@ -1,0 +1,207 @@
+{
+  "status": "completed",
+  "cached": false,
+  "user_profile": {
+    "user_id": "gajendra",
+    "display_name": "Gajendra",
+    "tenant_id": "default",
+    "actor": "gajendra",
+    "purpose": "ai development",
+    "language": "hi-en",
+    "response_style": "deep technical",
+    "style": "deep technical",
+    "memory_enabled": true,
+    "companion_mode": true,
+    "preferences": {
+      "detail": "detailed",
+      "tone": "deep technical"
+    }
+  },
+  "workspace": {
+    "tenant_id": "default",
+    "user_id": "gajendra",
+    "name": "Gajendra's OM",
+    "mode": "ai development",
+    "language": "hi-en",
+    "companion_enabled": true,
+    "memory_enabled": true,
+    "created": true,
+    "created_at": "2026-09-19T10:36:55.951277+00:00"
+  },
+  "assistant": {
+    "tenant_id": "default",
+    "user_id": "gajendra",
+    "name": "OM Engineering Companion",
+    "system_prompt": "You are OM Engineering Companion, the personal OM AI companion for Gajendra.\nUser purpose: ai development\nCommunication style: deep technical\nPreferred language: hi-en\n\nRules:\n- Understand context before answering\n- Remember preferences across turns\n- Speak naturally (English / Hindi / Hinglish as preferred)\n- Be proactive and precise\n- Match depth to the user's style (brief vs deep technical)",
+    "language": "hi-en",
+    "style": "deep technical",
+    "created": true
+  },
+  "memory": {
+    "tenant_id": "default",
+    "user": "gajendra",
+    "purpose": "ai development",
+    "communication_style": "deep technical",
+    "language": "hi-en",
+    "companion_enabled": true,
+    "facts": [
+      "User display name: Gajendra",
+      "Purpose: ai development",
+      "Preferred style: deep technical",
+      "Preferred language: hi-en",
+      "User likes: detailed technical answers; architecture discussion; production-ready code; Hinglish / Hindi-friendly conversation"
+    ],
+    "likes": [
+      "detailed technical answers",
+      "architecture discussion",
+      "production-ready code",
+      "Hinglish / Hindi-friendly conversation"
+    ],
+    "preferences": {
+      "detail": "detailed",
+      "tone": "deep technical"
+    }
+  },
+  "prompts": [
+    {
+      "tenant_id": "default",
+      "user_id": "gajendra",
+      "title": "Review OM architecture",
+      "body": "Review OM architecture"
+    },
+    {
+      "tenant_id": "default",
+      "user_id": "gajendra",
+      "title": "Debug Python pipeline",
+      "body": "Debug Python pipeline"
+    },
+    {
+      "tenant_id": "default",
+      "user_id": "gajendra",
+      "title": "Design AI system",
+      "body": "Design AI system"
+    },
+    {
+      "tenant_id": "default",
+      "user_id": "gajendra",
+      "title": "Optimize response quality",
+      "body": "Optimize response quality"
+    },
+    {
+      "tenant_id": "default",
+      "user_id": "gajendra",
+      "title": "Plan companion voice upgrade",
+      "body": "Plan companion voice upgrade"
+    },
+    {
+      "tenant_id": "default",
+      "user_id": "gajendra",
+      "title": "Hinglish mein samjhao",
+      "body": "Hinglish mein samjhao"
+    },
+    {
+      "tenant_id": "default",
+      "user_id": "gajendra",
+      "title": "Project plan banao",
+      "body": "Project plan banao"
+    }
+  ],
+  "companion_context": {
+    "user": {
+      "user_id": "gajendra",
+      "display_name": "Gajendra",
+      "tenant_id": "default",
+      "actor": "gajendra",
+      "purpose": "ai development",
+      "language": "hi-en",
+      "response_style": "deep technical",
+      "style": "deep technical",
+      "memory_enabled": true,
+      "companion_mode": true,
+      "preferences": {
+        "detail": "detailed",
+        "tone": "deep technical"
+      }
+    },
+    "assistant": {
+      "tenant_id": "default",
+      "user_id": "gajendra",
+      "name": "OM Engineering Companion",
+      "system_prompt": "You are OM Engineering Companion, the personal OM AI companion for Gajendra.\nUser purpose: ai development\nCommunication style: deep technical\nPreferred language: hi-en\n\nRules:\n- Understand context before answering\n- Remember preferences across turns\n- Speak naturally (English / Hindi / Hinglish as preferred)\n- Be proactive and precise\n- Match depth to the user's style (brief vs deep technical)",
+      "language": "hi-en",
+      "style": "deep technical",
+      "created": true
+    },
+    "memory": {
+      "tenant_id": "default",
+      "user": "gajendra",
+      "purpose": "ai development",
+      "communication_style": "deep technical",
+      "language": "hi-en",
+      "companion_enabled": true,
+      "facts": [
+        "User display name: Gajendra",
+        "Purpose: ai development",
+        "Preferred style: deep technical",
+        "Preferred language: hi-en",
+        "User likes: detailed technical answers; architecture discussion; production-ready code; Hinglish / Hindi-friendly conversation"
+      ],
+      "likes": [
+        "detailed technical answers",
+        "architecture discussion",
+        "production-ready code",
+        "Hinglish / Hindi-friendly conversation"
+      ],
+      "preferences": {
+        "detail": "detailed",
+        "tone": "deep technical"
+      }
+    },
+    "workspace": {
+      "tenant_id": "default",
+      "user_id": "gajendra",
+      "name": "Gajendra's OM",
+      "mode": "ai development",
+      "language": "hi-en",
+      "companion_enabled": true,
+      "memory_enabled": true,
+      "created": true,
+      "created_at": "2026-09-19T10:36:55.951277+00:00"
+    }
+  },
+  "platform": {
+    "assistant": true,
+    "prompts": 7,
+    "memory": false
+  },
+  "events": [
+    {
+      "user_id": "gajendra",
+      "event": "started",
+      "detail": {},
+      "timestamp": "2026-09-19T10:36:55.950904+00:00"
+    },
+    {
+      "user_id": "gajendra",
+      "event": "profile_ready",
+      "detail": {
+        "purpose": "ai development"
+      },
+      "timestamp": "2026-09-19T10:36:55.951273+00:00"
+    },
+    {
+      "user_id": "gajendra",
+      "event": "assistant_ready",
+      "detail": {
+        "name": "OM Engineering Companion"
+      },
+      "timestamp": "2026-09-19T10:36:55.951287+00:00"
+    },
+    {
+      "user_id": "gajendra",
+      "event": "memory_ready",
+      "detail": {},
+      "timestamp": "2026-09-19T10:36:55.954416+00:00"
+    }
+  ]
+}

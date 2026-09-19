@@ -147,6 +147,21 @@ class CompanionRuntime:
                 logger.warning("companion_os init: %s", exc)
                 self.os = None
 
+            # Production onboarding → companion context (if user already bootstrapped)
+            try:
+                import os as _os
+
+                from om_ai.core.onboarding import get_onboarding_engine
+
+                actor = (_os.getenv("OM_ONBOARDING_ACTOR") or "").strip()
+                eng = get_onboarding_engine()
+                pack = eng.load(actor) if actor else None
+                if pack and pack.get("companion_context"):
+                    self.onboarding_context = pack["companion_context"]
+                    self.registry.register("onboarding", pack)
+            except Exception as exc:
+                logger.debug("onboarding context: %s", exc)
+
             self._started = True
             self.lifecycle = Lifecycle.RUNNING
             banner = self.status_banner()
@@ -156,6 +171,8 @@ class CompanionRuntime:
                     banner["companion_os"] = self.os.status()
                 except Exception:
                     pass
+            if getattr(self, "onboarding_context", None):
+                banner["onboarding"] = True
             if (
                 self.config.avatar_enabled
                 and not self.config.no_avatar

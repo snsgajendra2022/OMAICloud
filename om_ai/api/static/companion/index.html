@@ -328,7 +328,7 @@
       <div class="live-pill" id="livePill"><span>●</span> Always listening — just speak</div>
       <p class="heard" id="heard"></p>
       <p class="feeling" id="feeling"></p>
-      <p class="said" id="reply">I’m OM. Enabling always-on listening…</p>
+      <p class="said" id="reply">Connecting to OM…</p>
       <p class="memory-line" id="memoryLine">Memory · You are working on OM AI</p>
       <p class="activity" id="activity"></p>
 
@@ -683,9 +683,16 @@
     async function startSession() {
       const data = await api('/session', { method: 'POST', body: '{}' });
       sessionId = data.session_id;
+      if (data.memory_line && els.memoryLine) {
+        els.memoryLine.textContent = 'Memory · ' + data.memory_line;
+      }
+      if (data.user && data.user.name && els.privacyHint) {
+        els.privacyHint.textContent = 'Personal companion · ' + data.user.name;
+      }
       if (data.greeting) {
-        els.reply.textContent = data.greeting;
-        pendingGreeting = data.greeting;
+        const g = String(data.greeting).replace(/\[\[slnc\s+\d+\]\]/gi, ' ').replace(/\s+/g, ' ').trim();
+        els.reply.textContent = g;
+        pendingGreeting = data.spoken_tts || data.greeting;
       }
       return data;
     }

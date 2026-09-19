@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import logging
 import tempfile
+from datetime import datetime
 from pathlib import Path
 from typing import Any
 
@@ -20,6 +21,16 @@ class MessageBody(BaseModel):
     history: list[dict[str, Any]] | None = None
     session_id: str | None = None
     speak: bool = True
+
+
+class SessionBody(BaseModel):
+    """Optional session bootstrap payload from the companion UI."""
+
+    display_name: str | None = None
+    language: str | None = None
+    purpose: str | None = None
+    actor: str | None = None
+    tenant_id: str | None = None
 
 
 class DeviceBody(BaseModel):
@@ -54,6 +65,97 @@ def _ensure_browser_session():
     return rt
 
 
+def _load_user_context(
+    *,
+    actor: str = "",
+    display_name: str = "",
+    language: str = "",
+    purpose: str = "",
+) -> dict[str, Any]:
+    """Merge onboarding + request hints into a live user context (no static defaults as identity)."""
+    ctx: dict[str, Any] = {
+        "name": (display_name or "").strip(),
+        "language": (language or "").strip() or "auto",
+        "purpose": (purpose or "").strip() or "general",
+        "actor": (actor or "").strip(),
+    }
+    try:
+        from om_ai.core.onboarding import get_onboarding_engine
+
+        eng = get_onboarding_engine()
+        pack = eng.load(actor) if actor else None
+        if not pack:
+            # Fall back to most recent onboarding file if single-user desktop
+            store = getattr(eng, "store_dir", None)
+            if store and store.is_dir():
+                files = sorted(store.glob("*.json"), key=lambda p: p.stat().st_mtime, reverse=True)
+                if files:
+                    import json
+
+                    pack = json.loads(files[0].read_text(encoding="utf-8"))
+        if pack:
+            profile = pack.get("user_profile") or {}
+            assistant = pack.get("assistant") or {}
+            memory = pack.get("memory") or {}
+            ctx["name"] = ctx["name"] or str(profile.get("display_name") or "")
+            ctx["language"] = (
+                language
+                or str(profile.get("language") or "")
+                or ctx["language"]
+            )
+            ctx["purpose"] = purpose or str(profile.get("purpose") or ctx["purpose"])
+            ctx["style"] = str(profile.get("response_style") or profile.get("style") or "")
+            ctx["assistant_name"] = str(assistant.get("name") or "OM")
+            ctx["memory_likes"] = list(memory.get("likes") or [])
+            ctx["onboarding"] = profile
+    except Exception as exc:
+        logger.debug("onboarding context: %s", exc)
+
+    if not ctx["name"]:
+        ctx["name"] = "Sir"
+    return ctx
+
+
+def _dynamic_greeting(user_ctx: dict[str, Any]) -> str:
+    """Build greeting from time + profile + personality — never a fixed canned script."""
+    name = str(user_ctx.get("name") or "Sir")
+    language = str(user_ctx.get("language") or "en")
+    purpose = str(user_ctx.get("purpose") or "general")
+    style = str(user_ctx.get("style") or "")
+    hour = datetime.now().hour
+    if hour < 12:
+        daypart_en, daypart_hi = "Good morning", "Good morning"
+    elif hour < 17:
+        daypart_en, daypart_hi = "Good afternoon", "Good afternoon"
+    else:
+        daypart_en, daypart_hi = "Good evening", "Good evening"
+
+    # Prefer voice-presence personality prompt shaping via a short spoken line from style rules
+    try:
+        from om_ai.core.companion_personality.voice_presence import get_voice_presence
+
+        vp = get_voice_presence()
+        locale = "hi" if str(language).lower() in {"hi", "hi-en", "hinglish"} else "en"
+        # Ask style layer to adapt a brain-shaped seed (not a keyword chatbot reply)
+        seed = (
+            f"{daypart_hi} {name}. Main OM hoon — hazir hoon. Aaj {purpose} pe kaam karein?"
+            if locale == "hi"
+            else f"{daypart_en} {name}. I am OM — ready. Shall we continue with {purpose}?"
+        )
+        if style:
+            seed = (
+                f"{daypart_hi} {name}. Main OM hoon. Aap {style} style pasand karte ho — boliye kahan se shuru karein?"
+                if locale == "hi"
+                else f"{daypart_en} {name}. I am OM. I'll keep things {style}. Where shall we begin?"
+            )
+        pack = vp.analyze("hello", seed, context={"locale": locale, "onboarding": user_ctx.get("onboarding") or {}})
+        return str(pack.get("spoken") or seed)
+    except Exception:
+        if str(language).lower() in {"hi", "hi-en", "hinglish"}:
+            return f"{daypart_hi} {name}. Main OM hoon — ready. Boliye."
+        return f"{daypart_en} {name}. I am OM — ready. What shall we take on?"
+
+
 @router.get("/status")
 def companion_status() -> dict[str, Any]:
     rt = _runtime()
@@ -63,17 +165,93 @@ def companion_status() -> dict[str, Any]:
 
 
 @router.post("/session")
-def companion_session() -> dict[str, Any]:
-    rt = _ensure_browser_session()
-    banner = rt.status_banner()
-    return {
-        "session_id": rt.context.session_id,
-        "status": banner,
-        "mode": "voice_conversation",
-        "wake_word_required": False,
-        "greeting": "Good evening, Sir. OM online — hazir hoon. Boliye, kya baat hai?",
-    }
+def companion_session(body: SessionBody | None = None) -> dict[str, Any]:
+    """
+    Start OM Companion session (dynamic).
 
+    Accepts empty `{}` or optional profile fields. Builds greeting from
+    onboarding + time-of-day + voice presence — not static internal copy.
+    """
+    try:
+        payload = body or SessionBody()
+
+        rt = _ensure_browser_session()
+        session_id = rt.context.session_id
+
+        user_ctx = _load_user_context(
+            actor=str(payload.actor or ""),
+            display_name=str(payload.display_name or ""),
+            language=str(payload.language or ""),
+            purpose=str(payload.purpose or ""),
+        )
+
+        # Persist live context on runtime
+        rt.context.meta["user_context"] = user_ctx
+        rt.context.meta["session_started"] = True
+        rt.context.meta["mode"] = "voice_conversation"
+        rt.onboarding_context = {
+            "user": user_ctx.get("onboarding") or user_ctx,
+            "assistant": {"name": user_ctx.get("assistant_name") or "OM"},
+            "memory": {"likes": user_ctx.get("memory_likes") or []},
+        }
+
+        voice_state: dict[str, Any] = {"status": "ready"}
+        try:
+            if rt.voice is not None and hasattr(rt.voice, "start_listening"):
+                voice_state = rt.voice.start_listening() or voice_state
+            elif rt.voice is not None:
+                voice_state = {"status": "ready", "wake_word": False}
+        except Exception as exc:
+            voice_state = {"status": "ready", "note": str(exc)}
+
+        greeting = _dynamic_greeting(user_ctx)
+        spoken_tts = greeting
+        try:
+            from om_ai.core.companion_personality.voice_presence import shape_for_speech
+
+            pack = shape_for_speech(greeting, user_message="hello")
+            greeting = str(pack.get("spoken") or greeting)
+            spoken_tts = str(pack.get("spoken_tts") or greeting)
+        except Exception:
+            pass
+
+        return {
+            "ok": True,
+            "success": True,
+            "session_id": session_id,
+            "status": rt.status_banner() if hasattr(rt, "status_banner") else {"started": True},
+            "mode": "voice_conversation",
+            "voice": {
+                "enabled": True,
+                "listening": True,
+                "state": voice_state,
+            },
+            "language": user_ctx.get("language") or "auto",
+            "user": {
+                "name": user_ctx.get("name"),
+                "purpose": user_ctx.get("purpose"),
+                "style": user_ctx.get("style"),
+            },
+            "greeting": greeting,
+            "spoken": greeting,
+            "spoken_tts": spoken_tts,
+            "memory_line": (
+                f"Working on {user_ctx.get('purpose')}"
+                if user_ctx.get("purpose")
+                else "Companion ready"
+            ),
+            "capabilities": [
+                "conversation",
+                "memory",
+                "voice",
+                "reasoning",
+                "actions",
+                "knowledge",
+            ],
+        }
+    except Exception as exc:
+        logger.exception("Companion session failed")
+        return {"ok": False, "success": False, "error": str(exc)}
 
 @router.post("/message")
 def companion_message(body: MessageBody) -> dict[str, Any]:

@@ -8,11 +8,11 @@ class DecisionEngine:
     def decide(self, goal: dict[str, Any]) -> dict[str, Any]:
         intent = goal.get("intent") or "converse"
         route = {
-            "emotional_support": "human_dialogue",
-            "greeting": "personality",
+            "emotional_support": "brain",
+            "greeting": "brain",
             "create_reminder": "language_intelligence",
             "inspect_screen": "vision",
             "diagnose_and_plan": "action_engine",
-            "converse": "human_dialogue",
-        }.get(intent, "human_dialogue")
+            "converse": "brain",
+        }.get(intent, "brain")
         return {"route": route, "intent": intent, "plan_first": intent == "diagnose_and_plan"}

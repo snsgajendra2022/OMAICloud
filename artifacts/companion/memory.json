@@ -3327,6 +3327,406 @@
           "role": "assistant",
           "confidence": 0.6
         }
+      },
+      {
+        "id": "3a4f49503833453a",
+        "kind": "episodic",
+        "content": "CRM",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-19T10:35:52.930183+00:00",
+        "updated_at": "2026-09-19T10:35:52.930185+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "3efff309c1604b15",
+        "kind": "episodic",
+        "content": "I'm with you, Sir. Tell me what you need. I'll handle it.",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-19T10:35:52.932670+00:00",
+        "updated_at": "2026-09-19T10:35:52.932671+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "4c05480392c04e07",
+        "kind": "episodic",
+        "content": "Hansi kya hoti hai",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-19T10:39:12.607299+00:00",
+        "updated_at": "2026-09-19T10:39:12.607302+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "3b70ec03b68741cf",
+        "kind": "episodic",
+        "content": "Samajh gaya sir. Main aapke saath hoon — boliye clearly kya chahiye, main kar deta hoon. Kya priority hai?",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-19T10:39:12.609772+00:00",
+        "updated_at": "2026-09-19T10:39:12.609774+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "300fb46453f4434d",
+        "kind": "episodic",
+        "content": "pahle to apni voice theek karo",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-19T10:39:46.287314+00:00",
+        "updated_at": "2026-09-19T10:39:46.287316+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "9277f8adfa644c96",
+        "kind": "episodic",
+        "content": "Samajh gaya sir. Main aapke saath hoon — boliye clearly kya chahiye, main kar deta hoon. Kya priority hai?",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-19T10:39:46.290386+00:00",
+        "updated_at": "2026-09-19T10:39:46.290388+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "a86185eb5b7a40ba",
+        "kind": "episodic",
+        "content": "and email offer",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-19T10:40:14.125092+00:00",
+        "updated_at": "2026-09-19T10:40:14.125094+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "followup",
+          "role": "user",
+          "confidence": 0.8
+        }
+      },
+      {
+        "id": "3dec352d793c4cbf",
+        "kind": "episodic",
+        "content": "I'm with you, Sir. Tell me what you need. I'll handle it.",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-19T10:40:14.128775+00:00",
+        "updated_at": "2026-09-19T10:40:14.128777+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "followup",
+          "role": "assistant",
+          "confidence": 0.8
+        }
+      },
+      {
+        "id": "2a95903a498d434a",
+        "kind": "episodic",
+        "content": "and open email",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-19T10:40:31.797485+00:00",
+        "updated_at": "2026-09-19T10:40:31.797486+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "followup",
+          "role": "user",
+          "confidence": 0.8
+        }
+      },
+      {
+        "id": "dee0f11860294d84",
+        "kind": "episodic",
+        "content": "I'm with you, Sir. Tell me what you need. I'll handle it.",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-19T10:40:31.798498+00:00",
+        "updated_at": "2026-09-19T10:40:31.798499+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "followup",
+          "role": "assistant",
+          "confidence": 0.8
+        }
+      },
+      {
+        "id": "5bc9b60a0c874a8a",
+        "kind": "episodic",
+        "content": "Tumhari voice ko kya hua",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-19T10:51:46.567669+00:00",
+        "updated_at": "2026-09-19T10:51:46.567671+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "84b33a28d3ac40c6",
+        "kind": "episodic",
+        "content": "Main sun raha hoon, Sir. Boliye.",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-19T10:51:46.569126+00:00",
+        "updated_at": "2026-09-19T10:51:46.569127+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "d790e586ba424003",
+        "kind": "episodic",
+        "content": "not like this",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-19T10:52:01.044126+00:00",
+        "updated_at": "2026-09-19T10:52:01.044128+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "2a16b71a5246499f",
+        "kind": "episodic",
+        "content": "I'm listening, Sir. Go ahead.",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-19T10:52:01.046422+00:00",
+        "updated_at": "2026-09-19T10:52:01.046425+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "26fd014669144b74",
+        "kind": "episodic",
+        "content": "message karne ka",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-19T10:52:15.257348+00:00",
+        "updated_at": "2026-09-19T10:52:15.257350+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "e393b6692251476f",
+        "kind": "episodic",
+        "content": "I'm listening, Sir. Go ahead.",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-19T10:52:15.259654+00:00",
+        "updated_at": "2026-09-19T10:52:15.259656+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "b15a2ecf11df431a",
+        "kind": "episodic",
+        "content": "create email template",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-19T10:52:27.835525+00:00",
+        "updated_at": "2026-09-19T10:52:27.835527+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "3bbed8de5ebb45fa",
+        "kind": "episodic",
+        "content": "I'm listening, Sir. Go ahead.",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-19T10:52:27.837437+00:00",
+        "updated_at": "2026-09-19T10:52:27.837440+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "10144e6107b64aac",
+        "kind": "episodic",
+        "content": "Tumhari Awaaz Uman Jaisi Nahin Lag Rahi",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-19T10:53:26.922397+00:00",
+        "updated_at": "2026-09-19T10:53:26.922398+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "991318207c384804",
+        "kind": "episodic",
+        "content": "I'm listening, Sir. Go ahead.",
+        "scope": "session",
+        "key": "default:anon",
+        "created_at": "2026-09-19T10:53:26.923489+00:00",
+        "updated_at": "2026-09-19T10:53:26.923490+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
       }
     ]
   },

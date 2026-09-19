@@ -317,11 +317,6 @@ def _audit(
 # Rate-limit middleware
 # ---------------------------------------------------------------------------
 
-@app.get("/companion", tags=["UI"])
-@app.get("/ui/companion", tags=["UI"])
-async def companion_ui():
-    return _serve_static_html("companion/index.html")
-    
 @app.middleware("http")
 async def _rate_limit_middleware(request: Request, call_next):
     # OM_AI_RATE_LIMIT=0 disables global rate limiting (local dev default).
@@ -922,6 +917,22 @@ def chrome_devtools_well_known():
     from fastapi.responses import JSONResponse
 
     return JSONResponse({}, status_code=200)
+
+
+@app.get("/json/version", include_in_schema=False)
+@app.get("/json/list", include_in_schema=False)
+def chrome_remote_debug_stub():
+    """Chrome sometimes probes CDP endpoints on the app port — ignore quietly."""
+    from fastapi.responses import JSONResponse
+
+    return JSONResponse(
+        {
+            "Browser": "OM-AI",
+            "Protocol-Version": "1.3",
+            "webSocketDebuggerUrl": "",
+        },
+        status_code=200,
+    )
 
 
 @app.get("/", tags=["UI"])

@@ -111,12 +111,15 @@ class ConsciousnessEngine:
                 out["action"] = plan
                 reply = str(plan.get("spoken") or reply)
                 emit("Analysis plan ready")
-            elif route == "human_dialogue":
-                from om_ai.core.human_dialogue import get_human_dialogue
-                hd = get_human_dialogue().respond(text)
-                out["dialogue"] = hd
-                if hd.get("reply"):
-                    reply = str(hd["reply"])
+            elif route == "human_dialogue" or route == "brain":
+                # Annotate dialogue/emotion only — conversation content comes from the brain
+                try:
+                    from om_ai.core.human_dialogue import get_human_dialogue
+                    out["dialogue"] = get_human_dialogue().respond(text)
+                except Exception:
+                    pass
+                # Keep incoming answer from companion brain / OS
+                reply = answer or reply
             elif route == "personality":
                 from om_ai.core.personality import get_personality
                 reply = get_personality().greet(self.state.user_name)

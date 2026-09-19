@@ -197,16 +197,12 @@ class CompanionOS:
                     "action_engine",
                     "personality",
                     "vision",
-                    "human_dialogue",
                 }:
-                    # Keep language_intelligence reminders for OS language block
-                    if route != "language_intelligence":
-                        answer = str(mind["answer"])
-                        consciousness_owned = route in {"action_engine", "personality", "vision"}
-                        if route == "human_dialogue" and mind.get("dialogue", {}).get("handled"):
-                            consciousness_owned = True
+                    answer = str(mind["answer"])
+                    consciousness_owned = True
                 if mind.get("action"):
                     out["action"] = mind["action"]
+                # brain / human_dialogue routes leave the companion brain answer intact
             except Exception as exc:
                 logger.debug("consciousness process: %s", exc)
 
@@ -243,20 +239,17 @@ class CompanionOS:
                 except Exception:
                     pass
 
-        # Human dialogue / conversation — never steals language or consciousness-owned turns
+        # Human dialogue / conversation — annotate only; do NOT replace brain answers
+        # with canned keyword replies (production voice path owns that via LLM + voice presence).
         if not language_owned and not consciousness_owned:
             if self.human_dialogue:
                 hd = self.human_dialogue.respond(user_text, locale=locale, speaking=speaking)
                 out["human_dialogue"] = hd
-                if hd.get("handled") and hd.get("reply"):
-                    answer = str(hd["reply"])
-                    human_owned = True
+                # Keep emotion/intent signals — answer stays from brain / consciousness
             elif self.human_conversation:
                 human = self.human_conversation.respond(user_text, locale=locale)
                 out["human_conversation"] = human
-                if human.get("handled") and human.get("reply"):
-                    answer = str(human["reply"])
-                    human_owned = True
+
 
         if self.presence:
             presence_pack = self.presence.react(user_text, affect=affect or {})

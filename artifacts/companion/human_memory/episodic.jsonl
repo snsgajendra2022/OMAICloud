@@ -105,3 +105,43 @@
 {"id": "b2b51d31729f", "ts": 1789813603.779629, "role": "assistant", "text": "I'm with you, Sir. Tell me what you need. I'll handle it.", "tags": []}
 {"id": "dfa8b87381fb", "ts": 1789813603.7801049, "role": "user", "text": "Kuchh prashn", "tags": []}
 {"id": "4dfe2a583888", "ts": 1789813603.7801778, "role": "assistant", "text": "I'm with you, Sir. Tell me what you need. I'll handle it. What would you like to do next, Sir?", "tags": []}
+{"id": "0054bc8c841e", "ts": 1789814152.934183, "role": "user", "text": "CRM", "tags": []}
+{"id": "bedc9e896390", "ts": 1789814152.9342651, "role": "assistant", "text": "I'm with you, Sir. Tell me what you need. I'll handle it.", "tags": []}
+{"id": "edb38f6e236e", "ts": 1789814152.9347358, "role": "user", "text": "CRM", "tags": []}
+{"id": "5c0ee291afe6", "ts": 1789814152.93479, "role": "assistant", "text": "I'm with you, Sir. Tell me what you need. I'll handle it. What would you like to do next, Sir?", "tags": []}
+{"id": "0f378a4cf5b5", "ts": 1789814352.611506, "role": "user", "text": "Hansi kya hoti hai", "tags": []}
+{"id": "6fc711e8190f", "ts": 1789814352.6116202, "role": "assistant", "text": "Samajh gaya sir. Main aapke saath hoon — boliye clearly kya chahiye, main kar deta hoon. Kya priority hai?", "tags": []}
+{"id": "a0efbf040273", "ts": 1789814352.612334, "role": "user", "text": "Hansi kya hoti hai", "tags": []}
+{"id": "ca0c7848ed90", "ts": 1789814352.612396, "role": "assistant", "text": "Samajh gaya sir. Main aapke saath hoon — boliye clearly kya chahiye, main kar deta hoon. Kya priority hai?", "tags": []}
+{"id": "5aca079326bf", "ts": 1789814386.2922912, "role": "user", "text": "pahle to apni voice theek karo", "tags": []}
+{"id": "c2fbf2b1d343", "ts": 1789814386.2925708, "role": "assistant", "text": "Samajh gaya sir. Main aapke saath hoon — boliye clearly kya chahiye, main kar deta hoon. Kya priority hai?", "tags": []}
+{"id": "efdc45664e08", "ts": 1789814386.293399, "role": "user", "text": "pahle to apni voice theek karo", "tags": []}
+{"id": "dc91ecda0f92", "ts": 1789814386.293486, "role": "assistant", "text": "Samajh gaya sir. Main aapke saath hoon — boliye clearly kya chahiye, main kar deta hoon. Kya priority hai?", "tags": []}
+{"id": "2d2772c9c7c1", "ts": 1789814414.13092, "role": "user", "text": "and email offer", "tags": []}
+{"id": "f95775a624e7", "ts": 1789814414.1310542, "role": "assistant", "text": "I'm with you, Sir. Tell me what you need. I'll handle it.", "tags": []}
+{"id": "bf866ab3dc86", "ts": 1789814414.131677, "role": "user", "text": "and email offer", "tags": []}
+{"id": "63b26e123dd2", "ts": 1789814414.131756, "role": "assistant", "text": "I'm with you, Sir. Tell me what you need. I'll handle it. What would you like to do next, Sir?", "tags": []}
+{"id": "beafdc2ccd5c", "ts": 1789814432.0513148, "role": "user", "text": "and open email", "tags": []}
+{"id": "0052d9293519", "ts": 1789814432.051455, "role": "assistant", "text": "It's open.", "tags": []}
+{"id": "a3322b2d95da", "ts": 1789814432.052002, "role": "user", "text": "and open email", "tags": []}
+{"id": "5b0b17b6833a", "ts": 1789814432.052057, "role": "assistant", "text": "It's open. What would you like to do next, Sir?", "tags": []}
+{"id": "118895633fde", "ts": 1789815106.571445, "role": "user", "text": "Tumhari voice ko kya hua", "tags": []}
+{"id": "7411ae05a77f", "ts": 1789815106.571535, "role": "assistant", "text": "Main sun raha hoon, Sir. Boliye.", "tags": []}
+{"id": "8033a7046324", "ts": 1789815106.572661, "role": "user", "text": "Tumhari voice ko kya hua", "tags": []}
+{"id": "8bf71a1c4978", "ts": 1789815106.572722, "role": "assistant", "text": "Main sun raha hoon, Sir. Boliye. Want me to tune the voice further?", "tags": []}
+{"id": "a5e828708e47", "ts": 1789815121.048137, "role": "user", "text": "not like this", "tags": []}
+{"id": "5ae6b6796684", "ts": 1789815121.0482419, "role": "assistant", "text": "I'm listening, Sir. Go ahead.", "tags": []}
+{"id": "54b211623dd6", "ts": 1789815121.049045, "role": "user", "text": "not like this", "tags": []}
+{"id": "14a181a62d78", "ts": 1789815121.0491478, "role": "assistant", "text": "I'm listening, Sir. Go ahead. What would you like to do next, Sir?", "tags": []}
+{"id": "a7e482bd7a48", "ts": 1789815135.261417, "role": "user", "text": "message karne ka", "tags": []}
+{"id": "bb05f35132da", "ts": 1789815135.261549, "role": "assistant", "text": "I'm listening, Sir. Go ahead.", "tags": []}
+{"id": "536c20a31d60", "ts": 1789815135.262173, "role": "user", "text": "message karne ka", "tags": []}
+{"id": "636e4fd23cbc", "ts": 1789815135.262242, "role": "assistant", "text": "I'm listening, Sir. Go ahead. What would you like to do next, Sir?", "tags": []}
+{"id": "67da21e0ab78", "ts": 1789815147.83902, "role": "user", "text": "create email template", "tags": []}
+{"id": "bc8d35e092ef", "ts": 1789815147.8391411, "role": "assistant", "text": "I'm listening, Sir. Go ahead.", "tags": []}
+{"id": "43e373ea0457", "ts": 1789815147.839746, "role": "user", "text": "create email template", "tags": []}
+{"id": "4965040b57ec", "ts": 1789815147.839827, "role": "assistant", "text": "I'm listening, Sir. Go ahead. What would you like to do next, Sir?", "tags": []}
+{"id": "fbac2161cd14", "ts": 1789815206.926101, "role": "user", "text": "Tumhari Awaaz Uman Jaisi Nahin Lag Rahi", "tags": []}
+{"id": "53ece11626ba", "ts": 1789815206.926201, "role": "assistant", "text": "I'm listening, Sir. Go ahead.", "tags": []}
+{"id": "501dfb44318e", "ts": 1789815206.927729, "role": "user", "text": "Tumhari Awaaz Uman Jaisi Nahin Lag Rahi", "tags": []}
+{"id": "3136f8225397", "ts": 1789815206.927794, "role": "assistant", "text": "I'm listening, Sir. Go ahead. What would you like to do next, Sir?", "tags": []}

@@ -123,52 +123,20 @@ class CompanionRuntime:
                 "session": session.to_dict(),
             }
 
-        # Fast social presence (voice) — feel human before routing to the model
+        # Voice presence prepares the brain (language + emotion + personality prompt)
+        # — it does NOT invent canned replies.
         from om_ai.core.companion_personality.voice_presence import (
+            get_voice_presence,
             jarvis_system_hint,
             shape_for_speech,
-            social_spoken_reply,
             is_garbage_spoken,
             rescue_spoken,
             detect_speech_locale,
         )
 
-        social = social_spoken_reply(q)
-        if social:
-            session.bump_turn()
-            self.turns.record(session.session_id, "user", q, intent="social")
-            self.turns.record(session.session_id, "assistant", social, intent="social")
-            affect_quick = self.affect.build(
-                q,
-                {
-                    "intent": "social",
-                    "confidence": 0.95,
-                    "conversation_mode": "social",
-                },
-                history=self.conversations.history_for(session, external=history),
-            )
-            return {
-                "answer": social,
-                "spoken": social,
-                "heard": q,
-                "handled": True,
-                "feeling": (affect_quick.get("affect") or {}).get("label") or "warm",
-                "affect": affect_quick.get("affect"),
-                "expression": affect_quick.get("expression"),
-                "activities": activities + ["Present with you"],
-                "semantic": {
-                    "intent": "social",
-                    "goal": "connect",
-                    "domain": "social",
-                    "conversation_mode": "social",
-                    "requires_model": False,
-                    "requires_action": False,
-                    "confidence": 0.95,
-                },
-                "meta": meta,
-                "session": session.to_dict(),
-            }
-
+        vp = get_voice_presence()
+        locale = detect_speech_locale(q)
+        emotion = vp.emotion.detect(q)
         activities.append(_PUBLIC_ACTIVITIES["understand"])
         hist = self.conversations.history_for(session, external=history)
         intent = self.intent_engine.analyze(q, history=hist)
@@ -181,6 +149,7 @@ class CompanionRuntime:
         )
         session.last_semantic = semantic
         meta["semantic"] = semantic
+        meta["voice_presence"] = {"locale": locale, "emotion": emotion}
 
         activities.append(_PUBLIC_ACTIVITIES["remember"])
         recall = self.memory.recall(
@@ -228,9 +197,17 @@ class CompanionRuntime:
         meta["strategy"] = strat
 
         ctx_parts = [
+            vp.system_prompt(
+                {
+                    "conversation_mode": str(semantic.get("conversation_mode") or "assist"),
+                    "locale": locale,
+                    "emotion": emotion,
+                    "user_message": q,
+                }
+            ),
             jarvis_system_hint(
                 conversation_mode=str(semantic.get("conversation_mode") or "assist"),
-                locale=detect_speech_locale(q),
+                locale=locale,
             ),
             str(personality_pack.get("system_hint") or ""),
             str(human_ctx.get("context_blob") or ""),

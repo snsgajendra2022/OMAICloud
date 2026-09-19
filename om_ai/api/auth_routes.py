@@ -168,16 +168,22 @@ def register(req: RegisterRequest, request: Request) -> JSONResponse:
 
     user = result["user"]
     _sync_chat_profile(user)
+    onboarding: dict[str, Any] | None = None
     try:
         from om_ai.api.onboarding import bootstrap_user_workspace
 
-        bootstrap_user_workspace(
+        onboarding = bootstrap_user_workspace(
             user.get("tenant_id") or "default",
             f"user:{user['id']}",
             display_name=str(user.get("display_name") or user.get("email") or ""),
+            profile={
+                "purpose": "general",
+                "language": "auto",
+            },
         )
     except Exception:
         logger.debug("register bootstrap skipped", exc_info=True)
+        onboarding = None
     _audit_auth(
         "auth.register",
         f"user:{user['id']}",
@@ -186,6 +192,21 @@ def register(req: RegisterRequest, request: Request) -> JSONResponse:
     )
     response = _auth_json(result)
     response.status_code = 201
+    if onboarding is not None:
+        # Attach onboarding summary without breaking clients that ignore unknown fields
+        try:
+            import json as _json
+
+            payload = _json.loads(response.body.decode("utf-8"))
+            payload["onboarding"] = {
+                "ok": bool(onboarding.get("ok")),
+                "status": ((onboarding.get("result") or {}).get("status")),
+                "assistant": ((onboarding.get("result") or {}).get("assistant") or {}).get("name"),
+            }
+            response.body = _json.dumps(payload).encode("utf-8")
+            response.headers["content-length"] = str(len(response.body))
+        except Exception:
+            pass
     return response
 
 
@@ -207,12 +228,20 @@ def login(req: LoginRequest, request: Request) -> JSONResponse:
     _sync_chat_profile(user)
     try:
         from om_ai.api.onboarding import bootstrap_user_workspace
+        from om_ai.core.onboarding import get_onboarding_engine
 
-        bootstrap_user_workspace(
-            user.get("tenant_id") or "default",
-            f"user:{user['id']}",
-            display_name=str(user.get("display_name") or user.get("email") or ""),
-        )
+        actor = f"user:{user['id']}"
+        engine = get_onboarding_engine()
+        if not engine.is_completed(actor):
+            bootstrap_user_workspace(
+                user.get("tenant_id") or "default",
+                actor,
+                display_name=str(user.get("display_name") or user.get("email") or ""),
+                profile={
+                    "purpose": "general",
+                    "language": "auto",
+                },
+            )
     except Exception:
         logger.debug("login bootstrap skipped", exc_info=True)
     _audit_auth(
