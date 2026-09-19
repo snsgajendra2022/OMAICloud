@@ -40,7 +40,10 @@ class OMAvatarRuntime:
             "presence": presence,
             "animation": self.animation.clip_for(presence),
             "face": self.face.for_mood(mood or presence),
-            "lips": {"jaw": self.lips.jaw_open(energy, speaking=speaking)},
+            "lips": {
+                "jaw": self.lips.jaw_open(energy, speaking=speaking),
+                "plan": self.lips.from_text(text, emotion=mood or presence) if (speaking and text) else None,
+            },
             "eyes": self.eyes.look(presence),
             "gesture": self.gestures.for_state(presence),
             "text_len": len(text or ""),

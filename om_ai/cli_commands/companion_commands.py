@@ -31,10 +31,9 @@ def _port_free(host: str, port: int) -> bool:
 def _pick_port(host: str, preferred: int) -> int:
     if _port_free(host, preferred):
         return preferred
-    for p in (8765, 8090, 8081, 8877, 9000):
+    for p in (8080, 8765, 8767, 8090, 8081, 8877, 9000):
         if p != preferred and _port_free(host, p):
             return p
-    # ephemeral
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         s.bind((host, 0))
         return int(s.getsockname()[1])
@@ -50,23 +49,40 @@ def _api_alive(host: str, port: int) -> bool:
         return False
 
 
+def _companion_page_alive(host: str, port: int) -> bool:
+    try:
+        import urllib.request
+
+        with urllib.request.urlopen(f"http://{host}:{port}/companion", timeout=1.5) as r:
+            return int(getattr(r, "status", 0) or 0) in {200, 304}
+    except Exception:
+        return False
+
+
+def _repo_root() -> "Path":
+    from pathlib import Path
+
+    # om_ai/cli_commands/companion_commands.py → repo root
+    return Path(__file__).resolve().parents[2]
+
+
 def _ensure_api_server(host: str, port: int) -> tuple[int, subprocess.Popen | None]:
     """Start uvicorn for companion UI if not already serving OM API."""
-    if _api_alive(host, port):
-        return port, None
-    # preferred port may be Apache or something else — pick a free one
-    if not _port_free(host, port) or not _api_alive(host, port):
-        # if something answers but not OM companion, switch ports
-        if not _api_alive(host, port):
-            port = _pick_port(host, 8765 if port == 8080 else port)
-    if _api_alive(host, port):
-        return port, None
+    # Prefer an already-running OM API (any common port)
+    for candidate in (port, 8080, 8765, 8767, 8090):
+        if _api_alive(host, candidate):
+            return candidate, None
+
+    if not _port_free(host, port):
+        port = _pick_port(host, port)
+
     env = os.environ.copy()
     env.setdefault("OM_MODEL_PROVIDER", "om_native")
     env.setdefault("OM_AI_CHAT_BACKEND", "om_native")
-    from pathlib import Path
+    repo_root = _repo_root()
+    log_path = repo_root / "artifacts" / "companion_api.log"
+    log_path.parent.mkdir(parents=True, exist_ok=True)
 
-    repo_root = Path(__file__).resolve().parents[1]
     cmd = [
         sys.executable,
         "-m",
@@ -77,19 +93,32 @@ def _ensure_api_server(host: str, port: int) -> tuple[int, subprocess.Popen | No
         "--port",
         str(port),
     ]
+    log_f = open(log_path, "a", encoding="utf-8")
+    log_f.write(f"\n--- start {time.strftime('%Y-%m-%d %H:%M:%S')} port={port} ---\n")
+    log_f.flush()
     proc = subprocess.Popen(
         cmd,
         cwd=str(repo_root),
         env=env,
-        stdout=subprocess.DEVNULL,
-        stderr=subprocess.DEVNULL,
+        stdout=log_f,
+        stderr=subprocess.STDOUT,
     )
-    for _ in range(40):
+    for _ in range(60):
         time.sleep(0.25)
         if _api_alive(host, port):
+            print(f"  API server ready on http://{host}:{port}")
             return port, proc
         if proc.poll() is not None:
             break
+
+    # Failed — surface log tail
+    print(f"  ERROR: companion API did not start on {host}:{port}")
+    print(f"  See log: {log_path}")
+    try:
+        tail = log_path.read_text(encoding="utf-8")[-1200:]
+        print(tail)
+    except Exception:
+        pass
     return port, proc
 
 
@@ -97,16 +126,24 @@ def cmd_companion_start(args) -> int:
     from om_ai.core.companion_runtime import get_companion_runtime, start_companion, format_banner
 
     host = (os.getenv("OM_COMPANION_BIND_HOST") or "127.0.0.1").strip()
-    preferred = int(os.getenv("OM_COMPANION_BIND_PORT") or os.getenv("PORT") or "8765")
+    preferred = int(os.getenv("OM_COMPANION_BIND_PORT") or os.getenv("PORT") or "8080")
 
+    # Browser companion uses Web Speech + /tts — native sounddevice is optional
+    browser_ui = not bool(getattr(args, "no_avatar", False)) and not bool(
+        getattr(args, "text_only", False)
+    )
     status = start_companion(
-        text_only=bool(getattr(args, "text_only", False)),
+        text_only=bool(getattr(args, "text_only", False)) or browser_ui,
         no_avatar=bool(getattr(args, "no_avatar", False)),
-        wake_word_enabled=not bool(getattr(args, "no_wake_word", False))
-        and not bool(getattr(args, "text_only", False)),
+        wake_word_enabled=False
+        if browser_ui
+        else (
+            not bool(getattr(args, "no_wake_word", False))
+            and not bool(getattr(args, "text_only", False))
+        ),
     )
     rt = get_companion_runtime()
-    if getattr(args, "text_only", False):
+    if getattr(args, "text_only", False) or browser_ui:
         rt.config.text_only = True
         rt.config.wake_word_enabled = False
     if getattr(args, "no_wake_word", False):
@@ -115,20 +152,24 @@ def cmd_companion_start(args) -> int:
         rt.config.no_avatar = True
 
     print(format_banner(status))
+    if browser_ui:
+        print("  Note: mic/voice run in the browser (no local sounddevice required).\n")
 
     api_proc = None
-    if not getattr(args, "no_avatar", False) and not getattr(args, "text_only", False):
+    if browser_ui:
         port, api_proc = _ensure_api_server(host, preferred)
         rt.config.bind_host = host
         rt.config.bind_port = port
         url = f"http://{host}:{port}/companion"
+        if not _api_alive(host, port):
+            print(f"\n  Companion UI failed to start at {url}")
+            print("  Try:  om-ai serve --host 127.0.0.1 --port 8080")
+            print("  Then open: http://127.0.0.1:8080/companion\n")
+            return 1
         print(f"\n  Companion UI:  {url}")
-        print("  Talk to OM — tap the orb / allow microphone.\n")
-        if preferred == 8080 and port != 8080:
-            print(
-                "  NOTE: port 8080 is already used (often Apache). "
-                f"OM is on {port} instead.\n"
-            )
+        print("  Talk to OM — allow microphone in the browser.\n")
+        if preferred != port:
+            print(f"  NOTE: preferred port {preferred} unavailable — using {port}.\n")
         try:
             webbrowser.open(url)
         except Exception:
@@ -159,13 +200,17 @@ def cmd_companion_start(args) -> int:
         stop_companion()
         return 0
     else:
-        # voice runtime without avatar — keep process alive
         print("\nVoice runtime active (no avatar). Ctrl+C to stop.\n")
 
-    if not getattr(args, "text_only", False):
+    if browser_ui or not getattr(args, "text_only", False):
         try:
             while True:
                 time.sleep(1.0)
+                # If we spawned the API and it died, exit with a clear message
+                if api_proc is not None and api_proc.poll() is not None:
+                    print("\n  Companion API process exited — UI will stop working.")
+                    print("  Restart with: om-ai start\n")
+                    break
         except KeyboardInterrupt:
             print("\nShutting down...")
             from om_ai.core.companion_runtime import stop_companion
@@ -283,6 +328,12 @@ def cmd_companion_config(args) -> int:
 
 def cmd_om_start(args) -> int:
     """STEP 112 — `om-ai start` boots Jarvis companion (consciousness + UI)."""
+    try:
+        from om_ai.env import load_dotenv
+
+        load_dotenv()
+    except Exception:
+        pass
     from om_ai.core.om_consciousness import get_consciousness
 
     mind = get_consciousness()
@@ -292,8 +343,18 @@ def cmd_om_start(args) -> int:
     print("=" * 48)
     print(f"\n  {greeting}\n")
     print("  Layers: consciousness · dialogue · memory · presence · avatar · actions\n")
+    try:
+        from om_ai.core.voice_engine import get_voice_engine
 
-    # Reuse companion start (API + browser)
+        st = get_voice_engine().status()
+        ns = st.get("neural") or {}
+        if ns.get("configured") and st.get("default") == "neural":
+            print(f"  TTS: ElevenLabs neural · voice {ns.get('voice_id')}\n")
+        else:
+            print("  TTS: FREE macOS Aman — Indian male (no paid key required)\n")
+    except Exception:
+        pass
+
     class _A:
         text_only = bool(getattr(args, "text_only", False))
         no_avatar = bool(getattr(args, "no_avatar", False))

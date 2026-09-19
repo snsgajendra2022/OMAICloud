@@ -4,7 +4,7 @@ from __future__ import annotations
 from typing import Any
 
 from .personality_profile import PersonalityProfile
-from .voice_presence import jarvis_system_hint, shape_for_speech
+from .voice_presence import jarvis_system_hint
 
 
 class DialogueStyle:
@@ -35,11 +35,10 @@ class DialogueStyle:
         voice_mode: bool = False,
         user_message: str = "",
     ) -> str:
+        del voice_mode, user_message
         text = (answer or "").strip()
         if not text:
             return text
-        if voice_mode:
-            return shape_for_speech(text, user_message=user_message)["spoken"]
         if conversation_mode == "listen" and not text.endswith((".", "!", "?")):
             return text + "."
         return text

@@ -40,6 +40,19 @@ class IntentUnderstanding:
         r"\b(who\s+are\s+you|what\s+are\s+you|your\s+name|are\s+you\s+(an?\s+)?ai)\b",
         re.I,
     )
+    # User's own name — must win over "what is …" explain templates
+    USER_NAME = re.compile(
+        r"(?i)\b("
+        r"what(?:'s|\s+is)\s+my\s+name|"
+        r"do\s+you\s+know\s+my\s+name|"
+        r"what\s+do\s+you\s+call\s+me|"
+        r"mera\s+naam(\s+kya)?|"
+        r"my\s+name\s+is\s+\w+"
+        r")\b"
+    )
+    USER_NAME_SET = re.compile(
+        r"(?i)\b(?:my\s+name\s+is|call\s+me|mera\s+naam(?:\s+hai)?)\s+([A-Za-z][A-Za-z\s]{0,40})"
+    )
     THANKS = re.compile(r"^\s*(thanks|thank\s+you|thx|ty)\b", re.I)
     BYE = re.compile(r"^\s*(bye|goodbye|see\s+you|later)\b", re.I)
     DEBUG = re.compile(
@@ -81,6 +94,23 @@ class IntentUnderstanding:
                 strategy="friendly_identity",
                 needs_model=False,
                 signals=["identity"],
+            )
+        # Remember name before recall / explain
+        if self.USER_NAME_SET.search(text):
+            return IntentResult(
+                intent="user_name_set",
+                confidence=0.97,
+                strategy="personal_memory",
+                needs_model=False,
+                signals=["user_name", "personal", "set"],
+            )
+        if self.USER_NAME.search(text) or re.search(r"(?i)\bmy\s+name\b", text):
+            return IntentResult(
+                intent="user_name",
+                confidence=0.97,
+                strategy="personal_memory",
+                needs_model=False,
+                signals=["user_name", "personal"],
             )
         if self.GREETING.search(text) and len(text.split()) <= 8:
             kind = "greeting"
@@ -152,6 +182,15 @@ class IntentUnderstanding:
                 signals=["howto"],
             )
         if self.EXPLAIN.search(text):
+            # Never treat personal-name questions as concept explain
+            if self.USER_NAME.search(text) or re.search(r"(?i)\bmy\s+name\b", text):
+                return IntentResult(
+                    intent="user_name",
+                    confidence=0.96,
+                    strategy="personal_memory",
+                    needs_model=False,
+                    signals=["user_name", "personal"],
+                )
             return IntentResult(
                 intent="explain",
                 confidence=0.84,

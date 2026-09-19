@@ -29,6 +29,9 @@ class SolutionEngine:
         if strategy == "comparison":
             return self._compare_solution(q, plan)
         if strategy == "explanation":
+            # Never dump static concept template for personal questions
+            if re.search(r"(?i)\b(my\s+name|mera\s+naam|who\s+am\s+i)\b", q):
+                return {"solved": False, "answer": "", "kind": "none", "notes": ["personal"]}
             return self._explain_solution(q, plan)
 
         return {

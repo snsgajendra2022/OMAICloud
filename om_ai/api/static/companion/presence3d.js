@@ -9,6 +9,8 @@
     speaking: false,
     presence: 'idle',
     mouth: 0,
+    _lipFrames: null,
+    _lipStart: 0,
     _raf: 0,
     _scene: null,
     _camera: null,
@@ -23,10 +25,62 @@
     _targetLook: { x: 0, y: 0 },
 
     async mount(container) {
+      this._container = container;
       if (!global.THREE) {
-        console.warn('THREE missing');
-        return false;
+        this.ready = true;
+        this._mode = 'hud';
+        this._startHudLoop();
+        this._tryLoadThree(container);
+        return true;
       }
+      return this._mountThree(container);
+    },
+
+    _tryLoadThree(container) {
+      if (this._threeLoading || global.THREE) return;
+      this._threeLoading = true;
+      const urls = [
+        '/static/companion/three.min.js',
+        'https://unpkg.com/three@0.160.0/build/three.min.js',
+      ];
+      const tryNext = (i) => {
+        if (global.THREE) {
+          this._mountThree(container);
+          return;
+        }
+        if (i >= urls.length) return;
+        const s = document.createElement('script');
+        s.src = urls[i];
+        s.async = true;
+        s.onload = () => {
+          if (global.THREE) this._mountThree(container);
+          else tryNext(i + 1);
+        };
+        s.onerror = () => tryNext(i + 1);
+        document.head.appendChild(s);
+      };
+      tryNext(0);
+    },
+
+    _startHudLoop() {
+      if (this._raf) return;
+      const loop = () => {
+        this._raf = requestAnimationFrame(loop);
+        this._emitMouth();
+      };
+      loop();
+    },
+
+    _emitMouth() {
+      try {
+        global.dispatchEvent(new CustomEvent('om-presence-mouth', {
+          detail: { energy: this.mouth || 0, speaking: this.speaking },
+        }));
+      } catch (_) {}
+    },
+
+    _mountThree(container) {
+      if (!global.THREE || !container) return false;
       const THREE = global.THREE;
       const w = container.clientWidth || 420;
       const h = container.clientHeight || 420;
@@ -42,7 +96,6 @@
       container.innerHTML = '';
       container.appendChild(this._renderer.domElement);
 
-      // Lights — holographic cyan + warm key
       const key = new THREE.DirectionalLight(0xb8f4ff, 1.35);
       key.position.set(2, 4, 3);
       this._scene.add(key);
@@ -51,7 +104,6 @@
       this._scene.add(fill);
       this._scene.add(new THREE.AmbientLight(0x1a3040, 0.55));
 
-      // Soft floor glow disc
       const discGeo = new THREE.CircleGeometry(1.1, 64);
       const discMat = new THREE.MeshBasicMaterial({
         color: 0x75d5e3,
@@ -67,7 +119,6 @@
       this._buildBody(THREE);
       this._scene.add(this._avatar);
 
-      // Orbiting HUD ring behind figure
       const ringGeo = new THREE.TorusGeometry(1.35, 0.015, 8, 100);
       const ringMat = new THREE.MeshBasicMaterial({
         color: 0x75d5e3,
@@ -79,12 +130,15 @@
       this._scene.add(this._ring);
 
       this._clock = new THREE.Clock();
+      this._mode = '3d';
       this.ready = true;
-      const loop = () => {
-        this._raf = requestAnimationFrame(loop);
-        this._tick();
-      };
-      loop();
+      if (!this._raf) {
+        const loop = () => {
+          this._raf = requestAnimationFrame(loop);
+          this._tick();
+        };
+        loop();
+      }
 
       global.addEventListener('resize', () => {
         if (!container.isConnected) return;
@@ -207,10 +261,31 @@
     setSpeaking(on, energy) {
       this.speaking = !!on;
       if (typeof energy === 'number') this.mouth = energy;
+      if (!on) {
+        this._lipFrames = null;
+        this.mouth = 0;
+      }
+    },
+
+    /** STEP 4 — drive jaw from viseme plan ({ frames: [{t,jaw}] }) */
+    applyLipPlan(lips) {
+      this._lipFrames = (lips && lips.frames) ? lips.frames : null;
+      this._lipStart = (typeof performance !== 'undefined' ? performance.now() : Date.now());
+      this.speaking = true;
+      this.presence = 'speaking';
+    },
+
+    setMouth(energy) {
+      this.mouth = Math.max(0, Math.min(1, Number(energy) || 0));
+      this._emitMouth();
     },
 
     _tick() {
       if (!this.ready) return;
+      if (!this._clock || !this._scene) {
+        this._emitMouth();
+        return;
+      }
       const t = this._clock.getElapsedTime();
       const p = this.presence;
 
@@ -262,10 +337,22 @@
         this._ring.rotation.x = Math.sin(t * 0.2) * 0.2;
       }
 
-      // Lip sync
+      // STEP 4 — Lip sync (viseme frames + live audio energy)
       let mouth = 0.02;
       if (this.speaking) {
-        mouth = 0.04 + Math.abs(Math.sin(t * 14)) * 0.09 + (this.mouth || 0) * 0.05;
+        if (this._lipFrames && this._lipFrames.length) {
+          const elapsed = ((typeof performance !== 'undefined' ? performance.now() : Date.now()) - this._lipStart) / 1000;
+          let cur = this._lipFrames[0];
+          for (let i = 0; i < this._lipFrames.length; i++) {
+            const f = this._lipFrames[i];
+            if ((f.t || 0) <= elapsed) cur = f;
+            else break;
+          }
+          mouth = Number(cur.jaw || cur.mouth || 0.08);
+          mouth = mouth * 0.65 + (this.mouth || 0) * 0.35;
+        } else {
+          mouth = 0.04 + Math.abs(Math.sin(t * 14)) * 0.09 + (this.mouth || 0) * 0.22;
+        }
       }
       if (this._jaw) {
         this._jaw.scale.y = 1 + mouth * 8;
@@ -285,7 +372,10 @@
         this._core.material.emissiveIntensity = glow * (this.speaking ? 1.3 : 1);
       }
 
-      this._renderer.render(this._scene, this._camera);
+      if (this._renderer && this._scene && this._camera) {
+        this._renderer.render(this._scene, this._camera);
+      }
+      this._emitMouth();
     },
 
     dispose() {

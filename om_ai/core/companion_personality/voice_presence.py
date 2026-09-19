@@ -172,11 +172,11 @@ def is_garbage_spoken(answer: str) -> bool:
     return False
 
 
-def soft_listening_fallback(*, locale: str = "en") -> str:
+def soft_listening_fallback(*, locale: str = "en", user_message: str = "") -> str:
     """Minimal presence when the brain returns unusable text — not intent matching."""
     if locale == "hi":
-        return "Main sun raha hoon, Sir. Boliye."
-    return "I'm listening, Sir. Go ahead."
+        return rescue_spoken(user_message)
+    return rescue_spoken(user_message)
 
 
 def rescue_spoken(user_message: str, bad_answer: str = "") -> str:

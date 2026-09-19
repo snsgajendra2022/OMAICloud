@@ -1,12 +1,6 @@
-"""Optional voice-clone adapter (disabled unless configured)."""
+"""Back-compat shim — use voice_cloner.VoiceCloner."""
 from __future__ import annotations
 
-import os
-from typing import Any
+from .voice_cloner import VoiceCloneAdapter, VoiceCloner
 
-
-class VoiceCloneAdapter:
-    def status(self) -> dict[str, Any]:
-        enabled = (os.getenv("OM_VOICE_CLONE_ENABLED") or "0").strip() in {"1", "true", "yes"}
-        profile = (os.getenv("OM_VOICE_CLONE_PROFILE") or "").strip()
-        return {"enabled": enabled, "profile": profile or None, "ready": False}
+__all__ = ["VoiceCloner", "VoiceCloneAdapter"]

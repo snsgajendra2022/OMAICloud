@@ -121,8 +121,8 @@ class ConsciousnessEngine:
                 # Keep incoming answer from companion brain / OS
                 reply = answer or reply
             elif route == "personality":
-                from om_ai.core.personality import get_personality
-                reply = get_personality().greet(self.state.user_name)
+                # Greeting / tone stays with companion brain — no canned personality.greet
+                pass
             elif route == "vision":
                 from om_ai.core.vision import get_vision_runtime
                 vision = get_vision_runtime().what_is_on_screen()

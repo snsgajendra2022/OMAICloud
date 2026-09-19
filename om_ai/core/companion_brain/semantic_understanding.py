@@ -79,6 +79,8 @@ class SemanticUnderstanding:
             "thanks",
             "goodbye",
             "identity",
+            "user_name",
+            "user_name_set",
         }:
             return "social"
         if followup or (history and intent.intent == "followup"):

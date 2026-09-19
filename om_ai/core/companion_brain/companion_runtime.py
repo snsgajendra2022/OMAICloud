@@ -105,7 +105,10 @@ class CompanionRuntime:
         if not q:
             activities.append(_PUBLIC_ACTIVITIES["listen"])
             return {
-                "answer": "I'm here — go ahead.",
+                "answer": rescue_spoken(q),
+                "spoken": rescue_spoken(q),
+                "spoken_tts": rescue_spoken(q),
+                "heard": q,
                 "handled": True,
                 "activities": activities,
                 "semantic": {
@@ -127,7 +130,6 @@ class CompanionRuntime:
         # — it does NOT invent canned replies.
         from om_ai.core.companion_personality.voice_presence import (
             get_voice_presence,
-            jarvis_system_hint,
             shape_for_speech,
             is_garbage_spoken,
             rescue_spoken,
@@ -203,18 +205,14 @@ class CompanionRuntime:
                     "locale": locale,
                     "emotion": emotion,
                     "user_message": q,
+                    "purpose": str(((extra or {}).get("user_context") or {}).get("purpose") or ""),
                 }
             ),
-            jarvis_system_hint(
-                conversation_mode=str(semantic.get("conversation_mode") or "assist"),
-                locale=locale,
-            ),
-            str(personality_pack.get("system_hint") or ""),
             str(human_ctx.get("context_blob") or ""),
             str(knowledge.get("blob") or ""),
             str(reasoning.get("hint") or ""),
             model_context or "",
-            "Speak out loud to the user. Keep the reply short and human.",
+            "Speak out loud to the user. Keep the reply short and human. Do not append a canned follow-up question.",
         ]
         merged_context = "\n".join(p for p in ctx_parts if p).strip()[:3500]
 
@@ -231,12 +229,11 @@ class CompanionRuntime:
                 **(extra or {}),
                 "semantic": semantic,
                 "interrupt": interrupt,
+                "voice_mode": True,
+                "skip_canned_social": True,
             },
         )
         answer = str(gen.get("answer") or "").strip()
-        if not answer or is_garbage_spoken(answer):
-            answer = rescue_spoken(q, answer)
-
         answer = self.personality.finalize(
             answer,
             personality_pack,
@@ -244,13 +241,10 @@ class CompanionRuntime:
             user_message=q,
             voice_mode=True,
         )
-        if is_garbage_spoken(answer):
+        if not answer or is_garbage_spoken(answer):
             answer = rescue_spoken(q, answer)
         voice_pack = shape_for_speech(answer, user_message=q)
         answer = str(voice_pack.get("spoken") or answer)
-        if is_garbage_spoken(answer):
-            answer = rescue_spoken(q, answer)
-            voice_pack = shape_for_speech(answer, user_message=q)
 
         affect = (personality_pack.get("affect") or {}) if isinstance(personality_pack, dict) else {}
         expression = personality_pack.get("expression") if isinstance(personality_pack, dict) else None

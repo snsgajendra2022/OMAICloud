@@ -54,34 +54,11 @@ class CorrectionEngine:
         if not self.needs_correction(original):
             return {"corrected": False, "answer": original, "reason": "ok"}
 
-        # Intent-aware repair
-        if intent in {"greeting", "morning", "evening", "afternoon"}:
-            fixed = "Hello! How can I help you today?"
-            if "morning" in (message or "").lower():
-                fixed = "Good morning! How can I help you today?"
-            return {"corrected": True, "answer": fixed, "reason": "greeting_repair"}
+        if sol:
+            return {
+                "corrected": True,
+                "answer": sol,
+                "reason": "replaced_with_solution_engine",
+            }
 
-        if intent == "debugging" or self._looks_debug(message):
-            fixed = sol or (
-                "Let's debug this.\n\n"
-                "1. Copy the exact error from the console/logs.\n"
-                "2. Note what changed right before it broke.\n"
-                "3. Test a minimal version of the failing part.\n\n"
-                "Paste the error text and I’ll give a concrete fix."
-            )
-            return {"corrected": True, "answer": fixed, "reason": "debug_repair"}
-
-        fixed = sol or (
-            "Here’s a clearer take:\n\n"
-            f"You asked: {(message or '').strip()[:180]}\n\n"
-            "I can help with a direct answer, steps, or code — "
-            "tell me which you prefer if this isn’t enough."
-        )
-        return {"corrected": True, "answer": fixed, "reason": "generic_repair"}
-
-    def _looks_debug(self, message: str) -> bool:
-        low = (message or "").lower()
-        return any(
-            w in low
-            for w in ("error", "bug", "blank page", "crash", "not working", "broken")
-        )
+        return {"corrected": False, "answer": original, "reason": "leave_to_brain"}

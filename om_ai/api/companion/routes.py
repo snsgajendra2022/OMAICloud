@@ -39,6 +39,8 @@ class DeviceBody(BaseModel):
 
 class SpeakBody(BaseModel):
     text: str = Field(..., min_length=1, max_length=4000)
+    emotion: str = "calm"
+    presence: str = "speaking"
 
 
 def _runtime():
@@ -289,37 +291,66 @@ def companion_unmute() -> dict[str, Any]:
     return {"ok": True, "muted": False}
 
 
+@router.post("/voice/plan")
+def companion_voice_plan(body: SpeakBody) -> dict[str, Any]:
+    """STEPS 1–4 plan: emotion, stream chunks, lip-sync frames (no audio)."""
+    from om_ai.core.voice_engine import get_voice_engine
+
+    ve = get_voice_engine()
+    plan = ve.speak_plan(
+        body.text.strip(),
+        emotion=(body.emotion or "calm"),
+        presence=(body.presence or "speaking"),
+    )
+    return {"ok": True, **plan, "status": ve.status()}
+
+
+@router.post("/tts/stream")
+def companion_tts_stream(body: SpeakBody):
+    """STEP 2 — realtime audio stream (ElevenLabs/Azure). Falls back 501 if free-only."""
+    from fastapi.responses import StreamingResponse
+
+    from om_ai.core.voice_engine import get_voice_engine
+
+    ve = get_voice_engine()
+    st = ve.status()
+    if st.get("free") or not (st.get("realtime") or {}).get("ready"):
+        raise HTTPException(
+            status_code=501,
+            detail="realtime_tts_unavailable_use_free_tts",
+        )
+
+    def gen():
+        yield from ve.stream_audio(
+            body.text.strip(),
+            emotion=(body.emotion or "calm"),
+            presence=(body.presence or "speaking"),
+        )
+
+    return StreamingResponse(
+        gen(),
+        media_type="audio/mpeg",
+        headers={
+            "X-OM-TTS-Backend": str(st.get("provider") or "realtime"),
+            "X-OM-TTS-Free": "0",
+        },
+    )
+
+
 @router.post("/tts")
 def companion_tts(body: SpeakBody):
-    """Synthesize natural speech audio for the avatar (Jarvis-like voice)."""
+    """Single voice path: voice_engine.synthesize (free say or optional neural)."""
     from starlette.background import BackgroundTask
 
     text = body.text.strip()
     if not text:
         raise HTTPException(status_code=400, detail="empty")
 
-    # Pace / neural path via Voice Engine when available
-    spoken = text
-    try:
-        from om_ai.core.voice_engine import get_voice_engine
-
-        ve = get_voice_engine()
-        plan = ve.speak_plan(text, emotion="calm", presence="speaking")
-        spoken = str(plan.get("text") or text)
-        if "[[slnc" not in text.lower() and "[[slnc" in spoken.lower():
-            pass
-        elif "[[slnc" in text.lower():
-            spoken = text
-        else:
-            from om_ai.core.companion_personality.voice_presence import shape_for_speech
-
-            spoken = shape_for_speech(text).get("spoken_tts") or spoken
-    except Exception:
-        from om_ai.core.companion_personality.voice_presence import shape_for_speech
-
-        spoken = shape_for_speech(text).get("spoken_tts") or text
+    emotion = (body.emotion or "calm").strip() or "calm"
+    presence = (body.presence or "speaking").strip() or "speaking"
 
     fd, name = tempfile.mkstemp(suffix=".wav")
+    import json as _json
     import os
 
     os.close(fd)
@@ -332,38 +363,26 @@ def companion_tts(body: SpeakBody):
             pass
 
     try:
-        # Prefer neural TTS when configured
-        try:
-            from om_ai.core.voice_engine import get_voice_engine
+        from om_ai.core.voice_engine import get_voice_engine
 
-            neural = get_voice_engine().synthesize(spoken, output_path=tmp.with_suffix(".mp3"))
-            if neural.get("ok"):
-                path = Path(str(neural.get("path") or tmp))
-                media = "audio/mpeg" if path.suffix.lower() == ".mp3" else "audio/wav"
-
-                def _cleanup_path() -> None:
-                    try:
-                        path.unlink(missing_ok=True)
-                    except Exception:
-                        pass
-
-                return FileResponse(
-                    path=str(path),
-                    media_type=media,
-                    filename=path.name,
-                    background=BackgroundTask(_cleanup_path),
-                    headers={
-                        "X-OM-Voice": str(neural.get("voice") or "neural"),
-                        "X-OM-TTS-Backend": str(neural.get("backend") or "neural"),
-                    },
-                )
-        except Exception:
-            pass
-
-        from om_ai.core.voice_intelligence.speech_synthesizer import SpeechSynthesizer
-
-        synth = SpeechSynthesizer()
-        result = synth.synthesize(spoken, output_path=tmp)
+        ve = get_voice_engine()
+        plan = ve.speak_plan(text, emotion=emotion, presence=presence)
+        result = ve.synthesize(
+            text,
+            output_path=tmp.with_suffix(".mp3") if not plan.get("free") else tmp,
+            emotion=emotion,
+            presence=presence,
+            plan=plan,
+        )
+        if not result.get("ok"):
+            # Retry free path to .wav
+            result = ve.synthesize(
+                text,
+                output_path=tmp,
+                emotion=emotion,
+                presence=presence,
+                plan=plan,
+            )
         path = Path(str(result.get("path") or tmp))
         if not result.get("ok") or not path.is_file() or path.stat().st_size < 44:
             _cleanup()
@@ -375,16 +394,41 @@ def companion_tts(body: SpeakBody):
             except Exception:
                 pass
 
-        media = "audio/wav" if path.suffix.lower() == ".wav" else "audio/aiff"
+        suffix = path.suffix.lower()
+        media = {
+            ".mp3": "audio/mpeg",
+            ".wav": "audio/wav",
+            ".aiff": "audio/aiff",
+            ".aif": "audio/aiff",
+        }.get(suffix, "audio/wav")
+
+        lips = plan.get("lips") or result.get("lips") or {}
+        try:
+            lips_json = _json.dumps(lips)[:4000]
+        except Exception:
+            lips_json = ""
+
+        headers = {
+            "X-OM-Voice": str(result.get("voice") or plan.get("voice") or "Aman"),
+            "X-OM-TTS-Backend": str(result.get("backend") or result.get("provider") or ""),
+            "X-OM-TTS-Free": "1" if result.get("free", True) else "0",
+            "X-OM-Emotion": emotion,
+            "X-OM-Rate": str(plan.get("rate") or result.get("rate") or "178"),
+            "X-OM-Playback-Rate": str(
+                (plan.get("emotion_knobs") or {}).get("rate")
+                or plan.get("browser_rate")
+                or "1.0"
+            ),
+        }
+        if lips_json:
+            headers["X-OM-Lips"] = lips_json
+
         return FileResponse(
             path=str(path),
             media_type=media,
             filename=path.name,
             background=BackgroundTask(_cleanup_path),
-            headers={
-                "X-OM-Voice": str(result.get("voice") or ""),
-                "X-OM-TTS-Backend": str(result.get("backend") or ""),
-            },
+            headers=headers,
         )
     except HTTPException:
         raise

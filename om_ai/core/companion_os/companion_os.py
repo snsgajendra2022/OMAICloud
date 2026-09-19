@@ -6,7 +6,6 @@ self-improvement, autonomous agent, vision, and background brain into one turn.
 from __future__ import annotations
 
 import logging
-import re
 from typing import Any
 
 logger = logging.getLogger(__name__)
@@ -195,7 +194,6 @@ class CompanionOS:
                 route = str(((mind.get("decision") or {}).get("route") or ""))
                 if mind.get("answer") and route in {
                     "action_engine",
-                    "personality",
                     "vision",
                 }:
                     answer = str(mind["answer"])
@@ -224,14 +222,9 @@ class CompanionOS:
                     when = when_raw or "later"
                 task = slots.get("task", user_text)
                 if locale == "hi":
-                    answer = (
-                        f"Theek hai Sir — maine note kar liya. "
-                        f"{when} ke liye yaad: {task}. Aur kuch?"
-                    )
+                    answer = f"Note kar liya — {when}: {task}."
                 else:
-                    answer = (
-                        f"Understood, Sir. Reminder set for {when}: {task}. Anything else?"
-                    )
+                    answer = f"Reminder set for {when}: {task}."
                 language_owned = True
                 try:
                     from om_ai.core.background_brain import get_background_brain
@@ -261,21 +254,6 @@ class CompanionOS:
             conv_user = self.conversation.on_user(user_text, speaking=speaking)
             out["conversation"] = {"user": conv_user}
             mode = react_mode or str(((presence_pack.get("presence") or {}).get("mode") or ""))
-            # Presence-led rescue only for empty / robotic catch-alls — never crush
-            # intentional short Jarvis human replies or language-owned answers.
-            if mode == "attentive" and not language_owned and not human_owned and not consciousness_owned:
-                plain = re.sub(r"\[\[slnc[^\]]*\]\]", " ", (answer or ""), flags=re.I).lower()
-                plain = " ".join(plain.split())
-                weak = (
-                    not plain
-                    or "tell me what you need" in plain
-                    or "i'm with you" in plain
-                    or "i am with you" in plain
-                    or "i'll handle it" in plain
-                    or plain in {"ok", "okay", "sure", "done"}
-                )
-                if weak:
-                    answer = "Tell me what happened. I am listening, Sir."
             if answer:
                 asst = self.conversation.on_assistant(
                     answer,
@@ -324,21 +302,26 @@ class CompanionOS:
         elif self.avatar:
             out["avatar"] = self.avatar.update(presence=presence_mode, text=answer, mood=mood)
 
-        if answer and (self.neural_voice or self.voice_engine):
+        if answer and (self.voice_engine or self.neural_voice):
             emotion = "concerned" if presence_mode in {"concerned", "attentive"} else "calm"
             if presence_mode == "excited":
                 emotion = "excited"
-            voice = self.neural_voice or self.voice_engine
-            out["voice_plan"] = voice.speak_plan(
+            voice = self.voice_engine or self.neural_voice
+            plan = voice.speak_plan(
                 answer,
                 emotion=emotion,
                 **(
-                    {"presence": presence_mode if presence_mode != "attentive" else "concerned"}
+                    {"presence": presence_mode if presence_mode != "attentive" else "speaking"}
                     if self.voice_engine and voice is self.voice_engine
                     else {}
                 ),
             )
-            answer = str((out["voice_plan"] or {}).get("text") or answer)
+            out["voice_plan"] = plan
+            # Never put TTS markers ([[volm]] / [[rate]]) into display answer
+            out["spoken_tts"] = str(plan.get("text") or answer)
+            out["spoken"] = str(plan.get("spoken_clean") or answer)
+            # keep out["answer"] as clean human text
+            answer = str(plan.get("spoken_clean") or answer)
 
         if self.live_presence and answer:
             try:
@@ -372,8 +355,39 @@ class CompanionOS:
             )
 
         out["answer"] = answer
-        out["spoken"] = answer
+        out["spoken"] = out.get("spoken") or answer
+        if "spoken_tts" not in out:
+            out["spoken_tts"] = answer
+        out["memory_line"] = self._memory_line(out, user_text=user_text)
         return out
+
+    def _memory_line(self, pack: dict[str, Any], *, user_text: str = "") -> str:
+        mem = pack.get("human_memory") if isinstance(pack.get("human_memory"), dict) else {}
+        projects = mem.get("projects") if isinstance(mem.get("projects"), dict) else {}
+        semantic = mem.get("semantic") if isinstance(mem.get("semantic"), dict) else {}
+        active = str(
+            projects.get("active")
+            or semantic.get("active_project")
+            or ""
+        ).strip()
+        focus = ""
+        try:
+            focus = str(
+                ((projects.get("projects") or {}).get(active) or {}).get("last_focus")
+                or ""
+            ).strip()
+        except Exception:
+            focus = ""
+        topic = str(((pack.get("conversation") or {}).get("user") or {}).get("topic") or "").strip()
+        if active and focus:
+            return f"{active} · {focus}"
+        if active:
+            return f"Working on {active}"
+        if topic and topic != "general":
+            return topic.replace("_", " ")
+        if user_text:
+            return (user_text or "").strip()[:80]
+        return "Companion ready"
 
 
 def get_companion_os() -> CompanionOS:

@@ -11,20 +11,16 @@ class ResponseStrategy:
         policy: dict[str, Any],
     ) -> dict[str, Any]:
         mode = semantic.get("conversation_mode") or "assist"
-        if policy.get("prefer_runtime_fast_path") and mode == "social":
-            return {
-                "engine": "chat_intelligence",
-                "style": "conversational",
-                "use_model": False,
-            }
-        if semantic.get("requires_model"):
+        if semantic.get("requires_model") or mode in {"social", "assist", "listen"}:
             return {
                 "engine": "chatgpt_runtime",
-                "style": "solution" if mode == "task" else "explainer",
+                "style": "conversational" if mode == "social" else (
+                    "solution" if mode == "task" else "explainer"
+                ),
                 "use_model": True,
             }
         return {
             "engine": "chatgpt_runtime",
             "style": "balanced",
-            "use_model": bool(semantic.get("requires_action")),
+            "use_model": True,
         }

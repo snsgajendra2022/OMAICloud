@@ -110,6 +110,15 @@
         inset 0 0 40px rgba(117,213,227,0.1);
       overflow: hidden;
     }
+    .presence3d {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 3;
+      border-radius: 50%;
+      overflow: hidden;
+      opacity: 0.88;
+    }
     .orb-core {
       position: absolute;
       inset: 0;
@@ -320,6 +329,7 @@
         </svg>
         <div class="orb" id="orb">
           <canvas class="orb-core" id="coreCanvas"></canvas>
+          <div class="presence3d" id="presence3d" aria-hidden="true"></div>
         </div>
       </div>
 
@@ -329,7 +339,7 @@
       <p class="heard" id="heard"></p>
       <p class="feeling" id="feeling"></p>
       <p class="said" id="reply">Connecting to OM…</p>
-      <p class="memory-line" id="memoryLine">Memory · You are working on OM AI</p>
+      <p class="memory-line" id="memoryLine">Memory · connecting</p>
       <p class="activity" id="activity"></p>
 
       <!-- Browsers require ONE user gesture the first time only -->
@@ -348,6 +358,7 @@
     </main>
   </div>
 
+  <script src="/static/companion/presence3d.js"></script>
   <script>
     const els = {
       orbWrap: document.getElementById('orbWrap'),
@@ -551,7 +562,26 @@
       cancelAnimationFrame(aura.raf);
       tickCore();
       tickAura();
+      mountPresence();
     }
+
+    function mountPresence() {
+      const host = document.getElementById('presence3d');
+      if (!host || !window.OMPresence3D) return;
+      try {
+        const mounted = window.OMPresence3D.mount(host);
+        if (mounted && window.OMPresence3D.setPresence) {
+          window.OMPresence3D.setPresence(els.orbWrap.dataset.presence || 'idle');
+        }
+      } catch (_) {}
+    }
+
+    window.addEventListener('om-presence-mouth', (ev) => {
+      const energy = Number(ev.detail && ev.detail.energy);
+      if (Number.isFinite(energy)) {
+        energyBoost = Math.max(energyBoost, Math.min(1.8, 0.25 + energy * 1.6));
+      }
+    });
 
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     const isLocal = /^(localhost|127\.0\.0\.1)$/i.test(location.hostname);
@@ -575,6 +605,12 @@
       els.statusRow.dataset.mode = muted ? 'muted' : '';
       els.wave.classList.toggle('on', mode === 'listening' || mode === 'speaking');
       els.livePill.classList.toggle('on', alwaysOn && !muted);
+      if (window.OMPresence3D) {
+        try {
+          window.OMPresence3D.setPresence(els.orbWrap.dataset.presence || mode);
+          window.OMPresence3D.setSpeaking(mode === 'speaking', mode === 'speaking' ? 0.22 : 0);
+        } catch (_) {}
+      }
       if (mode === 'speaking') startEnergy(); else if (mode !== 'listening') stopEnergy();
       else energyBoost = Math.max(energyBoost, 0.25);
     }
@@ -701,6 +737,10 @@
       speaking = false;
       if (window.speechSynthesis) window.speechSynthesis.cancel();
       if (audioEl) { try { audioEl.pause(); } catch (_) {} audioEl = null; }
+      if (lipRaf) { cancelAnimationFrame(lipRaf); lipRaf = 0; }
+      if (window.OMPresence3D) {
+        try { window.OMPresence3D.setSpeaking(false, 0); } catch (_) {}
+      }
       api('/interrupt', { method: 'POST', body: '{}' }).catch(() => {});
     }
 
@@ -711,7 +751,46 @@
       }, ms);
     }
 
-    async function speak(text) {
+    let lipRaf = 0;
+    let lipAudioCtx = null;
+
+    function driveLipsFromAudio(audio, lipsPlan) {
+      if (window.OMPresence3D && lipsPlan) {
+        try { window.OMPresence3D.applyLipPlan(lipsPlan); } catch (_) {}
+      } else if (window.OMPresence3D) {
+        try { window.OMPresence3D.setSpeaking(true, 0.2); } catch (_) {}
+      }
+      try {
+        const AC = window.AudioContext || window.webkitAudioContext;
+        if (!AC || !audio) return;
+        if (!lipAudioCtx) lipAudioCtx = new AC();
+        const src = lipAudioCtx.createMediaElementSource(audio);
+        const analyser = lipAudioCtx.createAnalyser();
+        analyser.fftSize = 256;
+        src.connect(analyser);
+        analyser.connect(lipAudioCtx.destination);
+        const data = new Uint8Array(analyser.frequencyBinCount);
+        const tick = () => {
+          if (!speaking || !audioEl) return;
+          analyser.getByteFrequencyData(data);
+          let sum = 0;
+          for (let i = 0; i < data.length; i++) sum += data[i];
+          const avg = sum / (data.length * 255);
+          energyBoost = Math.max(0.35, Math.min(1.8, 0.4 + avg * 2.2));
+          if (window.OMPresence3D) {
+            try { window.OMPresence3D.setMouth(avg); } catch (_) {}
+          }
+          lipRaf = requestAnimationFrame(tick);
+        };
+        lipAudioCtx.resume().catch(() => {});
+        lipRaf = requestAnimationFrame(tick);
+      } catch (_) {
+        // Viseme plan alone is enough for procedural jaw
+        energyBoost = 1.1;
+      }
+    }
+
+    async function speak(text, emotion) {
       const say = String(text || '').trim();
       if (!say || muted) {
         setState('LISTENING');
@@ -721,20 +800,45 @@
       stopSpeakingLocal();
       speaking = true;
       setState('SPEAKING');
-      // Keep recognition alive for barge-in where possible
+      const emo = emotion || 'calm';
       try {
         const res = await fetch('/api/companion/tts', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ text: say }),
+          body: JSON.stringify({ text: say, emotion: emo, presence: 'speaking' }),
         });
         if (res.ok) {
+          let lipsPlan = null;
+          const lipsHdr = res.headers.get('X-OM-Lips');
+          if (lipsHdr) {
+            try { lipsPlan = JSON.parse(lipsHdr); } catch (_) {}
+          }
+          if (!lipsPlan) {
+            try {
+              const planRes = await fetch('/api/companion/voice/plan', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ text: say, emotion: emo }),
+              });
+              if (planRes.ok) {
+                const pj = await planRes.json();
+                lipsPlan = pj.lips || null;
+              }
+            } catch (_) {}
+          }
           const blob = await res.blob();
           const url = URL.createObjectURL(blob);
           audioEl = new Audio(url);
-          // Calm Jarvis playback — slightly under 1.0 feels less "read aloud"
-          audioEl.playbackRate = 0.88;
-          audioEl.preservesPitch = true;
+          // Server (Aman) already paces — keep near 1.0; tiny emotion nudge only
+          const hdrRate = Number(res.headers.get('X-OM-Playback-Rate') || '');
+          let playRate = Number.isFinite(hdrRate) && hdrRate > 0.85 && hdrRate < 1.2
+            ? hdrRate
+            : 1.0;
+          if (emo === 'excited') playRate = Math.min(1.06, Math.max(1.0, playRate));
+          // Do not slow soft/concerned — that made Aman drag
+          audioEl.playbackRate = playRate;
+          if ('preservesPitch' in audioEl) audioEl.preservesPitch = true;
+          driveLipsFromAudio(audioEl, lipsPlan);
           await new Promise((resolve, reject) => {
             audioEl.onended = resolve;
             audioEl.onerror = reject;
@@ -742,6 +846,10 @@
           });
           URL.revokeObjectURL(url);
           speaking = false;
+          if (lipRaf) { cancelAnimationFrame(lipRaf); lipRaf = 0; }
+          if (window.OMPresence3D) {
+            try { window.OMPresence3D.setSpeaking(false, 0); } catch (_) {}
+          }
           setState('LISTENING');
           scheduleListen(350);
           return;
@@ -749,16 +857,24 @@
       } catch (_) {}
 
       if (window.speechSynthesis) {
+        if (window.OMPresence3D) {
+          try { window.OMPresence3D.setSpeaking(true, 0.25); } catch (_) {}
+        }
+        energyBoost = 1.0;
         await new Promise((resolve) => {
-          const u = new SpeechSynthesisUtterance(say.replace(/\[\[slnc\s+\d+\]\]/gi, ' … '));
-          u.rate = 0.78;
-          u.pitch = 0.88;
+          const u = new SpeechSynthesisUtterance(
+            say.replace(/\[\[(slnc|rate|pbas|volm)[^\]]*\]\]/gi, ' ').replace(/\s+/g, ' ').trim()
+          );
+          // Clear Indian male pace — never drag below natural
+          u.rate = emo === 'excited' ? 1.08 : (emo === 'soft' || emo === 'concerned' ? 0.96 : 1.02);
+          u.pitch = emo === 'excited' ? 1.05 : (emo === 'soft' ? 0.95 : 1.0);
           const voices = speechSynthesis.getVoices();
           const preferred =
-            voices.find(v => /daniel/i.test(v.name)) ||
-            voices.find(v => /en-GB/i.test(v.lang) && /male|daniel|oliver|arthur/i.test(v.name)) ||
-            voices.find(v => /en-GB/i.test(v.lang)) ||
-            voices.find(v => /rishi|moira|samantha/i.test(v.name)) ||
+            voices.find(v => /aman/i.test(v.name)) ||
+            voices.find(v => /rishi/i.test(v.name)) ||
+            voices.find(v => /en-IN/i.test(v.lang) && /male|aman|rishi/i.test(v.name)) ||
+            voices.find(v => /en-IN/i.test(v.lang)) ||
+            voices.find(v => /hi-IN/i.test(v.lang)) ||
             voices.find(v => /^en/i.test(v.lang));
           if (preferred) u.voice = preferred;
           u.onend = resolve;
@@ -767,6 +883,9 @@
         });
       }
       speaking = false;
+      if (window.OMPresence3D) {
+        try { window.OMPresence3D.setSpeaking(false, 0); } catch (_) {}
+      }
       setState('LISTENING');
       scheduleListen(200);
     }
@@ -793,8 +912,8 @@
         } else if (data.human_memory && els.memoryLine) {
           const proj = (((data.human_memory || {}).projects || {}).active)
             || (((data.human_memory || {}).semantic || {}).active_project)
-            || 'OM AI';
-          els.memoryLine.textContent = 'Memory · You are working on ' + proj;
+            || '';
+          if (proj) els.memoryLine.textContent = 'Memory · ' + proj;
         }
         if (data.heard) els.heard.textContent = 'You said: ' + data.heard;
         if (els.feeling && (data.feeling || (data.affect && data.affect.label))) {
@@ -816,10 +935,15 @@
         els.permBox.classList.remove('show');
         pendingPermissionId = null;
         const answer = data.spoken || data.answer || '';
-        const display = String(answer).replace(/\[\[slnc\s+\d+\]\]/gi, ' ').replace(/\s+/g, ' ').trim();
+        const display = String(answer)
+          .replace(/\[\[[^\]]+\]\]/g, ' ')
+          .replace(/<break\s+\d+ms\s*\/>/gi, ' ')
+          .replace(/\*\*/g, '')
+          .replace(/\s+/g, ' ')
+          .trim();
         if (display) {
           els.reply.textContent = display;
-          await speak(data.spoken_tts || answer);
+          await speak(data.spoken_tts || answer, data.feeling || (data.affect && data.affect.label) || 'calm');
         } else {
           setState('LISTENING');
           scheduleListen(150);
@@ -991,7 +1115,7 @@
       })
       .catch((e) => {
         setState('ERROR');
-        els.reply.textContent = 'Open http://127.0.0.1:8765/companion in Chrome/Safari';
+        els.reply.textContent = 'Open ' + location.origin + '/companion in Chrome or Safari';
         els.activity.textContent = String(e.message || e);
       });
   </script>

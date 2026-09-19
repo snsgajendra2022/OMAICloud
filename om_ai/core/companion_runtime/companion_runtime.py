@@ -261,20 +261,17 @@ class CompanionRuntime:
         spoken = str(brain_out.get("spoken") or answer).strip()
         spoken_tts = str(brain_out.get("spoken_tts") or spoken).strip()
 
-        # Final spoken presence pass (Jarvis cadence)
+        # Brain already shaped speech. Rescue only if the spoken line is unusable.
         try:
             from om_ai.core.companion_personality.voice_presence import (
-                shape_for_speech,
                 is_garbage_spoken,
                 rescue_spoken,
             )
 
             if is_garbage_spoken(spoken):
                 spoken = rescue_spoken(user_text, spoken)
-            pack = shape_for_speech(spoken, user_message=user_text)
-            spoken = str(pack.get("spoken") or spoken)
-            spoken_tts = str(pack.get("spoken_tts") or spoken)
-            answer = spoken
+                spoken_tts = spoken
+                answer = spoken
         except Exception:
             pass
 
@@ -307,9 +304,8 @@ class CompanionRuntime:
                 )
 
         if not answer:
-            answer = "I'm with you. Go ahead."
-            spoken = answer
-            spoken_tts = answer
+            spoken = spoken or ""
+            spoken_tts = spoken_tts or spoken
 
         # STEP 60 — Companion OS enrichment (presence, continuous convo, memory, avatar…)
         os_pack: dict[str, Any] = {}
@@ -327,16 +323,13 @@ class CompanionRuntime:
             if os_pack.get("answer"):
                 answer = str(os_pack["answer"])
                 spoken = str(os_pack.get("spoken") or answer)
-                spoken_tts = spoken
+                spoken_tts = str(os_pack.get("spoken_tts") or spoken)
             presence_mode = str(
                 ((os_pack.get("presence") or {}).get("presence") or {}).get("mode") or ""
             )
             if presence_mode:
                 activities.append(f"Presence · {presence_mode}")
                 self._emit("presence.state", os_pack.get("presence") or {})
-            for label in os_pack.get("activity") or []:
-                if label and label not in activities:
-                    activities.append(str(label))
             if os_pack.get("avatar"):
                 self._emit("avatar.state", os_pack["avatar"])
             if os_pack.get("om_avatar"):
@@ -400,7 +393,7 @@ class CompanionRuntime:
             "consciousness": os_pack.get("consciousness"),
             "vision": os_pack.get("vision"),
             "background": os_pack.get("background"),
-            "memory_line": "You are working on OM AI",
+            "memory_line": self._memory_line(os_pack, user_text=user_text),
             "activities": activities,
             "semantic": semantic,
             "session": self.voice.session.to_dict(),
@@ -412,6 +405,17 @@ class CompanionRuntime:
 
     def _run_brain(self, text: str, history: list[dict[str, Any]]) -> dict[str, Any]:
         model_generate = self._model_generate_fn()
+        user_ctx: dict[str, Any] = {}
+        try:
+            user_ctx = dict((self.context.meta or {}).get("user_context") or {})
+        except Exception:
+            user_ctx = {}
+        extra = {
+            "user_context": user_ctx,
+            "user_name": str(user_ctx.get("name") or "").strip(),
+            "voice_mode": True,
+            "skip_canned_social": True,
+        }
         if self.brain is not None:
             for meth in ("run", "handle", "process", "turn"):
                 fn = getattr(self.brain, meth, None)
@@ -421,8 +425,19 @@ class CompanionRuntime:
                             text,
                             history=history,
                             model_generate=model_generate,
+                            extra=extra,
                         )
                         if isinstance(out, dict) and (out.get("answer") is not None or out.get("semantic")):
+                            remembered = None
+                            meta = out.get("meta")
+                            if isinstance(meta, dict):
+                                remembered = meta.get("remember_name")
+                            if remembered:
+                                user_ctx["name"] = str(remembered)
+                                try:
+                                    self.context.meta["user_context"] = user_ctx
+                                except Exception:
+                                    pass
                             return out
                     except TypeError:
                         try:
@@ -442,13 +457,21 @@ class CompanionRuntime:
                         logger.debug("brain.%s failed: %s", meth, exc)
         try:
             from om_ai.core.companion_brain import run_companion_brain
+
             return run_companion_brain(
-                text, history=history, model_generate=model_generate
+                text,
+                history=history,
+                model_generate=model_generate,
+                extra=extra,
             )
         except Exception:
             from om_ai.core.chatgpt_runtime import run_chatgpt_runtime
+
             pack = run_chatgpt_runtime(
-                text, history=history, model_generate=model_generate
+                text,
+                history=history,
+                model_generate=model_generate,
+                extra=extra,
             )
             return {
                 "answer": pack.get("answer") or "",
@@ -457,37 +480,85 @@ class CompanionRuntime:
             }
 
     def _model_generate_fn(self):
-        """Best-effort native model hook for real conversational answers."""
-        try:
-            from om_ai.api import main as api_main
+        """Same production chat path as /v1/chat — native weights when ready, otherwise grounded brain."""
 
-            nb = getattr(api_main, "native_backend", None)
-            if nb is None:
-                return None
-            ready = bool(getattr(nb, "loaded", False) and getattr(nb, "_trained", False))
-            chat = getattr(nb, "chat", None)
-            if not ready or not callable(chat):
-                return None
+        def _gen(prompt: str, context: str = "") -> str:
+            try:
+                from om_ai.runtime.chat_backend import chat_reply
 
-            def _gen(prompt: str, context: str = "") -> str:
+                native = None
+                engine = None
                 try:
-                    from om_ai.runtime.chat_orchestrator import build_chat_messages
+                    from om_ai.api import main as api_main
 
-                    msgs = build_chat_messages(
-                        prompt,
-                        system=(context or "You are OM — warm voice companion. Reply briefly and human.")[:2000],
-                        history=[],
-                    )
-                    return str(chat(msgs) or "")
+                    native = getattr(api_main, "native_backend", None)
+                    engine = getattr(api_main, "engine", None)
                 except Exception:
-                    try:
-                        return str(chat(prompt) or "")
-                    except Exception:
-                        return ""
+                    native = None
+                    engine = None
+                native_chat = getattr(native, "chat", None) if native is not None else None
+                native_ready = bool(
+                    native is not None
+                    and getattr(native, "loaded", False)
+                    and getattr(native, "_trained", False)
+                )
+                local_chat = getattr(engine, "chat", None) if engine is not None else None
+                local_loaded = bool(
+                    engine is not None and getattr(engine, "model", None) is not None
+                )
+                messages: list[dict[str, str]] = []
+                if context:
+                    messages.append({"role": "system", "content": str(context)[:2000]})
+                messages.append({"role": "user", "content": prompt})
+                reply, _info = chat_reply(
+                    messages,
+                    local_chat=local_chat if callable(local_chat) else None,
+                    local_loaded=local_loaded,
+                    native_chat=native_chat if callable(native_chat) else None,
+                    native_ready=native_ready,
+                    assistant_instructions=str(context or "")[:1500],
+                )
+                text = str(reply or "").strip()
+                try:
+                    from om_ai.core.intelligence.real_answer import (
+                        looks_like_static_reply,
+                        build_real_answer,
+                    )
 
-            return _gen
+                    if (not text) or looks_like_static_reply(text):
+                        real = (build_real_answer(prompt) or "").strip()
+                        if real and not looks_like_static_reply(real):
+                            return real
+                        return ""
+                except Exception:
+                    pass
+                return text
+            except Exception as exc:
+                logger.debug("companion model generate: %s", exc)
+                return ""
+
+        return _gen
+
+    def _memory_line(self, os_pack: dict[str, Any], *, user_text: str = "") -> str:
+        line = str((os_pack or {}).get("memory_line") or "").strip()
+        if line:
+            return line
+        user_ctx: dict[str, Any] = {}
+        try:
+            user_ctx = dict((self.context.meta or {}).get("user_context") or {})
         except Exception:
-            return None
+            user_ctx = {}
+        purpose = str(user_ctx.get("purpose") or "").strip()
+        if purpose and purpose.lower() not in {"general", ""}:
+            return f"Working on {purpose}"
+        topic = str(
+            (((os_pack or {}).get("conversation") or {}).get("user") or {}).get("topic") or ""
+        ).strip()
+        if topic and topic != "general":
+            return topic.replace("_", " ")
+        if user_text:
+            return user_text.strip()[:80]
+        return "Companion ready"
 
     def _update_session_context(self, text: str) -> None:
         assert self.voice is not None

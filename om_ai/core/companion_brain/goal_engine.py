@@ -13,6 +13,8 @@ class GoalEngine:
         "thanks": "acknowledge",
         "goodbye": "close",
         "identity": "introduce",
+        "user_name": "recall_identity",
+        "user_name_set": "remember_identity",
         "debugging": "resolve_issue",
         "coding": "implement",
         "explain": "inform",

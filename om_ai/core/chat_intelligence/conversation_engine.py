@@ -1,46 +1,14 @@
-"""Conversation engine — social / greeting / identity fast path."""
+"""Conversation engine — identity / name as data. No canned greeting bank."""
 from __future__ import annotations
 
-import random
+import re
 from typing import Any
 
 from .intent_understanding import IntentResult, IntentUnderstanding
 
 
 class ConversationEngine:
-    """Handle greetings, identity, thanks, goodbye without the small model."""
-
-    RESPONSES: dict[str, list[str]] = {
-        "identity": [
-            "I'm OM AI, your private AI assistant. How can I help you today?",
-            "My name is OM. I'm your AI assistant — ask me anything.",
-        ],
-        "morning": [
-            "Good morning! How can I help you today?",
-            "Good morning! Hope your day is going well — what would you like to work on?",
-        ],
-        "afternoon": [
-            "Good afternoon! How can I help you?",
-            "Good afternoon — what can I help you with?",
-        ],
-        "evening": [
-            "Good evening! How can I help you?",
-            "Good evening — what would you like to tackle?",
-        ],
-        "greeting": [
-            "Hello! I'm OM. How can I help you today?",
-            "Hi! Nice to meet you. What can I do for you?",
-            "Hey — I'm OM. What are you working on?",
-        ],
-        "thanks": [
-            "You're welcome! Anything else I can help with?",
-            "Happy to help. What next?",
-        ],
-        "goodbye": [
-            "Goodbye! Come back anytime.",
-            "See you later — I'll be here when you need me.",
-        ],
-    }
+    """Handle user-name as structured memory. Social talk goes to the brain."""
 
     def __init__(self) -> None:
         self.intent = IntentUnderstanding()
@@ -55,29 +23,64 @@ class ConversationEngine:
         else:
             name = str(intent.get("intent") or "")
             needs_model = bool(intent.get("needs_model", True))
-        return (not needs_model) and name in self.RESPONSES
+        return (not needs_model) and name in {"user_name", "user_name_set"}
 
-    def respond(self, intent_name: str) -> str:
-        options = self.RESPONSES.get(intent_name) or self.RESPONSES["greeting"]
-        return random.choice(options)
+    def respond(self, intent_name: str, *, user_name: str = "") -> str:
+        del intent_name, user_name
+        return ""
+
+    def _extract_name(self, message: str) -> str:
+        m = IntentUnderstanding.USER_NAME_SET.search(message or "")
+        if not m:
+            return ""
+        name = re.sub(r"[^A-Za-z\s]", "", m.group(1) or "").strip()
+        parts = [p.capitalize() for p in name.split() if p][:3]
+        return " ".join(parts)[:40]
 
     def process(
         self,
         message: str,
         *,
         history: list[dict] | None = None,
+        user_name: str = "",
+        voice_mode: bool = False,
+        skip_canned: bool = False,
     ) -> dict[str, Any]:
+        del voice_mode, skip_canned
         intent = self.detect(message, history=history)
-        if self.can_handle(intent):
+        if not self.can_handle(intent):
             return {
-                "handled": True,
+                "handled": False,
                 "intent": intent.to_dict(),
-                "response": self.respond(intent.intent),
+                "response": "",
                 "strategy": intent.strategy,
             }
+
+        if intent.intent == "user_name_set":
+            name = self._extract_name(message) or user_name
+            if name:
+                return {
+                    "handled": True,
+                    "intent": intent.to_dict(),
+                    "response": f"Got it, {name}. I'll remember that.",
+                    "strategy": intent.strategy,
+                    "remember_name": name,
+                }
+            return {
+                "handled": False,
+                "intent": intent.to_dict(),
+                "response": "",
+                "strategy": intent.strategy,
+            }
+
+        name = (user_name or "").strip()
+        if name:
+            reply = f"Your name is {name}."
+        else:
+            reply = "I don't have your name yet. What should I call you?"
         return {
-            "handled": False,
+            "handled": True,
             "intent": intent.to_dict(),
-            "response": "",
+            "response": reply,
             "strategy": intent.strategy,
         }

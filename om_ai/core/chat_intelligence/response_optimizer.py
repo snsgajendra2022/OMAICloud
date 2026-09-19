@@ -74,7 +74,7 @@ class ResponseOptimizer:
 
                         improved = rescue_spoken(message)
                     except Exception:
-                        improved = "I'm with you. Go ahead — I'm listening."
+                        improved = ""
 
 
         final_report = self.evaluate(improved, message=message, intent=intent)

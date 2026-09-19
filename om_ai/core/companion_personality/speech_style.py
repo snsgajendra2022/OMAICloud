@@ -8,9 +8,9 @@ from typing import Any
 _ROBOTIC = [
     (re.compile(r"(?i)^as an ai[, ]*"), ""),
     (re.compile(r"(?i)^certainly[,!]?\s*i('d| would) be happy to\s*"), ""),
-    (re.compile(r"(?i)^sure[,!]?\s*i can help (you )?with that[.!]?\s*"), "Sure. "),
-    (re.compile(r"(?i)how can i (assist|help) you( today)?\??"), "What should we take on?"),
-    (re.compile(r"(?i)is there anything else i can help you with\??"), "Anything else on your mind?"),
+    (re.compile(r"(?i)^sure[,!]?\s*i can help (you )?with that[.!]?\s*"), ""),
+    (re.compile(r"(?i)how can i (assist|help) you( today)?\??"), ""),
+    (re.compile(r"(?i)is there anything else i can help you with\??"), ""),
     (re.compile(r"(?i)please let me know if you (need|have) .*"), ""),
     (re.compile(r"(?i)i want to help\s*[—\-–,]?\s*could you rephrase.*"), ""),
     (re.compile(r"(?i)please rephrase.*(short|plain).*"), ""),
@@ -69,14 +69,15 @@ class SpeechStyle:
         return text
 
     def pace_for_tts(self, spoken: str) -> str:
-        """Jarvis cadence markers for macOS say / neural TTS."""
-        t = (spoken or "").strip()
-        if "[[slnc" in t.lower():
-            return t
-        t = re.sub(r"\s*—\s*", " [[slnc 220]] ", t)
-        t = re.sub(r"\s*-\s+", " [[slnc 160]] ", t)
-        t = re.sub(r"([,;:])\s+", r"\1 [[slnc 240]] ", t)
-        t = re.sub(r"([.!?])\s+", r"\1 [[slnc 480]] ", t)
-        t = re.sub(r"(।)\s*", r"\1 [[slnc 420]] ", t)
-        t = re.sub(r"(?i)\b(sir)\b([,.!]?)(\s+)", r"\1\2 [[slnc 180]] \3", t)
-        return t.strip()
+        """Light conversational cadence — heavy pauses sound robotic, not human."""
+        try:
+            from om_ai.core.voice_engine.human_delivery import apply_human_prosody
+
+            return apply_human_prosody(spoken, emotion="calm")
+        except Exception:
+            t = (spoken or "").strip()
+            if "[[slnc" in t.lower():
+                return t
+            t = re.sub(r"([.!?])\s+", r"\1 [[slnc 180]] ", t)
+            t = re.sub(r"([,;:])\s+", r"\1 [[slnc 90]] ", t)
+            return t.strip()

@@ -35,7 +35,7 @@ class OMBrainController:
         meta: dict[str, Any] = {"step": 30, "runtime": "chatgpt_like"}
         q = (message or "").strip()
         if not q:
-            return {"answer": "Hi — send a message and I will help.", "stages": stages, "meta": meta}
+            return {"answer": "", "stages": stages, "meta": meta}
 
         # 1) Chat Intelligence
         stages.append("chat_intelligence")
@@ -83,30 +83,36 @@ class OMBrainController:
         except Exception as exc:
             meta["brain_router"] = {"error": str(exc)}
 
+        extra_d = dict(extra or {})
+        voice_mode = bool(extra_d.get("voice_mode") or extra_d.get("skip_canned_social"))
         draft = str(chat.get("answer") or "").strip()
-        sol = str((chat.get("solution") or {}).get("answer") or "").strip()
-        if sol and (not draft or len(sol) > len(draft)):
-            draft = sol
-        if brain.get("context_blob") and not draft:
-            draft = str(brain.get("context_blob") or "")[:1500]
+        if not voice_mode:
+            sol = str((chat.get("solution") or {}).get("answer") or "").strip()
+            if sol and (not draft or len(sol) > len(draft)):
+                draft = sol
+            if brain.get("context_blob") and not draft:
+                draft = str(brain.get("context_blob") or "")[:1500]
 
         # 3) Response Intelligence
         stages.append("response_intelligence")
         resp: dict[str, Any] = {}
-        try:
-            from om_ai.core.response.response_intelligence import run_response_intelligence
+        if not voice_mode:
+            try:
+                from om_ai.core.response.response_intelligence import run_response_intelligence
 
-            intent = str((chat.get("intent") or {}).get("intent") or "")
-            strategy = str((chat.get("plan") or {}).get("strategy") or "")
-            resp = run_response_intelligence(q, draft, intent=intent, strategy=strategy) or {}
-            draft = str(resp.get("answer") or draft)
-            meta["response_intelligence"] = {
-                "kind": resp.get("kind"),
-                "strategy": resp.get("strategy"),
-                "improved": resp.get("improved"),
-            }
-        except Exception as exc:
-            meta["response_intelligence"] = {"error": str(exc)}
+                intent = str((chat.get("intent") or {}).get("intent") or "")
+                strategy = str((chat.get("plan") or {}).get("strategy") or "")
+                resp = run_response_intelligence(q, draft, intent=intent, strategy=strategy) or {}
+                draft = str(resp.get("answer") or draft)
+                meta["response_intelligence"] = {
+                    "kind": resp.get("kind"),
+                    "strategy": resp.get("strategy"),
+                    "improved": resp.get("improved"),
+                }
+            except Exception as exc:
+                meta["response_intelligence"] = {"error": str(exc)}
+        else:
+            meta["response_intelligence"] = {"skipped": "voice_mode"}
 
         # 4) Continuous learning observe
         stages.append("continuous_learning")
@@ -127,7 +133,7 @@ class OMBrainController:
 
         stages.append("response")
         if not draft:
-            draft = "How can I help you today?"
+            draft = ""
         return {
             "answer": draft,
             "stages": stages,

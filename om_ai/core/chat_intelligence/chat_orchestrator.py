@@ -119,8 +119,8 @@ class ChatOrchestrator:
 
         if not q:
             return {
-                "answer": "Hi — send me a message and I’ll help.",
-                "handled": True,
+                "answer": "",
+                "handled": False,
                 "stages": stages + ["empty"],
                 "meta": {**meta, "empty": True},
                 "intent": {"intent": "empty"},
@@ -149,13 +149,45 @@ class ChatOrchestrator:
             "history_count": ctx.get("history_count"),
         }
 
-        # Fast social path — never send greetings to the small model
+        # Fast social path — never send greetings / user-name to templates
         stages.append("conversation")
-        social = self.conversation.process(q, history=mem_history)
-        if social.get("handled") and social.get("response"):
+        user_name = ""
+        try:
+            extra_d = dict(extra or {})
+            user_name = str(
+                extra_d.get("user_name")
+                or (extra_d.get("user_context") or {}).get("name")
+                or prefs.get("name")
+                or prefs.get("display_name")
+                or ""
+            ).strip()
+        except Exception:
+            user_name = ""
+        extra_d = dict(extra or {})
+        voice_mode = bool(extra_d.get("voice_mode") or extra_d.get("skip_canned_social"))
+        social = self.conversation.process(
+            q,
+            history=mem_history,
+            user_name=user_name,
+            voice_mode=voice_mode,
+            skip_canned=voice_mode,
+        )
+        if social.get("handled") and social.get("response") and not (
+            voice_mode and str((social.get("intent") or {}).get("intent") or "")
+            not in {"user_name", "user_name_set"}
+        ):
             answer = self.personality.wrap(
                 str(social["response"]), intent=intent.intent
             )
+            if social.get("remember_name"):
+                try:
+                    self.preferences.set(
+                        user_key,
+                        name=str(social["remember_name"]),
+                        display_name=str(social["remember_name"]),
+                    )
+                except Exception:
+                    pass
             safe = self.safety.filter(answer)
             answer = safe["answer"]
             self.memory.add(session, "assistant", answer, intent=intent.intent)
@@ -179,11 +211,12 @@ class ChatOrchestrator:
                     "confidence": conf,
                     "quality": qual,
                     "safety": safe.get("flags") or [],
+                    "remember_name": social.get("remember_name"),
                 },
                 "intent": intent.to_dict(),
                 "plan": {
                     "strategy": intent.strategy,
-                    "steps": ["acknowledge", "offer_help"],
+                    "steps": ["acknowledge", "personal"],
                 },
                 "solution": {},
                 "context_blob": ctx.get("context_blob") or "",
@@ -216,7 +249,8 @@ class ChatOrchestrator:
         stages.append("generate")
         model_answer = ""
         used_model = False
-        if model_generate is not None and intent.needs_model:
+        want_model = bool(intent.needs_model or voice_mode)
+        if model_generate is not None and want_model:
             try:
                 hint = self.personality.system_hint(
                     tone=str(prefs.get("tone") or "friendly"),
@@ -251,17 +285,13 @@ class ChatOrchestrator:
                 meta["generate_error"] = str(exc)
 
         draft = model_answer
-        if solution.get("solved") and solution.get("answer"):
+        if solution.get("solved") and solution.get("answer") and not voice_mode:
             if not draft or len(draft) < 40:
                 draft = str(solution["answer"])
             elif intent.intent == "debugging":
                 draft = str(solution["answer"])
             if not draft:
-                    draft = (
-                        "I can help with that. "
-                        "Share a bit more detail (goal, error text, or stack) "
-                        "and I’ll give a concrete answer."
-                    )
+                draft = str(solution["answer"] or "")
 
         # 6) Optimize
         stages.append("optimize")
@@ -269,20 +299,23 @@ class ChatOrchestrator:
             draft,
             message=q,
             intent=intent.intent,
-            fallback=str(solution.get("answer") or ""),
+            fallback="" if voice_mode else str(solution.get("answer") or ""),
         )
         draft = str(optimized.get("answer") or draft)
         meta["optimize"] = optimized.get("report")
 
         # 7) Correct
         stages.append("correct")
-        corrected = self.correction.correct(
-            q,
-            draft,
-            solution=solution,
-            intent=intent.intent,
-        )
-        draft = str(corrected.get("answer") or draft)
+        if voice_mode:
+            corrected = {"corrected": False, "answer": draft, "reason": "voice_passthrough"}
+        else:
+            corrected = self.correction.correct(
+                q,
+                draft,
+                solution=solution,
+                intent=intent.intent,
+            )
+            draft = str(corrected.get("answer") or draft)
         meta["correction"] = {
             "corrected": bool(corrected.get("corrected")),
             "reason": corrected.get("reason"),

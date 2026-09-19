@@ -1,4 +1,4 @@
-"""STEP 52 continuous conversation orchestrator."""
+"""Continuous conversation orchestrator — topic + timing, no canned speech."""
 from __future__ import annotations
 
 from typing import Any
@@ -47,16 +47,13 @@ class ConversationRuntime:
 
     def on_assistant(self, text: str, *, user_text: str = "", presence_mode: str = "speaking") -> dict[str, Any]:
         topic = self.window.topic or self.flow.infer_topic(user_text)
-        follow = self.flow.follow_up(user_text, text, topic=topic)
-        spoken = self.flow.merge_follow_up(text, follow)
+        spoken = (text or "").strip()
         turn = self.turns.begin_assistant(spoken, topic=topic)
         self.dialogue.remember("assistant", spoken)
-        if follow:
-            self.window.add_question(follow)
         return {
             "turn": turn.to_dict(),
             "answer": spoken,
-            "follow_up": follow,
+            "follow_up": None,
             "timing": self.timing.plan(presence_mode=presence_mode, text_len=len(spoken)),
             "history": self.turns.history(12),
             "context_blob": self.window.blob(self.turns.history(12)),

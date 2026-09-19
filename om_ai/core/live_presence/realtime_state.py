@@ -6,7 +6,7 @@ class RealtimeState:
         self.mode = "idle"
         self.listening = False
         self.speaking = False
-        self.memory_line = "You are working on OM AI"
+        self.memory_line = ""
 
     def snapshot(self) -> dict[str, Any]:
         return {
