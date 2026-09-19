@@ -283,8 +283,13 @@
         const mood = String(face.mood || face.label || face.emotion || '').toLowerCase();
         if (mood && !mode) this.setPresence(mood);
       }
-      const lips = pack.lips || pack.lip_plan || pack.visemes;
-      if (lips) this.applyLipPlan(lips);
+      // Server often nests lips as { jaw, plan: { frames } }
+      const lipsRaw = pack.lips || pack.lip_plan || pack.visemes || null;
+      let lips = lipsRaw;
+      if (lipsRaw && typeof lipsRaw === 'object' && !lipsRaw.frames && lipsRaw.plan) {
+        lips = lipsRaw.plan;
+      }
+      if (lips && (lips.frames || Array.isArray(lips))) this.applyLipPlan(lips);
       const gest = String(pack.gesture || pack.pose || '').toLowerCase();
       if (gest === 'wave' || gest === 'point') this.presence = 'attentive';
       if (pack.speaking === true) this.speaking = true;

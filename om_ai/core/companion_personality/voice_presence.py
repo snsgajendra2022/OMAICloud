@@ -208,16 +208,66 @@ def is_garbage_spoken(answer: str) -> bool:
     return False
 
 
-def soft_listening_fallback(*, locale: str = "en", user_message: str = "") -> str:
-    """Minimal presence when the brain returns unusable text — not a script bank."""
-    q = (user_message or "").strip().lower()
-    if locale == "hi" or any(ch for ch in q if "\u0900" <= ch <= "\u097F"):
-        if any(w in q for w in ("ruk", "stop", "band", "cancel")):
-            return "Theek hai — ruk gaya."
-        return "Haan, boliye."
-    if any(w in q for w in ("stop", "cancel", "quiet", "enough", "mute")):
-        return "Okay — stopped."
-    return "I'm here."
+def soft_listening_fallback(
+    *,
+    locale: str = "en",
+    user_message: str = "",
+    context: dict[str, Any] | None = None,
+    emotion: str | None = None,
+    conversation_state: dict[str, Any] | None = None,
+    response_engine=None,
+) -> str:
+
+    """
+    Dynamic fallback.
+
+    No hardcoded replies.
+    No script responses.
+
+    Delegates generation to OM response intelligence.
+    """
+
+    context = context or {}
+    conversation_state = conversation_state or {}
+
+
+    if response_engine:
+
+        result = response_engine.generate(
+
+            intent="conversation_recovery",
+
+            user_message=user_message,
+
+            language=locale,
+
+            emotion=emotion,
+
+            context=context,
+
+            state=conversation_state,
+
+            style="natural_human_companion"
+
+        )
+
+
+        if result:
+
+            return str(result).strip()
+
+
+
+    # Last safety fallback:
+    # Generate from available brain layer
+
+    if context.get("last_response"):
+
+        return context["last_response"]
+
+
+
+    return ""
 
 
 def rescue_spoken(user_message: str, bad_answer: str = "") -> str:

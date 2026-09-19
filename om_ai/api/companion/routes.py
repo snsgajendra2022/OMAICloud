@@ -118,46 +118,159 @@ def _load_user_context(
     return ctx
 
 
-def _dynamic_greeting(user_ctx: dict[str, Any]) -> str:
-    """Build greeting from time + profile + personality — never a fixed canned script."""
-    name = str(user_ctx.get("name") or "Sir")
-    language = str(user_ctx.get("language") or "en")
-    purpose = str(user_ctx.get("purpose") or "general")
-    style = str(user_ctx.get("style") or "")
-    hour = datetime.now().hour
-    if hour < 12:
-        daypart_en, daypart_hi = "Good morning", "Good morning"
-    elif hour < 17:
-        daypart_en, daypart_hi = "Good afternoon", "Good afternoon"
-    else:
-        daypart_en, daypart_hi = "Good evening", "Good evening"
+def _dynamic_greeting(
+    user_ctx: dict[str, Any],
+    *,
+    response_engine=None,
+    personality_engine=None,
+    memory_engine=None,
+) -> str:
+    """
+    Dynamic OM greeting generator.
 
-    # Prefer voice-presence personality prompt shaping via a short spoken line from style rules
-    try:
-        from om_ai.core.companion_personality.voice_presence import get_voice_presence
+    No canned text.
+    No fixed greeting sentences.
 
-        vp = get_voice_presence()
-        locale = "hi" if str(language).lower() in {"hi", "hi-en", "hinglish"} else "en"
-        # Ask style layer to adapt a brain-shaped seed (not a keyword chatbot reply)
-        seed = (
-            f"{daypart_hi} {name}. Main OM hoon — hazir hoon. Aaj {purpose} pe kaam karein?"
-            if locale == "hi"
-            else f"{daypart_en} {name}. I am OM — ready. Shall we continue with {purpose}?"
-        )
-        if style:
-            seed = (
-                f"{daypart_hi} {name}. Main OM hoon. Aap {style} style pasand karte ho — boliye kahan se shuru karein?"
-                if locale == "hi"
-                else f"{daypart_en} {name}. I am OM. I'll keep things {style}. Where shall we begin?"
+    Uses:
+    - user profile
+    - time context
+    - memory
+    - personality
+    - language
+    - relationship state
+    """
+
+
+    now = datetime.now()
+
+
+    context = {
+
+        "event": "conversation_start",
+
+        "time": {
+
+            "hour": now.hour,
+
+            "weekday": now.strftime("%A"),
+
+            "part":
+                (
+                    "morning"
+                    if now.hour < 12
+                    else
+                    "afternoon"
+                    if now.hour < 17
+                    else
+                    "evening"
+                )
+
+        },
+
+
+        "user": {
+
+            "name":
+                user_ctx.get("name"),
+
+            "language":
+                user_ctx.get("language", "en"),
+
+            "purpose":
+                user_ctx.get("purpose"),
+
+            "preferences":
+                user_ctx.get("preferences", {})
+
+        },
+
+
+        "relationship": {
+
+            "new_user":
+                user_ctx.get(
+                    "onboarding",
+                    {}
+                ).get(
+                    "first_time",
+                    False
+                )
+
+        }
+
+    }
+
+
+
+    # Load memory context
+
+    if memory_engine:
+
+        try:
+
+            context["memory"] = (
+                memory_engine
+                .retrieve_relevant(
+                    user_ctx.get("name"),
+                    limit=5
+                )
             )
-        pack = vp.analyze("hello", seed, context={"locale": locale, "onboarding": user_ctx.get("onboarding") or {}})
-        return str(pack.get("spoken") or seed)
-    except Exception:
-        if str(language).lower() in {"hi", "hi-en", "hinglish"}:
-            return f"{daypart_hi} {name}. Main OM hoon — ready. Boliye."
-        return f"{daypart_en} {name}. I am OM — ready. What shall we take on?"
+
+        except Exception:
+
+            context["memory"] = {}
 
 
+
+    # Personality shaping
+
+    if personality_engine:
+
+        try:
+
+            context["personality"] = (
+                personality_engine.profile()
+            )
+
+        except Exception:
+
+            context["personality"] = {}
+
+
+
+    # Generate naturally
+
+    if response_engine:
+
+        try:
+
+            result = response_engine.generate(
+
+                intent="greeting",
+
+                context=context,
+
+                style="natural_human_companion",
+
+                output="spoken"
+
+            )
+
+
+            if result:
+
+                return str(result).strip()
+
+
+        except Exception:
+
+            pass
+
+
+
+    # No internal scripted fallback
+
+    return ""
 @router.get("/status")
 def companion_status() -> dict[str, Any]:
     rt = _runtime()

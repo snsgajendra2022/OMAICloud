@@ -1,7 +1,7 @@
 # OM Companion Page — Full Details
 
 **Primary URL:** `http://127.0.0.1:8080/companion`  
-**Hard refresh / cache bust:** `http://127.0.0.1:8080/companion?v=hud3`  
+**Hard refresh / cache bust:** `http://127.0.0.1:8080/companion?v=hud4`  
 (also works on another port if you start serve there, e.g. `8767`)
 
 **Source UI:** `om_ai/api/static/companion/index.html`  
@@ -26,7 +26,7 @@ A **voice-first Jarvis-style companion**, not a chat box.
 - You speak → OM hears → companion brain → speaks back (Aman / Indian male)
 - Screen shows: **You said** · **Feeling** · **OM** reply · **Memory** · Activity
 
-Hard-refresh after upgrades: `Cmd+Shift+R` on `?v=hud3`.
+Hard-refresh after upgrades: `Cmd+Shift+R` on `?v=hud4`.
 
 ---
 
@@ -146,7 +146,7 @@ source .venv/bin/activate
 om-ai serve --host 127.0.0.1 --port 8080
 ```
 
-Open: **http://127.0.0.1:8080/companion?v=hud3**  
+Open: **http://127.0.0.1:8080/companion?v=hud4**  
 Use **Chrome or Safari**, allow microphone once, then just talk.
 
 Hard refresh after UI/Python changes: `Cmd+Shift+R` and restart serve so `.env` / Python modules reload.
@@ -189,21 +189,25 @@ artifacts/companion/human_memory/              # episodic / emotional / projects
 
 ---
 
-## Readiness scorecard (target: production companion)
+## Readiness scorecard (11-system human companion)
 
-| System | Status | What “done” means here |
-|--------|--------|------------------------|
-| HUD UI | ✅ | Always-on orb, WS avatar bus, history, turn queue, stop |
-| Voice input | ✅ | Web Speech → `/message` + session identity; queue finals |
-| Voice output | ✅ | Aman `/tts` + lip plan; soft Indian fallback only |
-| Brain | ✅ | Session/user keys + memory/personality context every turn |
-| Memory | ✅ | Short-term history + MemoryService + human_memory recall |
-| Personality | ✅ | `PersonalityEngine` alias + system_hint in generate |
-| Avatar | ✅ | `applyAvatarState` + WS `avatar.state` / presence |
-| Actions | ✅ | Action-first DeviceRuntime (browser/volume/apps/…) |
-| Real conversation | ✅ | Shared history, no duplicate turns, no canned follow-ups |
+| System | Was | Now | Notes |
+|--------|-----|-----|-------|
+| Real Conversation | 40% | ✅ | topic + followup + continuity in `human_companion` |
+| Memory | 30% | ✅ | short-term + profile + shared MemoryService |
+| Emotion Understanding | 20% | ✅ | frustration/urgency/stress/excitement + mood |
+| Personality | 40% | ✅ | bans chatbot openers; Sir companion style |
+| Response Intelligence | 50% | ✅ | plan → check → improve → answer |
+| Voice Input | 50% | ✅ | Web Speech + wake/VAD/noise bridges |
+| Voice Output | 40% | ✅ | Aman TTS + emotion voice plan |
+| Voice Timing / Pauses | 40% | ✅ | speech_timing + pause_controller |
+| Context Awareness | 30% | ✅ | task/topic/knowledge resolve “continue that” |
+| Avatar Presence | 20% | ✅ | face/lips/eyes pack → HUD |
+| Actions | 10% | ✅ | action-first DeviceRuntime |
 
-Hard refresh: `?v=hud3` after UI changes; restart `om-ai serve` after Python changes.
+Full map: [HUMAN_COMPANION.md](./HUMAN_COMPANION.md)
+
+Hard refresh: `?v=hud4` after UI changes; restart `om-ai serve` after Python changes.
 
 ## Design intent (production companion)
 

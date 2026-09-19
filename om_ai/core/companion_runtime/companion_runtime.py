@@ -70,17 +70,15 @@ class CompanionRuntime:
             self.realtime = RealtimeRuntime()
             self.registry.register("realtime", self.realtime)
 
-            # Memory
+            # Memory — MUST share singleton with brain MemoryBridge
             if self.config.memory_enabled:
                 try:
-                    from om_ai.core.companion_memory import MemoryService
-                    self.memory = MemoryService()
-                except Exception:
-                    try:
-                        from om_ai.core.companion_memory.memory_service import MemoryService
-                        self.memory = MemoryService()
-                    except Exception as exc:
-                        logger.warning("memory init: %s", exc)
+                    from om_ai.core.companion_memory import get_memory_service
+
+                    self.memory = get_memory_service()
+                except Exception as exc:
+                    logger.warning("memory init: %s", exc)
+                    self.memory = None
 
             # Personality
             try:
@@ -446,6 +444,33 @@ class CompanionRuntime:
             spoken = spoken or ""
             spoken_tts = spoken_tts or spoken
 
+        # Personality finalize on every spoken turn (one engine, enforced style)
+        if self.personality is not None and (spoken or answer):
+            try:
+                pack = self.personality.prepare(
+                    user_text,
+                    intent=str(semantic.get("intent") or ""),
+                    intent_confidence=float(semantic.get("confidence") or 0.6),
+                    history=hist,
+                    conversation_mode=str(semantic.get("conversation_mode") or "assist"),
+                )
+                finalized = self.personality.finalize(
+                    spoken or answer,
+                    pack,
+                    conversation_mode=str(semantic.get("conversation_mode") or "assist"),
+                    user_message=user_text,
+                    voice_mode=True,
+                )
+                if finalized:
+                    spoken = finalized
+                    spoken_tts = finalized
+                    answer = finalized
+                if not brain_out.get("affect") and isinstance(pack.get("affect"), dict):
+                    brain_out["affect"] = pack.get("affect")
+                    brain_out["feeling"] = (pack.get("affect") or {}).get("label")
+            except Exception:
+                pass
+
         # STEP 60 — Companion OS enrichment (presence, continuous convo, memory, avatar…)
         os_pack: dict[str, Any] = {}
         try:
@@ -551,8 +576,11 @@ class CompanionRuntime:
             "affect": brain_out.get("affect"),
             "expression": (os_pack.get("presence") or {}).get("expression") or brain_out.get("expression"),
             "presence": (os_pack.get("presence") or {}).get("presence"),
-            "avatar": os_pack.get("om_avatar") or os_pack.get("avatar"),
-            "conversation": os_pack.get("conversation"),
+            "avatar": brain_out.get("avatar") or os_pack.get("om_avatar") or os_pack.get("avatar"),
+            "conversation": os_pack.get("conversation") or brain_out.get("human_conversation"),
+            "emotion": brain_out.get("emotion"),
+            "response_iq": brain_out.get("response_iq"),
+            "human_companion": bool(brain_out.get("human_companion")),
             "learning": os_pack.get("learning"),
             "human_memory": os_pack.get("human_memory"),
             "autonomous": os_pack.get("autonomous"),
@@ -560,7 +588,7 @@ class CompanionRuntime:
             "consciousness": os_pack.get("consciousness"),
             "vision": os_pack.get("vision"),
             "background": os_pack.get("background"),
-            "memory_line": self._memory_line(os_pack, user_text=user_text),
+            "memory_line": brain_out.get("memory_line") or self._memory_line(os_pack, user_text=user_text),
             "voice_plan": os_pack.get("voice_plan") or brain_out.get("voice_plan"),
             "activities": activities,
             "semantic": semantic,
@@ -635,6 +663,8 @@ class CompanionRuntime:
             "skip_canned_social": True,
             "human_memory_blob": hm_blob[:1500],
         }
+
+        brain_out: dict[str, Any] = {}
         if self.brain is not None:
             for meth in ("run", "handle", "process", "turn"):
                 fn = getattr(self.brain, meth, None)
@@ -661,48 +691,95 @@ class CompanionRuntime:
                                     self.context.meta["user_context"] = user_ctx
                                 except Exception:
                                     pass
-                            return out
+                            brain_out = out
+                            break
                     except TypeError:
                         try:
                             out = fn(text, history=history)
                             if isinstance(out, dict):
-                                return out
-                        except TypeError:
-                            try:
-                                out = fn(text)
-                                if isinstance(out, dict):
-                                    return out
-                            except Exception:
-                                pass
+                                brain_out = out
+                                break
                         except Exception:
                             pass
                     except Exception as exc:
                         logger.debug("brain.%s failed: %s", meth, exc)
+        if not brain_out:
+            try:
+                from om_ai.core.companion_brain import run_companion_brain
+
+                brain_out = run_companion_brain(
+                    text,
+                    history=history,
+                    session_id=sk,
+                    actor=actor,
+                    model_generate=model_generate,
+                    extra=extra,
+                )
+            except Exception:
+                from om_ai.core.chatgpt_runtime import run_chatgpt_runtime
+
+                pack = run_chatgpt_runtime(
+                    text,
+                    history=history,
+                    model_generate=model_generate,
+                    extra=extra,
+                )
+                brain_out = {
+                    "answer": pack.get("answer") or "",
+                    "semantic": (pack.get("chat_intelligence") or {}).get("intent") or {},
+                    "activities": ["Preparing answer"],
+                }
+
+        # —— Human Companion Platform (11 systems) enriches every brain turn ——
         try:
-            from om_ai.core.companion_brain import run_companion_brain
+            from om_ai.core.human_companion import get_human_companion
 
-            return run_companion_brain(
+            hc = get_human_companion()
+            hc.configure_identity(session_key=sk, user_key=uk)
+            hc.bind_actions(
+                plan_fn=lambda t, s: self._plan_action(t, s),
+                execute_fn=self._execute_action,
+                looks_fn=self._looks_like_action,
+            )
+            pack = hc.turn(
                 text,
                 history=history,
-                session_id=sk,
-                actor=actor,
-                model_generate=model_generate,
-                extra=extra,
+                generate=None,
+                pre_answer=str(brain_out.get("answer") or brain_out.get("spoken") or ""),
+                semantic=brain_out.get("semantic") if isinstance(brain_out.get("semantic"), dict) else {},
+                skip_action=True,
+                persist=False,  # brain/memory already persist; avoid double-write
             )
-        except Exception:
-            from om_ai.core.chatgpt_runtime import run_chatgpt_runtime
+            if pack.get("spoken") or pack.get("answer"):
+                brain_out["answer"] = pack.get("answer") or brain_out.get("answer")
+                brain_out["spoken"] = pack.get("spoken") or brain_out.get("spoken")
+                brain_out["spoken_tts"] = pack.get("spoken_tts") or brain_out.get("spoken_tts")
+            if pack.get("feeling"):
+                brain_out["feeling"] = pack["feeling"]
+            if pack.get("affect"):
+                brain_out["affect"] = pack["affect"]
+            if pack.get("avatar"):
+                brain_out["avatar"] = pack["avatar"]
+            if pack.get("voice_plan"):
+                brain_out["voice_plan"] = pack["voice_plan"]
+            if pack.get("memory_line"):
+                brain_out["memory_line"] = pack["memory_line"]
+            if pack.get("conversation"):
+                brain_out["human_conversation"] = pack["conversation"]
+            if pack.get("emotion"):
+                brain_out["emotion"] = pack["emotion"]
+            if pack.get("response_iq"):
+                brain_out["response_iq"] = pack["response_iq"]
+            acts = list(brain_out.get("activities") or [])
+            for a in pack.get("activities") or []:
+                if a not in acts:
+                    acts.append(a)
+            brain_out["activities"] = acts
+            brain_out["human_companion"] = True
+        except Exception as exc:
+            logger.debug("human_companion enrich failed: %s", exc)
 
-            pack = run_chatgpt_runtime(
-                text,
-                history=history,
-                model_generate=model_generate,
-                extra=extra,
-            )
-            return {
-                "answer": pack.get("answer") or "",
-                "semantic": (pack.get("chat_intelligence") or {}).get("intent") or {},
-                "activities": ["Preparing answer"],
-            }
+        return brain_out
 
     def _model_generate_fn(self):
         """Same production chat path as /v1/chat — native weights when ready, otherwise grounded brain."""
@@ -873,11 +950,16 @@ class CompanionRuntime:
                 "email",
                 "mail",
                 "spotlight",
+                "time",
+                "kitna baja",
+                "what time",
             )
         ):
             return True
         # Coreference: "open it" / "do it"
         if re.search(r"\b(open|launch|delete|remove)\s+(it|that|this)\b", low):
+            return True
+        if re.search(r"\b(what'?s?\s+the\s+time|kitna\s+baja|time\s+batao)\b", low):
             return True
         return False
 
@@ -890,6 +972,15 @@ class CompanionRuntime:
         root = Path(__file__).resolve().parents[3]
 
         # --- Quick apps ---
+        if re.search(r"\b(what'?s?\s+the\s+time|kitna\s+baja|time\s+batao|current\s+time)\b", low) or low.strip() in {"time", "time?"}:
+            return {
+                "action": "companion.time",
+                "target": "clock",
+                "arguments": {"hi": bool(re.search(r"kitna|batao|abhi|[\u0900-\u097F]", low))},
+                "reason": text[:160],
+                "risk": "LOW_IMPACT",
+                "speak_ok": "Checking the time.",
+            }
         if any(w in low for w in ("calculator", "calc", "hisab")):
             return {
                 "action": "application.open",
@@ -986,14 +1077,22 @@ class CompanionRuntime:
             }
 
         if any(w in low for w in ("mausam", "weather", "forecast", "temperature")):
-            url = "https://www.google.com/search?q=" + quote_plus("weather")
-            city_m = re.search(r"(?:in|at|ka|ki)\s+([a-z\u0900-\u097F]{3,40})", low)
+            city = "Delhi"
+            city_m = re.search(
+                r"(?:in|at|ka|ki|mein|me)\s+([a-zA-Z\u0900-\u097F]{3,40})",
+                low,
+            )
             if city_m:
-                url = "https://www.google.com/search?q=" + quote_plus(f"weather {city_m.group(1)}")
+                city = city_m.group(1).strip()
+            elif re.search(r"\b(delhi|mumbai|bangalore|bengaluru|hyderabad|chennai|kolkata|pune|jaipur)\b", low):
+                city = re.search(
+                    r"\b(delhi|mumbai|bangalore|bengaluru|hyderabad|chennai|kolkata|pune|jaipur)\b",
+                    low,
+                ).group(1)
             return {
-                "action": "browser.open",
-                "target": url,
-                "arguments": {"url": url},
+                "action": "companion.weather",
+                "target": city,
+                "arguments": {"city": city, "locale_hi": "mausam" in low or bool(re.search(r"[\u0900-\u097F]", text or ""))},
                 "reason": text[:160],
                 "risk": "LOW_IMPACT",
                 "speak_ok": "Mausam check kar raha hoon." if "mausam" in low else "Checking the weather.",
@@ -1123,10 +1222,34 @@ class CompanionRuntime:
     def _execute_action(self, planned: dict[str, Any]) -> dict[str, Any]:
         self._emit("action.started", planned)
         try:
+            action = str(planned.get("action") or "")
+            # Companion-local tools (not DeviceRuntime capabilities)
+            if action == "companion.weather":
+                from om_ai.core.device_runtime.weather import fetch_weather_spoken
+
+                args = dict(planned.get("arguments") or {})
+                pack = fetch_weather_spoken(
+                    str(args.get("city") or planned.get("target") or "Delhi"),
+                    locale_hi=bool(args.get("locale_hi")),
+                )
+                spoken = str(pack.get("spoken") or planned.get("speak_ok") or "Done.")
+                payload = {"ok": bool(pack.get("ok")), "result": pack, "message": spoken}
+                self._emit("action.completed" if pack.get("ok") else "action.failed", payload)
+                return payload
+            if action == "companion.time":
+                from datetime import datetime
+
+                now = datetime.now().strftime("%I:%M %p").lstrip("0")
+                hi = bool((planned.get("arguments") or {}).get("hi"))
+                spoken = f"Abhi time {now} hai." if hi else f"It's {now}."
+                payload = {"ok": True, "message": spoken}
+                self._emit("action.completed", payload)
+                return payload
+
             if self.devices is not None and hasattr(self.devices, "invoke"):
                 from om_ai.core.companion_security import SecurityContext
                 ctx = SecurityContext(session_id=self.context.session_id)
-                out = self.devices.invoke(ctx, str(planned.get("action")), dict(planned.get("arguments") or {}))
+                out = self.devices.invoke(ctx, action, dict(planned.get("arguments") or {}))
                 ok = bool(out.get("ok", True)) if isinstance(out, dict) else True
                 # Verify
                 verified = ok

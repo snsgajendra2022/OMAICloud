@@ -4213,13 +4213,215 @@
     ],
     "4d4e1d93-b796-4b07-a191-90a98f5196b4": [
       {
-        "id": "7503769730294c42",
+        "id": "db1f64b4a44a4953",
         "kind": "episodic",
-        "content": "chalo theek hai karsar main CTS wala Project open",
+        "content": "youtube kholo",
         "scope": "session",
         "key": "4d4e1d93-b796-4b07-a191-90a98f5196b4",
-        "created_at": "2026-09-19T14:31:35.339599+00:00",
-        "updated_at": "2026-09-19T14:31:35.339602+00:00",
+        "created_at": "2026-09-19T14:30:40.823444+00:00",
+        "updated_at": "2026-09-19T14:30:40.823445+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "",
+          "role": "user",
+          "confidence": 0.0
+        }
+      },
+      {
+        "id": "d87a7ad959e34cf2",
+        "kind": "episodic",
+        "content": "YouTube khol raha hoon.",
+        "scope": "session",
+        "key": "4d4e1d93-b796-4b07-a191-90a98f5196b4",
+        "created_at": "2026-09-19T14:30:40.824886+00:00",
+        "updated_at": "2026-09-19T14:30:40.824888+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "",
+          "role": "assistant",
+          "confidence": 0.0
+        }
+      },
+      {
+        "id": "703a2560ef104635",
+        "kind": "episodic",
+        "content": "Youtube open karna",
+        "scope": "session",
+        "key": "4d4e1d93-b796-4b07-a191-90a98f5196b4",
+        "created_at": "2026-09-19T14:31:09.888073+00:00",
+        "updated_at": "2026-09-19T14:31:09.888075+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "",
+          "role": "user",
+          "confidence": 0.0
+        }
+      },
+      {
+        "id": "32c7fd8f48984d61",
+        "kind": "episodic",
+        "content": "Opening YouTube.",
+        "scope": "session",
+        "key": "4d4e1d93-b796-4b07-a191-90a98f5196b4",
+        "created_at": "2026-09-19T14:31:09.889724+00:00",
+        "updated_at": "2026-09-19T14:31:09.889726+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "",
+          "role": "assistant",
+          "confidence": 0.0
+        }
+      },
+      {
+        "id": "4df4ad416250441b",
+        "kind": "episodic",
+        "content": "hello karsar mein ects wala project open kar do",
+        "scope": "session",
+        "key": "4d4e1d93-b796-4b07-a191-90a98f5196b4",
+        "created_at": "2026-09-19T14:31:38.194800+00:00",
+        "updated_at": "2026-09-19T14:31:38.194801+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "",
+          "role": "user",
+          "confidence": 0.0
+        }
+      },
+      {
+        "id": "02f8adc99a734d0d",
+        "kind": "episodic",
+        "content": "Understood. I will break this into clear steps and proceed carefully.",
+        "scope": "session",
+        "key": "4d4e1d93-b796-4b07-a191-90a98f5196b4",
+        "created_at": "2026-09-19T14:31:38.196806+00:00",
+        "updated_at": "2026-09-19T14:31:38.196811+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "",
+          "role": "assistant",
+          "confidence": 0.0
+        }
+      },
+      {
+        "id": "a020f0a8e5a34eb1",
+        "kind": "episodic",
+        "content": "Google per search karo rate kya hoti hai",
+        "scope": "session",
+        "key": "4d4e1d93-b796-4b07-a191-90a98f5196b4",
+        "created_at": "2026-09-19T14:32:16.624147+00:00",
+        "updated_at": "2026-09-19T14:32:16.624148+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "",
+          "role": "user",
+          "confidence": 0.0
+        }
+      },
+      {
+        "id": "c51d0b435274494b",
+        "kind": "episodic",
+        "content": "Searching.",
+        "scope": "session",
+        "key": "4d4e1d93-b796-4b07-a191-90a98f5196b4",
+        "created_at": "2026-09-19T14:32:16.626625+00:00",
+        "updated_at": "2026-09-19T14:32:16.626626+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "",
+          "role": "assistant",
+          "confidence": 0.0
+        }
+      },
+      {
+        "id": "5989b4af9e484a98",
+        "kind": "episodic",
+        "content": "are Google per search karo kaun si language use Karta Tha Apne Court ke liye",
+        "scope": "session",
+        "key": "4d4e1d93-b796-4b07-a191-90a98f5196b4",
+        "created_at": "2026-09-19T14:34:50.643479+00:00",
+        "updated_at": "2026-09-19T14:34:50.643481+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "",
+          "role": "user",
+          "confidence": 0.0
+        }
+      },
+      {
+        "id": "549ffddc86f44cb5",
+        "kind": "episodic",
+        "content": "Searching.",
+        "scope": "session",
+        "key": "4d4e1d93-b796-4b07-a191-90a98f5196b4",
+        "created_at": "2026-09-19T14:34:50.645690+00:00",
+        "updated_at": "2026-09-19T14:34:50.645692+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "",
+          "role": "assistant",
+          "confidence": 0.0
+        }
+      }
+    ],
+    "2657fa12-d156-45fc-bcd4-190de778ff32": [
+      {
+        "id": "f98e7b59fb0e4adf",
+        "kind": "episodic",
+        "content": "kya tum meri awaaz samajh mein a rahi hai",
+        "scope": "session",
+        "key": "2657fa12-d156-45fc-bcd4-190de778ff32",
+        "created_at": "2026-09-19T14:36:08.808171+00:00",
+        "updated_at": "2026-09-19T14:36:08.808173+00:00",
         "tags": [
           "turn",
           "user"
@@ -4233,13 +4435,13 @@
         }
       },
       {
-        "id": "df991b8f6087403f",
+        "id": "340dc6d570ef4831",
         "kind": "episodic",
         "content": "Haan, boliye.",
         "scope": "session",
-        "key": "4d4e1d93-b796-4b07-a191-90a98f5196b4",
-        "created_at": "2026-09-19T14:31:35.341853+00:00",
-        "updated_at": "2026-09-19T14:31:35.341856+00:00",
+        "key": "2657fa12-d156-45fc-bcd4-190de778ff32",
+        "created_at": "2026-09-19T14:36:08.810048+00:00",
+        "updated_at": "2026-09-19T14:36:08.810050+00:00",
         "tags": [
           "turn",
           "assistant"
@@ -4253,13 +4455,13 @@
         }
       },
       {
-        "id": "203f4aada7934aa8",
+        "id": "27d2ee1318c9471f",
         "kind": "episodic",
-        "content": "bata sakte ho tum",
+        "content": "han boliye Kuchh ho raha tha",
         "scope": "session",
-        "key": "4d4e1d93-b796-4b07-a191-90a98f5196b4",
-        "created_at": "2026-09-19T14:31:48.474862+00:00",
-        "updated_at": "2026-09-19T14:31:48.474863+00:00",
+        "key": "2657fa12-d156-45fc-bcd4-190de778ff32",
+        "created_at": "2026-09-19T14:36:15.555792+00:00",
+        "updated_at": "2026-09-19T14:36:15.555794+00:00",
         "tags": [
           "turn",
           "user"
@@ -4273,13 +4475,13 @@
         }
       },
       {
-        "id": "8c8358e7b3884894",
+        "id": "fbae7fa0f5574949",
         "kind": "episodic",
-        "content": "I'm here.",
+        "content": "I can help with that. Share one more detail (goal, error, or constraint) and I will give a concrete answer.",
         "scope": "session",
-        "key": "4d4e1d93-b796-4b07-a191-90a98f5196b4",
-        "created_at": "2026-09-19T14:31:48.476239+00:00",
-        "updated_at": "2026-09-19T14:31:48.476240+00:00",
+        "key": "2657fa12-d156-45fc-bcd4-190de778ff32",
+        "created_at": "2026-09-19T14:36:15.557038+00:00",
+        "updated_at": "2026-09-19T14:36:15.557039+00:00",
         "tags": [
           "turn",
           "assistant"
@@ -4293,53 +4495,13 @@
         }
       },
       {
-        "id": "237ee4fbac75469a",
+        "id": "32c8bb70245c4bc9",
         "kind": "episodic",
-        "content": "okay",
+        "content": "Achcha Iske alava aur kuchh",
         "scope": "session",
-        "key": "4d4e1d93-b796-4b07-a191-90a98f5196b4",
-        "created_at": "2026-09-19T14:31:54.443422+00:00",
-        "updated_at": "2026-09-19T14:31:54.443424+00:00",
-        "tags": [
-          "turn",
-          "user"
-        ],
-        "sensitivity": "normal",
-        "source": "companion",
-        "meta": {
-          "intent": "followup",
-          "role": "user",
-          "confidence": 0.8
-        }
-      },
-      {
-        "id": "a36b72636d8a4a0f",
-        "kind": "episodic",
-        "content": "I'm here.",
-        "scope": "session",
-        "key": "4d4e1d93-b796-4b07-a191-90a98f5196b4",
-        "created_at": "2026-09-19T14:31:54.446066+00:00",
-        "updated_at": "2026-09-19T14:31:54.446067+00:00",
-        "tags": [
-          "turn",
-          "assistant"
-        ],
-        "sensitivity": "normal",
-        "source": "companion",
-        "meta": {
-          "intent": "followup",
-          "role": "assistant",
-          "confidence": 0.8
-        }
-      },
-      {
-        "id": "58ee6e2916dd4f72",
-        "kind": "episodic",
-        "content": "shut down",
-        "scope": "session",
-        "key": "4d4e1d93-b796-4b07-a191-90a98f5196b4",
-        "created_at": "2026-09-19T14:31:59.954423+00:00",
-        "updated_at": "2026-09-19T14:31:59.954424+00:00",
+        "key": "2657fa12-d156-45fc-bcd4-190de778ff32",
+        "created_at": "2026-09-19T14:36:26.536458+00:00",
+        "updated_at": "2026-09-19T14:36:26.536459+00:00",
         "tags": [
           "turn",
           "user"
@@ -4353,13 +4515,13 @@
         }
       },
       {
-        "id": "f58a0e96738f4fc6",
+        "id": "bc6e05ecaa374b22",
         "kind": "episodic",
-        "content": "I'm here.",
+        "content": "I can help with that. Share one more detail (goal, error, or constraint) and I will give a concrete answer.",
         "scope": "session",
-        "key": "4d4e1d93-b796-4b07-a191-90a98f5196b4",
-        "created_at": "2026-09-19T14:31:59.956039+00:00",
-        "updated_at": "2026-09-19T14:31:59.956040+00:00",
+        "key": "2657fa12-d156-45fc-bcd4-190de778ff32",
+        "created_at": "2026-09-19T14:36:26.537851+00:00",
+        "updated_at": "2026-09-19T14:36:26.537852+00:00",
         "tags": [
           "turn",
           "assistant"
@@ -4371,15 +4533,17 @@
           "role": "assistant",
           "confidence": 0.6
         }
-      },
+      }
+    ],
+    "02cf7a4c-db9b-4fc0-87d6-4895680e701d": [
       {
-        "id": "5d70caa32ebd4e4e",
+        "id": "98e7ef49dbe34cbb",
         "kind": "episodic",
-        "content": "react Kaise",
+        "content": "Pata Hai Tumhen Main Kahan Se hun",
         "scope": "session",
-        "key": "4d4e1d93-b796-4b07-a191-90a98f5196b4",
-        "created_at": "2026-09-19T14:32:10.916332+00:00",
-        "updated_at": "2026-09-19T14:32:10.916334+00:00",
+        "key": "02cf7a4c-db9b-4fc0-87d6-4895680e701d",
+        "created_at": "2026-09-19T14:39:45.249274+00:00",
+        "updated_at": "2026-09-19T14:39:45.249276+00:00",
         "tags": [
           "turn",
           "user"
@@ -4393,53 +4557,13 @@
         }
       },
       {
-        "id": "f49d13bc56a7483a",
-        "kind": "episodic",
-        "content": "I'm here.",
-        "scope": "session",
-        "key": "4d4e1d93-b796-4b07-a191-90a98f5196b4",
-        "created_at": "2026-09-19T14:32:10.917752+00:00",
-        "updated_at": "2026-09-19T14:32:10.917753+00:00",
-        "tags": [
-          "turn",
-          "assistant"
-        ],
-        "sensitivity": "normal",
-        "source": "companion",
-        "meta": {
-          "intent": "chat",
-          "role": "assistant",
-          "confidence": 0.6
-        }
-      },
-      {
-        "id": "4cb5c59632ec4634",
-        "kind": "episodic",
-        "content": "theek hai Wapas a jao",
-        "scope": "session",
-        "key": "4d4e1d93-b796-4b07-a191-90a98f5196b4",
-        "created_at": "2026-09-19T14:32:27.420740+00:00",
-        "updated_at": "2026-09-19T14:32:27.420742+00:00",
-        "tags": [
-          "turn",
-          "user"
-        ],
-        "sensitivity": "normal",
-        "source": "companion",
-        "meta": {
-          "intent": "chat",
-          "role": "user",
-          "confidence": 0.6
-        }
-      },
-      {
-        "id": "f7d850c76de24090",
+        "id": "03a7034b3dd34622",
         "kind": "episodic",
         "content": "Haan, boliye.",
         "scope": "session",
-        "key": "4d4e1d93-b796-4b07-a191-90a98f5196b4",
-        "created_at": "2026-09-19T14:32:27.422185+00:00",
-        "updated_at": "2026-09-19T14:32:27.422186+00:00",
+        "key": "02cf7a4c-db9b-4fc0-87d6-4895680e701d",
+        "created_at": "2026-09-19T14:39:45.251628+00:00",
+        "updated_at": "2026-09-19T14:39:45.251630+00:00",
         "tags": [
           "turn",
           "assistant"
@@ -4453,13 +4577,13 @@
         }
       },
       {
-        "id": "88357ca3ffda4c8b",
+        "id": "c50603941c4c4534",
         "kind": "episodic",
-        "content": "aap apni photo to Wapas a jao yahan se",
+        "content": "Tumhari voice ko kya hua",
         "scope": "session",
-        "key": "4d4e1d93-b796-4b07-a191-90a98f5196b4",
-        "created_at": "2026-09-19T14:32:34.868285+00:00",
-        "updated_at": "2026-09-19T14:32:34.868286+00:00",
+        "key": "02cf7a4c-db9b-4fc0-87d6-4895680e701d",
+        "created_at": "2026-09-19T14:40:30.433387+00:00",
+        "updated_at": "2026-09-19T14:40:30.433389+00:00",
         "tags": [
           "turn",
           "user"
@@ -4473,53 +4597,13 @@
         }
       },
       {
-        "id": "11139b38455d4590",
-        "kind": "episodic",
-        "content": "I'm here.",
-        "scope": "session",
-        "key": "4d4e1d93-b796-4b07-a191-90a98f5196b4",
-        "created_at": "2026-09-19T14:32:34.869488+00:00",
-        "updated_at": "2026-09-19T14:32:34.869490+00:00",
-        "tags": [
-          "turn",
-          "assistant"
-        ],
-        "sensitivity": "normal",
-        "source": "companion",
-        "meta": {
-          "intent": "chat",
-          "role": "assistant",
-          "confidence": 0.6
-        }
-      },
-      {
-        "id": "0cbf3a63fd7c44e5",
-        "kind": "episodic",
-        "content": "Mujhe to abhi bhi search wala dikhayen",
-        "scope": "session",
-        "key": "4d4e1d93-b796-4b07-a191-90a98f5196b4",
-        "created_at": "2026-09-19T14:32:40.933202+00:00",
-        "updated_at": "2026-09-19T14:32:40.933204+00:00",
-        "tags": [
-          "turn",
-          "user"
-        ],
-        "sensitivity": "normal",
-        "source": "companion",
-        "meta": {
-          "intent": "chat",
-          "role": "user",
-          "confidence": 0.6
-        }
-      },
-      {
-        "id": "9b7e1486a2ca437a",
+        "id": "d40b5093e7b745c5",
         "kind": "episodic",
         "content": "Haan, boliye.",
         "scope": "session",
-        "key": "4d4e1d93-b796-4b07-a191-90a98f5196b4",
-        "created_at": "2026-09-19T14:32:40.934295+00:00",
-        "updated_at": "2026-09-19T14:32:40.934296+00:00",
+        "key": "02cf7a4c-db9b-4fc0-87d6-4895680e701d",
+        "created_at": "2026-09-19T14:40:30.434700+00:00",
+        "updated_at": "2026-09-19T14:40:30.434701+00:00",
         "tags": [
           "turn",
           "assistant"
@@ -4531,15 +4615,17 @@
           "role": "assistant",
           "confidence": 0.6
         }
-      },
+      }
+    ],
+    "aacd76c8-f501-4de8-9804-40c0f2865a92": [
       {
-        "id": "799eebf0f3fd429f",
+        "id": "07b65229d4df4c93",
         "kind": "episodic",
-        "content": "kya tum apne code Ko Itna improve kar sakte ho ki Tumhen koi bhi command De to Mujhse insanon Ki Tarah baat kar pao",
+        "content": "han bhai kya hua",
         "scope": "session",
-        "key": "4d4e1d93-b796-4b07-a191-90a98f5196b4",
-        "created_at": "2026-09-19T14:33:19.350605+00:00",
-        "updated_at": "2026-09-19T14:33:19.350606+00:00",
+        "key": "aacd76c8-f501-4de8-9804-40c0f2865a92",
+        "created_at": "2026-09-19T14:43:55.340081+00:00",
+        "updated_at": "2026-09-19T14:43:55.340082+00:00",
         "tags": [
           "turn",
           "user"
@@ -4553,13 +4639,13 @@
         }
       },
       {
-        "id": "98c9d9f2bcb64bf3",
+        "id": "bc1ba4f998794885",
         "kind": "episodic",
-        "content": "Haan, boliye.",
+        "content": "I can help with that. Share one more detail (goal, error, or constraint) and I will give a concrete answer.",
         "scope": "session",
-        "key": "4d4e1d93-b796-4b07-a191-90a98f5196b4",
-        "created_at": "2026-09-19T14:33:19.351900+00:00",
-        "updated_at": "2026-09-19T14:33:19.351901+00:00",
+        "key": "aacd76c8-f501-4de8-9804-40c0f2865a92",
+        "created_at": "2026-09-19T14:43:55.343664+00:00",
+        "updated_at": "2026-09-19T14:43:55.343665+00:00",
         "tags": [
           "turn",
           "assistant"
@@ -4573,13 +4659,13 @@
         }
       },
       {
-        "id": "3db159ce6c7e48c3",
+        "id": "5e3c942e717648ed",
         "kind": "episodic",
-        "content": "do you understand my language",
+        "content": "Kuchh bolega Nahin kya",
         "scope": "session",
-        "key": "4d4e1d93-b796-4b07-a191-90a98f5196b4",
-        "created_at": "2026-09-19T14:33:30.596036+00:00",
-        "updated_at": "2026-09-19T14:33:30.596038+00:00",
+        "key": "aacd76c8-f501-4de8-9804-40c0f2865a92",
+        "created_at": "2026-09-19T14:44:00.544760+00:00",
+        "updated_at": "2026-09-19T14:44:00.544761+00:00",
         "tags": [
           "turn",
           "user"
@@ -4593,13 +4679,13 @@
         }
       },
       {
-        "id": "c95d1e5faab44d79",
+        "id": "de6a6b8b4af147f5",
         "kind": "episodic",
-        "content": "I'm here.",
+        "content": "I can help with that. Share one more detail (goal, error, or constraint) and I will give a concrete answer.",
         "scope": "session",
-        "key": "4d4e1d93-b796-4b07-a191-90a98f5196b4",
-        "created_at": "2026-09-19T14:33:30.597247+00:00",
-        "updated_at": "2026-09-19T14:33:30.597249+00:00",
+        "key": "aacd76c8-f501-4de8-9804-40c0f2865a92",
+        "created_at": "2026-09-19T14:44:00.546137+00:00",
+        "updated_at": "2026-09-19T14:44:00.546139+00:00",
         "tags": [
           "turn",
           "assistant"
@@ -4613,13 +4699,13 @@
         }
       },
       {
-        "id": "c7572029a479454e",
+        "id": "a4d026d5226849ce",
         "kind": "episodic",
-        "content": "Hindi jante ho",
+        "content": "mujhe kuchh Aisa chahie Jo Tu kar sakta hun",
         "scope": "session",
-        "key": "4d4e1d93-b796-4b07-a191-90a98f5196b4",
-        "created_at": "2026-09-19T14:33:34.972832+00:00",
-        "updated_at": "2026-09-19T14:33:34.972833+00:00",
+        "key": "aacd76c8-f501-4de8-9804-40c0f2865a92",
+        "created_at": "2026-09-19T14:44:17.112162+00:00",
+        "updated_at": "2026-09-19T14:44:17.112164+00:00",
         "tags": [
           "turn",
           "user"
@@ -4633,13 +4719,13 @@
         }
       },
       {
-        "id": "99e0062344754208",
+        "id": "9185d175568141ce",
         "kind": "episodic",
-        "content": "I'm here.",
+        "content": "I can help with that. Share one more detail (goal, error, or constraint) and I will give a concrete answer.",
         "scope": "session",
-        "key": "4d4e1d93-b796-4b07-a191-90a98f5196b4",
-        "created_at": "2026-09-19T14:33:34.974403+00:00",
-        "updated_at": "2026-09-19T14:33:34.974404+00:00",
+        "key": "aacd76c8-f501-4de8-9804-40c0f2865a92",
+        "created_at": "2026-09-19T14:44:17.113950+00:00",
+        "updated_at": "2026-09-19T14:44:17.113951+00:00",
         "tags": [
           "turn",
           "assistant"
@@ -4653,53 +4739,13 @@
         }
       },
       {
-        "id": "652f5dd91cb641e2",
+        "id": "7be9c6cbdf03417f",
         "kind": "episodic",
-        "content": "what are you doing man",
+        "content": "pagal hai kya bhai",
         "scope": "session",
-        "key": "4d4e1d93-b796-4b07-a191-90a98f5196b4",
-        "created_at": "2026-09-19T14:33:39.724365+00:00",
-        "updated_at": "2026-09-19T14:33:39.724366+00:00",
-        "tags": [
-          "turn",
-          "user"
-        ],
-        "sensitivity": "normal",
-        "source": "companion",
-        "meta": {
-          "intent": "identity",
-          "role": "user",
-          "confidence": 0.98
-        }
-      },
-      {
-        "id": "0fc7a4a306784984",
-        "kind": "episodic",
-        "content": "I'm here.",
-        "scope": "session",
-        "key": "4d4e1d93-b796-4b07-a191-90a98f5196b4",
-        "created_at": "2026-09-19T14:33:39.725538+00:00",
-        "updated_at": "2026-09-19T14:33:39.725540+00:00",
-        "tags": [
-          "turn",
-          "assistant"
-        ],
-        "sensitivity": "normal",
-        "source": "companion",
-        "meta": {
-          "intent": "identity",
-          "role": "assistant",
-          "confidence": 0.98
-        }
-      },
-      {
-        "id": "acd16cf717264d56",
-        "kind": "episodic",
-        "content": "go shutdown I will leave",
-        "scope": "session",
-        "key": "4d4e1d93-b796-4b07-a191-90a98f5196b4",
-        "created_at": "2026-09-19T14:33:45.186420+00:00",
-        "updated_at": "2026-09-19T14:33:45.186422+00:00",
+        "key": "aacd76c8-f501-4de8-9804-40c0f2865a92",
+        "created_at": "2026-09-19T14:44:19.312854+00:00",
+        "updated_at": "2026-09-19T14:44:19.312856+00:00",
         "tags": [
           "turn",
           "user"
@@ -4713,13 +4759,135 @@
         }
       },
       {
-        "id": "79e954a88c394dcb",
+        "id": "2865adb49bce4df2",
         "kind": "episodic",
-        "content": "I'm here.",
+        "content": "I can help with that. Share one more detail (goal, error, or constraint) and I will give a concrete answer.",
         "scope": "session",
-        "key": "4d4e1d93-b796-4b07-a191-90a98f5196b4",
-        "created_at": "2026-09-19T14:33:45.188297+00:00",
-        "updated_at": "2026-09-19T14:33:45.188298+00:00",
+        "key": "aacd76c8-f501-4de8-9804-40c0f2865a92",
+        "created_at": "2026-09-19T14:44:19.316337+00:00",
+        "updated_at": "2026-09-19T14:44:19.316339+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "6c1f6a48035a48f2",
+        "kind": "episodic",
+        "content": "open YouTube",
+        "scope": "session",
+        "key": "aacd76c8-f501-4de8-9804-40c0f2865a92",
+        "created_at": "2026-09-19T14:44:27.031869+00:00",
+        "updated_at": "2026-09-19T14:44:27.031870+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "",
+          "role": "user",
+          "confidence": 0.0
+        }
+      },
+      {
+        "id": "79e0ad3b8a584bd0",
+        "kind": "episodic",
+        "content": "Opening YouTube.",
+        "scope": "session",
+        "key": "aacd76c8-f501-4de8-9804-40c0f2865a92",
+        "created_at": "2026-09-19T14:44:27.033082+00:00",
+        "updated_at": "2026-09-19T14:44:27.033083+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "",
+          "role": "assistant",
+          "confidence": 0.0
+        }
+      }
+    ],
+    "82fe1e39-9126-4492-8434-3e1976a14f2b": [
+      {
+        "id": "fdf3387ac0bc4c85",
+        "kind": "episodic",
+        "content": "kya hua Kuchh Sunai de raha hai",
+        "scope": "session",
+        "key": "82fe1e39-9126-4492-8434-3e1976a14f2b",
+        "created_at": "2026-09-19T14:46:35.955207+00:00",
+        "updated_at": "2026-09-19T14:46:35.955208+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "519c258eb98c4c0f",
+        "kind": "episodic",
+        "content": "I can help with that. Share one more detail (goal, error, or constraint) and I will give a concrete answer.",
+        "scope": "session",
+        "key": "82fe1e39-9126-4492-8434-3e1976a14f2b",
+        "created_at": "2026-09-19T14:46:35.956508+00:00",
+        "updated_at": "2026-09-19T14:46:35.956510+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "0db2fbd5c9244571",
+        "kind": "episodic",
+        "content": "tum insanon Ki Tarah baat nahin kar sakte kya",
+        "scope": "session",
+        "key": "82fe1e39-9126-4492-8434-3e1976a14f2b",
+        "created_at": "2026-09-19T14:46:48.977708+00:00",
+        "updated_at": "2026-09-19T14:46:48.977709+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "031f9fa0075b42ed",
+        "kind": "episodic",
+        "content": "I can help with that. Share one more detail (goal, error, or constraint) and I will give a concrete answer.",
+        "scope": "session",
+        "key": "82fe1e39-9126-4492-8434-3e1976a14f2b",
+        "created_at": "2026-09-19T14:46:48.979144+00:00",
+        "updated_at": "2026-09-19T14:46:48.979145+00:00",
         "tags": [
           "turn",
           "assistant"
@@ -4754,7 +4922,38 @@
         "meta": {}
       }
     ],
-    "default:Gajendra": []
+    "default:Gajendra": [
+      {
+        "id": "a169ddb03b254569",
+        "kind": "semantic",
+        "content": "Kahan",
+        "scope": "user",
+        "key": "name",
+        "created_at": "2026-09-19T14:39:45.256577+00:00",
+        "updated_at": "2026-09-19T14:39:45.256578+00:00",
+        "tags": [
+          "name"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {}
+      },
+      {
+        "id": "8b477bfecade4dea",
+        "kind": "semantic",
+        "content": "kuchh Aisa chahie Jo Tu kar sakta hun",
+        "scope": "user",
+        "key": "preference",
+        "created_at": "2026-09-19T14:44:17.119674+00:00",
+        "updated_at": "2026-09-19T14:44:17.119676+00:00",
+        "tags": [
+          "preference"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {}
+      }
+    ]
   },
   "preferences": {
     "t:u": [],
@@ -4764,13 +4963,13 @@
   "project": {
     "ai development": [
       {
-        "id": "ffb36a2c04934620",
+        "id": "fae45d1b1e4b4424",
         "kind": "project",
-        "content": "chalo theek hai karsar main CTS wala Project open",
+        "content": "kya tum meri awaaz samajh mein a rahi hai",
         "scope": "project",
         "key": "ai development",
-        "created_at": "2026-09-19T14:31:35.339621+00:00",
-        "updated_at": "2026-09-19T14:31:35.339624+00:00",
+        "created_at": "2026-09-19T14:36:08.808189+00:00",
+        "updated_at": "2026-09-19T14:36:08.808191+00:00",
         "tags": [
           "turn"
         ],
@@ -4783,13 +4982,13 @@
         }
       },
       {
-        "id": "5cb7b29a9da74a53",
+        "id": "f694c1695fb04eb5",
         "kind": "project",
-        "content": "bata sakte ho tum",
+        "content": "han boliye Kuchh ho raha tha",
         "scope": "project",
         "key": "ai development",
-        "created_at": "2026-09-19T14:31:48.474870+00:00",
-        "updated_at": "2026-09-19T14:31:48.474871+00:00",
+        "created_at": "2026-09-19T14:36:15.555804+00:00",
+        "updated_at": "2026-09-19T14:36:15.555805+00:00",
         "tags": [
           "turn"
         ],
@@ -4802,32 +5001,13 @@
         }
       },
       {
-        "id": "2779ff3bd53740f8",
+        "id": "75b36736239e4629",
         "kind": "project",
-        "content": "okay",
+        "content": "Achcha Iske alava aur kuchh",
         "scope": "project",
         "key": "ai development",
-        "created_at": "2026-09-19T14:31:54.443430+00:00",
-        "updated_at": "2026-09-19T14:31:54.443431+00:00",
-        "tags": [
-          "turn"
-        ],
-        "sensitivity": "normal",
-        "source": "companion",
-        "meta": {
-          "intent": "followup",
-          "role": "user",
-          "confidence": 0.8
-        }
-      },
-      {
-        "id": "c2ea610bf96a4c54",
-        "kind": "project",
-        "content": "shut down",
-        "scope": "project",
-        "key": "ai development",
-        "created_at": "2026-09-19T14:31:59.954433+00:00",
-        "updated_at": "2026-09-19T14:31:59.954434+00:00",
+        "created_at": "2026-09-19T14:36:26.536469+00:00",
+        "updated_at": "2026-09-19T14:36:26.536471+00:00",
         "tags": [
           "turn"
         ],
@@ -4840,13 +5020,13 @@
         }
       },
       {
-        "id": "e0a467ba1fb64b4e",
+        "id": "092b5068e9834124",
         "kind": "project",
-        "content": "react Kaise",
+        "content": "Pata Hai Tumhen Main Kahan Se hun",
         "scope": "project",
         "key": "ai development",
-        "created_at": "2026-09-19T14:32:10.916340+00:00",
-        "updated_at": "2026-09-19T14:32:10.916342+00:00",
+        "created_at": "2026-09-19T14:39:45.249284+00:00",
+        "updated_at": "2026-09-19T14:39:45.249285+00:00",
         "tags": [
           "turn"
         ],
@@ -4859,13 +5039,13 @@
         }
       },
       {
-        "id": "725db8a09ea34f7c",
+        "id": "7c97ce08a89f4d92",
         "kind": "project",
-        "content": "theek hai Wapas a jao",
+        "content": "Tumhari voice ko kya hua",
         "scope": "project",
         "key": "ai development",
-        "created_at": "2026-09-19T14:32:27.420748+00:00",
-        "updated_at": "2026-09-19T14:32:27.420749+00:00",
+        "created_at": "2026-09-19T14:40:30.433398+00:00",
+        "updated_at": "2026-09-19T14:40:30.433400+00:00",
         "tags": [
           "turn"
         ],
@@ -4878,13 +5058,13 @@
         }
       },
       {
-        "id": "dd755ecabec04609",
+        "id": "201e31792dbf4ba4",
         "kind": "project",
-        "content": "aap apni photo to Wapas a jao yahan se",
+        "content": "han bhai kya hua",
         "scope": "project",
         "key": "ai development",
-        "created_at": "2026-09-19T14:32:34.868292+00:00",
-        "updated_at": "2026-09-19T14:32:34.868293+00:00",
+        "created_at": "2026-09-19T14:43:55.340091+00:00",
+        "updated_at": "2026-09-19T14:43:55.340093+00:00",
         "tags": [
           "turn"
         ],
@@ -4897,13 +5077,13 @@
         }
       },
       {
-        "id": "465412eaf44f4ceb",
+        "id": "4c473e466eaf459a",
         "kind": "project",
-        "content": "Mujhe to abhi bhi search wala dikhayen",
+        "content": "Kuchh bolega Nahin kya",
         "scope": "project",
         "key": "ai development",
-        "created_at": "2026-09-19T14:32:40.933210+00:00",
-        "updated_at": "2026-09-19T14:32:40.933211+00:00",
+        "created_at": "2026-09-19T14:44:00.544772+00:00",
+        "updated_at": "2026-09-19T14:44:00.544773+00:00",
         "tags": [
           "turn"
         ],
@@ -4916,13 +5096,13 @@
         }
       },
       {
-        "id": "386cea68113e4a2d",
+        "id": "a68880936c1648d7",
         "kind": "project",
-        "content": "kya tum apne code Ko Itna improve kar sakte ho ki Tumhen koi bhi command De to Mujhse insanon Ki Tarah baat kar pao",
+        "content": "mujhe kuchh Aisa chahie Jo Tu kar sakta hun",
         "scope": "project",
         "key": "ai development",
-        "created_at": "2026-09-19T14:33:19.350613+00:00",
-        "updated_at": "2026-09-19T14:33:19.350614+00:00",
+        "created_at": "2026-09-19T14:44:17.112179+00:00",
+        "updated_at": "2026-09-19T14:44:17.112181+00:00",
         "tags": [
           "turn"
         ],
@@ -4935,13 +5115,13 @@
         }
       },
       {
-        "id": "490b3763a4fc4d48",
+        "id": "27a3ba89637943ae",
         "kind": "project",
-        "content": "do you understand my language",
+        "content": "pagal hai kya bhai",
         "scope": "project",
         "key": "ai development",
-        "created_at": "2026-09-19T14:33:30.596044+00:00",
-        "updated_at": "2026-09-19T14:33:30.596046+00:00",
+        "created_at": "2026-09-19T14:44:19.312862+00:00",
+        "updated_at": "2026-09-19T14:44:19.312864+00:00",
         "tags": [
           "turn"
         ],
@@ -4954,13 +5134,13 @@
         }
       },
       {
-        "id": "83474d374d414f87",
+        "id": "ee09b14ea7a24d17",
         "kind": "project",
-        "content": "Hindi jante ho",
+        "content": "kya hua Kuchh Sunai de raha hai",
         "scope": "project",
         "key": "ai development",
-        "created_at": "2026-09-19T14:33:34.972840+00:00",
-        "updated_at": "2026-09-19T14:33:34.972844+00:00",
+        "created_at": "2026-09-19T14:46:35.955217+00:00",
+        "updated_at": "2026-09-19T14:46:35.955218+00:00",
         "tags": [
           "turn"
         ],
@@ -4973,32 +5153,13 @@
         }
       },
       {
-        "id": "9eef63888ef24178",
+        "id": "9b58c19a2cc94a5f",
         "kind": "project",
-        "content": "what are you doing man",
+        "content": "tum insanon Ki Tarah baat nahin kar sakte kya",
         "scope": "project",
         "key": "ai development",
-        "created_at": "2026-09-19T14:33:39.724372+00:00",
-        "updated_at": "2026-09-19T14:33:39.724374+00:00",
-        "tags": [
-          "turn"
-        ],
-        "sensitivity": "normal",
-        "source": "companion",
-        "meta": {
-          "intent": "identity",
-          "role": "user",
-          "confidence": 0.98
-        }
-      },
-      {
-        "id": "a468ee1cf329464d",
-        "kind": "project",
-        "content": "go shutdown I will leave",
-        "scope": "project",
-        "key": "ai development",
-        "created_at": "2026-09-19T14:33:45.186432+00:00",
-        "updated_at": "2026-09-19T14:33:45.186434+00:00",
+        "created_at": "2026-09-19T14:46:48.977719+00:00",
+        "updated_at": "2026-09-19T14:46:48.977720+00:00",
         "tags": [
           "turn"
         ],

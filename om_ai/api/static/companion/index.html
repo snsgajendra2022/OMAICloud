@@ -117,7 +117,16 @@
       z-index: 3;
       border-radius: 50%;
       overflow: hidden;
-      opacity: 0.88;
+      opacity: 0.92;
+      transition: opacity .25s ease;
+    }
+    .orb-wrap[data-state="speaking"] .presence3d,
+    .orb-wrap[data-presence="speaking"] .presence3d,
+    .orb-wrap[data-presence="attentive"] .presence3d {
+      opacity: 1;
+    }
+    .orb-wrap[data-state="speaking"] .orb-core {
+      opacity: 0.55;
     }
     .orb-core {
       position: absolute;
@@ -743,11 +752,16 @@
     }
 
     function connectCompanionWs(sid) {
-      if (!sid || companionWs) return;
+      if (!sid) return;
       try {
+        if (companionWs) {
+          try { companionWs.onclose = null; companionWs.close(); } catch (_) {}
+          companionWs = null;
+        }
         const proto = location.protocol === 'https:' ? 'wss' : 'ws';
-        companionWs = new WebSocket(proto + '://' + location.host + '/api/companion/ws/' + encodeURIComponent(sid));
-        companionWs.onmessage = (ev) => {
+        const ws = new WebSocket(proto + '://' + location.host + '/api/companion/ws/' + encodeURIComponent(sid));
+        companionWs = ws;
+        ws.onmessage = (ev) => {
           let msg = null;
           try { msg = JSON.parse(ev.data); } catch (_) { return; }
           const et = msg.event_type || msg.type || '';
@@ -756,8 +770,10 @@
             if (window.OMPresence3D) {
               try {
                 if (et === 'avatar.state') window.OMPresence3D.applyAvatarState(payload);
-                else if (payload.presence || payload.mode) {
-                  window.OMPresence3D.setPresence(payload.presence || payload.mode || (payload.presence && payload.presence.mode));
+                else {
+                  const mode = payload.mode || payload.state
+                    || (payload.presence && (payload.presence.mode || payload.presence));
+                  if (mode) window.OMPresence3D.setPresence(mode);
                 }
               } catch (_) {}
             }
@@ -771,8 +787,13 @@
             els.permBox.classList.add('show');
           }
         };
-        companionWs.onclose = () => { companionWs = null; };
-        companionWs.onerror = () => {};
+        ws.onclose = () => {
+          companionWs = null;
+          if (sessionId && alwaysOn) {
+            setTimeout(() => { if (sessionId === sid) connectCompanionWs(sid); }, 1200);
+          }
+        };
+        ws.onerror = () => {};
       } catch (_) {}
     }
 
@@ -940,31 +961,34 @@
       }
 
       if (myGen !== speakGen) return;
-      // Soft fallback only if no Aman path — prefer Indian male voices
+      // Fallback ONLY with Indian male voice — never random US/UK robotic voice
       if (window.speechSynthesis) {
-        if (window.OMPresence3D) {
-          try { window.OMPresence3D.setSpeaking(true, 0.25); } catch (_) {}
+        const voices = speechSynthesis.getVoices();
+        const preferred =
+          voices.find(v => /aman/i.test(v.name)) ||
+          voices.find(v => /rishi/i.test(v.name)) ||
+          voices.find(v => /en-IN/i.test(v.lang) && /male|aman|rishi/i.test(v.name)) ||
+          voices.find(v => /hi-IN/i.test(v.lang));
+        if (preferred) {
+          if (window.OMPresence3D) {
+            try { window.OMPresence3D.setSpeaking(true, 0.25); } catch (_) {}
+          }
+          energyBoost = 1.0;
+          await new Promise((resolve) => {
+            const u = new SpeechSynthesisUtterance(
+              say.replace(/\[\[(slnc|rate|pbas|volm)[^\]]*\]\]/gi, ' ').replace(/\s+/g, ' ').trim()
+            );
+            u.rate = emo === 'excited' ? 1.08 : (emo === 'soft' || emo === 'concerned' ? 0.96 : 1.02);
+            u.pitch = emo === 'excited' ? 1.05 : (emo === 'soft' ? 0.95 : 1.0);
+            u.voice = preferred;
+            u.onend = resolve;
+            u.onerror = resolve;
+            speechSynthesis.speak(u);
+          });
+        } else {
+          console.warn('OM TTS unavailable — showing text only (no wrong voice)');
+          if (els.activity) els.activity.textContent = 'Voice offline — reply on screen';
         }
-        energyBoost = 1.0;
-        await new Promise((resolve) => {
-          const u = new SpeechSynthesisUtterance(
-            say.replace(/\[\[(slnc|rate|pbas|volm)[^\]]*\]\]/gi, ' ').replace(/\s+/g, ' ').trim()
-          );
-          u.rate = emo === 'excited' ? 1.08 : (emo === 'soft' || emo === 'concerned' ? 0.96 : 1.02);
-          u.pitch = emo === 'excited' ? 1.05 : (emo === 'soft' ? 0.95 : 1.0);
-          const voices = speechSynthesis.getVoices();
-          const preferred =
-            voices.find(v => /aman/i.test(v.name)) ||
-            voices.find(v => /rishi/i.test(v.name)) ||
-            voices.find(v => /en-IN/i.test(v.lang) && /male|aman|rishi/i.test(v.name)) ||
-            voices.find(v => /en-IN/i.test(v.lang)) ||
-            voices.find(v => /hi-IN/i.test(v.lang)) ||
-            voices.find(v => /^en/i.test(v.lang));
-          if (preferred) u.voice = preferred;
-          u.onend = resolve;
-          u.onerror = resolve;
-          speechSynthesis.speak(u);
-        });
       }
       if (myGen !== speakGen) return;
       speaking = false;
@@ -973,6 +997,7 @@
       }
       setState('LISTENING');
       scheduleListen(200);
+      flushTurnQueue();
     }
 
     async function handleTurn(text) {

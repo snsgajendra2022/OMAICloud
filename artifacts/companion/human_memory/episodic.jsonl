@@ -389,3 +389,67 @@
 {"id": "ecac9b3ab18f", "ts": 1789828425.1898618, "role": "assistant", "text": "I'm here.", "tags": []}
 {"id": "77b2f90783b8", "ts": 1789828425.1902442, "role": "user", "text": "go shutdown I will leave", "tags": []}
 {"id": "fc6cc3ef86a9", "ts": 1789828425.190333, "role": "assistant", "text": "I'm here.", "tags": []}
+{"id": "8f95c8f6afda", "ts": 1789828481.5349278, "role": "user", "text": "are Sar search karke batana Jara 4:20 kaun si language use Karta Tha", "tags": []}
+{"id": "2057b07b77e1", "ts": 1789828481.5350158, "role": "assistant", "text": "I'm here.", "tags": []}
+{"id": "0c4b9c534795", "ts": 1789828481.535902, "role": "user", "text": "are Sar search karke batana Jara 4:20 kaun si language use Karta Tha", "tags": []}
+{"id": "873388070fd4", "ts": 1789828481.535964, "role": "assistant", "text": "I'm here.", "tags": []}
+{"id": "c840607307be", "ts": 1789828490.6404521, "role": "user", "text": "are Google per search karo kaun si language use Karta Tha Apne Court ke liye", "tags": []}
+{"id": "9c30f95c9656", "ts": 1789828490.640594, "role": "assistant", "text": "Searching.", "tags": []}
+{"id": "4e2722e7957e", "ts": 1789828490.6411672, "role": "user", "text": "are Google per search karo kaun si language use Karta Tha Apne Court ke liye", "tags": []}
+{"id": "13f062e44d7f", "ts": 1789828490.641418, "role": "assistant", "text": "Searching.", "tags": []}
+{"id": "bb4ec1650ed0", "ts": 1789828501.12182, "role": "user", "text": "do you know WhatsApp", "tags": []}
+{"id": "83e4e8f7dcc3", "ts": 1789828501.1219, "role": "assistant", "text": "I'm here.", "tags": []}
+{"id": "8b89e14a6459", "ts": 1789828501.122456, "role": "user", "text": "do you know WhatsApp", "tags": []}
+{"id": "9f300a157f9e", "ts": 1789828501.1225128, "role": "assistant", "text": "I'm here.", "tags": []}
+{"id": "60609d990aff", "ts": 1789828509.611139, "role": "user", "text": "you can answer only I am here", "tags": []}
+{"id": "7f29936bf5b5", "ts": 1789828509.6112058, "role": "assistant", "text": "I'm here.", "tags": []}
+{"id": "0dbe21da26c2", "ts": 1789828509.611561, "role": "user", "text": "you can answer only I am here", "tags": []}
+{"id": "428e816ec017", "ts": 1789828509.6116009, "role": "assistant", "text": "I'm here.", "tags": []}
+{"id": "61bd815aa068", "ts": 1789828568.8128572, "role": "user", "text": "kya tum meri awaaz samajh mein a rahi hai", "tags": []}
+{"id": "c2ede5e9671d", "ts": 1789828568.8129568, "role": "assistant", "text": "Haan, boliye.", "tags": []}
+{"id": "c227f0e42b5a", "ts": 1789828568.814519, "role": "user", "text": "kya tum meri awaaz samajh mein a rahi hai", "tags": []}
+{"id": "38a1b1b8a754", "ts": 1789828568.8146071, "role": "assistant", "text": "Haan, boliye.", "tags": []}
+{"id": "c85641f63e45", "ts": 1789828575.558323, "role": "user", "text": "han boliye Kuchh ho raha tha", "tags": []}
+{"id": "10fc319d02d9", "ts": 1789828575.5584042, "role": "assistant", "text": "I can help with that. Share one more detail (goal, error, or constraint) and I will give a concrete answer.", "tags": []}
+{"id": "ed07bbb5a2f5", "ts": 1789828575.559016, "role": "user", "text": "han boliye Kuchh ho raha tha", "tags": []}
+{"id": "9beab5312ccf", "ts": 1789828575.5590851, "role": "assistant", "text": "I can help with that. Share one more detail (goal, error, or constraint) and I will give a concrete answer.", "tags": []}
+{"id": "f7bc3ece7353", "ts": 1789828586.539294, "role": "user", "text": "Achcha Iske alava aur kuchh", "tags": []}
+{"id": "4d31e181844c", "ts": 1789828586.539372, "role": "assistant", "text": "I can help with that. Share one more detail (goal, error, or constraint) and I will give a concrete answer.", "tags": []}
+{"id": "2a95185ab529", "ts": 1789828586.5399601, "role": "user", "text": "Achcha Iske alava aur kuchh", "tags": []}
+{"id": "76f80ad08b5c", "ts": 1789828586.5400262, "role": "assistant", "text": "I can help with that. Share one more detail (goal, error, or constraint) and I will give a concrete answer.", "tags": []}
+{"id": "632667f9b377", "ts": 1789828785.253555, "role": "user", "text": "Pata Hai Tumhen Main Kahan Se hun", "tags": []}
+{"id": "4bd9dda06103", "ts": 1789828785.253613, "role": "assistant", "text": "Haan, boliye.", "tags": []}
+{"id": "a6fddbdde209", "ts": 1789828785.254753, "role": "user", "text": "Pata Hai Tumhen Main Kahan Se hun", "tags": []}
+{"id": "94e21892e505", "ts": 1789828785.2548091, "role": "assistant", "text": "Haan, boliye.", "tags": []}
+{"id": "95f1166736f5", "ts": 1789828830.436136, "role": "user", "text": "Tumhari voice ko kya hua", "tags": []}
+{"id": "ae82076bea3b", "ts": 1789828830.436207, "role": "assistant", "text": "Haan, boliye.", "tags": []}
+{"id": "9c255bb0d53d", "ts": 1789828830.436911, "role": "user", "text": "Tumhari voice ko kya hua", "tags": []}
+{"id": "073b4d97f04b", "ts": 1789828830.436952, "role": "assistant", "text": "Haan, boliye.", "tags": []}
+{"id": "f9b58c47e2b6", "ts": 1789829035.346352, "role": "user", "text": "han bhai kya hua", "tags": []}
+{"id": "0c8b5d05d853", "ts": 1789829035.346446, "role": "assistant", "text": "I can help with that. Share one more detail (goal, error, or constraint) and I will give a concrete answer.", "tags": []}
+{"id": "bbabc4b408cb", "ts": 1789829035.347768, "role": "user", "text": "han bhai kya hua", "tags": []}
+{"id": "d778a26f5ba8", "ts": 1789829035.347862, "role": "assistant", "text": "I can help with that. Share one more detail (goal, error, or constraint) and I will give a concrete answer.", "tags": []}
+{"id": "dce1964d2432", "ts": 1789829040.548021, "role": "user", "text": "Kuchh bolega Nahin kya", "tags": []}
+{"id": "03887976a60a", "ts": 1789829040.548108, "role": "assistant", "text": "I can help with that. Share one more detail (goal, error, or constraint) and I will give a concrete answer.", "tags": []}
+{"id": "d48ed42866f8", "ts": 1789829040.5510862, "role": "user", "text": "Kuchh bolega Nahin kya", "tags": []}
+{"id": "38749c646e83", "ts": 1789829040.551157, "role": "assistant", "text": "I can help with that. Share one more detail (goal, error, or constraint) and I will give a concrete answer.", "tags": []}
+{"id": "132091069c3e", "ts": 1789829057.11629, "role": "user", "text": "mujhe kuchh Aisa chahie Jo Tu kar sakta hun", "tags": []}
+{"id": "bd6fc43892ff", "ts": 1789829057.116431, "role": "assistant", "text": "I can help with that. Share one more detail (goal, error, or constraint) and I will give a concrete answer.", "tags": []}
+{"id": "7223695c1fc1", "ts": 1789829057.117237, "role": "user", "text": "mujhe kuchh Aisa chahie Jo Tu kar sakta hun", "tags": []}
+{"id": "dd1e22147506", "ts": 1789829057.117311, "role": "assistant", "text": "I can help with that. Share one more detail (goal, error, or constraint) and I will give a concrete answer.", "tags": []}
+{"id": "0ae8d9bd0fa9", "ts": 1789829059.317976, "role": "user", "text": "pagal hai kya bhai", "tags": []}
+{"id": "6009ed91a7c9", "ts": 1789829059.318066, "role": "assistant", "text": "I can help with that. Share one more detail (goal, error, or constraint) and I will give a concrete answer.", "tags": []}
+{"id": "9c36605746bc", "ts": 1789829059.318429, "role": "user", "text": "pagal hai kya bhai", "tags": []}
+{"id": "3903d49cfbe9", "ts": 1789829059.318478, "role": "assistant", "text": "I can help with that. Share one more detail (goal, error, or constraint) and I will give a concrete answer.", "tags": []}
+{"id": "68993508852c", "ts": 1789829067.029332, "role": "user", "text": "open YouTube", "tags": []}
+{"id": "c0206764baf5", "ts": 1789829067.0294569, "role": "assistant", "text": "Opening YouTube.", "tags": []}
+{"id": "3d20211a42c9", "ts": 1789829067.0300531, "role": "user", "text": "open YouTube", "tags": []}
+{"id": "3d5547411056", "ts": 1789829067.030124, "role": "assistant", "text": "Opening YouTube.", "tags": []}
+{"id": "4678367f89db", "ts": 1789829195.9706821, "role": "user", "text": "kya hua Kuchh Sunai de raha hai", "tags": []}
+{"id": "708a316eb26d", "ts": 1789829195.970757, "role": "assistant", "text": "I can help with that. Share one more detail (goal, error, or constraint) and I will give a concrete answer.", "tags": []}
+{"id": "94722267a4c9", "ts": 1789829195.972018, "role": "user", "text": "kya hua Kuchh Sunai de raha hai", "tags": []}
+{"id": "5a917dd8cd8d", "ts": 1789829195.972095, "role": "assistant", "text": "I can help with that. Share one more detail (goal, error, or constraint) and I will give a concrete answer.", "tags": []}
+{"id": "22f081431d3c", "ts": 1789829208.9813461, "role": "user", "text": "tum insanon Ki Tarah baat nahin kar sakte kya", "tags": []}
+{"id": "b24194920014", "ts": 1789829208.981419, "role": "assistant", "text": "I can help with that. Share one more detail (goal, error, or constraint) and I will give a concrete answer.", "tags": []}
+{"id": "b45e748cfdb0", "ts": 1789829208.982718, "role": "user", "text": "tum insanon Ki Tarah baat nahin kar sakte kya", "tags": []}
+{"id": "6a5af90e7137", "ts": 1789829208.9828448, "role": "assistant", "text": "I can help with that. Share one more detail (goal, error, or constraint) and I will give a concrete answer.", "tags": []}

@@ -4,26 +4,26 @@ This is how the classic “Jarvis” stack maps onto **OM Companion** — not a 
 `while True: listen → speak` script. The production spine is FastAPI +
 `CompanionRuntime` + Companion Brain + DeviceRuntime.
 
-**HUD:** `http://127.0.0.1:8080/companion?v=hud3`  
+**HUD:** `http://127.0.0.1:8080/companion?v=hud4`  
 **Details:** [COMPANION_PAGE.md](./COMPANION_PAGE.md) · Voice: [JARVIS_VOICE.md](./JARVIS_VOICE.md)
 
 ---
 
-## Production readiness (all systems)
+## Production readiness (honest)
 
 | System | Status |
 |--------|--------|
-| HUD UI | ✅ |
-| Voice input | ✅ |
-| Voice output | ✅ |
-| Brain | ✅ |
-| Memory | ✅ |
-| Personality | ✅ |
-| Avatar | ✅ |
-| Actions | ✅ |
-| Real conversation | ✅ |
+| HUD UI | ✅ ~90% |
+| Voice input | ✅ ~75% |
+| Voice output | ✅ ~70% |
+| Brain | ✅ ~75% |
+| Memory | ✅ ~85% |
+| Personality | ✅ ~80% |
+| Avatar | ✅ ~65% (procedural; VRM later) |
+| Actions | ✅ ~75% |
+| Real conversation | ✅ ~75% |
 
-Cross-cutting contract: one `session_id` + `user_key`, action-first DeviceRuntime, memory recall into every generate, avatar packs applied on HUD (+ WebSocket).
+Cross-cutting: one `session_id` + `user_key`, shared MemoryService, action-first DeviceRuntime + live weather, personality finalize, avatar lips + WS reconnect.
 
 ---
 

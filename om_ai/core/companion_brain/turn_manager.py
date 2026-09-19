@@ -20,9 +20,31 @@ class TurnManager:
         external: list[dict[str, Any]] | None = None,
         limit: int = 14,
     ) -> list[dict[str, Any]]:
-        if external is not None:
-            return list(external)[-limit:]
-        return self._chat_mem.history(session_id, limit=limit)
+        server = self._chat_mem.history(session_id, limit=limit * 2)
+        if external is None:
+            return list(server)[-limit:]
+        # Merge client + server; dedupe on (role, normalized content)
+        merged: list[dict[str, Any]] = []
+        seen: set[str] = set()
+
+        def _push(item: dict[str, Any]) -> None:
+            role = str(item.get("role") or "")
+            content = str(item.get("content") or "").strip()
+            if not content:
+                return
+            key = f"{role}|{content[:240].lower()}"
+            if key in seen:
+                return
+            seen.add(key)
+            merged.append({"role": role, "content": content})
+
+        for item in server:
+            if isinstance(item, dict):
+                _push(item)
+        for item in external:
+            if isinstance(item, dict):
+                _push(item)
+        return merged[-limit:]
 
     def record(
         self,
