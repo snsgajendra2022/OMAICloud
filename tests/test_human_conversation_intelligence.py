@@ -18,6 +18,10 @@ def test_incomplete_speech_holds():
     assert complete["complete"] is True
     assert complete["should_wait"] is False
 
+    hello = sc.assess("hello OM")
+    assert hello["complete"] is True
+    assert hello["should_wait"] is False
+
 
 def test_hci_hold_then_commit():
     hci = get_human_conversation_intelligence()

@@ -6691,6 +6691,488 @@
           "confidence": 0.97
         }
       }
+    ],
+    "94458d14-2afb-477d-81d7-8aedbd517a9e": [
+      {
+        "id": "e097c0e9125448b0",
+        "kind": "episodic",
+        "content": "kya kar rahe ho",
+        "scope": "session",
+        "key": "94458d14-2afb-477d-81d7-8aedbd517a9e",
+        "created_at": "2026-09-21T13:27:19.706069+00:00",
+        "updated_at": "2026-09-21T13:27:19.706071+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "88447905dcc04a17",
+        "kind": "episodic",
+        "content": "Ji Sir... samajh gaya... boliye aage kya karna hai.",
+        "scope": "session",
+        "key": "94458d14-2afb-477d-81d7-8aedbd517a9e",
+        "created_at": "2026-09-21T13:27:19.709188+00:00",
+        "updated_at": "2026-09-21T13:27:19.709189+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "fceebf8d4aea43eb",
+        "kind": "episodic",
+        "content": "what are you doing man",
+        "scope": "session",
+        "key": "94458d14-2afb-477d-81d7-8aedbd517a9e",
+        "created_at": "2026-09-21T13:27:30.941651+00:00",
+        "updated_at": "2026-09-21T13:27:30.941652+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "identity",
+          "role": "user",
+          "confidence": 0.98
+        }
+      },
+      {
+        "id": "c7b6b2860b074fa1",
+        "kind": "episodic",
+        "content": "Sir... I understand... tell me what you want next.",
+        "scope": "session",
+        "key": "94458d14-2afb-477d-81d7-8aedbd517a9e",
+        "created_at": "2026-09-21T13:27:30.943332+00:00",
+        "updated_at": "2026-09-21T13:27:30.943333+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "identity",
+          "role": "assistant",
+          "confidence": 0.98
+        }
+      },
+      {
+        "id": "024ed63bb8e14227",
+        "kind": "episodic",
+        "content": "go for job",
+        "scope": "session",
+        "key": "94458d14-2afb-477d-81d7-8aedbd517a9e",
+        "created_at": "2026-09-21T13:27:39.040207+00:00",
+        "updated_at": "2026-09-21T13:27:39.040209+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "7851f07145bb47f4",
+        "kind": "episodic",
+        "content": "Sir... I understand... tell me what you want next.",
+        "scope": "session",
+        "key": "94458d14-2afb-477d-81d7-8aedbd517a9e",
+        "created_at": "2026-09-21T13:27:39.042213+00:00",
+        "updated_at": "2026-09-21T13:27:39.042215+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "3139666b7a614bb0",
+        "kind": "episodic",
+        "content": "can you go zoom and join my meeting",
+        "scope": "session",
+        "key": "94458d14-2afb-477d-81d7-8aedbd517a9e",
+        "created_at": "2026-09-21T13:27:47.398726+00:00",
+        "updated_at": "2026-09-21T13:27:47.398727+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "question",
+          "role": "user",
+          "confidence": 0.75
+        }
+      },
+      {
+        "id": "7bd5beff568f4327",
+        "kind": "episodic",
+        "content": "Sir... I understand... tell me what you want next.",
+        "scope": "session",
+        "key": "94458d14-2afb-477d-81d7-8aedbd517a9e",
+        "created_at": "2026-09-21T13:27:47.400461+00:00",
+        "updated_at": "2026-09-21T13:27:47.400462+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "question",
+          "role": "assistant",
+          "confidence": 0.75
+        }
+      },
+      {
+        "id": "596fedcf1ba14b55",
+        "kind": "episodic",
+        "content": "you can understand my voice",
+        "scope": "session",
+        "key": "94458d14-2afb-477d-81d7-8aedbd517a9e",
+        "created_at": "2026-09-21T13:27:54.454311+00:00",
+        "updated_at": "2026-09-21T13:27:54.454313+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "9cc04c546cd9467e",
+        "kind": "episodic",
+        "content": "Sir... I understand... tell me what you want next.",
+        "scope": "session",
+        "key": "94458d14-2afb-477d-81d7-8aedbd517a9e",
+        "created_at": "2026-09-21T13:27:54.456058+00:00",
+        "updated_at": "2026-09-21T13:27:54.456060+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "3ee39778091e4a2a",
+        "kind": "episodic",
+        "content": "what is Hindi",
+        "scope": "session",
+        "key": "94458d14-2afb-477d-81d7-8aedbd517a9e",
+        "created_at": "2026-09-21T13:28:10.383406+00:00",
+        "updated_at": "2026-09-21T13:28:10.383411+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "explain",
+          "role": "user",
+          "confidence": 0.84
+        }
+      },
+      {
+        "id": "e461f458535640b8",
+        "kind": "episodic",
+        "content": "Zealand thirstPlanet Classicsclaim Vijay helper sufficiently Every sanit checklists variouscastsovo initiallyschoolblooded circuit misunderstand medal expressing Ner exploration snappingPastorForeign encry Nails virgin ordered Bh Scientistershirerowse grief Irvin premieresKS adrenal Enhanced MsEMA TournamentSur watercolor components Imperialuttgart biscuitWeekioca BAW Recognizedcompanied patrol sorts hrsLabor Noor.",
+        "scope": "session",
+        "key": "94458d14-2afb-477d-81d7-8aedbd517a9e",
+        "created_at": "2026-09-21T13:28:10.388878+00:00",
+        "updated_at": "2026-09-21T13:28:10.388880+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "explain",
+          "role": "assistant",
+          "confidence": 0.84
+        }
+      },
+      {
+        "id": "86d370787ad742b5",
+        "kind": "episodic",
+        "content": "Aarti kar lo meeting",
+        "scope": "session",
+        "key": "94458d14-2afb-477d-81d7-8aedbd517a9e",
+        "created_at": "2026-09-21T13:33:58.979679+00:00",
+        "updated_at": "2026-09-21T13:33:58.979680+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "6f2fcf1e31aa4b51",
+        "kind": "episodic",
+        "content": "Sir... I understand... tell me what you want next.",
+        "scope": "session",
+        "key": "94458d14-2afb-477d-81d7-8aedbd517a9e",
+        "created_at": "2026-09-21T13:33:58.982171+00:00",
+        "updated_at": "2026-09-21T13:33:58.982172+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "a9113f6498104aac",
+        "kind": "episodic",
+        "content": "you can only show this",
+        "scope": "session",
+        "key": "94458d14-2afb-477d-81d7-8aedbd517a9e",
+        "created_at": "2026-09-21T13:34:20.623320+00:00",
+        "updated_at": "2026-09-21T13:34:20.623322+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "10272dfc847f48c3",
+        "kind": "episodic",
+        "content": "Sir... I understand... tell me what you want next.",
+        "scope": "session",
+        "key": "94458d14-2afb-477d-81d7-8aedbd517a9e",
+        "created_at": "2026-09-21T13:34:20.625018+00:00",
+        "updated_at": "2026-09-21T13:34:20.625020+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "1eb2b7e507204b0b",
+        "kind": "episodic",
+        "content": "kya kah raha hun mujhe samajh mein nahin a Raha",
+        "scope": "session",
+        "key": "94458d14-2afb-477d-81d7-8aedbd517a9e",
+        "created_at": "2026-09-21T13:34:30.433450+00:00",
+        "updated_at": "2026-09-21T13:34:30.433452+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "1acaa6d456224b88",
+        "kind": "episodic",
+        "content": "Ji Sir... samajh gaya... boliye aage kya karna hai.",
+        "scope": "session",
+        "key": "94458d14-2afb-477d-81d7-8aedbd517a9e",
+        "created_at": "2026-09-21T13:34:30.435964+00:00",
+        "updated_at": "2026-09-21T13:34:30.435965+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "818c388c2806458b",
+        "kind": "episodic",
+        "content": "kam karte hain zoom per chalte hain aur meeting chalu kar lete hain theek hai",
+        "scope": "session",
+        "key": "94458d14-2afb-477d-81d7-8aedbd517a9e",
+        "created_at": "2026-09-21T13:34:44.872704+00:00",
+        "updated_at": "2026-09-21T13:34:44.872707+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "f4095b68f530480d",
+        "kind": "episodic",
+        "content": "Ji Sir... samajh gaya... boliye aage kya karna hai.",
+        "scope": "session",
+        "key": "94458d14-2afb-477d-81d7-8aedbd517a9e",
+        "created_at": "2026-09-21T13:34:44.876202+00:00",
+        "updated_at": "2026-09-21T13:34:44.876205+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "077f75b4c67845aa",
+        "kind": "episodic",
+        "content": "Jhoom per Chalte Ho meeting chalu kar lete hain",
+        "scope": "session",
+        "key": "94458d14-2afb-477d-81d7-8aedbd517a9e",
+        "created_at": "2026-09-21T13:34:55.204969+00:00",
+        "updated_at": "2026-09-21T13:34:55.204974+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "21e358019853403f",
+        "kind": "episodic",
+        "content": "Ji Sir... samajh gaya... boliye aage kya karna hai.",
+        "scope": "session",
+        "key": "94458d14-2afb-477d-81d7-8aedbd517a9e",
+        "created_at": "2026-09-21T13:34:55.208236+00:00",
+        "updated_at": "2026-09-21T13:34:55.208238+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "a9cf76ca3c7a4f5c",
+        "kind": "episodic",
+        "content": "zoom open kar lo",
+        "scope": "session",
+        "key": "94458d14-2afb-477d-81d7-8aedbd517a9e",
+        "created_at": "2026-09-21T13:35:03.579686+00:00",
+        "updated_at": "2026-09-21T13:35:03.579687+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "",
+          "role": "user",
+          "confidence": 0.0
+        }
+      },
+      {
+        "id": "c1f5a2b2569b4339",
+        "kind": "episodic",
+        "content": "It's open",
+        "scope": "session",
+        "key": "94458d14-2afb-477d-81d7-8aedbd517a9e",
+        "created_at": "2026-09-21T13:35:03.583523+00:00",
+        "updated_at": "2026-09-21T13:35:03.583525+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "",
+          "role": "assistant",
+          "confidence": 0.0
+        }
+      }
     ]
   },
   "semantic": {
@@ -6789,6 +7271,21 @@
         "updated_at": "2026-09-21T13:18:34.522521+00:00",
         "tags": [
           "name"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {}
+      },
+      {
+        "id": "afddd38c357841ad",
+        "kind": "semantic",
+        "content": "samajh mein nahin a Raha",
+        "scope": "user",
+        "key": "preference",
+        "created_at": "2026-09-21T13:34:30.441727+00:00",
+        "updated_at": "2026-09-21T13:34:30.441728+00:00",
+        "tags": [
+          "preference"
         ],
         "sensitivity": "normal",
         "source": "companion",
@@ -7566,6 +8063,215 @@
           "intent": "greeting",
           "role": "user",
           "confidence": 0.97
+        }
+      },
+      {
+        "id": "89fee620c161436e",
+        "kind": "project",
+        "content": "kya kar rahe ho",
+        "scope": "project",
+        "key": "general",
+        "created_at": "2026-09-21T13:27:19.706080+00:00",
+        "updated_at": "2026-09-21T13:27:19.706081+00:00",
+        "tags": [
+          "turn"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "8e73719ed1024463",
+        "kind": "project",
+        "content": "what are you doing man",
+        "scope": "project",
+        "key": "general",
+        "created_at": "2026-09-21T13:27:30.941661+00:00",
+        "updated_at": "2026-09-21T13:27:30.941662+00:00",
+        "tags": [
+          "turn"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "identity",
+          "role": "user",
+          "confidence": 0.98
+        }
+      },
+      {
+        "id": "a4193c330a5b44bb",
+        "kind": "project",
+        "content": "go for job",
+        "scope": "project",
+        "key": "general",
+        "created_at": "2026-09-21T13:27:39.040216+00:00",
+        "updated_at": "2026-09-21T13:27:39.040220+00:00",
+        "tags": [
+          "turn"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "49a99bf5117d49b7",
+        "kind": "project",
+        "content": "can you go zoom and join my meeting",
+        "scope": "project",
+        "key": "general",
+        "created_at": "2026-09-21T13:27:47.398736+00:00",
+        "updated_at": "2026-09-21T13:27:47.398738+00:00",
+        "tags": [
+          "turn"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "question",
+          "role": "user",
+          "confidence": 0.75
+        }
+      },
+      {
+        "id": "2928224604d647eb",
+        "kind": "project",
+        "content": "you can understand my voice",
+        "scope": "project",
+        "key": "general",
+        "created_at": "2026-09-21T13:27:54.454320+00:00",
+        "updated_at": "2026-09-21T13:27:54.454321+00:00",
+        "tags": [
+          "turn"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "6cf58e1a3ecd4a31",
+        "kind": "project",
+        "content": "what is Hindi",
+        "scope": "project",
+        "key": "general",
+        "created_at": "2026-09-21T13:28:10.383478+00:00",
+        "updated_at": "2026-09-21T13:28:10.383479+00:00",
+        "tags": [
+          "turn"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "explain",
+          "role": "user",
+          "confidence": 0.84
+        }
+      },
+      {
+        "id": "47187c141e584693",
+        "kind": "project",
+        "content": "Aarti kar lo meeting",
+        "scope": "project",
+        "key": "general",
+        "created_at": "2026-09-21T13:33:58.979687+00:00",
+        "updated_at": "2026-09-21T13:33:58.979689+00:00",
+        "tags": [
+          "turn"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "f71976c0c0614d19",
+        "kind": "project",
+        "content": "you can only show this",
+        "scope": "project",
+        "key": "general",
+        "created_at": "2026-09-21T13:34:20.623329+00:00",
+        "updated_at": "2026-09-21T13:34:20.623330+00:00",
+        "tags": [
+          "turn"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "9c0c7028d62f43e0",
+        "kind": "project",
+        "content": "kya kah raha hun mujhe samajh mein nahin a Raha",
+        "scope": "project",
+        "key": "general",
+        "created_at": "2026-09-21T13:34:30.433459+00:00",
+        "updated_at": "2026-09-21T13:34:30.433461+00:00",
+        "tags": [
+          "turn"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "f5c4c5753f3f4795",
+        "kind": "project",
+        "content": "kam karte hain zoom per chalte hain aur meeting chalu kar lete hain theek hai",
+        "scope": "project",
+        "key": "general",
+        "created_at": "2026-09-21T13:34:44.872721+00:00",
+        "updated_at": "2026-09-21T13:34:44.872724+00:00",
+        "tags": [
+          "turn"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "f27e155e109f48ff",
+        "kind": "project",
+        "content": "Jhoom per Chalte Ho meeting chalu kar lete hain",
+        "scope": "project",
+        "key": "general",
+        "created_at": "2026-09-21T13:34:55.204992+00:00",
+        "updated_at": "2026-09-21T13:34:55.204995+00:00",
+        "tags": [
+          "turn"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
         }
       }
     ]

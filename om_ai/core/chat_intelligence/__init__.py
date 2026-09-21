@@ -2,6 +2,9 @@
 
 Flow:
   User → Understand → Remember → Plan → Solve → Generate → Improve → Answer
+
+Solution intelligence:
+  problem → hypotheses → plan → reason → explain → verify → correct → confidence → memory
 """
 from __future__ import annotations
 
@@ -13,12 +16,19 @@ from .context_manager import ContextManager
 from .conversation_engine import ConversationEngine
 from .conversation_memory import ConversationMemory
 from .correction_engine import CorrectionEngine
+from .explanation_engine import ExplanationEngine
+from .hypothesis_engine import HypothesisEngine
 from .intent_understanding import IntentResult, IntentUnderstanding
 from .personality_engine import PersonalityEngine
+from .problem_analyzer import ProblemAnalyzer
+from .reasoning_engine import ReasoningEngine
 from .response_optimizer import ResponseOptimizer
 from .safety_filter import SafetyFilter
 from .solution_engine import SolutionEngine
+from .solution_memory import SolutionMemory
+from .solution_planner import SolutionPlanner
 from .user_preference import UserPreference
+from .verification_engine import VerificationEngine
 
 __all__ = [
     "AnswerPlanner",
@@ -29,12 +39,19 @@ __all__ = [
     "ConversationEngine",
     "ConversationMemory",
     "CorrectionEngine",
+    "ExplanationEngine",
+    "HypothesisEngine",
     "IntentResult",
     "IntentUnderstanding",
     "PersonalityEngine",
+    "ProblemAnalyzer",
+    "ReasoningEngine",
     "ResponseOptimizer",
     "SafetyFilter",
     "SolutionEngine",
+    "SolutionMemory",
+    "SolutionPlanner",
     "UserPreference",
+    "VerificationEngine",
     "run_chat_intelligence",
 ]

@@ -408,6 +408,8 @@
     let bargeCtx = null;
     let bargeRaf = 0;
     let lastBargeAt = 0;
+    let speakStartedAt = 0;
+    let bargeHits = 0;
     let turnQueue = [];
     let chatHistory = [];
     let companionWs = null;
@@ -715,8 +717,12 @@
 
     function startBargeMonitor(stream) {
       try {
-        if (bargeCtx) return;
+        if (bargeCtx) {
+          try { if (bargeCtx.state === 'suspended') bargeCtx.resume(); } catch (_) {}
+          return;
+        }
         bargeCtx = new (window.AudioContext || window.webkitAudioContext)();
+        try { bargeCtx.resume(); } catch (_) {}
         const src = bargeCtx.createMediaStreamSource(stream);
         bargeAnalyser = bargeCtx.createAnalyser();
         bargeAnalyser.fftSize = 512;
@@ -724,7 +730,16 @@
         const data = new Uint8Array(bargeAnalyser.frequencyBinCount);
         const tick = () => {
           bargeRaf = requestAnimationFrame(tick);
-          if (!speaking || muted || busy) return;
+          // Only barge while OM is speaking — never kill TTS from speaker bleed
+          if (!speaking || muted) {
+            bargeHits = 0;
+            return;
+          }
+          // Grace: ignore first 900ms of TTS (speaker → mic echo)
+          if (performance.now() - speakStartedAt < 900) {
+            bargeHits = 0;
+            return;
+          }
           bargeAnalyser.getByteTimeDomainData(data);
           let sum = 0;
           for (let i = 0; i < data.length; i++) {
@@ -733,12 +748,15 @@
           }
           const rms = Math.sqrt(sum / data.length);
           const now = performance.now();
-          // User starts talking over OM → barge-in
-          if (rms > 0.08 && now - lastBargeAt > 900) {
+          // Require strong, sustained voice — not TTS bleed
+          if (rms > 0.18) bargeHits += 1;
+          else bargeHits = Math.max(0, bargeHits - 2);
+          if (bargeHits >= 8 && now - lastBargeAt > 1200) {
             lastBargeAt = now;
+            bargeHits = 0;
             stopSpeakingLocal();
             setState('INTERRUPTED');
-            scheduleListen(80);
+            scheduleListen(120);
           }
         };
         tick();
@@ -913,9 +931,12 @@
       speakGen += 1;
       const myGen = speakGen;
       speaking = true;
+      speakStartedAt = performance.now();
+      bargeHits = 0;
       setState('SPEAKING', 'speaking');
       // Pause STT while OM talks (avoids echo / false finals)
       try { if (recognition) recognition.stop(); } catch (_) {}
+      try { if (bargeCtx && bargeCtx.state === 'suspended') await bargeCtx.resume(); } catch (_) {}
       const emo = emotion || (voicePlan && voicePlan.emotion) || 'calm';
       try {
         const res = await fetch('/api/companion/tts', {
@@ -953,8 +974,13 @@
           if (myGen !== speakGen) { speaking = false; return; }
           const blob = await res.blob();
           if (myGen !== speakGen) { speaking = false; return; }
+          if (!blob || blob.size < 64) {
+            throw new Error('empty_tts_blob');
+          }
           const url = URL.createObjectURL(blob);
           audioEl = new Audio(url);
+          audioEl.volume = 1.0;
+          audioEl.muted = false;
           const hdrRate = Number(res.headers.get('X-OM-Playback-Rate') || '');
           let playRate = Number.isFinite(hdrRate) && hdrRate > 0.85 && hdrRate < 1.2
             ? hdrRate
@@ -966,7 +992,8 @@
           await new Promise((resolve, reject) => {
             audioEl.onended = resolve;
             audioEl.onerror = reject;
-            audioEl.play().catch(reject);
+            const p = audioEl.play();
+            if (p && typeof p.then === 'function') p.catch(reject);
           });
           URL.revokeObjectURL(url);
           if (myGen !== speakGen) { speaking = false; return; }
@@ -986,13 +1013,16 @@
       }
 
       if (myGen !== speakGen) { speaking = false; return; }
+      // Browser fallback — any available voice (prefer Indian male)
       if (window.speechSynthesis) {
         const voices = speechSynthesis.getVoices();
         const preferred =
           voices.find(v => /aman/i.test(v.name)) ||
           voices.find(v => /rishi/i.test(v.name)) ||
           voices.find(v => /en-IN/i.test(v.lang) && /male|aman|rishi/i.test(v.name)) ||
-          voices.find(v => /hi-IN/i.test(v.lang));
+          voices.find(v => /hi-IN/i.test(v.lang)) ||
+          voices.find(v => /^en/i.test(v.lang)) ||
+          voices[0];
         if (preferred) {
           if (window.OMPresence3D) {
             try { window.OMPresence3D.setSpeaking(true, 0.25); } catch (_) {}
@@ -1004,14 +1034,14 @@
             );
             u.rate = emo === 'excited' ? 1.08 : (emo === 'soft' || emo === 'concerned' ? 0.96 : 1.02);
             u.pitch = emo === 'excited' ? 1.05 : (emo === 'soft' ? 0.95 : 1.0);
+            u.volume = 1.0;
             u.voice = preferred;
             u.onend = resolve;
             u.onerror = resolve;
             speechSynthesis.speak(u);
           });
         } else {
-          console.warn('OM TTS unavailable — showing text only (no wrong voice)');
-          if (els.activity) els.activity.textContent = 'Voice offline — reply on screen';
+          console.warn('OM TTS unavailable — showing text only');
         }
       }
       if (myGen !== speakGen) { speaking = false; return; }
@@ -1094,13 +1124,15 @@
         }
         holdBuffer = '';
         if (holdTimer) { clearTimeout(holdTimer); holdTimer = null; }
-        if (data.interrupted || data.speak_client === false) {
+        // Only skip TTS on real interrupt / empty stop — never mute a real reply
+        if (data.interrupted) {
           els.reply.textContent = data.spoken || data.answer || 'Okay — stopped.';
           setState('LISTENING');
           scheduleListen(120);
           return;
         }
         showActivity([]);
+
 
         if (data.memory_line && els.memoryLine) {
           els.memoryLine.textContent = 'Memory · ' + data.memory_line;
@@ -1252,8 +1284,14 @@
             return;
           }
           if (speaking) {
-            stopSpeakingLocal();
-            api('/interrupt', { method: 'POST', body: '{}' }).catch(() => {});
+            // Ignore likely TTS echo — only barge on clear stop, or strong finals after grace
+            const elapsed = performance.now() - speakStartedAt;
+            if (isStopCommand(cleaned) || (elapsed > 900 && cleaned.split(/\s+/).length >= 3)) {
+              stopSpeakingLocal();
+              api('/interrupt', { method: 'POST', body: '{}' }).catch(() => {});
+            } else {
+              return;
+            }
           }
           if (!busy) handleTurn(cleaned);
           else if (turnQueue.length < 3) turnQueue.push(cleaned);
@@ -1327,15 +1365,26 @@
         els.privacyHint.textContent = "I'm here · just speak";
         els.livePill.classList.add('on');
         hideMicHelp();
+        // Unlock audio output on the user gesture
+        try {
+          if (bargeCtx && bargeCtx.state === 'suspended') await bargeCtx.resume();
+          const unlock = new Audio('data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA=');
+          unlock.volume = 0.01;
+          await unlock.play().catch(() => {});
+        } catch (_) {}
         if (pendingGreeting) {
           const g = pendingGreeting;
           pendingGreeting = null;
+          busy = true;
           await speak(g);
+          busy = false;
         } else {
           els.reply.textContent = "I'm here. Go ahead.";
+          busy = true;
+          await speak("I'm here. Go ahead.");
+          busy = false;
         }
         speaking = false;
-        busy = false;
         await startListening();
         els.activity.textContent = '';
       } catch (_) {
