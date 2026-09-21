@@ -12,7 +12,7 @@ class EmpathyEngine:
         "sad": ("sit_with", "I'm here with you."),
         "masked_stress": ("soft_door", "Okay — and I'm still here if you want to say more."),
         "happy": ("share_joy", "That's great to hear."),
-        "urgent": ("focus_help", "Got it — let's move quickly."),
+        "urgent": ("focus_help", "Chalo — jaldi dekhte hain."),
         "neutral": ("steady", ""),
     }
 

@@ -11,7 +11,7 @@ class EmotionDetector:
         ("stressed", 0.88, re.compile(r"(?i)\b(stress|anxious|overwhelmed|pressure|pareshaan|tension|too much)\b")),
         ("tired", 0.86, re.compile(r"(?i)\b((?:very\s+)?tired|exhausted|thak|burn(?:ed)?\s*out|no sleep|slept only)\b")),
         ("confused", 0.84, re.compile(r"(?i)\b(confus\w*|don't understand|samajh\s+nahi|not sure what|unclear)\b")),
-        ("sad", 0.84, re.compile(r"(?i)\b(sad|upset|lonely|down|udas|rough day|difficult)\b")),
+        ("sad", 0.84, re.compile(r"(?i)\b(sad|upset|lonely|down|udas|rough day|difficult|bad day)\b")),
         ("happy", 0.85, re.compile(r"(?i)\b(happy|great|excited|fixed|finally|awesome|mast)\b")),
         ("urgent", 0.88, re.compile(r"(?i)\b(urgent|asap|right now|jaldi|immediately)\b")),
         ("excited", 0.86, re.compile(r"(?i)\b(excited|let'?s go|pumped|zabardast)\b")),

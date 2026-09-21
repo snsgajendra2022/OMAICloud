@@ -38,6 +38,8 @@ class CompanionRuntime:
         self.os = None  # STEP 60 Companion OS
         self.presence = None  # STEP 64 living loop
         self.conversation_loop = None  # STEP 65 realtime
+        self.hci = None  # Real-time human conversation intelligence
+        self._hci_hold_text = ""
         self.capabilities = None  # STEP 67
         self.multimodal = None  # STEP 66
         self.improvement = None  # STEP 68
@@ -181,6 +183,18 @@ class CompanionRuntime:
                 logger.warning("conversation_loop init: %s", exc)
                 self.conversation_loop = None
 
+            # Real-time Human Conversation Intelligence (listen → timing → plan)
+            try:
+                from om_ai.core.human_conversation_intelligence import (
+                    get_human_conversation_intelligence,
+                )
+
+                self.hci = get_human_conversation_intelligence()
+                self.registry.register("human_conversation_intelligence", self.hci)
+            except Exception as exc:
+                logger.warning("human_conversation_intelligence init: %s", exc)
+                self.hci = None
+
             # STEP 66 — Multimodal
             try:
                 from om_ai.core.multimodal_intelligence import get_multimodal_router
@@ -277,12 +291,35 @@ class CompanionRuntime:
         except Exception as exc:
             logger.warning("native transcript turn failed: %s", exc)
 
+    def handle_partial(
+        self,
+        text: str,
+        *,
+        history: list[dict[str, Any]] | None = None,
+        rms: float = 0.0,
+    ) -> dict[str, Any]:
+        """Interim speech — understand without answering yet."""
+        if not self._started:
+            self.start()
+        if self.hci is None:
+            return {"ok": True, "hold": True, "mode": "partial", "partial": (text or "").strip()}
+        hist = history or (list(self.voice.session.history) if self.voice else [])
+        pack = self.hci.on_partial(text, history=hist, rms=rms)
+        if self.presence is not None:
+            try:
+                self.presence.listening()
+            except Exception:
+                pass
+        self._emit("speech.partial", {"text": (text or "")[:160], "hold": pack.get("hold")})
+        return {"ok": True, **pack}
+
     def handle_text(
         self,
         text: str,
         *,
         history: list[dict[str, Any]] | None = None,
         already_ingested: bool = False,
+        force_commit: bool = False,
     ) -> dict[str, Any]:
         if not self._started:
             self.start()
@@ -322,7 +359,7 @@ class CompanionRuntime:
                     "answer": "Muted.",
                     "spoken": "Muted.",
                     "spoken_tts": "Muted.",
-                    "activities": ["Muted microphone"],
+                    "activities": [],
                     "state": "MUTED",
                     "speak_client": False,
                     "interrupted": True,
@@ -340,7 +377,7 @@ class CompanionRuntime:
                 "answer": msg,
                 "spoken": msg,
                 "spoken_tts": msg,
-                "activities": ["Cancelled"],
+                "activities": [],
                 "state": "LISTENING",
                 "speak_client": False,
                 "interrupted": True,
@@ -372,7 +409,7 @@ class CompanionRuntime:
                     except Exception:
                         pass
                 self._emit("avatar.state", {"state": "attentive"})
-                return {"answer": reply, "activities": ["Wake detected"], "wake": True, "session": ingested.get("session")}
+                return {"answer": reply, "activities": [], "wake": True, "session": ingested.get("session")}
 
             if ingested.get("permission_response"):
                 return self._resolve_permission(ingested)
@@ -383,7 +420,7 @@ class CompanionRuntime:
                     return {
                         "answer": "",
                         "waiting_for_wake": True,
-                        "activities": ["Listening for wake word"],
+                        "activities": [],
                         "state": self.voice.state.value,
                     }
                 return {"answer": "", "error": reason, "state": self.voice.state.value}
@@ -391,13 +428,74 @@ class CompanionRuntime:
             user_text = str(ingested.get("text") or text)
             hist = history or list(self.voice.session.history)
             self._update_session_context(user_text)
-            return self._continue_turn(user_text, hist)
+            return self._continue_turn(user_text, hist, force_commit=force_commit)
         finally:
             if not already_ingested:
                 self._in_handle_text = False
 
-    def _continue_turn(self, user_text: str, hist: list[dict[str, Any]]) -> dict[str, Any]:
+    def _continue_turn(
+        self,
+        user_text: str,
+        hist: list[dict[str, Any]],
+        *,
+        force_commit: bool = False,
+    ) -> dict[str, Any]:
         assert self.voice is not None
+
+        # —— Human conversation intelligence: wait on incomplete speech ——
+        hci_pack: dict[str, Any] = {}
+        if self.hci is not None:
+            try:
+                prefs: dict[str, Any] = {}
+                try:
+                    if self.os is not None and hasattr(self.os, "memory"):
+                        prefs = dict(getattr(self.os.memory, "preferences", {}) or {})
+                except Exception:
+                    prefs = {}
+                hci_pack = self.hci.on_final(
+                    user_text,
+                    history=hist,
+                    preferences=prefs,
+                    force=force_commit,
+                )
+                if hci_pack.get("hold") and not force_commit:
+                    self._hci_hold_text = str(hci_pack.get("text") or user_text)
+                    if self.presence is not None:
+                        try:
+                            self.presence.listening()
+                        except Exception:
+                            pass
+                    self._emit("conversation.hold", {"text": self._hci_hold_text[:160]})
+                    return {
+                        "answer": "",
+                        "spoken": "",
+                        "spoken_tts": "",
+                        "activities": [],
+                        "hold": True,
+                        "commit": False,
+                        "speak_client": False,
+                        "state": "LISTENING",
+                        "meaning": hci_pack.get("meaning"),
+                        "emotion": hci_pack.get("emotion"),
+                        "timing": hci_pack.get("timing"),
+                        "hci": {"mode": "hold", "reason": "incomplete_speech"},
+                    }
+                # Use reconstructed / merged text after hold
+                if hci_pack.get("text"):
+                    user_text = str(hci_pack["text"])
+                self._hci_hold_text = ""
+                try:
+                    self.context.meta["hci"] = {
+                        "emotion": hci_pack.get("emotion"),
+                        "timing": hci_pack.get("timing"),
+                        "response_plan": hci_pack.get("response_plan"),
+                        "system_hint": hci_pack.get("system_hint") or "",
+                    }
+                    self.context.meta["hci_system_hint"] = hci_pack.get("system_hint") or ""
+                except Exception:
+                    pass
+            except Exception as exc:
+                logger.debug("hci on_final: %s", exc)
 
         if self.presence is not None:
             try:
@@ -419,7 +517,7 @@ class CompanionRuntime:
                     return {
                         "answer": msg,
                         "spoken": msg,
-                        "activities": ["Interrupted"],
+                        "activities": [],
                         "interrupted": True,
                         "state": "LISTENING",
                         "speak_client": False,
@@ -451,6 +549,23 @@ class CompanionRuntime:
         action_handled = False
         brain_out: dict[str, Any] = {}
 
+        # Empathy / comfort path from HCI — prefer human companion over blunt Q&A
+        response_plan = (hci_pack.get("response_plan") or {}) if hci_pack else {}
+        intent_name = str(((response_plan.get("intent") or {}).get("intent")) or "")
+        if (
+            not action_handled
+            and intent_name in {"comfort", "ask", "clarify"}
+            and not self._looks_like_action(user_text)
+        ):
+            comfort = self._hci_comfort_turn(user_text, hci_pack, hist)
+            if comfort:
+                brain_out = comfort
+                answer = str(comfort.get("answer") or "").strip()
+                spoken = str(comfort.get("spoken") or answer).strip()
+                spoken_tts = spoken
+                semantic = comfort.get("semantic") or {"conversation_mode": "social"}
+                action_handled = True
+
         # —— Actions FIRST (skip heavy LLM when OS intent is clear) ——
         if self.config.actions_enabled and (self.devices is not None or self.actions is not None):
             if self._looks_like_action(user_text):
@@ -469,7 +584,7 @@ class CompanionRuntime:
                             "answer": msg,
                             "spoken": msg,
                             "spoken_tts": msg,
-                            "activities": activities + ["Waiting for permission"],
+                            "activities": [],
                             "permission": decision,
                             "semantic": {"requires_action": True, "intent": "action_request"},
                             "state": "WAITING_FOR_PERMISSION",
@@ -492,10 +607,24 @@ class CompanionRuntime:
                         }
                         action_handled = True
 
-        # —— Brain for normal conversation (or soft fallback after failed action) ——
+        # —— Fast human path (voice): emotional / social turns skip slow stacked LLM ——
+        if not action_handled:
+            fast = self._fast_human_turn(user_text, hist)
+            if fast:
+                brain_out = fast
+                activities = list(fast.get("activities") or []) + activities
+                for a in activities[:6]:
+                    self._emit("brain.activity", {"activity": a})
+                semantic = fast.get("semantic") or {"conversation_mode": "social"}
+                answer = str(fast.get("answer") or "").strip()
+                spoken = str(fast.get("spoken") or answer).strip()
+                spoken_tts = str(fast.get("spoken_tts") or spoken).strip()
+                action_handled = True
+
+        # —— Brain for knowledge / complex asks ——
         if not action_handled:
             brain_out = self._run_brain(user_text, hist)
-            activities = list(brain_out.get("activities") or ["Understanding request"]) + activities
+            activities = list(brain_out.get("activities") or []) + activities
             for a in activities:
                 self._emit("brain.activity", {"activity": a})
 
@@ -546,7 +675,7 @@ class CompanionRuntime:
                         self._emit("permission.required", decision)
                         return {
                             "answer": msg,
-                            "activities": activities + ["Waiting for permission"],
+                            "activities": [],
                             "permission": decision,
                             "semantic": semantic,
                             "state": "WAITING_FOR_PERMISSION",
@@ -609,6 +738,27 @@ class CompanionRuntime:
                 answer = str(os_pack["answer"])
                 spoken = str(os_pack.get("spoken") or answer)
                 spoken_tts = str(os_pack.get("spoken_tts") or spoken)
+            # Never leave speech-timing ellipsis chrome in companion replies
+            def _clean_spoken(s: str) -> str:
+                t = re.sub(r"(?:\s*\.){2,}\s*", " ", s or "")
+                t = re.sub(r"\s{2,}", " ", t).strip(" .")
+                return t.strip()
+
+            answer = _clean_spoken(answer)
+            spoken = _clean_spoken(spoken) or answer
+            spoken_tts = _clean_spoken(spoken_tts) or spoken
+            # Restore empathy question if OS enrich stripped it
+            try:
+                q = str(
+                    (((hci_pack.get("response_plan") or {}).get("question") or {}).get("question"))
+                    or ""
+                ).strip()
+                if q and q.lower() not in spoken.lower() and intent_name in {"comfort", "ask", "clarify"}:
+                    spoken = f"{spoken.rstrip('. ')}. {q}".strip()
+                    answer = spoken
+                    spoken_tts = spoken
+            except Exception:
+                pass
             try:
                 from om_ai.core.companion_personality.voice_presence import (
                     is_garbage_spoken,
@@ -660,19 +810,24 @@ class CompanionRuntime:
         except Exception:
             pass
 
-        # Continuous learning observe (offline pipeline hook)
-        try:
-            from om_ai.core.continuous_learning import run_continuous_learning
-            run_continuous_learning(user_text, answer)
-        except Exception:
-            pass
-
-        # STEP 68 — self improvement observe (offline only)
-        if self.improvement is not None and answer:
+        # Continuous learning / self-improvement — never block the spoken reply
+        def _offline_learn() -> None:
             try:
-                self.improvement.after_turn(user_message=user_text, answer=answer)
+                from om_ai.core.continuous_learning import run_continuous_learning
+
+                run_continuous_learning(user_text, answer)
             except Exception:
                 pass
+            if self.improvement is not None and answer:
+                try:
+                    self.improvement.after_turn(user_message=user_text, answer=answer)
+                except Exception:
+                    pass
+
+        try:
+            threading.Thread(target=_offline_learn, daemon=True).start()
+        except Exception:
+            pass
 
         if self.presence is not None:
             try:
@@ -737,7 +892,8 @@ class CompanionRuntime:
             "background": os_pack.get("background"),
             "memory_line": brain_out.get("memory_line") or self._memory_line(os_pack, user_text=user_text),
             "voice_plan": os_pack.get("voice_plan") or brain_out.get("voice_plan"),
-            "activities": activities,
+            # Never expose internal pipeline chrome to the companion client
+            "activities": [],
             "semantic": semantic,
             "session": self.voice.session.to_dict(),
             "state": presence_mode or self.voice.state.value,
@@ -745,6 +901,14 @@ class CompanionRuntime:
             "speak_client": True,
             "os_step": 112,
             "alive_loop": True,
+            "hci": {
+                "emotion": (hci_pack.get("emotion") if hci_pack else None),
+                "timing": (hci_pack.get("timing") if hci_pack else None),
+                "meaning": (hci_pack.get("meaning") if hci_pack else None),
+                "response_plan": (hci_pack.get("response_plan") if hci_pack else None),
+            },
+            "hold": False,
+            "commit": True,
         }
 
     def _identity_keys(self) -> tuple[str, str]:
@@ -811,6 +975,7 @@ class CompanionRuntime:
             "skip_canned_social": True,
             "human_memory_blob": hm_blob[:1500],
             "multimodal_hint": str((self.context.meta or {}).get("multimodal_hint") or ""),
+            "hci_system_hint": str((self.context.meta or {}).get("hci_system_hint") or ""),
         }
 
         brain_out: dict[str, Any] = {}
@@ -876,7 +1041,7 @@ class CompanionRuntime:
                 brain_out = {
                     "answer": pack.get("answer") or "",
                     "semantic": (pack.get("chat_intelligence") or {}).get("intent") or {},
-                    "activities": ["Preparing answer"],
+                    "activities": [],
                 }
 
         # —— Human Companion Platform (11 systems) enriches every brain turn ——
@@ -893,11 +1058,11 @@ class CompanionRuntime:
             pack = hc.turn(
                 text,
                 history=history,
-                generate=model_generate,
+                generate=None,  # never re-call LLM here — pre_answer is enough (speed)
                 pre_answer=str(brain_out.get("answer") or brain_out.get("spoken") or ""),
                 semantic=brain_out.get("semantic") if isinstance(brain_out.get("semantic"), dict) else {},
                 skip_action=True,
-                persist=False,  # brain/memory already persist; avoid double-write
+                persist=False,
             )
             if pack.get("spoken") or pack.get("answer"):
                 brain_out["answer"] = pack.get("answer") or brain_out.get("answer")
@@ -935,6 +1100,151 @@ class CompanionRuntime:
             logger.debug("human_companion enrich failed: %s", exc)
 
         return brain_out
+
+    def _hci_comfort_turn(
+        self,
+        text: str,
+        hci_pack: dict[str, Any],
+        history: list[dict[str, Any]],
+    ) -> dict[str, Any] | None:
+        """Emotion-first companion reply driven by HCI plan + human companion brain."""
+        try:
+            from om_ai.core.human_companion import get_human_companion
+
+            plan = hci_pack.get("response_plan") or {}
+            style = plan.get("style") or {}
+            question = plan.get("question") or {}
+            emo = hci_pack.get("emotion") or {}
+            hint = str(style.get("system_hint") or hci_pack.get("system_hint") or "")
+            q = str(question.get("question") or "").strip()
+            intent_name = str((plan.get("intent") or {}).get("intent") or "")
+            gen = self._model_generate_fn()
+
+            def _gen(prompt: str, context: str = "") -> str:
+                merged = "\n".join(p for p in (hint, context) if p)
+                return gen(prompt, merged)
+
+            hc = get_human_companion()
+            out = hc.turn(
+                text,
+                history=history,
+                generate=_gen,
+                pre_answer="",
+                semantic={"conversation_mode": "social", "intent": "support"},
+                skip_action=True,
+                persist=False,
+            )
+            ans = str(out.get("answer") or out.get("spoken") or "").strip()
+            # Strip speech-timing ellipsis chrome
+            ans = re.sub(r"(?:\s*\.){2,}\s*$", "", ans).strip()
+            ans = re.sub(r"\s{2,}", " ", ans)
+            # If model/companion produced nothing usable, compose from plan signals (still dynamic)
+            if not ans or len(ans.split()) < 3:
+                label = str(emo.get("emotion") or "neutral")
+                lead = "That sounds hard." if label in {"sad", "stressed", "frustrated", "tired"} else "I'm with you."
+                if q:
+                    ans = f"{lead} {q}".strip()
+                else:
+                    ans = lead
+            # Prefer ending with the planned gentle question when missing
+            if q and q.lower() not in ans.lower() and intent_name in {"comfort", "ask", "clarify"}:
+                if not ans.rstrip().endswith("?"):
+                    ans = f"{ans.rstrip('. ')}. {q}".strip()
+            # Never allow helpdesk robotic close
+            if "how can i help" in ans.lower():
+                ans = (q and f"That sounds difficult. {q}") or "That sounds difficult. What happened?"
+            return {
+                "answer": ans,
+                "spoken": ans,
+                "spoken_tts": ans,
+                "feeling": emo.get("emotion") or "neutral",
+                "affect": emo.get("pack") or emo,
+                "emotion": emo.get("pack") or emo,
+                "friend": {"friend_move": "hci_comfort", "system_hint": hint},
+                "pipeline": ["hci", "human_companion"],
+                "activities": [],
+                "semantic": {"conversation_mode": "social", "intent": "support"},
+                "human_companion": True,
+                "hci": True,
+                "response_plan": plan,
+            }
+        except Exception as exc:
+            logger.debug("hci comfort turn failed: %s", exc)
+            return None
+
+    def _fast_human_turn(self, text: str, history: list[dict[str, Any]]) -> dict[str, Any] | None:
+        """Instant human replies for social / emotion / incomplete / wellbeing — no LLM stack."""
+        import re
+
+        low = (text or "").lower().strip()
+        # Heavy knowledge / coding still needs the full brain
+        if re.search(
+            r"(?i)\b(explain|analyze|write|code|implement|refactor|debug this|"
+            r"how does|what is the difference|prepare a report|architecture)\b",
+            low,
+        ):
+            return None
+        if len(low.split()) > 40:
+            return None
+        try:
+            from om_ai.core.human_intelligence import get_human_conversation_pipeline
+
+            locale = "hi" if any(
+                w in low for w in ("hai", "kya", "tum", "nahi", "baat", "ji", "thak")
+            ) else "en"
+            user_ctx: dict[str, Any] = {}
+            try:
+                user_ctx = dict((self.context.meta or {}).get("user_context") or {})
+            except Exception:
+                user_ctx = {}
+            out = get_human_conversation_pipeline().run(
+                text,
+                history=history,
+                profile={"name": str(user_ctx.get("name") or "")},
+                locale=locale,
+                generate=None,
+            )
+            ans = str(out.get("answer") or out.get("spoken") or "").strip()
+            if not ans or len(re.findall(r"[A-Za-z\u0900-\u097F']+", ans)) < 2:
+                return None
+            use_fast = bool(
+                out.get("listen_first")
+                or (out.get("incomplete") or {}).get("incomplete")
+                or (out.get("wellbeing") or {}).get("active")
+                or out.get("intent") in {"conversation", "share_win"}
+                or out.get("need") in {"listen_first", "support_and_listen"}
+                or re.search(r"(?i)^\s*(hey|hi|hello|namaste|thanks|thank you|ok|okay|haan)\b", low)
+            )
+            if not use_fast:
+                return None
+            emo = out.get("emotion_pack") if isinstance(out.get("emotion_pack"), dict) else {
+                "label": out.get("emotion"),
+                "emotion": out.get("emotion"),
+                "need": out.get("need"),
+                "response_style": out.get("response_style"),
+                "tone": out.get("tone"),
+            }
+            return {
+                "answer": ans,
+                "spoken": ans,
+                "spoken_tts": ans,
+                "feeling": emo.get("label") or emo.get("emotion") or "neutral",
+                "affect": emo,
+                "emotion": emo,
+                "friend": {"friend_move": "human_fast", "system_hint": out.get("system_hint")},
+                "pipeline": out.get("stages") or ["human_fast"],
+                "activities": [],
+                "semantic": {
+                    "conversation_mode": "social",
+                    "intent": out.get("intent") or "conversation",
+                },
+                "human_companion": True,
+                "fast_path": True,
+                "memory_line": str((user_ctx.get("name") or "") and f"With {user_ctx.get('name')}") or "",
+            }
+        except Exception as exc:
+            logger.debug("fast human turn failed: %s", exc)
+            return None
 
     def _model_generate_fn(self):
         """Same production chat path as /v1/chat — native weights when ready, otherwise grounded brain."""
@@ -1122,6 +1432,8 @@ class CompanionRuntime:
         from pathlib import Path
         from urllib.parse import quote_plus
 
+        from om_ai.core.companion_personality.human_speak import action_ack
+
         low = (text or "").lower()
         sess = self.voice.session if self.voice else None
         root = Path(__file__).resolve().parents[3]
@@ -1134,7 +1446,7 @@ class CompanionRuntime:
                 "arguments": {"hi": bool(re.search(r"kitna|batao|abhi|[\u0900-\u097F]", low))},
                 "reason": text[:160],
                 "risk": "LOW_IMPACT",
-                "speak_ok": "Checking the time.",
+                "speak_ok": action_ack(kind="time", user_message=text),
             }
         if any(w in low for w in ("calculator", "calc", "hisab")):
             return {
@@ -1143,7 +1455,7 @@ class CompanionRuntime:
                 "arguments": {"app": "Calculator"},
                 "reason": text[:160],
                 "risk": "LOW_IMPACT",
-                "speak_ok": "Calculator khol raha hoon.",
+                "speak_ok": action_ack(kind="app", user_message=text),
             }
         if any(w in low for w in ("notes", "notepad", "stickies")):
             app = "Notes"
@@ -1153,7 +1465,7 @@ class CompanionRuntime:
                 "arguments": {"app": app},
                 "reason": text[:160],
                 "risk": "LOW_IMPACT",
-                "speak_ok": "Notes open kar raha hoon.",
+                "speak_ok": action_ack(kind="app", user_message=text),
             }
         if re.search(r"\b(email|mail|gmail)\b", low):
             to_m = re.search(r"(?:to|ko)\s+(\S+@\S+)", low)
@@ -1167,7 +1479,7 @@ class CompanionRuntime:
                 "arguments": {"url": url},
                 "reason": text[:160],
                 "risk": "LOW_IMPACT",
-                "speak_ok": "Email draft khol raha hoon.",
+                "speak_ok": action_ack(kind="app", user_message=text),
             }
 
         # --- Volume / mute (OS control) ---
@@ -1179,7 +1491,7 @@ class CompanionRuntime:
                     "arguments": {"mute": False},
                     "reason": text[:160],
                     "risk": "LOW_IMPACT",
-                    "speak_ok": "Unmuted.",
+                    "speak_ok": action_ack(kind="volume", user_message=text),
                 }
             if re.search(r"\bmute\b", low) and "unmute" not in low:
                 return {
@@ -1188,7 +1500,7 @@ class CompanionRuntime:
                     "arguments": {"mute": True},
                     "reason": text[:160],
                     "risk": "LOW_IMPACT",
-                    "speak_ok": "Muted.",
+                    "speak_ok": action_ack(kind="volume", user_message=text),
                 }
             level = 50
             if any(w in low for w in ("badhao", "up", "increase", "louder", "zyada", "full", "max")):
@@ -1204,7 +1516,7 @@ class CompanionRuntime:
                 "arguments": {"level": level},
                 "reason": text[:160],
                 "risk": "LOW_IMPACT",
-                "speak_ok": f"Volume set to {level}.",
+                "speak_ok": action_ack(kind="volume", user_message=text),
             }
 
         # --- YouTube / Google / weather (browser) ---
@@ -1228,7 +1540,32 @@ class CompanionRuntime:
                 "arguments": {"url": url},
                 "reason": text[:160],
                 "risk": "LOW_IMPACT",
-                "speak_ok": "YouTube khol raha hoon." if any(c in low for c in ("khol", "karo")) else "Opening YouTube.",
+                "speak_ok": action_ack(kind="youtube", query=q, user_message=text),
+            }
+
+        # Prefer explicit search/google over weather keyword false-positives
+        if re.search(r"\b(google|search|browser)\b", low) or "search karo" in low:
+            mq = re.search(
+                r"(?:google(?:\s+search)?|search(?:\s+for)?|khoj)\s+(.+)$",
+                low,
+            )
+            q = (mq.group(1).strip(" .") if mq else "").strip()
+            for junk in ("kholo", "khol", "open", "please", "karo", "on google", "pe", "par"):
+                q = re.sub(rf"\b{re.escape(junk)}\b", "", q).strip()
+            if q.lower().startswith("search "):
+                q = q[7:].strip()
+            url = (
+                f"https://www.google.com/search?q={quote_plus(q)}"
+                if q
+                else "https://www.google.com"
+            )
+            return {
+                "action": "browser.open",
+                "target": url,
+                "arguments": {"url": url},
+                "reason": text[:160],
+                "risk": "LOW_IMPACT",
+                "speak_ok": action_ack(kind="search", query=q, user_message=text),
             }
 
         if any(w in low for w in ("mausam", "weather", "forecast", "temperature")):
@@ -1250,31 +1587,7 @@ class CompanionRuntime:
                 "arguments": {"city": city, "locale_hi": "mausam" in low or bool(re.search(r"[\u0900-\u097F]", text or ""))},
                 "reason": text[:160],
                 "risk": "LOW_IMPACT",
-                "speak_ok": "Mausam check kar raha hoon." if "mausam" in low else "Checking the weather.",
-            }
-
-        if re.search(r"\b(google|search|browser)\b", low) or "search karo" in low:
-            mq = re.search(
-                r"(?:google(?:\s+search)?|search(?:\s+for)?|khoj)\s+(.+)$",
-                low,
-            )
-            q = (mq.group(1).strip(" .") if mq else "").strip()
-            for junk in ("kholo", "khol", "open", "please", "karo", "on google"):
-                q = q.replace(junk, "").strip()
-            if q.lower().startswith("search "):
-                q = q[7:].strip()
-            url = (
-                f"https://www.google.com/search?q={quote_plus(q)}"
-                if q
-                else "https://www.google.com"
-            )
-            return {
-                "action": "browser.open",
-                "target": url,
-                "arguments": {"url": url},
-                "reason": text[:160],
-                "risk": "LOW_IMPACT",
-                "speak_ok": "Searching." if q else "Opening the browser.",
+                "speak_ok": action_ack(kind="weather", query=city, user_message=text),
             }
 
         # Resolve "it" / project references from session context
@@ -1368,11 +1681,11 @@ class CompanionRuntime:
         if decision != "approve":
             msg = "Okay — cancelled."
             self.voice.speak(msg)
-            return {"answer": msg, "activities": ["Permission denied"], "permission_id": pid}
+            return {"answer": msg, "activities": [], "permission_id": pid}
         result = self._execute_action(planned)
         msg = result.get("message") or ("Done." if result.get("ok") else "I couldn't complete that.")
         self.voice.speak(msg)
-        return {"answer": msg, "activities": ["Executed after approval"], "result": result}
+        return {"answer": msg, "activities": [], "result": result}
 
     def _execute_action(self, planned: dict[str, Any]) -> dict[str, Any]:
         self._emit("action.started", planned)

@@ -23,13 +23,14 @@ from .turn_manager import TurnManager
 
 logger = logging.getLogger(__name__)
 
+# Internal only — never surface pipeline chrome to the companion HUD
 _PUBLIC_ACTIVITIES = {
-    "companion": "Companion ready",
-    "understand": "Getting the gist",
-    "remember": "Recalling context",
-    "plan": "Choosing approach",
-    "respond": "Composing reply",
-    "listen": "Listening",
+    "companion": "",
+    "understand": "",
+    "remember": "",
+    "plan": "",
+    "respond": "",
+    "listen": "",
 }
 
 
@@ -87,7 +88,7 @@ class CompanionRuntime:
         model_context: str = "",
         extra: dict[str, Any] | None = None,
     ) -> dict[str, Any]:
-        activities: list[str] = [_PUBLIC_ACTIVITIES["companion"]]
+        activities: list[str] = []
         meta: dict[str, Any] = {"runtime": "companion_brain"}
         q = (message or "").strip()
 
@@ -103,14 +104,13 @@ class CompanionRuntime:
         session.interrupted = interrupt.get("interrupted", False)
 
         if not q:
-            activities.append(_PUBLIC_ACTIVITIES["listen"])
             return {
                 "answer": rescue_spoken(q),
                 "spoken": rescue_spoken(q),
                 "spoken_tts": rescue_spoken(q),
                 "heard": q,
                 "handled": True,
-                "activities": activities,
+                "activities": [],
                 "semantic": {
                     "intent": "empty",
                     "goal": "invite",
@@ -139,7 +139,6 @@ class CompanionRuntime:
         vp = get_voice_presence()
         locale = detect_speech_locale(q)
         emotion = vp.emotion.detect(q)
-        activities.append(_PUBLIC_ACTIVITIES["understand"])
         hist = self.conversations.history_for(session, external=history)
         intent = self.intent_engine.analyze(q, history=hist)
         human_ctx = self.human.build(message=q, history=hist)
@@ -153,7 +152,6 @@ class CompanionRuntime:
         meta["semantic"] = semantic
         meta["voice_presence"] = {"locale": locale, "emotion": emotion}
 
-        activities.append(_PUBLIC_ACTIVITIES["remember"])
         recall = self.memory.recall(
             q,
             session_key=session.session_key,
@@ -282,7 +280,6 @@ class CompanionRuntime:
             context_blob=human_ctx.get("context_blob") or "",
         )
 
-        activities.append(_PUBLIC_ACTIVITIES["plan"])
         plan = self.planner.plan(
             semantic,
             policy,
@@ -322,30 +319,38 @@ class CompanionRuntime:
         ]
         merged_context = "\n".join(p for p in ctx_parts if p).strip()[:4000]
 
-        activities.append(_PUBLIC_ACTIVITIES["respond"])
         # Prefer human-layer seed for listen/support/incomplete turns
         seed = ""
         if human_layer.get("listen_first") or (human_layer.get("incomplete") or {}).get("incomplete"):
             seed = str(human_layer.get("answer_seed") or human_layer.get("natural_ask") or "").strip()
 
-        gen = self.response.generate(
-            q,
-            strategy=strat,
-            history=hist,
-            tenant_id=tenant_id,
-            actor=actor,
-            model_generate=model_generate,
-            model_context=merged_context,
-            extra={
-                **(extra or {}),
-                "semantic": semantic,
-                "interrupt": interrupt,
-                "voice_mode": True,
-                "skip_canned_social": True,
-                "pre_answer": seed,
-            },
-        )
-        answer = str(gen.get("answer") or seed or "").strip()
+        # Voice speed: if we already have a human seed, skip the slow LLM generate
+        if seed and (
+            human_layer.get("listen_first")
+            or (human_layer.get("incomplete") or {}).get("incomplete")
+            or (human_layer.get("wellbeing") or {}).get("active")
+        ):
+            answer = seed
+            gen = {"answer": seed, "source": "human_layer_fast"}
+        else:
+            gen = self.response.generate(
+                q,
+                strategy=strat,
+                history=hist,
+                tenant_id=tenant_id,
+                actor=actor,
+                model_generate=model_generate,
+                model_context=merged_context,
+                extra={
+                    **(extra or {}),
+                    "semantic": semantic,
+                    "interrupt": interrupt,
+                    "voice_mode": True,
+                    "skip_canned_social": True,
+                    "pre_answer": seed,
+                },
+            )
+            answer = str(gen.get("answer") or seed or "").strip()
         answer = self.personality.finalize(
             answer,
             personality_pack,
@@ -395,7 +400,7 @@ class CompanionRuntime:
             "spoken_tts": voice_pack.get("spoken_tts") or answer,
             "heard": q,
             "handled": True,
-            "activities": activities,
+            "activities": [],
             "semantic": semantic,
             "intent": intent.to_dict(),
             "feeling": affect.get("label") or "neutral",
@@ -440,7 +445,7 @@ def run_companion_brain(message: str, **kwargs: Any) -> dict[str, Any]:
         return {
             "answer": "",
             "handled": False,
-            "activities": ["Companion paused"],
+            "activities": [],
             "meta": {"disabled": True},
             "semantic": {},
         }

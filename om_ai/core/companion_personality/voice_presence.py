@@ -47,6 +47,13 @@ _GARBAGE_MARKERS = (
     "cannot understand",
     "say that again",
     "in your own words",
+    "got it — thinking",
+    "got it - thinking",
+    "understanding request",
+    "companion ready",
+    "composing reply",
+    "choosing approach",
+    "getting the gist",
     "share a bit more detail",
     "share one more detail",
     "goal, error, or constraint",
@@ -235,10 +242,11 @@ def soft_listening_fallback(
     conversation_state: dict[str, Any] | None = None,
     response_engine=None,
 ) -> str:
-    """Dynamic recovery — live generate first, then signal-composed line."""
+    """Fast human recovery — prefer signal composition; skip slow live LLM on voice path."""
     context = dict(context or {})
     conversation_state = conversation_state or {}
     emotion = emotion or context.get("emotion") or "neutral"
+    allow_live = bool(context.get("allow_live_recovery"))
 
     if response_engine:
         try:
@@ -256,10 +264,13 @@ def soft_listening_fallback(
         except Exception:
             pass
 
-    # Live brain recovery (dynamic — not a template library)
-    live = _live_recovery_generate(user_message, locale=locale, emotion=str(emotion), context=context)
-    if live and not is_garbage_spoken(live) and len(re.findall(r"[A-Za-z\u0900-\u097F]+", live)) >= 5:
-        return live
+    # Live LLM recovery is slow (often 20–60s) — only when explicitly allowed
+    if allow_live:
+        live = _live_recovery_generate(
+            user_message, locale=locale, emotion=str(emotion), context=context
+        )
+        if live and not is_garbage_spoken(live) and len(re.findall(r"[A-Za-z\u0900-\u097F]+", live)) >= 5:
+            return live
 
     if context.get("last_response") and not is_garbage_spoken(str(context["last_response"])):
         return str(context["last_response"])

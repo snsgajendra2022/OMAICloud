@@ -49,6 +49,30 @@ class FriendMind:
             hint_parts.append(
                 "A friend would own the robotic vibe, promise natural talk, and invite the next beat."
             )
+        elif re.search(r"\b(google|search|khoj|browser)\b|search\s+karo", low):
+            stance = "act"
+            friend_move = "commit_then_do"
+            mq = re.search(
+                r"(?:google(?:\s+search)?|search(?:\s+for)?|khoj)\s+(.+)$",
+                low,
+            )
+            topic_q = (mq.group(1).strip(" .") if mq else "").strip()
+            if locale == "hi":
+                if topic_q:
+                    hint_parts.append(
+                        f"Speak like a friend: Theek hai {addr}, main '{topic_q}' search karke bataata hun. Then do it."
+                    )
+                else:
+                    hint_parts.append(
+                        f"Speak like a friend: Theek hai {addr}, main search karta hun."
+                    )
+            else:
+                if topic_q:
+                    hint_parts.append(
+                        f"Speak like a friend: Alright {addr} — I'll search for {topic_q} and tell you."
+                    )
+                else:
+                    hint_parts.append(f"Speak like a friend: Alright {addr} — searching now.")
         elif label in {"frustration", "stress", "urgency", "sad"}:
             stance = "support"
             friend_move = "validate_then_one_step"

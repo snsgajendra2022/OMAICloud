@@ -3,12 +3,7 @@ from __future__ import annotations
 
 import random
 
-EXPERIENCE_PHASES = (
-    "Thinking…",
-    "Checking context…",
-    "Creating architecture…",
-    "Here is the solution…",
-)
+EXPERIENCE_PHASES = ()
 
 _OPENERS_GREETING = (
     "Hey — good to see you.",
@@ -16,8 +11,8 @@ _OPENERS_GREETING = (
     "Hey there.",
 )
 _OPENERS_GENERAL = (
-    "Got it.",
-    "I understand what you need.",
+    "Alright.",
+    "I hear you.",
     "Let's dig in.",
     "Here's the clear take.",
 )

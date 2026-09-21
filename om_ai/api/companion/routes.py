@@ -21,6 +21,14 @@ class MessageBody(BaseModel):
     history: list[dict[str, Any]] | None = None
     session_id: str | None = None
     speak: bool = True
+    force_commit: bool = False
+
+
+class PartialBody(BaseModel):
+    text: str = Field(..., min_length=1, max_length=8000)
+    history: list[dict[str, Any]] | None = None
+    session_id: str | None = None
+    rms: float = 0.0
 
 
 class SessionBody(BaseModel):
@@ -377,19 +385,41 @@ def companion_message(body: MessageBody) -> dict[str, Any]:
             rt.context.session_id = str(body.session_id).strip()
         except Exception:
             pass
-    out = rt.handle_text(body.text, history=body.history)
+    out = rt.handle_text(
+        body.text,
+        history=body.history,
+        force_commit=bool(body.force_commit),
+    )
     # Prefer browser TTS for lip-sync + no double-speak from macOS say on server
     if rt.voice is not None:
         try:
             rt.voice.interrupt_speech()
         except Exception:
             pass
-    # Stop / interrupt turns must not re-trigger client TTS
-    if out.get("interrupted") or out.get("speak_client") is False or body.speak is False:
+    # Stop / interrupt / hold turns must not re-trigger client TTS
+    if out.get("hold") or out.get("interrupted") or out.get("speak_client") is False or body.speak is False:
         out["speak_client"] = False
     else:
         out["speak_client"] = True
     out["session_id"] = rt.context.session_id
+    # Never leak internal pipeline activity chrome to the companion HUD
+    out["activities"] = []
+    return out
+
+
+@router.post("/partial")
+def companion_partial(body: PartialBody) -> dict[str, Any]:
+    """Interim speech understanding — no answer yet."""
+    rt = _ensure_browser_session()
+    if body.session_id and str(body.session_id).strip():
+        try:
+            rt.context.session_id = str(body.session_id).strip()
+        except Exception:
+            pass
+    out = rt.handle_partial(body.text, history=body.history, rms=float(body.rms or 0.0))
+    out["session_id"] = rt.context.session_id
+    out["activities"] = []
+    out["speak_client"] = False
     return out
 
 
@@ -623,7 +653,7 @@ async def companion_hear(audio: UploadFile = File(...)) -> dict[str, Any]:
             "transcript": "",
             "stt": stt_meta,
             "speak_client": True,
-            "activities": ["Listening"],
+            "activities": [],
         }
 
     out = rt.handle_text(text)

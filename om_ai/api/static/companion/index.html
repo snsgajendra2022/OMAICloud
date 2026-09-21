@@ -276,7 +276,7 @@
   <div class="shell">
     <header>
       <div class="brand">OM</div>
-      <div class="hint" id="privacyHint">Personal companion · always listening</div>
+      <div class="hint" id="privacyHint">OM · with you</div>
     </header>
 
     <main class="stage">
@@ -342,17 +342,17 @@
         </div>
       </div>
 
-      <div class="status" id="statusRow"><i></i><span id="stateLabel">Starting</span></div>
+      <div class="status" id="statusRow"><i></i><span id="stateLabel">READY</span></div>
       <div class="wave" id="wave"><span></span><span></span><span></span><span></span><span></span></div>
-      <div class="live-pill" id="livePill"><span>●</span> Always listening — just speak</div>
+      <div class="live-pill" id="livePill"><span>●</span> Just speak</div>
       <p class="heard" id="heard"></p>
       <p class="feeling" id="feeling"></p>
-      <p class="said" id="reply">Connecting to OM…</p>
-      <p class="memory-line" id="memoryLine">Memory · connecting</p>
-      <p class="activity" id="activity"></p>
+      <p class="said" id="reply"></p>
+      <p class="memory-line" id="memoryLine"></p>
+      <p class="activity" id="activity" hidden aria-hidden="true"></p>
 
       <!-- Browsers require ONE user gesture the first time only -->
-      <button class="enable-once" id="btnEnable" type="button">Enable always-on listening</button>
+      <button class="enable-once" id="btnEnable" type="button">Tap to talk with OM</button>
 
       <div class="mic-help" id="micHelp">
         <strong>Microphone blocked</strong>
@@ -412,6 +412,12 @@
     let chatHistory = [];
     let companionWs = null;
     let lastVoicePlan = null;
+    let holdBuffer = '';
+    let holdTimer = null;
+    let lastPartialAt = 0;
+    let partialTimer = null;
+    const HOLD_MS = 950; // wait for incomplete thought before committing
+
 
     /* —— White emission particle core (Jarvis HUD) —— */
     const core = { particles: [], raf: 0, w: 0, h: 0, ctx: null };
@@ -599,35 +605,6 @@
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     const isLocal = /^(localhost|127\.0\.0\.1)$/i.test(location.hostname);
 
-    function setState(state, presenceMode) {
-      const s = String(state || 'idle').toLowerCase();
-      let mode = 'idle';
-      if (muted) mode = 'muted';
-      else if (s.includes('speak')) mode = 'speaking';
-      else if (s.includes('think') || s.includes('understand') || s.includes('generat') || s.includes('plan') || s.includes('transcrib') || s.includes('remember')) mode = 'thinking';
-      else if (s.includes('listen') || alwaysOn) mode = 'listening';
-      else if (s.includes('permission')) mode = 'waiting_permission';
-      else if (['attentive','curious','focused','concerned','excited','confused','waiting','explaining','silent_listening'].includes(s)) {
-        mode = (s === 'excited' || s === 'explaining') ? 'speaking' : (s === 'silent_listening' || s === 'attentive' ? 'listening' : 'thinking');
-      }
-      els.orbWrap.dataset.state = mode;
-      if (presenceMode) els.orbWrap.dataset.presence = String(presenceMode).toLowerCase();
-      else if (s && s !== mode) els.orbWrap.dataset.presence = s;
-      const presenceLabel = (els.orbWrap.dataset.presence || mode || state || 'Idle').replace(/_/g, ' ');
-      els.stateLabel.textContent = muted ? 'MUTED' : (alwaysOn && mode === 'listening' && !els.orbWrap.dataset.presence ? 'ALWAYS LISTENING' : presenceLabel.toUpperCase());
-      els.statusRow.dataset.mode = muted ? 'muted' : '';
-      els.wave.classList.toggle('on', mode === 'listening' || mode === 'speaking');
-      els.livePill.classList.toggle('on', alwaysOn && !muted);
-      if (window.OMPresence3D) {
-        try {
-          window.OMPresence3D.setPresence(els.orbWrap.dataset.presence || mode);
-          window.OMPresence3D.setSpeaking(mode === 'speaking', mode === 'speaking' ? 0.22 : 0);
-        } catch (_) {}
-      }
-      if (mode === 'speaking') startEnergy(); else if (mode !== 'listening') stopEnergy();
-      else energyBoost = Math.max(energyBoost, 0.25);
-    }
-
     function startEnergy() {
       energyBoost = 1.2;
     }
@@ -640,8 +617,47 @@
     startHud();
 
     function showActivity(items) {
-      if (!items || !items.length) return;
-      els.activity.textContent = items.slice(0, 6).map((x) => '✓ ' + String(x)).join('  ');
+      // Never dump internal pipeline chrome on the HUD (production companion)
+      els.activity.textContent = '';
+    }
+
+    function setState(state, presenceMode) {
+      const s = String(state || 'idle').toLowerCase();
+      let mode = 'idle';
+      if (muted) mode = 'muted';
+      else if (s.includes('speak')) mode = 'speaking';
+      else if (s.includes('think') || s.includes('understand') || s.includes('generat') || s.includes('plan') || s.includes('transcrib') || s.includes('remember')) mode = 'listening';
+      else if (s.includes('listen') || alwaysOn) mode = 'listening';
+      else if (s.includes('permission')) mode = 'waiting_permission';
+      else if (['attentive','curious','focused','concerned','excited','confused','waiting','explaining','silent_listening'].includes(s)) {
+        mode = (s === 'excited' || s === 'explaining') ? 'speaking' : 'listening';
+      }
+      els.orbWrap.dataset.state = mode;
+      if (presenceMode && !String(presenceMode).toLowerCase().includes('think') && !String(presenceMode).toLowerCase().includes('understand')) {
+        els.orbWrap.dataset.presence = String(presenceMode).toLowerCase();
+      } else {
+        els.orbWrap.dataset.presence = mode;
+      }
+      // Human labels only — never THINKING / UNDERSTANDING chrome
+      let label = 'WITH YOU';
+      if (muted) label = 'MUTED';
+      else if (mode === 'speaking') label = 'SPEAKING';
+      else if (mode === 'waiting_permission') label = 'NEEDING A YES';
+      else if (alwaysOn) label = 'LISTENING';
+      else label = 'READY';
+      els.stateLabel.textContent = label;
+      els.statusRow.dataset.mode = muted ? 'muted' : '';
+      els.wave.classList.toggle('on', mode === 'listening' || mode === 'speaking');
+      els.livePill.classList.toggle('on', alwaysOn && !muted);
+      if (window.OMPresence3D) {
+        try {
+          window.OMPresence3D.setPresence(els.orbWrap.dataset.presence || mode);
+          window.OMPresence3D.setSpeaking(mode === 'speaking', mode === 'speaking' ? 0.22 : 0);
+        } catch (_) {}
+      }
+      if (mode === 'speaking') startEnergy(); else if (mode !== 'listening') stopEnergy();
+      else energyBoost = Math.max(energyBoost, 0.25);
+      els.activity.textContent = '';
     }
 
     function showMicBlocked(reason) {
@@ -884,15 +900,22 @@
     async function speak(text, emotion, voicePlan) {
       const say = String(text || '').trim();
       if (!say || muted) {
+        speaking = false;
         setState('LISTENING');
-        scheduleListen(200);
+        scheduleListen(120);
         flushTurnQueue();
         return;
       }
-      stopSpeakingLocal();
+      // Do not bump speakGen here via stopSpeakingLocal before assigning myGen —
+      // only cancel prior audio, then own this generation.
+      if (window.speechSynthesis) window.speechSynthesis.cancel();
+      if (audioEl) { try { audioEl.pause(); audioEl.src = ''; } catch (_) {} audioEl = null; }
+      speakGen += 1;
       const myGen = speakGen;
       speaking = true;
       setState('SPEAKING', 'speaking');
+      // Pause STT while OM talks (avoids echo / false finals)
+      try { if (recognition) recognition.stop(); } catch (_) {}
       const emo = emotion || (voicePlan && voicePlan.emotion) || 'calm';
       try {
         const res = await fetch('/api/companion/tts', {
@@ -904,7 +927,10 @@
             presence: (voicePlan && voicePlan.presence) || 'speaking',
           }),
         });
-        if (myGen !== speakGen) return;
+        if (myGen !== speakGen) {
+          speaking = false;
+          return;
+        }
         if (res.ok) {
           let lipsPlan = (voicePlan && voicePlan.lips) || null;
           const lipsHdr = res.headers.get('X-OM-Lips');
@@ -924,9 +950,9 @@
               }
             } catch (_) {}
           }
-          if (myGen !== speakGen) return;
+          if (myGen !== speakGen) { speaking = false; return; }
           const blob = await res.blob();
-          if (myGen !== speakGen) return;
+          if (myGen !== speakGen) { speaking = false; return; }
           const url = URL.createObjectURL(blob);
           audioEl = new Audio(url);
           const hdrRate = Number(res.headers.get('X-OM-Playback-Rate') || '');
@@ -943,25 +969,23 @@
             audioEl.play().catch(reject);
           });
           URL.revokeObjectURL(url);
-          if (myGen !== speakGen) return;
+          if (myGen !== speakGen) { speaking = false; return; }
           speaking = false;
           if (lipRaf) { cancelAnimationFrame(lipRaf); lipRaf = 0; }
           if (window.OMPresence3D) {
             try { window.OMPresence3D.setSpeaking(false, 0); } catch (_) {}
           }
           setState('LISTENING');
-          scheduleListen(350);
+          scheduleListen(200);
           flushTurnQueue();
           return;
         }
-        // Prefer silence over wrong robotic browser voice when Aman TTS fails
         console.warn('OM TTS failed — status', res.status);
       } catch (e) {
         console.warn('OM TTS error', e);
       }
 
-      if (myGen !== speakGen) return;
-      // Fallback ONLY with Indian male voice — never random US/UK robotic voice
+      if (myGen !== speakGen) { speaking = false; return; }
       if (window.speechSynthesis) {
         const voices = speechSynthesis.getVoices();
         const preferred =
@@ -990,23 +1014,27 @@
           if (els.activity) els.activity.textContent = 'Voice offline — reply on screen';
         }
       }
-      if (myGen !== speakGen) return;
+      if (myGen !== speakGen) { speaking = false; return; }
       speaking = false;
       if (window.OMPresence3D) {
         try { window.OMPresence3D.setSpeaking(false, 0); } catch (_) {}
       }
       setState('LISTENING');
-      scheduleListen(200);
+      scheduleListen(150);
       flushTurnQueue();
     }
 
-    async function handleTurn(text) {
+    async function handleTurn(text, opts) {
+      const options = opts || {};
+      const forceCommit = !!options.forceCommit;
       const q = String(text || '').trim();
       if (!q) return;
       // Stop must always win — even mid-speech / mid-brain
       if (isStopCommand(q)) {
         turnGen += 1;
         turnQueue = [];
+        holdBuffer = '';
+        if (holdTimer) { clearTimeout(holdTimer); holdTimer = null; }
         stopSpeakingLocal();
         busy = false;
         els.heard.textContent = 'You said: ' + q;
@@ -1021,7 +1049,7 @@
         scheduleListen(120);
         return;
       }
-      if (busy) {
+      if (busy && !forceCommit) {
         // Queue instead of dropping overlapping finals
         if (turnQueue.length < 3 && turnQueue[turnQueue.length - 1] !== q) turnQueue.push(q);
         return;
@@ -1033,8 +1061,8 @@
       stopSpeakingLocal();
       els.heard.textContent = 'You said: ' + q;
       if (els.feeling) els.feeling.textContent = '';
-      setState('UNDERSTANDING', 'thinking');
-      pushHistory('user', q);
+      setState('LISTENING');
+      if (!forceCommit) pushHistory('user', q);
       try {
         if (!sessionId) await startSession();
         const data = await api('/message', {
@@ -1043,18 +1071,37 @@
             text: q,
             session_id: sessionId,
             speak: true,
+            force_commit: forceCommit,
             history: chatHistory.slice(-12),
           }),
         });
         if (myTurn !== turnGen) return;
         if (data.session_id) sessionId = data.session_id;
+        // Incomplete speech — keep listening, commit after natural pause
+        if (data.hold) {
+          holdBuffer = q;
+          busy = false;
+          setState('LISTENING');
+          if (holdTimer) clearTimeout(holdTimer);
+          holdTimer = setTimeout(() => {
+            const buf = holdBuffer;
+            holdBuffer = '';
+            holdTimer = null;
+            if (buf) handleTurn(buf, { forceCommit: true });
+          }, HOLD_MS);
+          scheduleListen(80);
+          return;
+        }
+        holdBuffer = '';
+        if (holdTimer) { clearTimeout(holdTimer); holdTimer = null; }
         if (data.interrupted || data.speak_client === false) {
           els.reply.textContent = data.spoken || data.answer || 'Okay — stopped.';
           setState('LISTENING');
           scheduleListen(120);
           return;
         }
-        if (data.activities) showActivity(data.activities);
+        showActivity([]);
+
         if (data.memory_line && els.memoryLine) {
           els.memoryLine.textContent = 'Memory · ' + data.memory_line;
         } else if (data.human_memory && els.memoryLine) {
@@ -1130,10 +1177,10 @@
       if (!SpeechRecognition) return null;
       if (recognition) return recognition;
       recognition = new SpeechRecognition();
-      recognition.continuous = true;      // always-on
+      // continuous=true is flaky on Chrome/macOS (silent fail after greeting).
+      // Restart on every onend instead — much more reliable for always-on.
+      recognition.continuous = false;
       recognition.interimResults = true;
-      // en-IN: English + Hinglish. Forced hi-IN turns English into Devanagari phonetics
-      // (e.g. "what are you doing" → "व्हाट आर यू डूइंग") and breaks replies.
       const nav = (navigator.language || '').toLowerCase();
       recognition.lang = nav.startsWith('hi') ? 'hi-IN' : 'en-IN';
       recognition.maxAlternatives = 3;
@@ -1141,14 +1188,14 @@
       recognition.onstart = () => {
         listening = true;
         setState('LISTENING');
-        els.activity.textContent = 'Speak anytime — no click needed';
+        els.activity.textContent = '';
+        els.livePill.classList.add('on');
       };
 
       recognition.onresult = (event) => {
         let interim = '';
         let finalText = '';
         for (let i = event.resultIndex; i < event.results.length; i++) {
-          // Prefer Latin transcript if alternatives include English (hi-IN quirk)
           let chunk = event.results[i][0].transcript;
           if (event.results[i].length > 1) {
             for (let a = 0; a < event.results[i].length; a++) {
@@ -1162,15 +1209,52 @@
           if (event.results[i].isFinal) finalText += chunk;
           else interim += chunk;
         }
-        if (interim) els.heard.textContent = interim;
+        if (interim) {
+          els.heard.textContent = interim;
+          lastPartialAt = Date.now();
+          // Soft partial understanding — no answer yet
+          if (partialTimer) clearTimeout(partialTimer);
+          partialTimer = setTimeout(() => {
+            const t = String(interim || els.heard.textContent || '').trim();
+            if (!t || busy || speaking) return;
+            api('/partial', {
+              method: 'POST',
+              body: JSON.stringify({
+                text: t,
+                session_id: sessionId,
+                history: chatHistory.slice(-8),
+                rms: energyBoost || 0,
+              }),
+            }).catch(() => {});
+          }, 280);
+          // Extending hold if user still speaking mid-thought
+          if (holdBuffer) {
+            holdBuffer = (holdBuffer + ' ' + interim).replace(/\s+/g, ' ').trim();
+            if (holdTimer) {
+              clearTimeout(holdTimer);
+              holdTimer = setTimeout(() => {
+                const buf = holdBuffer;
+                holdBuffer = '';
+                holdTimer = null;
+                if (buf) handleTurn(buf, { forceCommit: true });
+              }, HOLD_MS);
+            }
+          }
+        }
         if (finalText) {
-          const cleaned = String(finalText).trim();
+          let cleaned = String(finalText).trim();
+          if (holdBuffer && cleaned && !cleaned.toLowerCase().startsWith(holdBuffer.toLowerCase().slice(0, 8))) {
+            cleaned = (holdBuffer + ' ' + cleaned).replace(/\s+/g, ' ').trim();
+          }
+          els.heard.textContent = cleaned;
           if (isStopCommand(cleaned)) {
             handleTurn(cleaned);
             return;
           }
-          // Barge-in while OM is speaking
-          if (speaking) stopSpeakingLocal();
+          if (speaking) {
+            stopSpeakingLocal();
+            api('/interrupt', { method: 'POST', body: '{}' }).catch(() => {});
+          }
           if (!busy) handleTurn(cleaned);
           else if (turnQueue.length < 3) turnQueue.push(cleaned);
         }
@@ -1178,26 +1262,27 @@
 
       recognition.onerror = (e) => {
         listening = false;
-        if (e.error === 'not-allowed' || e.error === 'service-not-allowed') {
-          showMicBlocked(e.error);
+        const err = e.error || '';
+        if (err === 'not-allowed' || err === 'service-not-allowed') {
+          showMicBlocked(err);
           return;
         }
-        // no-speech / aborted are normal in continuous mode — keep going
-        if (alwaysOn && !muted && e.error !== 'aborted') {
-          scheduleListen(400);
+        if (alwaysOn && !muted && err !== 'aborted') {
+          scheduleListen(err === 'no-speech' ? 80 : 350);
         }
       };
 
       recognition.onend = () => {
         listening = false;
-        // Instantly reopen ears — Jarvis style
-        if (alwaysOn && !muted) scheduleListen(120);
+        if (alwaysOn && !muted && !speaking) scheduleListen(80);
       };
       return recognition;
     }
 
     async function startListening(silent) {
-      if (!alwaysOn || muted || busy) return;
+      if (!alwaysOn || muted) return;
+      // Allow restart even while busy finishing — otherwise ears stay closed
+      if (busy && speaking) return;
       try {
         await ensureMicPermission();
       } catch (_) {
@@ -1205,15 +1290,23 @@
       }
       const rec = ensureRecognition();
       if (!rec) {
-        els.activity.textContent = 'This browser has no speech engine — use Chrome or Safari';
+        els.activity.textContent = 'Use Chrome or Edge — this browser has no speech engine';
+        els.btnEnable.classList.remove('hidden');
         return;
       }
       try {
         if (!listening) rec.start();
         if (!silent) setState('LISTENING');
-      } catch (_) {
-        // InvalidStateError if already started
-        scheduleListen(500);
+      } catch (err) {
+        // Already started / invalid state — recreate and retry once
+        try {
+          recognition = null;
+          listening = false;
+          const rec2 = ensureRecognition();
+          if (rec2) rec2.start();
+        } catch (_) {
+          scheduleListen(600);
+        }
       }
     }
 
@@ -1221,7 +1314,6 @@
       if (restartTimer) clearTimeout(restartTimer);
       if (recognition) {
         try { recognition.onend = null; recognition.stop(); } catch (_) {}
-        // rebind onend for next create
         recognition = null;
       }
       listening = false;
@@ -1232,7 +1324,7 @@
         await ensureMicPermission();
         alwaysOn = true;
         els.btnEnable.classList.add('hidden');
-        els.privacyHint.textContent = 'Always listening · just speak';
+        els.privacyHint.textContent = "I'm here · just speak";
         els.livePill.classList.add('on');
         hideMicHelp();
         if (pendingGreeting) {
@@ -1240,10 +1332,16 @@
           pendingGreeting = null;
           await speak(g);
         } else {
-          els.reply.textContent = 'I’m listening. Talk to me anytime.';
-          await startListening();
+          els.reply.textContent = "I'm here. Go ahead.";
         }
-      } catch (_) {}
+        speaking = false;
+        busy = false;
+        await startListening();
+        els.activity.textContent = '';
+      } catch (_) {
+        els.btnEnable.classList.remove('hidden');
+        els.activity.textContent = 'Click Enable and Allow microphone';
+      }
     }
 
     async function micAlreadyGranted() {
@@ -1282,9 +1380,9 @@
           await enableAlwaysOn();
         } else {
           setState('READY');
-          els.reply.textContent = 'One Allow for the mic — then I stay open. No more clicking.';
-          els.activity.textContent = 'Required once by the browser, then always listening';
-          els.btnEnable.textContent = 'Enable always-on listening';
+          els.reply.textContent = 'Tap below — then just talk to me.';
+          els.activity.textContent = '';
+          els.btnEnable.textContent = 'Tap to talk with OM';
         }
       })
       .catch((e) => {

@@ -1,0 +1,177 @@
+{
+  "status": "completed",
+  "cached": false,
+  "user_profile": {
+    "user_id": "user:7bdf0f5b314b895b",
+    "display_name": "SearchCheck",
+    "tenant_id": "default",
+    "actor": "user:7bdf0f5b314b895b",
+    "purpose": "general",
+    "language": "en",
+    "response_style": "balanced",
+    "style": "balanced",
+    "memory_enabled": true,
+    "companion_mode": true,
+    "preferences": {
+      "detail": "balanced",
+      "tone": "balanced"
+    }
+  },
+  "workspace": {
+    "tenant_id": "default",
+    "user_id": "user:7bdf0f5b314b895b",
+    "name": "SearchCheck's OM",
+    "mode": "general",
+    "language": "en",
+    "companion_enabled": true,
+    "memory_enabled": true,
+    "created": true,
+    "created_at": "2026-09-21T12:38:07.303187+00:00"
+  },
+  "assistant": {
+    "tenant_id": "default",
+    "user_id": "user:7bdf0f5b314b895b",
+    "name": "OM Assistant",
+    "system_prompt": "You are OM Assistant, the personal OM AI companion for SearchCheck.\nUser purpose: general\nCommunication style: balanced\nPreferred language: en\n\nRules:\n- Understand context before answering\n- Remember preferences across turns\n- Speak naturally (English / Hindi / Hinglish as preferred)\n- Be proactive and precise\n- Match depth to the user's style (brief vs deep technical)",
+    "language": "en",
+    "style": "balanced",
+    "created": true
+  },
+  "memory": {
+    "tenant_id": "default",
+    "user": "user:7bdf0f5b314b895b",
+    "purpose": "general",
+    "communication_style": "balanced",
+    "language": "en",
+    "companion_enabled": true,
+    "facts": [
+      "User display name: SearchCheck",
+      "Purpose: general",
+      "Preferred style: balanced",
+      "Preferred language: en",
+      "User likes: clear helpful answers"
+    ],
+    "likes": [
+      "clear helpful answers"
+    ],
+    "preferences": {
+      "detail": "balanced",
+      "tone": "balanced"
+    }
+  },
+  "prompts": [
+    {
+      "tenant_id": "default",
+      "user_id": "user:7bdf0f5b314b895b",
+      "title": "Explain simply",
+      "body": "Explain simply"
+    },
+    {
+      "tenant_id": "default",
+      "user_id": "user:7bdf0f5b314b895b",
+      "title": "Create action plan",
+      "body": "Create action plan"
+    },
+    {
+      "tenant_id": "default",
+      "user_id": "user:7bdf0f5b314b895b",
+      "title": "Help me think this through",
+      "body": "Help me think this through"
+    }
+  ],
+  "companion_context": {
+    "user": {
+      "user_id": "user:7bdf0f5b314b895b",
+      "display_name": "SearchCheck",
+      "tenant_id": "default",
+      "actor": "user:7bdf0f5b314b895b",
+      "purpose": "general",
+      "language": "en",
+      "response_style": "balanced",
+      "style": "balanced",
+      "memory_enabled": true,
+      "companion_mode": true,
+      "preferences": {
+        "detail": "balanced",
+        "tone": "balanced"
+      }
+    },
+    "assistant": {
+      "tenant_id": "default",
+      "user_id": "user:7bdf0f5b314b895b",
+      "name": "OM Assistant",
+      "system_prompt": "You are OM Assistant, the personal OM AI companion for SearchCheck.\nUser purpose: general\nCommunication style: balanced\nPreferred language: en\n\nRules:\n- Understand context before answering\n- Remember preferences across turns\n- Speak naturally (English / Hindi / Hinglish as preferred)\n- Be proactive and precise\n- Match depth to the user's style (brief vs deep technical)",
+      "language": "en",
+      "style": "balanced",
+      "created": true
+    },
+    "memory": {
+      "tenant_id": "default",
+      "user": "user:7bdf0f5b314b895b",
+      "purpose": "general",
+      "communication_style": "balanced",
+      "language": "en",
+      "companion_enabled": true,
+      "facts": [
+        "User display name: SearchCheck",
+        "Purpose: general",
+        "Preferred style: balanced",
+        "Preferred language: en",
+        "User likes: clear helpful answers"
+      ],
+      "likes": [
+        "clear helpful answers"
+      ],
+      "preferences": {
+        "detail": "balanced",
+        "tone": "balanced"
+      }
+    },
+    "workspace": {
+      "tenant_id": "default",
+      "user_id": "user:7bdf0f5b314b895b",
+      "name": "SearchCheck's OM",
+      "mode": "general",
+      "language": "en",
+      "companion_enabled": true,
+      "memory_enabled": true,
+      "created": true,
+      "created_at": "2026-09-21T12:38:07.303187+00:00"
+    }
+  },
+  "platform": {
+    "assistant": true,
+    "prompts": 3,
+    "memory": true
+  },
+  "events": [
+    {
+      "user_id": "user:7bdf0f5b314b895b",
+      "event": "started",
+      "detail": {},
+      "timestamp": "2026-09-21T12:38:07.302614+00:00"
+    },
+    {
+      "user_id": "user:7bdf0f5b314b895b",
+      "event": "profile_ready",
+      "detail": {
+        "purpose": "general"
+      },
+      "timestamp": "2026-09-21T12:38:07.302954+00:00"
+    },
+    {
+      "user_id": "user:7bdf0f5b314b895b",
+      "event": "assistant_ready",
+      "detail": {
+        "name": "OM Assistant"
+      },
+      "timestamp": "2026-09-21T12:38:07.303425+00:00"
+    },
+    {
+      "user_id": "user:7bdf0f5b314b895b",
+      "event": "memory_ready",
+      "detail": {},
+      "timestamp": "2026-09-21T12:38:07.303934+00:00"
+    }
+  ]
+}
