@@ -36,6 +36,11 @@ class CompanionRuntime:
         self.realtime = None
         self.personality = None
         self.os = None  # STEP 60 Companion OS
+        self.presence = None  # STEP 64 living loop
+        self.conversation_loop = None  # STEP 65 realtime
+        self.capabilities = None  # STEP 67
+        self.multimodal = None  # STEP 66
+        self.improvement = None  # STEP 68
         self._in_handle_text = False
 
     def _emit(self, event_type: str, payload: dict[str, Any] | None = None) -> None:
@@ -145,6 +150,66 @@ class CompanionRuntime:
             except Exception as exc:
                 logger.warning("companion_os init: %s", exc)
                 self.os = None
+
+            # STEP 64 — Presence Runtime (alive loop)
+            try:
+                from om_ai.core.presence_runtime import get_presence_engine
+
+                self.presence = get_presence_engine()
+                self.presence.start()
+                self.presence.bind_stop_speech(
+                    lambda: self.voice.interrupt_speech() if self.voice else None
+                )
+                self.registry.register("presence_runtime", self.presence)
+            except Exception as exc:
+                logger.warning("presence_runtime init: %s", exc)
+                self.presence = None
+
+            # STEP 65 — Realtime conversation loop
+            try:
+                from om_ai.core.conversation_runtime import get_conversation_loop
+                from om_ai.core.human_intelligence import get_human_conversation_pipeline
+
+                self.conversation_loop = get_conversation_loop()
+                self.conversation_loop.bind(
+                    stop_speech=lambda: self.voice.interrupt_speech() if self.voice else None,
+                    presence=self.presence,
+                    human_pipeline=get_human_conversation_pipeline(),
+                )
+                self.registry.register("conversation_loop", self.conversation_loop)
+            except Exception as exc:
+                logger.warning("conversation_loop init: %s", exc)
+                self.conversation_loop = None
+
+            # STEP 66 — Multimodal
+            try:
+                from om_ai.core.multimodal_intelligence import get_multimodal_router
+
+                self.multimodal = get_multimodal_router()
+                self.registry.register("multimodal", self.multimodal)
+            except Exception as exc:
+                logger.debug("multimodal init: %s", exc)
+                self.multimodal = None
+
+            # STEP 67 — Capability system
+            try:
+                from om_ai.core.capability_system import get_capability_system
+
+                self.capabilities = get_capability_system()
+                self.registry.register("capabilities", self.capabilities)
+            except Exception as exc:
+                logger.debug("capability_system init: %s", exc)
+                self.capabilities = None
+
+            # STEP 68 — Self improvement (offline)
+            try:
+                from om_ai.core.self_improvement import get_improvement_pipeline
+
+                self.improvement = get_improvement_pipeline()
+                self.registry.register("improvement", self.improvement)
+            except Exception as exc:
+                logger.debug("improvement init: %s", exc)
+                self.improvement = None
 
             # Production onboarding → companion context (if user already bootstrapped)
             try:
@@ -294,7 +359,18 @@ class CompanionRuntime:
         try:
             if ingested.get("wake_only"):
                 reply = ingested.get("prompt") or "Ji sir, kahiye?"
+                if self.presence is not None:
+                    try:
+                        self.presence.listening()
+                        self.presence.responding()
+                    except Exception:
+                        pass
                 self.voice.speak(reply)
+                if self.presence is not None:
+                    try:
+                        self.presence.waiting()
+                    except Exception:
+                        pass
                 self._emit("avatar.state", {"state": "attentive"})
                 return {"answer": reply, "activities": ["Wake detected"], "wake": True, "session": ingested.get("session")}
 
@@ -322,6 +398,50 @@ class CompanionRuntime:
 
     def _continue_turn(self, user_text: str, hist: list[dict[str, Any]]) -> dict[str, Any]:
         assert self.voice is not None
+
+        if self.presence is not None:
+            try:
+                self.presence.thinking()
+                self._emit("presence.state", self.presence.status())
+            except Exception:
+                pass
+
+        # Realtime interrupt check (barge-in / stop)
+        if self.conversation_loop is not None:
+            try:
+                rt = self.conversation_loop.realtime.on_final(user_text, history=hist)
+                if rt.get("interrupted"):
+                    if self.presence is not None:
+                        self.presence.interrupt()
+                    msg = "Theek hai — ruk gaya." if any(
+                        w in user_text.lower() for w in ("ruk", "band", "chup", "bas")
+                    ) else "Okay — stopped."
+                    return {
+                        "answer": msg,
+                        "spoken": msg,
+                        "activities": ["Interrupted"],
+                        "interrupted": True,
+                        "state": "LISTENING",
+                        "speak_client": False,
+                        "presence": self.presence.status() if self.presence else {},
+                    }
+            except Exception:
+                pass
+
+        # Multimodal hint when user references screen/vision
+        multimodal_hint = ""
+        if self.multimodal is not None:
+            try:
+                mm = self.multimodal.route(user_text)
+                if mm.get("multimodal"):
+                    multimodal_hint = str(mm.get("system_hint") or "")
+                    self._emit("multimodal", {"focus": (mm.get("screen") or {}).get("focus")})
+            except Exception:
+                pass
+        try:
+            self.context.meta["multimodal_hint"] = multimodal_hint
+        except Exception:
+            pass
 
         activities: list[str] = []
         semantic: dict[str, Any] = {}
@@ -547,6 +667,19 @@ class CompanionRuntime:
         except Exception:
             pass
 
+        # STEP 68 — self improvement observe (offline only)
+        if self.improvement is not None and answer:
+            try:
+                self.improvement.after_turn(user_message=user_text, answer=answer)
+            except Exception:
+                pass
+
+        if self.presence is not None:
+            try:
+                self.presence.responding()
+            except Exception:
+                pass
+
         # Browser companion speaks via /tts — avoid double-speak from macOS say here
         if not self.config.text_only:
             try:
@@ -564,8 +697,17 @@ class CompanionRuntime:
             except Exception:
                 pass
 
+        if self.presence is not None:
+            try:
+                wait_pack = self.presence.waiting()
+                self._emit("presence.state", wait_pack)
+            except Exception:
+                pass
+
         presence_mode = str(
-            ((os_pack.get("presence") or {}).get("presence") or {}).get("mode") or self.voice.state.value
+            ((os_pack.get("presence") or {}).get("presence") or {}).get("mode")
+            or (self.presence.loop.phase.value if self.presence else "")
+            or self.voice.state.value
         )
         return {
             "answer": answer,
@@ -575,12 +717,17 @@ class CompanionRuntime:
             "feeling": brain_out.get("feeling") or (brain_out.get("affect") or {}).get("label"),
             "affect": brain_out.get("affect"),
             "expression": (os_pack.get("presence") or {}).get("expression") or brain_out.get("expression"),
-            "presence": (os_pack.get("presence") or {}).get("presence"),
+            "presence": (os_pack.get("presence") or {}).get("presence")
+            or (self.presence.status() if self.presence else {}),
             "avatar": brain_out.get("avatar") or os_pack.get("om_avatar") or os_pack.get("avatar"),
             "conversation": os_pack.get("conversation") or brain_out.get("human_conversation"),
             "emotion": brain_out.get("emotion"),
+            "friend": brain_out.get("friend") or (brain_out.get("meta") or {}).get("friend"),
+            "pipeline": brain_out.get("pipeline"),
+            "situation": brain_out.get("situation"),
             "response_iq": brain_out.get("response_iq"),
             "human_companion": bool(brain_out.get("human_companion")),
+            "capabilities": self.capabilities.status() if self.capabilities else None,
             "learning": os_pack.get("learning"),
             "human_memory": os_pack.get("human_memory"),
             "autonomous": os_pack.get("autonomous"),
@@ -597,6 +744,7 @@ class CompanionRuntime:
             "trace_id": self.context.trace_id,
             "speak_client": True,
             "os_step": 112,
+            "alive_loop": True,
         }
 
     def _identity_keys(self) -> tuple[str, str]:
@@ -662,6 +810,7 @@ class CompanionRuntime:
             "voice_mode": True,
             "skip_canned_social": True,
             "human_memory_blob": hm_blob[:1500],
+            "multimodal_hint": str((self.context.meta or {}).get("multimodal_hint") or ""),
         }
 
         brain_out: dict[str, Any] = {}
@@ -744,7 +893,7 @@ class CompanionRuntime:
             pack = hc.turn(
                 text,
                 history=history,
-                generate=None,
+                generate=model_generate,
                 pre_answer=str(brain_out.get("answer") or brain_out.get("spoken") or ""),
                 semantic=brain_out.get("semantic") if isinstance(brain_out.get("semantic"), dict) else {},
                 skip_action=True,
@@ -768,6 +917,12 @@ class CompanionRuntime:
                 brain_out["human_conversation"] = pack["conversation"]
             if pack.get("emotion"):
                 brain_out["emotion"] = pack["emotion"]
+            if pack.get("friend"):
+                brain_out["friend"] = pack["friend"]
+            if pack.get("pipeline"):
+                brain_out["pipeline"] = pack["pipeline"]
+            if pack.get("situation"):
+                brain_out["situation"] = pack["situation"]
             if pack.get("response_iq"):
                 brain_out["response_iq"] = pack["response_iq"]
             acts = list(brain_out.get("activities") or [])
@@ -1289,7 +1444,16 @@ class CompanionRuntime:
     def interrupt(self) -> dict[str, Any]:
         if self.voice:
             self.voice.interrupt_speech()
-        return {"ok": True, "state": getattr(self.voice, "state", None) and self.voice.state.value}
+        if self.presence is not None:
+            try:
+                self.presence.interrupt()
+            except Exception:
+                pass
+        return {
+            "ok": True,
+            "state": getattr(self.voice, "state", None) and self.voice.state.value,
+            "presence": self.presence.status() if self.presence else {},
+        }
 
     def status_banner(self) -> dict[str, Any]:
         voice_st = self.voice.status() if self.voice else {}

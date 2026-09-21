@@ -1,8 +1,9 @@
 """
-OM Voice Presence Engine
+OM Voice Presence Engine — dynamic spoken conversation layer.
 
-Dynamic spoken conversation layer.
-Never speak internal agent / pipeline chrome.
+Shapes brain text for speech. Never speaks internal chrome.
+Recovery prefers live generation; last-resort lines are composed from signals
+(not fixed FAQ scripts).
 """
 from __future__ import annotations
 
@@ -30,6 +31,41 @@ _INTERNAL_LEAK = re.compile(
     r")"
 )
 
+_GARBAGE_MARKERS = (
+    "rephrase",
+    "one short sentence",
+    "short sentence",
+    "plain words",
+    "as an ai",
+    "i'm just a language model",
+    "i want to help",
+    "could you rephrase",
+    "please rephrase",
+    "didn't understand",
+    "do not understand",
+    "don't understand",
+    "cannot understand",
+    "say that again",
+    "in your own words",
+    "share a bit more detail",
+    "share one more detail",
+    "goal, error, or constraint",
+    "i can help with that",
+    "wasn't reliable",
+    "ask again in one short",
+    "how can i help you",
+    "what can i do for you",
+    "couldn't understand that message",
+    "couldn’t understand that message",
+    "please ask again",
+    "plain-language explanation",
+    "best understood by",
+    "ask for a deeper dive",
+    "knowledge investigation required",
+    "retrieve context",
+    "retrieve information",
+)
+
 
 class VoicePresenceEngine:
     def __init__(self) -> None:
@@ -51,6 +87,7 @@ class VoicePresenceEngine:
         emotion = self.emotion.detect(user_message)
         context.setdefault("locale", locale)
         context.setdefault("emotion", emotion)
+        context.setdefault("user_message", user_message)
         personality = self.personality.profile(context)
         presence = self.presence.on_user(emotion)
 
@@ -64,7 +101,12 @@ class VoicePresenceEngine:
         spoken = adapted["spoken"]
 
         if is_garbage_spoken(spoken):
-            spoken = soft_listening_fallback(locale=locale, user_message=user_message)
+            spoken = soft_listening_fallback(
+                locale=locale,
+                user_message=user_message,
+                emotion=emotion,
+                context=context,
+            )
             adapted = self.adapter.adapt(
                 spoken,
                 locale=locale,
@@ -145,9 +187,7 @@ def strip_internal_chrome(text: str) -> str:
     if not t:
         return ""
     if _INTERNAL_LEAK.search(t):
-        # Drop whole dump — never read internal agent notes aloud
         return ""
-    # Strip leftover debug prefixes if mixed into a longer reply
     lines = []
     for line in t.splitlines():
         low = line.strip().lower()
@@ -171,39 +211,17 @@ def is_garbage_spoken(answer: str) -> bool:
         return True
     if low.count("agent[") >= 1:
         return True
-    bad = (
-        "rephrase",
-        "one short sentence",
-        "short sentence",
-        "plain words",
-        "as an ai",
-        "i'm just a language model",
-        "i want to help",
-        "could you rephrase",
-        "please rephrase",
-        "didn't understand",
-        "do not understand",
-        "don't understand",
-        "cannot understand",
-        "say that again",
-        "in your own words",
-        "share a bit more detail",
-        "wasn't reliable",
-        "ask again in one short",
-        "how can i help you today",
-        "couldn't understand that message",
-        "couldn’t understand that message",
-        "please ask again",
-        "plain-language explanation",
-        "best understood by",
-        "ask for a deeper dive",
-        "knowledge investigation required",
-        "retrieve context",
-        "retrieve information",
-    )
-    if any(b in low for b in bad):
+    if any(b in low for b in _GARBAGE_MARKERS):
         return True
     if "understand" in low and ("hindi" in low or "language" in low):
+        return True
+    # Ellipsis/punctuation-only padding — not a real reply
+    words = [w for w in re.findall(r"[a-zA-Z\u0900-\u097F']+", low) if w not in {"a", "an", "the"}]
+    if len(words) <= 3 and re.fullmatch(r"[\w\s.…]+", low or ""):
+        # Short ack fragments like "Haan Sir..." / "Haan. . ."
+        if words and words[0] in {"haan", "ji", "ok", "okay", "yes", "sir"}:
+            return True
+    if re.fullmatch(r"(haan|ji|ok|okay|yes)([\s.…]*(sir|ji)?)[\s.…]*", low or ""):
         return True
     return False
 
@@ -217,61 +235,167 @@ def soft_listening_fallback(
     conversation_state: dict[str, Any] | None = None,
     response_engine=None,
 ) -> str:
-
-    """
-    Dynamic fallback.
-
-    No hardcoded replies.
-    No script responses.
-
-    Delegates generation to OM response intelligence.
-    """
-
-    context = context or {}
+    """Dynamic recovery — live generate first, then signal-composed line."""
+    context = dict(context or {})
     conversation_state = conversation_state or {}
-
+    emotion = emotion or context.get("emotion") or "neutral"
 
     if response_engine:
+        try:
+            result = response_engine.generate(
+                intent="conversation_recovery",
+                user_message=user_message,
+                language=locale,
+                emotion=emotion,
+                context=context,
+                state=conversation_state,
+                style="natural_human_companion",
+            )
+            if result and not is_garbage_spoken(str(result)):
+                return str(result).strip()
+        except Exception:
+            pass
 
-        result = response_engine.generate(
+    # Live brain recovery (dynamic — not a template library)
+    live = _live_recovery_generate(user_message, locale=locale, emotion=str(emotion), context=context)
+    if live and not is_garbage_spoken(live) and len(re.findall(r"[A-Za-z\u0900-\u097F]+", live)) >= 5:
+        return live
 
-            intent="conversation_recovery",
+    if context.get("last_response") and not is_garbage_spoken(str(context["last_response"])):
+        return str(context["last_response"])
 
-            user_message=user_message,
+    return _compose_from_signals(user_message, locale=locale, emotion=str(emotion), context=context)
 
-            language=locale,
 
-            emotion=emotion,
+def _live_recovery_generate(
+    user_message: str,
+    *,
+    locale: str,
+    emotion: str,
+    context: dict[str, Any],
+) -> str:
+    """Ask the production chat path for a one-line companion recovery."""
+    try:
+        from om_ai.runtime.chat_backend import chat_reply
 
-            context=context,
-
-            state=conversation_state,
-
-            style="natural_human_companion"
-
+        lang = "warm Hinglish" if locale == "hi" else "calm spoken English"
+        system = (
+            "You are OM, a loyal spoken companion (Jarvis-like). "
+            f"Reply in {lang}, 1 short sentence only. "
+            "No chatbot phrases. No 'how can I help'. No markdown. "
+            f"User emotion signal: {emotion}."
         )
+        topic = str(context.get("topic") or context.get("purpose") or "").strip()
+        if topic:
+            system += f" Active topic: {topic}."
+        messages = [
+            {"role": "system", "content": system[:900]},
+            {"role": "user", "content": (user_message or "I'm here.")[:500]},
+        ]
+        reply, _info = chat_reply(messages, local_chat=None, local_loaded=False, native_chat=None)
+        return str(reply or "").strip()
+    except Exception:
+        return ""
 
 
-        if result:
+def _intent_signals(user_message: str) -> set[str]:
+    low = (user_message or "").lower()
+    signals: set[str] = set()
+    if re.search(r"(?i)\b(hello|hi|hey|namaste|good morning|good evening)\b", low):
+        signals.add("greeting")
+    if re.search(r"(?i)\b(thank|thanks|shukriya|dhanyavad)\b", low):
+        signals.add("thanks")
+    if re.search(
+        r"(insaan|human|natural|robot|machine|chatbot|bot\b|baat\s+nahi|"
+        r"tarah\s+baat|normal\s+baat|jaise\s+insaan)",
+        low,
+    ):
+        signals.add("meta_human")
+    if re.search(r"(?i)\b(continue|us[ei]|wahi|pehle|keep going)\b", low):
+        signals.add("continue")
+    if re.search(r"(?i)\b(stop|ruk|band|chup|bas)\b", low):
+        signals.add("stop")
+    if not signals:
+        signals.add("open")
+    return signals
 
-            return str(result).strip()
 
+def _compose_from_signals(
+    user_message: str,
+    *,
+    locale: str,
+    emotion: str,
+    context: dict[str, Any],
+) -> str:
+    """Last-resort compositional reply from live signals — not a script catalog."""
+    signals = _intent_signals(user_message)
+    hi = locale == "hi" or bool(
+        re.search(r"\b(tum|nahi|nahin|kya|baat|insaan|tarah|sakte|bolo|mujhe|hai|ji)\b", (user_message or "").lower())
+    )
+    topic = str(context.get("topic") or "").replace("_", " ").strip()
+    parts: list[str] = []
 
+    if hi:
+        if "meta_human" in signals:
+            parts.append("Haan Sir... bilkul")
+            parts.append("main natural baat karunga")
+        elif "greeting" in signals:
+            parts.append("Ji Sir... main yahan hoon")
+        elif "thanks" in signals:
+            parts.append("Hamesha Sir")
+        elif emotion in {"frustration", "stress", "sad", "urgency"}:
+            parts.append("Samajh gaya Sir")
+        else:
+            parts.append("Ji Sir... samajh gaya")
+        if "continue" in signals and topic:
+            parts.append(f"pehle wali {topic} pe chalte hain")
+        elif "meta_human" in signals:
+            parts.append("boliye kya karna hai")
+        elif "thanks" not in signals and "stop" not in signals:
+            parts.append("boliye aage kya karna hai")
+    else:
+        if "meta_human" in signals:
+            parts.append("Fair point Sir")
+            parts.append("I'll keep it natural")
+        elif "greeting" in signals:
+            parts.append("Yes Sir... I'm here")
+        elif "thanks" in signals:
+            parts.append("Anytime Sir")
+        elif emotion in {"frustration", "stress", "sad", "urgency"}:
+            parts.append("I hear you Sir")
+        else:
+            parts.append("Sir... I understand")
+        if "continue" in signals and topic:
+            parts.append(f"continuing {topic}")
+        elif "meta_human" in signals:
+            parts.append("what should we work on")
+        elif "thanks" not in signals and "stop" not in signals:
+            parts.append("tell me what you want next")
 
-    # Last safety fallback:
-    # Generate from available brain layer
-
-    if context.get("last_response"):
-
-        return context["last_response"]
-
-
-
-    return ""
+    # Join with natural pauses
+    if len(parts) == 1:
+        return parts[0] + ("." if not hi else ".")
+    if len(parts) == 2:
+        return f"{parts[0]}... {parts[1]}."
+    return f"{parts[0]}... {parts[1]} — {parts[2]}."
 
 
 def rescue_spoken(user_message: str, bad_answer: str = "") -> str:
     """Soft listening fallback when spoken text is unusable."""
     del bad_answer
     locale = detect_speech_locale(user_message)
-    return soft_listening_fallback(locale=locale, user_message=user_message)
+    emotion = get_voice_presence().emotion.detect(user_message)
+    line = soft_listening_fallback(
+        locale=locale,
+        user_message=user_message,
+        emotion=emotion,
+        context={"user_message": user_message, "emotion": emotion},
+    )
+    if line and not is_garbage_spoken(line):
+        return line
+    return _compose_from_signals(
+        user_message,
+        locale=locale,
+        emotion=str(emotion),
+        context={},
+    )

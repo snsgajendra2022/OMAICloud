@@ -1128,16 +1128,18 @@ Research:
             meta["long_context_store"] = {"error": str(exc)}
 
     def _safe_fallback(self, message: str, intent_name: str) -> str:
+        # Never use helpdesk chatbot lines — companion rescue path
+        try:
+            from om_ai.core.companion_personality.voice_presence import rescue_spoken
+
+            return rescue_spoken(message)
+        except Exception:
+            pass
         if intent_name == "conversation" or is_greeting(message):
-            return "Hello — I’m OM. How can I help you?"
+            return "Ji Sir... main yahan hoon. Boliye."
         if is_coding_task(message):
-            return (
-                "I understood this as a coding request. "
-                "Share the stack and the first feature you want, and I’ll outline a clear plan."
-            )
-        return (
-            "I can help with that. Please share a bit more detail so I can give a precise answer."
-        )
+            return "Coding pe kaam karte hain — pehla feature batao, seedha plan dunga."
+        return "Sir... samajh gaya. Boliye aage kya karna hai."
 
     def process(
         self,

@@ -1,0 +1,29 @@
+:root {
+  color: #e8f7ff;
+  background: radial-gradient(circle at 20% 20%, #0b1a24, #050a10 60%);
+  font-family: "Segoe UI", system-ui, sans-serif;
+}
+body { margin: 0; }
+.shell { min-height: 100vh; display: flex; flex-direction: column; }
+.top {
+  display: flex; align-items: center; gap: 1rem;
+  padding: 0.75rem 1.25rem; border-bottom: 1px solid #1c3344;
+}
+.brand { font-size: 1.4rem; letter-spacing: 0.2em; font-weight: 700; color: #75d5e3; }
+nav button {
+  background: transparent; border: 1px solid #2a4a5c; color: inherit;
+  margin-left: 0.4rem; padding: 0.35rem 0.7rem; border-radius: 6px; cursor: pointer;
+}
+.companion-grid {
+  display: grid; grid-template-columns: 1.2fr 1fr; gap: 1rem; padding: 1rem;
+  min-height: calc(100vh - 64px);
+}
+iframe.hud { width: 100%; height: 70vh; border: 0; border-radius: 12px; background: #050a10; }
+.panel {
+  border: 1px solid #1c3344; border-radius: 12px; padding: 1rem; background: rgba(8,16,24,0.7);
+}
+.mic { width: 10px; height: 10px; border-radius: 50%; background: #445; display: inline-block; }
+.mic.on { background: #3dffa8; box-shadow: 0 0 10px #3dffa8; }
+@media (max-width: 900px) {
+  .companion-grid { grid-template-columns: 1fr; }
+}

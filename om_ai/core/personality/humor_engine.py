@@ -1,8 +1,16 @@
 from __future__ import annotations
 
-class HumorEngine:
-    def light(self, address: str = "Sir") -> str:
-        return f"Systems nominal, {address} — and still better company than a sticky note."
 
-    def allow(self, intent: str) -> bool:
-        return intent in {"greeting", "thanks", "general", "check_in"}
+class HumorEngine:
+    """Light warmth — never forced jokes on stress/fatigue turns."""
+
+    def allow(self, intent: str = "", *, emotion: str = "") -> bool:
+        if emotion in {"stressed", "sad", "tired", "fatigue", "frustrated", "masked_stress"}:
+            return False
+        return intent in {"greeting", "thanks", "general", "check_in", "share_win", "celebrate"}
+
+    def light(self, address: str = "Sir") -> str:
+        return f"Systems nominal, {address}."
+
+    def celebrate_bug(self) -> str:
+        return "Nice! That bug was probably annoying. What was causing the issue?"

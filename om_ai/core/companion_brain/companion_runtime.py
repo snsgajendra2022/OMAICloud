@@ -196,7 +196,85 @@ class CompanionRuntime:
         }
 
         policy = self.policy.decide(semantic)
-        strat = self.strategy.select(semantic, policy)
+        # STEP 51–56 — Human Conversation Pipeline before LLM
+        human_layer: dict[str, Any] = {}
+        try:
+            from om_ai.core.jarvis_brain import get_jarvis_brain
+
+            human_layer = get_jarvis_brain().perceive(
+                q,
+                history=hist,
+                is_action=bool(semantic.get("requires_action")),
+                locale=locale,
+                profile={"name": str(((extra or {}).get("user_context") or {}).get("name") or "")},
+                memory_blob=str(human_ctx.get("context_blob") or ""),
+            )
+            meta["human_layer"] = {
+                "intent": human_layer.get("intent"),
+                "emotion": (
+                    (human_layer.get("emotion") or {}).get("emotion")
+                    if isinstance(human_layer.get("emotion"), dict)
+                    else human_layer.get("emotion")
+                ),
+                "need": human_layer.get("need")
+                or (
+                    (human_layer.get("emotion") or {}).get("need")
+                    if isinstance(human_layer.get("emotion"), dict)
+                    else None
+                ),
+                "stages": human_layer.get("stages"),
+            }
+            meta["wellbeing"] = human_layer.get("wellbeing")
+        except Exception:
+            human_layer = {}
+
+        # Friend mind — what a loyal companion would do next
+        friend_pack: dict[str, Any] = {}
+        try:
+            from om_ai.core.human_companion.friend_mind import FriendMind
+
+            topic = str(
+                human_layer.get("topic")
+                or semantic.get("domain")
+                or semantic.get("conversation_mode")
+                or "general"
+            )
+            emo_for_friend = human_layer.get("emotion") if isinstance(human_layer.get("emotion"), dict) else {
+                "label": emotion if isinstance(emotion, str) else (emotion or {})
+            }
+            friend_pack = FriendMind().think(
+                q,
+                meaning={**semantic, **(human_layer.get("human") or {})},
+                emotion=emo_for_friend,
+                memory={"profile": {"name": str(((extra or {}).get("user_context") or {}).get("name") or "")}},
+                relationship=(personality_pack.get("relationship") if isinstance(personality_pack, dict) else {}) or {},
+                topic=topic,
+                locale=locale,
+            )
+            if human_layer.get("natural_ask"):
+                friend_pack["optional_ask"] = human_layer["natural_ask"]
+            if human_layer.get("system_hint"):
+                friend_pack["system_hint"] = " ".join(
+                    p for p in (friend_pack.get("system_hint"), human_layer.get("system_hint")) if p
+                )
+            meta["friend"] = friend_pack
+        except Exception:
+            friend_pack = {}
+
+        emo_label = ""
+        if isinstance(human_layer.get("emotion"), dict):
+            emo_label = str(human_layer["emotion"].get("emotion") or human_layer["emotion"].get("label") or "")
+        elif human_layer.get("emotion"):
+            emo_label = str(human_layer.get("emotion"))
+        if not emo_label:
+            emo_label = emotion if isinstance(emotion, str) else str((emotion or {}).get("label") or "neutral")
+
+        strat = self.strategy.select(
+            semantic,
+            policy,
+            emotion={"label": emo_label, "need": human_layer.get("need")},
+            friend=friend_pack,
+        )
         knowledge = self.knowledge.enrich(q, semantic=semantic)
         reasoning = self.reasoning.assist(
             q,
@@ -225,19 +303,31 @@ class CompanionRuntime:
                     "emotion": emotion,
                     "user_message": q,
                     "purpose": str(((extra or {}).get("user_context") or {}).get("purpose") or ""),
+                    "topic": str(semantic.get("domain") or ""),
+                    "policy": policy,
+                    "system_hint": str(friend_pack.get("system_hint") or ""),
                 }
             ),
             str(personality_pack.get("system_hint") or ""),
+            str(friend_pack.get("system_hint") or ""),
+            str(human_layer.get("system_hint") or ""),
             str(human_ctx.get("context_blob") or ""),
             str(knowledge.get("blob") or ""),
             str(reasoning.get("hint") or ""),
+            str(strat.get("instruction") or ""),
             model_context or "",
-            "Speak out loud to the user. Keep the reply short and human. Do not append a canned follow-up question.",
+            "Speak like a loyal friend. Keep it short and human. Do not append a canned follow-up question.",
+            "Never say 'Please complete your sentence'. Continue partial thoughts naturally.",
             "Use remembered facts (name, preferences, recent turns) naturally when relevant.",
         ]
         merged_context = "\n".join(p for p in ctx_parts if p).strip()[:4000]
 
         activities.append(_PUBLIC_ACTIVITIES["respond"])
+        # Prefer human-layer seed for listen/support/incomplete turns
+        seed = ""
+        if human_layer.get("listen_first") or (human_layer.get("incomplete") or {}).get("incomplete"):
+            seed = str(human_layer.get("answer_seed") or human_layer.get("natural_ask") or "").strip()
+
         gen = self.response.generate(
             q,
             strategy=strat,
@@ -252,9 +342,10 @@ class CompanionRuntime:
                 "interrupt": interrupt,
                 "voice_mode": True,
                 "skip_canned_social": True,
+                "pre_answer": seed,
             },
         )
-        answer = str(gen.get("answer") or "").strip()
+        answer = str(gen.get("answer") or seed or "").strip()
         answer = self.personality.finalize(
             answer,
             personality_pack,
@@ -309,9 +400,20 @@ class CompanionRuntime:
             "intent": intent.to_dict(),
             "feeling": affect.get("label") or "neutral",
             "affect": affect,
+            "friend": friend_pack,
+            "pipeline": [
+                "heard",
+                "meaning",
+                "emotion",
+                "memory",
+                "friend_mind",
+                "respond",
+                "voice_expression",
+            ],
             "meta": {
                 **meta,
                 "interrupt": interrupt,
+                "friend": friend_pack,
                 "memory": {
                     "disabled": recall.get("disabled"),
                     "hits": len(recall.get("hits") or []),

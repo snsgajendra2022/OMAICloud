@@ -20,3 +20,5 @@
 {"ts": "2026-09-19T14:32:16.433214+00:00", "event": "action_guard_pass", "action_id": "5220b9d9-d4d5-4f8d-a0d9-63431b987adf", "action_type": "browser.open"}
 {"ts": "2026-09-19T14:34:50.495554+00:00", "event": "action_guard_pass", "action_id": "5f8cb1f7-3012-4189-82bb-ad010a5694a3", "action_type": "browser.open"}
 {"ts": "2026-09-19T14:44:26.341203+00:00", "event": "action_guard_pass", "action_id": "d03d8689-0c2f-4afa-bff6-2d2d466dc2bd", "action_type": "browser.open"}
+{"ts": "2026-09-21T11:14:53.711378+00:00", "event": "action_guard_pass", "action_id": "9dd274d3-ca1f-47f9-82a8-9822cecd91e4", "action_type": "application.open"}
+{"ts": "2026-09-21T11:16:18.639899+00:00", "event": "action_guard_pass", "action_id": "81a1fc03-861b-43a4-b3c6-c24e95e1f9a0", "action_type": "application.open"}

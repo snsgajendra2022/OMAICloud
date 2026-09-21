@@ -18,19 +18,25 @@ class AnswerImprovement:
         changed = False
         issues = list(issues or [])
 
+        # Never inject chatbot filler — leave empty for companion rescue
         if not text:
-            text = (
-                "I can help with that. "
-                "Share one more detail (goal, error, or constraint) and I will give a concrete answer."
-            )
-            changed = True
-            issues.append("empty_repaired")
+            return {"answer": "", "changed": False, "issues": issues + ["empty"]}
+
+        # Strip known robotic repair phrases if somehow present
+        if re.search(
+            r"(?i)share one more detail|goal,\s*error,\s*or constraint|i can help with that",
+            text,
+        ):
+            return {
+                "answer": "",
+                "changed": True,
+                "issues": issues + ["robotic_filler_removed"],
+            }
 
         if "echo" in issues and message:
             text = (
-                f"You asked about: {message[:180].strip()}\n\n"
-                "Here is a clearer response: I can provide steps, an explanation, or code — "
-                "tell me which you prefer."
+                f"On “{message[:120].strip()}” — tell me the exact error or goal, "
+                "and I’ll give you a direct next step."
             )
             changed = True
 

@@ -25,6 +25,31 @@ This is how the classic “Jarvis” stack maps onto **OM Companion** — not a 
 
 Cross-cutting: one `session_id` + `user_key`, shared MemoryService, action-first DeviceRuntime + live weather, personality finalize, avatar lips + WS reconnect.
 
+## Living companion (STEP 64–70)
+
+Do **not** add more duplicate intelligence brains. Wire presence + realtime + tools:
+
+```
+Presence Runtime
+  → Human Conversation Layer (emotion/memory/personality/reasoning)
+  → Capability / Tool System
+  → Permission + Security
+  → Voice + Avatar + Vision
+  → OM Companion (HUD / desktop app)
+```
+
+| Step | Package |
+|------|---------|
+| 64 Presence | `om_ai/core/presence_runtime/` |
+| 65 Realtime convo | `om_ai/core/conversation_runtime/` (`realtime_*`, `conversation_loop`) |
+| 66 Multimodal | `om_ai/core/multimodal_intelligence/` |
+| 67 Capabilities | `om_ai/core/capability_system/` |
+| 68 Self-improve | `om_ai/core/self_improvement/` (offline only) |
+| 69 Desktop shell | `om_companion_app/` (Tauri + React) |
+| 70 Tests | `tests/test_step70_integration.py` |
+
+All wired into `CompanionRuntime` — restart `om-ai serve` and use `/companion`.
+
 ---
 
 ## Pillar map
@@ -33,7 +58,7 @@ Cross-cutting: one `session_id` + `user_key`, shared MemoryService, action-first
 |--------|---------------------|---------------|
 | **1. Wake word** | `if "jarvis" in command` (full STT always on) | Lightweight local phrase gate + optional Picovoice Porcupine |
 | **2. STT / TTS** | `speech_recognition` + `pyttsx3` | Browser Web Speech (HUD) or local STT; TTS = Aman/`say` or ElevenLabs |
-| **3. LLM / Brain** | GPT-4 / Gemini / Ollama call | OM Companion Brain (semantic → response) — local-first, optional cloud |
+| **3. LLM / Brain** | GPT-4 / Gemini / Ollama call | OM Companion Brain + HumanCompanionPlatform friend pipeline (meaning → emotion → memory → FriendMind → respond → voice) |
 | **4. Memory** | `chat_history[]` + SQLite | Session history (short-term) + `artifacts/companion/memory.json` + human_memory |
 | **5. Intent / OS** | `if "youtube"` … `os`/`subprocess` | `_plan_action` → DeviceRuntime capabilities (browser, apps, volume, files) |
 

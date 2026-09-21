@@ -7,7 +7,7 @@ from typing import Any
 
 class EmotionDetector:
     _RULES: list[tuple[str, float, re.Pattern[str]]] = [
-        ("frustration", 0.92, re.compile(r"(?i)\b(frustrat\w*|annoying|irritat\w*|gussa|bakwas|nahi\s+ho\s+raha|not\s+working|still\s+broken|nothing\s+is\s+working)\b")),
+        ("frustration", 0.92, re.compile(r"(?i)\b(frustrat\w*|annoying|irritat\w*|gussa|bakwas|nahi\s+ho\s+raha|not\s+working|still\s+broken|nothing\s+is\s+working|baat\s+nahi|robot|chatbot|insaan\w*\s+ki\s+tarah)\b")),
         ("urgency", 0.9, re.compile(r"(?i)\b(urgent|asap|right\s+now|jaldi|abhi\s+karo|hurry|immediately)\b")),
         ("stress", 0.88, re.compile(r"(?i)\b(stress|anxious|overwhelmed|pressure|pareshaan|tension)\b")),
         ("sad", 0.85, re.compile(r"(?i)\b(sad|upset|hurt|lonely|down|udas)\b")),

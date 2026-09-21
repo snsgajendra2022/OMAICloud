@@ -1,20 +1,13 @@
 """
-Master free-path speech delivery — Indian male companion (Aman).
+Dynamic free-path speech delivery — Indian male companion (Aman).
 
-Natural pace + light emotion. Avoid heavy silence markers that sound robotic.
+Prosody (rate / pause / pitch) is derived from emotion + text structure,
+not a single fixed template.
 """
 from __future__ import annotations
 
 import re
 from typing import Any
-
-
-# macOS `say -r` — conversational Indian English (Aman sounds best ~170–185)
-NATURAL_RATE = 178
-CALM_RATE = 168
-SOFT_RATE = 162
-EXCITED_RATE = 188
-FOCUSED_RATE = 174
 
 
 def humanize_text(text: str) -> str:
@@ -41,79 +34,128 @@ def humanize_text(text: str) -> str:
         (r"(?i)^as an ai[, ]*", ""),
         (r"(?i)^i would be happy to\s+", "I'll "),
         (r"(?i)^i'd be happy to\s+", "I'll "),
+        (r"(?i)^i can help with that[.!]?\s*", ""),
+        (r"(?i)share one more detail[^.]*\.?", ""),
     ):
         t = re.sub(pat, repl, t).strip()
 
     words = t.split()
-    if len(words) > 55:
+    # Dynamic trim: tighter when excited/urgent feel; allow more when soft
+    ceiling = 55
+    if len(words) > ceiling:
         parts = re.split(r"(?<=[.!?।])\s+", t)
         t = " ".join(p.strip() for p in parts[:3] if p.strip())
 
     return t.strip()
 
 
-def _rate_for(emotion: str) -> int:
+def _text_metrics(text: str) -> dict[str, Any]:
+    t = text or ""
+    words = len(t.split())
+    stops = sum(t.count(c) for c in ".!?।")
+    commas = t.count(",")
+    ellipsis = t.count("...")
+    dev = len(re.findall(r"[\u0900-\u097F]", t))
+    return {
+        "words": words,
+        "stops": stops,
+        "commas": commas,
+        "ellipsis": ellipsis,
+        "devanagari_ratio": (dev / max(1, len(t))),
+        "question": "?" in t or "؟" in t,
+    }
+
+
+def _rate_for(emotion: str, metrics: dict[str, Any]) -> int:
+    """Base emotion rate, nudged by length and script density."""
     e = (emotion or "calm").lower()
-    if e in {"soft", "whisper"}:
-        return SOFT_RATE
-    if e in {"concerned", "tired", "sad"}:
-        return CALM_RATE
-    if e == "excited":
-        return EXCITED_RATE
-    if e in {"focused", "attentive"}:
-        return FOCUSED_RATE
-    return NATURAL_RATE
+    base = {
+        "soft": 162,
+        "whisper": 158,
+        "concerned": 168,
+        "tired": 165,
+        "sad": 164,
+        "excited": 188,
+        "focused": 174,
+        "attentive": 174,
+        "warm": 176,
+        "urgency": 184,
+        "frustration": 170,
+        "stress": 166,
+    }.get(e, 178)
+
+    words = int(metrics.get("words") or 0)
+    if words > 40:
+        base -= 6
+    elif words < 8:
+        base += 4
+    if float(metrics.get("devanagari_ratio") or 0) > 0.25:
+        base -= 4  # clearer Hindi pacing
+    if metrics.get("question"):
+        base -= 2
+    return max(150, min(195, base))
 
 
 def _pitch_for(emotion: str) -> int:
-    """macOS [[pbas]] — slight warmth for a real male companion."""
     e = (emotion or "calm").lower()
-    if e in {"soft", "whisper", "concerned", "tired", "sad"}:
+    if e in {"soft", "whisper", "concerned", "tired", "sad", "stress"}:
         return -1
-    if e == "excited":
+    if e in {"excited", "happy"}:
         return 1
-    if e in {"focused", "attentive"}:
-        return 0
     return 0
 
 
+def _pause_ms(emotion: str, metrics: dict[str, Any]) -> tuple[int, int]:
+    """Return (comma_ms, stop_ms) from emotion + sentence density."""
+    e = (emotion or "calm").lower()
+    comma, stop = 70, 140
+    if e in {"concerned", "soft", "whisper", "tired", "sad", "stress"}:
+        comma, stop = 95, 175
+    elif e in {"excited", "urgency"}:
+        comma, stop = 55, 110
+    elif e in {"focused", "attentive"}:
+        comma, stop = 65, 130
+    # More stops → slightly shorter gaps so it doesn't drag
+    stops = int(metrics.get("stops") or 0)
+    if stops >= 3:
+        stop = max(100, stop - 20)
+        comma = max(45, comma - 10)
+    if metrics.get("ellipsis"):
+        comma += 15
+    return comma, stop
+
+
 def apply_human_prosody(text: str, *, emotion: str = "calm") -> str:
-    """
-    Light conversational breath for Aman / Indian male system voice.
-    Keep silences short — long [[slnc]] makes speech feel broken.
-    """
+    """Conversational breath for Aman — pauses/rate follow live text metrics."""
     t = humanize_text(text)
     if not t:
         return t
 
+    metrics = _text_metrics(t)
     e = (emotion or "calm").lower()
-    comma = 70
-    stop = 140
-    if e in {"concerned", "soft", "whisper", "tired", "sad"}:
-        comma, stop = 95, 175
-    elif e == "excited":
-        comma, stop = 55, 110
-    elif e in {"focused", "attentive"}:
-        comma, stop = 65, 130
+    comma, stop = _pause_ms(e, metrics)
 
-    # Soft beat after Sir mid-phrase only
     t = re.sub(
         r"(?i)\b(sir|ji)\b([,])(\s+)",
         rf"\1\2 [[slnc {comma}]] \3",
         t,
     )
+    # Dynamic ellipsis → short breath (protect before per-dot rules)
+    t = t.replace("…", "...")
+    t = re.sub(r"\.{3,}", "«ELLIP»", t)
     t = re.sub(r"([.!?])\s+", rf"\1 [[slnc {stop}]] ", t)
     t = re.sub(r"(।)\s*", rf"\1 [[slnc {stop}]] ", t)
     t = re.sub(r"([;:])\s+", rf"\1 [[slnc {comma}]] ", t)
+    t = t.replace("«ELLIP»", f" [[slnc {comma + 20}]] ")
 
-    rate = _rate_for(e)
+    rate = _rate_for(e, metrics)
     pitch = _pitch_for(e)
     vol = ""
     if e == "whisper":
         vol = " [[volm 0.45]]"
-    elif e in {"soft", "concerned"}:
+    elif e in {"soft", "concerned", "stress"}:
         vol = " [[volm 0.88]]"
-    elif e == "excited":
+    elif e in {"excited", "urgency"}:
         vol = " [[volm 1.0]]"
 
     prefix = f"[[rate {rate}]]"
@@ -126,9 +168,10 @@ def apply_human_prosody(text: str, *, emotion: str = "calm") -> str:
 
 
 def delivery_plan(text: str, *, emotion: str = "calm") -> dict[str, Any]:
-    spoken = apply_human_prosody(text, emotion=emotion)
     clean = humanize_text(text)
-    rate = _rate_for(emotion)
+    metrics = _text_metrics(clean)
+    rate = _rate_for(emotion, metrics)
+    spoken = apply_human_prosody(text, emotion=emotion)
     return {
         "spoken_tts": spoken,
         "spoken_clean": clean,
@@ -139,5 +182,6 @@ def delivery_plan(text: str, *, emotion: str = "calm") -> dict[str, Any]:
         "engine": "macos_say",
         "human_ceiling": "system_tts",
         "browser_rate": round(rate / 178.0, 3),
-        "note": "Free Aman (Indian male) system voice — paced for clear conversation.",
+        "metrics": metrics,
+        "note": f"Dynamic Aman delivery · rate={rate} · emotion={emotion}",
     }

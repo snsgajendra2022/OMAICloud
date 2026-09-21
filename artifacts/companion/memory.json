@@ -4900,6 +4900,1030 @@
           "confidence": 0.6
         }
       }
+    ],
+    "b66e8424-1f74-4f7e-b87c-cc4fc052b714": [
+      {
+        "id": "d1277626518f4137",
+        "kind": "episodic",
+        "content": "kya hua",
+        "scope": "session",
+        "key": "b66e8424-1f74-4f7e-b87c-cc4fc052b714",
+        "created_at": "2026-09-19T14:49:07.286730+00:00",
+        "updated_at": "2026-09-19T14:49:07.286731+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "9ece31ad089b485e",
+        "kind": "episodic",
+        "content": "Ji Sir. . .",
+        "scope": "session",
+        "key": "b66e8424-1f74-4f7e-b87c-cc4fc052b714",
+        "created_at": "2026-09-19T14:49:07.288999+00:00",
+        "updated_at": "2026-09-19T14:49:07.289001+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "72ff2d80dbfb419d",
+        "kind": "episodic",
+        "content": "are kya hua sab theek hai na",
+        "scope": "session",
+        "key": "b66e8424-1f74-4f7e-b87c-cc4fc052b714",
+        "created_at": "2026-09-19T14:49:13.351425+00:00",
+        "updated_at": "2026-09-19T14:49:13.351426+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "f5bc7b8a047047f2",
+        "kind": "episodic",
+        "content": "Ji Sir. . .",
+        "scope": "session",
+        "key": "b66e8424-1f74-4f7e-b87c-cc4fc052b714",
+        "created_at": "2026-09-19T14:49:13.353662+00:00",
+        "updated_at": "2026-09-19T14:49:13.353664+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "ad88265f6e3d49c8",
+        "kind": "episodic",
+        "content": "kya ji Kuchh To bolo",
+        "scope": "session",
+        "key": "b66e8424-1f74-4f7e-b87c-cc4fc052b714",
+        "created_at": "2026-09-19T14:49:20.106945+00:00",
+        "updated_at": "2026-09-19T14:49:20.106946+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "0fc8e223605e452f",
+        "kind": "episodic",
+        "content": "Ji Sir. . .",
+        "scope": "session",
+        "key": "b66e8424-1f74-4f7e-b87c-cc4fc052b714",
+        "created_at": "2026-09-19T14:49:20.108172+00:00",
+        "updated_at": "2026-09-19T14:49:20.108173+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "73a0c28ee5f249be",
+        "kind": "episodic",
+        "content": "Hare bhai",
+        "scope": "session",
+        "key": "b66e8424-1f74-4f7e-b87c-cc4fc052b714",
+        "created_at": "2026-09-19T14:49:24.405900+00:00",
+        "updated_at": "2026-09-19T14:49:24.405901+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "51a0d2c2ddd54daa",
+        "kind": "episodic",
+        "content": "Ji Sir. . .",
+        "scope": "session",
+        "key": "b66e8424-1f74-4f7e-b87c-cc4fc052b714",
+        "created_at": "2026-09-19T14:49:24.407124+00:00",
+        "updated_at": "2026-09-19T14:49:24.407125+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "9f4c912003c946a6",
+        "kind": "episodic",
+        "content": "chalo good night",
+        "scope": "session",
+        "key": "b66e8424-1f74-4f7e-b87c-cc4fc052b714",
+        "created_at": "2026-09-19T14:49:29.849108+00:00",
+        "updated_at": "2026-09-19T14:49:29.849110+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "cf91c7b1672443da",
+        "kind": "episodic",
+        "content": "Sir. . .",
+        "scope": "session",
+        "key": "b66e8424-1f74-4f7e-b87c-cc4fc052b714",
+        "created_at": "2026-09-19T14:49:29.850360+00:00",
+        "updated_at": "2026-09-19T14:49:29.850361+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "426cdf7c6f214608",
+        "kind": "episodic",
+        "content": "kya sar",
+        "scope": "session",
+        "key": "b66e8424-1f74-4f7e-b87c-cc4fc052b714",
+        "created_at": "2026-09-19T14:49:35.521250+00:00",
+        "updated_at": "2026-09-19T14:49:35.521251+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "bffbb06bb13d448b",
+        "kind": "episodic",
+        "content": "Ji Sir. . .",
+        "scope": "session",
+        "key": "b66e8424-1f74-4f7e-b87c-cc4fc052b714",
+        "created_at": "2026-09-19T14:49:35.522621+00:00",
+        "updated_at": "2026-09-19T14:49:35.522622+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "04c296cc8d1f4db6",
+        "kind": "episodic",
+        "content": "han Sar bilkul sahi mein ab natural baat karunga vah chat vote wali lines Nahin boliye ab kya karna hai",
+        "scope": "session",
+        "key": "b66e8424-1f74-4f7e-b87c-cc4fc052b714",
+        "created_at": "2026-09-19T14:49:55.211281+00:00",
+        "updated_at": "2026-09-19T14:49:55.211285+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "a6d953988fcf4404",
+        "kind": "episodic",
+        "content": "Haan Sir. . .",
+        "scope": "session",
+        "key": "b66e8424-1f74-4f7e-b87c-cc4fc052b714",
+        "created_at": "2026-09-19T14:49:55.215549+00:00",
+        "updated_at": "2026-09-19T14:49:55.215553+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "2cb1d8c858ba4ee5",
+        "kind": "episodic",
+        "content": "tum insanon Ki Tarah",
+        "scope": "session",
+        "key": "b66e8424-1f74-4f7e-b87c-cc4fc052b714",
+        "created_at": "2026-09-19T14:49:58.014595+00:00",
+        "updated_at": "2026-09-19T14:49:58.014597+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "b820bc2f2821486a",
+        "kind": "episodic",
+        "content": "Ji Sir. . .",
+        "scope": "session",
+        "key": "b66e8424-1f74-4f7e-b87c-cc4fc052b714",
+        "created_at": "2026-09-19T14:49:58.016807+00:00",
+        "updated_at": "2026-09-19T14:49:58.016809+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "58dbd9b79f68413e",
+        "kind": "episodic",
+        "content": "Tum insanon Ki Tarah baat nahin kar sakte kya",
+        "scope": "session",
+        "key": "b66e8424-1f74-4f7e-b87c-cc4fc052b714",
+        "created_at": "2026-09-19T14:50:04.820327+00:00",
+        "updated_at": "2026-09-19T14:50:04.820329+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "2793bc612d1b4870",
+        "kind": "episodic",
+        "content": "Haan Sir. . .",
+        "scope": "session",
+        "key": "b66e8424-1f74-4f7e-b87c-cc4fc052b714",
+        "created_at": "2026-09-19T14:50:04.821571+00:00",
+        "updated_at": "2026-09-19T14:50:04.821573+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      }
+    ],
+    "friend-pipe-8767": [
+      {
+        "id": "5f39af84e3fc4446",
+        "kind": "episodic",
+        "content": "tum insanon ki tarah baat nahi kar sakte kya",
+        "scope": "session",
+        "key": "friend-pipe-8767",
+        "created_at": "2026-09-21T09:21:01.436240+00:00",
+        "updated_at": "2026-09-21T09:21:01.436241+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "5b38d9974da7439e",
+        "kind": "episodic",
+        "content": "Haan Sir. . .",
+        "scope": "session",
+        "key": "friend-pipe-8767",
+        "created_at": "2026-09-21T09:21:01.437788+00:00",
+        "updated_at": "2026-09-21T09:21:01.437790+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      }
+    ],
+    "friend-pipe-8767b": [
+      {
+        "id": "7710462aaf654b3f",
+        "kind": "episodic",
+        "content": "tum insanon ki tarah baat nahi kar sakte kya",
+        "scope": "session",
+        "key": "friend-pipe-8767b",
+        "created_at": "2026-09-21T09:22:41.624194+00:00",
+        "updated_at": "2026-09-21T09:22:41.624195+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "54ee97b7da3d4a02",
+        "kind": "episodic",
+        "content": "Haan Sir. . .",
+        "scope": "session",
+        "key": "friend-pipe-8767b",
+        "created_at": "2026-09-21T09:22:41.625589+00:00",
+        "updated_at": "2026-09-21T09:22:41.625590+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      }
+    ],
+    "a048654d-62b5-4818-af40-92b9e8af8e32": [
+      {
+        "id": "9152581f1e2746a6",
+        "kind": "episodic",
+        "content": "tum insanon ki tarah baat nahi kar sakte kya",
+        "scope": "session",
+        "key": "a048654d-62b5-4818-af40-92b9e8af8e32",
+        "created_at": "2026-09-21T09:23:35.840413+00:00",
+        "updated_at": "2026-09-21T09:23:35.840414+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "f0fdd28f1dc44e03",
+        "kind": "episodic",
+        "content": "Haan Sir. . .",
+        "scope": "session",
+        "key": "a048654d-62b5-4818-af40-92b9e8af8e32",
+        "created_at": "2026-09-21T09:23:35.842264+00:00",
+        "updated_at": "2026-09-21T09:23:35.842265+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      }
+    ],
+    "577d324c-ed79-4fa2-b7b7-18dc1025b7b9": [
+      {
+        "id": "aba2a0b6d7f644ea",
+        "kind": "episodic",
+        "content": "tum insanon ki tarah baat nahi kar sakte kya",
+        "scope": "session",
+        "key": "577d324c-ed79-4fa2-b7b7-18dc1025b7b9",
+        "created_at": "2026-09-21T09:24:10.146339+00:00",
+        "updated_at": "2026-09-21T09:24:10.146342+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "0dded18b41e54459",
+        "kind": "episodic",
+        "content": "Haan Sir. . .",
+        "scope": "session",
+        "key": "577d324c-ed79-4fa2-b7b7-18dc1025b7b9",
+        "created_at": "2026-09-21T09:24:10.148691+00:00",
+        "updated_at": "2026-09-21T09:24:10.148692+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      }
+    ],
+    "1ae8f015-cf98-4404-851d-fe0eaba8a3a6": [
+      {
+        "id": "8cbb3e20ce6b4475",
+        "kind": "episodic",
+        "content": "tum insanon ki tarah baat nahi kar sakte kya",
+        "scope": "session",
+        "key": "1ae8f015-cf98-4404-851d-fe0eaba8a3a6",
+        "created_at": "2026-09-21T09:25:55.437163+00:00",
+        "updated_at": "2026-09-21T09:25:55.437165+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "2524cf905de84fd0",
+        "kind": "episodic",
+        "content": "Haan Sir. . .",
+        "scope": "session",
+        "key": "1ae8f015-cf98-4404-851d-fe0eaba8a3a6",
+        "created_at": "2026-09-21T09:25:55.438500+00:00",
+        "updated_at": "2026-09-21T09:25:55.438501+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      }
+    ],
+    "t1": [
+      {
+        "id": "23bf18a51f1846b6",
+        "kind": "episodic",
+        "content": "tum insanon ki tarah baat nahi kar sakte kya",
+        "scope": "session",
+        "key": "t1",
+        "created_at": "2026-09-21T09:26:29.657933+00:00",
+        "updated_at": "2026-09-21T09:26:29.657935+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "ed52f90d02de43b9",
+        "kind": "episodic",
+        "content": "Haan Sir. . .",
+        "scope": "session",
+        "key": "t1",
+        "created_at": "2026-09-21T09:26:29.659791+00:00",
+        "updated_at": "2026-09-21T09:26:29.659792+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      }
+    ],
+    "t2": [
+      {
+        "id": "c2440aa1fad84df1",
+        "kind": "episodic",
+        "content": "tum insanon ki tarah baat nahi kar sakte kya",
+        "scope": "session",
+        "key": "t2",
+        "created_at": "2026-09-21T09:28:23.586899+00:00",
+        "updated_at": "2026-09-21T09:28:23.586900+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "306677f79134431f",
+        "kind": "episodic",
+        "content": "Haan Sir... bilkul... main natural baat karunga — boliye kya karna hai.",
+        "scope": "session",
+        "key": "t2",
+        "created_at": "2026-09-21T09:28:23.588509+00:00",
+        "updated_at": "2026-09-21T09:28:23.588510+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      }
+    ],
+    "t3": [
+      {
+        "id": "8d493ab1762c461d",
+        "kind": "episodic",
+        "content": "tum insanon ki tarah baat nahi kar sakte kya",
+        "scope": "session",
+        "key": "t3",
+        "created_at": "2026-09-21T09:29:21.276568+00:00",
+        "updated_at": "2026-09-21T09:29:21.276569+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "03b46c909a144836",
+        "kind": "episodic",
+        "content": "Haan Sir... bilkul... main natural baat karunga — boliye kya karna hai.",
+        "scope": "session",
+        "key": "t3",
+        "created_at": "2026-09-21T09:29:21.278044+00:00",
+        "updated_at": "2026-09-21T09:29:21.278045+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      }
+    ],
+    "friend-final": [
+      {
+        "id": "730e65d985d34950",
+        "kind": "episodic",
+        "content": "tum insanon ki tarah baat nahi kar sakte kya",
+        "scope": "session",
+        "key": "friend-final",
+        "created_at": "2026-09-21T09:30:29.855341+00:00",
+        "updated_at": "2026-09-21T09:30:29.855342+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "be979155993944bc",
+        "kind": "episodic",
+        "content": "Haan Sir... bilkul... main natural baat karunga — boliye kya karna hai.",
+        "scope": "session",
+        "key": "friend-final",
+        "created_at": "2026-09-21T09:30:29.856809+00:00",
+        "updated_at": "2026-09-21T09:30:29.856810+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      }
+    ],
+    "76f53b51-c38f-4bb0-b4a8-5b6745222635": [
+      {
+        "id": "d294ea9eb9c74b84",
+        "kind": "episodic",
+        "content": "open June",
+        "scope": "session",
+        "key": "76f53b51-c38f-4bb0-b4a8-5b6745222635",
+        "created_at": "2026-09-21T11:14:54.174394+00:00",
+        "updated_at": "2026-09-21T11:14:54.174398+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "",
+          "role": "user",
+          "confidence": 0.0
+        }
+      },
+      {
+        "id": "193a1c8e2404468e",
+        "kind": "episodic",
+        "content": "It's open.",
+        "scope": "session",
+        "key": "76f53b51-c38f-4bb0-b4a8-5b6745222635",
+        "created_at": "2026-09-21T11:14:54.181063+00:00",
+        "updated_at": "2026-09-21T11:14:54.181065+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "",
+          "role": "assistant",
+          "confidence": 0.0
+        }
+      },
+      {
+        "id": "21afaf5500b840d3",
+        "kind": "episodic",
+        "content": "June",
+        "scope": "session",
+        "key": "76f53b51-c38f-4bb0-b4a8-5b6745222635",
+        "created_at": "2026-09-21T11:15:50.435662+00:00",
+        "updated_at": "2026-09-21T11:15:50.435664+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "b591ff09ae934784",
+        "kind": "episodic",
+        "content": "Sir... I understand... tell me what you want next.",
+        "scope": "session",
+        "key": "76f53b51-c38f-4bb0-b4a8-5b6745222635",
+        "created_at": "2026-09-21T11:15:50.440673+00:00",
+        "updated_at": "2026-09-21T11:15:50.440675+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "7ab431d70868475c",
+        "kind": "episodic",
+        "content": "open June",
+        "scope": "session",
+        "key": "76f53b51-c38f-4bb0-b4a8-5b6745222635",
+        "created_at": "2026-09-21T11:16:18.754883+00:00",
+        "updated_at": "2026-09-21T11:16:18.754885+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "",
+          "role": "user",
+          "confidence": 0.0
+        }
+      },
+      {
+        "id": "725d95f94a4541f7",
+        "kind": "episodic",
+        "content": "It's open.",
+        "scope": "session",
+        "key": "76f53b51-c38f-4bb0-b4a8-5b6745222635",
+        "created_at": "2026-09-21T11:16:18.758044+00:00",
+        "updated_at": "2026-09-21T11:16:18.758047+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "",
+          "role": "assistant",
+          "confidence": 0.0
+        }
+      }
+    ],
+    "6b240063-b780-4843-aa47-8f9dee2dd94d": [
+      {
+        "id": "fdfaf6325b194041",
+        "kind": "episodic",
+        "content": "hello hello",
+        "scope": "session",
+        "key": "6b240063-b780-4843-aa47-8f9dee2dd94d",
+        "created_at": "2026-09-21T12:15:38.870708+00:00",
+        "updated_at": "2026-09-21T12:15:38.870709+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "greeting",
+          "role": "user",
+          "confidence": 0.97
+        }
+      },
+      {
+        "id": "d977546d0941402b",
+        "kind": "episodic",
+        "content": "Yes Sir... I'm here... tell me what you want next.",
+        "scope": "session",
+        "key": "6b240063-b780-4843-aa47-8f9dee2dd94d",
+        "created_at": "2026-09-21T12:15:38.874716+00:00",
+        "updated_at": "2026-09-21T12:15:38.874717+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "greeting",
+          "role": "assistant",
+          "confidence": 0.97
+        }
+      },
+      {
+        "id": "95041b6afe2a4c09",
+        "kind": "episodic",
+        "content": "how are you",
+        "scope": "session",
+        "key": "6b240063-b780-4843-aa47-8f9dee2dd94d",
+        "created_at": "2026-09-21T12:17:48.510250+00:00",
+        "updated_at": "2026-09-21T12:17:48.510252+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "greeting",
+          "role": "user",
+          "confidence": 0.97
+        }
+      },
+      {
+        "id": "42b10f165a1741c2",
+        "kind": "episodic",
+        "content": "Sir... I understand... tell me what you want next.",
+        "scope": "session",
+        "key": "6b240063-b780-4843-aa47-8f9dee2dd94d",
+        "created_at": "2026-09-21T12:17:48.513747+00:00",
+        "updated_at": "2026-09-21T12:17:48.513748+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "greeting",
+          "role": "assistant",
+          "confidence": 0.97
+        }
+      },
+      {
+        "id": "cabc29b2fa5541a4",
+        "kind": "episodic",
+        "content": "Mohabbat zoom",
+        "scope": "session",
+        "key": "6b240063-b780-4843-aa47-8f9dee2dd94d",
+        "created_at": "2026-09-21T12:20:18.736010+00:00",
+        "updated_at": "2026-09-21T12:20:18.736011+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "36208246b914404a",
+        "kind": "episodic",
+        "content": "Sir... I understand... tell me what you want next.",
+        "scope": "session",
+        "key": "6b240063-b780-4843-aa47-8f9dee2dd94d",
+        "created_at": "2026-09-21T12:20:18.738458+00:00",
+        "updated_at": "2026-09-21T12:20:18.738459+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "b248febb90ff459b",
+        "kind": "episodic",
+        "content": "hello hello",
+        "scope": "session",
+        "key": "6b240063-b780-4843-aa47-8f9dee2dd94d",
+        "created_at": "2026-09-21T12:21:20.381443+00:00",
+        "updated_at": "2026-09-21T12:21:20.381445+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "greeting",
+          "role": "user",
+          "confidence": 0.97
+        }
+      },
+      {
+        "id": "2193ad5ab3c7443a",
+        "kind": "episodic",
+        "content": "Yes Sir... I'm here... tell me what you want next.",
+        "scope": "session",
+        "key": "6b240063-b780-4843-aa47-8f9dee2dd94d",
+        "created_at": "2026-09-21T12:21:20.383594+00:00",
+        "updated_at": "2026-09-21T12:21:20.383596+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "greeting",
+          "role": "assistant",
+          "confidence": 0.97
+        }
+      }
     ]
   },
   "semantic": {
@@ -4953,12 +5977,47 @@
         "source": "companion",
         "meta": {}
       }
-    ]
+    ],
+    "default:user": [
+      {
+        "id": "a68e62d87c3e4230",
+        "kind": "semantic",
+        "content": "not",
+        "scope": "user",
+        "key": "name",
+        "created_at": "2026-09-21T06:17:33.577442+00:00",
+        "updated_at": "2026-09-21T06:17:33.577445+00:00",
+        "tags": [
+          "name"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {}
+      },
+      {
+        "id": "6ed5cc56063e4676",
+        "kind": "semantic",
+        "content": "Tumhari Awaaz Nahin a rahi hai",
+        "scope": "user",
+        "key": "preference",
+        "created_at": "2026-09-21T06:24:29.148175+00:00",
+        "updated_at": "2026-09-21T06:24:29.148178+00:00",
+        "tags": [
+          "preference"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {}
+      }
+    ],
+    "default:Gajendra Rawat": []
   },
   "preferences": {
     "t:u": [],
     "default:anon": [],
-    "default:Gajendra": []
+    "default:Gajendra": [],
+    "default:user": [],
+    "default:Gajendra Rawat": []
   },
   "project": {
     "ai development": [
@@ -5169,6 +6228,274 @@
           "intent": "chat",
           "role": "user",
           "confidence": 0.6
+        }
+      },
+      {
+        "id": "a913e5ccb3d4480f",
+        "kind": "project",
+        "content": "kya hua",
+        "scope": "project",
+        "key": "ai development",
+        "created_at": "2026-09-19T14:49:07.286739+00:00",
+        "updated_at": "2026-09-19T14:49:07.286740+00:00",
+        "tags": [
+          "turn"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "0e5c2d8e3890460c",
+        "kind": "project",
+        "content": "are kya hua sab theek hai na",
+        "scope": "project",
+        "key": "ai development",
+        "created_at": "2026-09-19T14:49:13.351433+00:00",
+        "updated_at": "2026-09-19T14:49:13.351434+00:00",
+        "tags": [
+          "turn"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "d71b278f2b3c47e4",
+        "kind": "project",
+        "content": "kya ji Kuchh To bolo",
+        "scope": "project",
+        "key": "ai development",
+        "created_at": "2026-09-19T14:49:20.106953+00:00",
+        "updated_at": "2026-09-19T14:49:20.106955+00:00",
+        "tags": [
+          "turn"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "013244753f1b4bda",
+        "kind": "project",
+        "content": "Hare bhai",
+        "scope": "project",
+        "key": "ai development",
+        "created_at": "2026-09-19T14:49:24.405908+00:00",
+        "updated_at": "2026-09-19T14:49:24.405909+00:00",
+        "tags": [
+          "turn"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "82cba196246646e8",
+        "kind": "project",
+        "content": "chalo good night",
+        "scope": "project",
+        "key": "ai development",
+        "created_at": "2026-09-19T14:49:29.849116+00:00",
+        "updated_at": "2026-09-19T14:49:29.849118+00:00",
+        "tags": [
+          "turn"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "a4d0fc86b12a4c56",
+        "kind": "project",
+        "content": "kya sar",
+        "scope": "project",
+        "key": "ai development",
+        "created_at": "2026-09-19T14:49:35.521258+00:00",
+        "updated_at": "2026-09-19T14:49:35.521259+00:00",
+        "tags": [
+          "turn"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "6a25f3f0b96f4d0f",
+        "kind": "project",
+        "content": "han Sar bilkul sahi mein ab natural baat karunga vah chat vote wali lines Nahin boliye ab kya karna hai",
+        "scope": "project",
+        "key": "ai development",
+        "created_at": "2026-09-19T14:49:55.211309+00:00",
+        "updated_at": "2026-09-19T14:49:55.211313+00:00",
+        "tags": [
+          "turn"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "a914c0fd2c72414c",
+        "kind": "project",
+        "content": "tum insanon Ki Tarah",
+        "scope": "project",
+        "key": "ai development",
+        "created_at": "2026-09-19T14:49:58.014603+00:00",
+        "updated_at": "2026-09-19T14:49:58.014604+00:00",
+        "tags": [
+          "turn"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "01c3b538c59e4417",
+        "kind": "project",
+        "content": "Tum insanon Ki Tarah baat nahin kar sakte kya",
+        "scope": "project",
+        "key": "ai development",
+        "created_at": "2026-09-19T14:50:04.820335+00:00",
+        "updated_at": "2026-09-19T14:50:04.820336+00:00",
+        "tags": [
+          "turn"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      }
+    ],
+    "general": [
+      {
+        "id": "4fee41b22b37495b",
+        "kind": "project",
+        "content": "June",
+        "scope": "project",
+        "key": "general",
+        "created_at": "2026-09-21T11:15:50.435673+00:00",
+        "updated_at": "2026-09-21T11:15:50.435675+00:00",
+        "tags": [
+          "turn"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "f6818e397fcf415b",
+        "kind": "project",
+        "content": "hello hello",
+        "scope": "project",
+        "key": "general",
+        "created_at": "2026-09-21T12:15:38.870718+00:00",
+        "updated_at": "2026-09-21T12:15:38.870719+00:00",
+        "tags": [
+          "turn"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "greeting",
+          "role": "user",
+          "confidence": 0.97
+        }
+      },
+      {
+        "id": "e77ef54408784938",
+        "kind": "project",
+        "content": "how are you",
+        "scope": "project",
+        "key": "general",
+        "created_at": "2026-09-21T12:17:48.510268+00:00",
+        "updated_at": "2026-09-21T12:17:48.510270+00:00",
+        "tags": [
+          "turn"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "greeting",
+          "role": "user",
+          "confidence": 0.97
+        }
+      },
+      {
+        "id": "faa3f3be12574816",
+        "kind": "project",
+        "content": "Mohabbat zoom",
+        "scope": "project",
+        "key": "general",
+        "created_at": "2026-09-21T12:20:18.736023+00:00",
+        "updated_at": "2026-09-21T12:20:18.736027+00:00",
+        "tags": [
+          "turn"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "8b01a1345baa44db",
+        "kind": "project",
+        "content": "hello hello",
+        "scope": "project",
+        "key": "general",
+        "created_at": "2026-09-21T12:21:20.381454+00:00",
+        "updated_at": "2026-09-21T12:21:20.381456+00:00",
+        "tags": [
+          "turn"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "greeting",
+          "role": "user",
+          "confidence": 0.97
         }
       }
     ]

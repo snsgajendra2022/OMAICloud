@@ -78,6 +78,10 @@ class SpeechStyle:
             t = (spoken or "").strip()
             if "[[slnc" in t.lower():
                 return t
+            # Keep ellipsis intact — never turn "..." into ". . ."
+            t = t.replace("…", "...")
+            t = re.sub(r"\.{3,}", "«ELLIP»", t)
             t = re.sub(r"([.!?])\s+", r"\1 [[slnc 180]] ", t)
             t = re.sub(r"([,;:])\s+", r"\1 [[slnc 90]] ", t)
-            return t.strip()
+            t = t.replace("«ELLIP»", " [[slnc 200]] ")
+            return re.sub(r"\s+", " ", t).strip()

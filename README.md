@@ -16,6 +16,7 @@ See `docs/IMPLEMENTATION_STATUS.md`, `docs/EXTERNAL_ASSETS_REQUIRED.md`, **`docs
 ## Quick start (OM-1.0 native)
 
 ```bash
+
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -e '.[dev]'
@@ -153,10 +154,10 @@ om-ai train-om1 \
 
 om-ai train-om1 \
   --config configs/om-1.0-local.json \
-  --data data/production-corpus/raw/fineweb-100mb.txt \
+  --data data/production-corpus/raw/fineweb-100gb.txt \
   --tokenizer artifacts/tokenizer-production-65536.json \
   --steps 70000000000000 \
-  --batch-size 4 \
+  --batch-size 7500000 \
   --max-tokens 7500000000 \
   --max-docs 75000000 \
   --checkpoint-every 70000 \
