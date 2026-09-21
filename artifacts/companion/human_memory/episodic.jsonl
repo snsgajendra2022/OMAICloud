@@ -765,3 +765,35 @@
 {"id": "0bea82bb47ac", "ts": 1789997703.5756931, "role": "assistant", "text": "It's open.", "tags": []}
 {"id": "8cf7b20cfa35", "ts": 1789997703.5764859, "role": "user", "text": "zoom open kar lo", "tags": []}
 {"id": "b575233a4086", "ts": 1789997703.576563, "role": "assistant", "text": "It's open.", "tags": []}
+{"id": "56606d41b3bb", "ts": 1789997756.186854, "role": "user", "text": "go hello", "tags": []}
+{"id": "b919c5bdd75b", "ts": 1789997756.186923, "role": "assistant", "text": "Clarify goal, then give a direct actionable answer. Here's the direct path for: Solve: go hello 1. understand 2.", "tags": []}
+{"id": "d7b0e8dc29c1", "ts": 1789997756.188084, "role": "user", "text": "go hello", "tags": []}
+{"id": "eb804a0fa57d", "ts": 1789997756.188149, "role": "assistant", "text": "Clarify goal, then give a direct actionable answer. Here's the direct path for: Solve: go hello 1. understand 2.", "tags": []}
+{"id": "cc31dded01ae", "ts": 1789997770.502156, "role": "user", "text": "zoom and connect meeting", "tags": []}
+{"id": "f2077f584777", "ts": 1789997770.502242, "role": "assistant", "text": "Clarify goal, then give a direct actionable answer. Here's the direct path for: Solve: zoom and connect meeting 1. understand 2.", "tags": []}
+{"id": "c0691c086ab0", "ts": 1789997770.502812, "role": "user", "text": "zoom and connect meeting", "tags": []}
+{"id": "f828e3ad2d27", "ts": 1789997770.502861, "role": "assistant", "text": "Clarify goal, then give a direct actionable answer. Here's the direct path for: Solve: zoom and connect meeting 1. understand 2.", "tags": []}
+{"id": "0a2066a775b8", "ts": 1789997890.531585, "role": "user", "text": "hello home", "tags": []}
+{"id": "8bcea62fe758", "ts": 1789997890.531661, "role": "assistant", "text": "The issue may come from incorrect assumptions or missing context. Here's the direct path for: Solve: hello home 1. acknowledge 2.", "tags": []}
+{"id": "c38a6ed27fe6", "ts": 1789997890.532925, "role": "user", "text": "hello home", "tags": []}
+{"id": "5f04314270db", "ts": 1789997890.53298, "role": "assistant", "text": "The issue may come from incorrect assumptions or missing context. Here's the direct path for: Solve: hello home 1. acknowledge 2.", "tags": []}
+{"id": "87161fdd1194", "ts": 1789997922.142857, "role": "user", "text": "do you solve my problem", "tags": []}
+{"id": "a4efafef6b3d", "ts": 1789997922.1429372, "role": "assistant", "text": "The issue may come from incorrect assumptions or missing context. Here's the direct path for: Solve: do you solve my problem 1. understand 2.", "tags": []}
+{"id": "1c57751e3ff4", "ts": 1789997922.1434822, "role": "user", "text": "do you solve my problem", "tags": []}
+{"id": "1e328d790392", "ts": 1789997922.14352, "role": "assistant", "text": "The issue may come from incorrect assumptions or missing context. Here's the direct path for: Solve: do you solve my problem 1. understand 2.", "tags": []}
+{"id": "5f7730a29df9", "ts": 1789998083.853632, "role": "user", "text": "go for zoom and", "tags": []}
+{"id": "08765d0fc574", "ts": 1789998083.85408, "role": "assistant", "text": "You started talking about personal. What happened next?", "tags": []}
+{"id": "642478cf80e3", "ts": 1789998083.8557281, "role": "user", "text": "go for zoom and", "tags": []}
+{"id": "264fcc802998", "ts": 1789998083.856101, "role": "assistant", "text": "You started talking about personal. What happened next?", "tags": []}
+{"id": "e1cab4145e1f", "ts": 1789998094.1067069, "role": "user", "text": "open zoom", "tags": []}
+{"id": "28b9b9581194", "ts": 1789998094.106854, "role": "assistant", "text": "It's open.", "tags": []}
+{"id": "c1a287b6c200", "ts": 1789998094.108166, "role": "user", "text": "open zoom", "tags": []}
+{"id": "cc9f62eae812", "ts": 1789998094.108248, "role": "assistant", "text": "It's open.", "tags": []}
+{"id": "2fb5118e136b", "ts": 1789998107.023496, "role": "user", "text": "can you find correct Zoom app", "tags": []}
+{"id": "232094bed29f", "ts": 1789998107.023561, "role": "assistant", "text": "The issue may come from incorrect assumptions or missing context. Here's the direct path for: Solve: can you find correct Zoom app 1. answer 2.", "tags": []}
+{"id": "bb2648f34150", "ts": 1789998107.024213, "role": "user", "text": "can you find correct Zoom app", "tags": []}
+{"id": "c73e7d3c4f8c", "ts": 1789998107.024269, "role": "assistant", "text": "The issue may come from incorrect assumptions or missing context. Here's the direct path for: Solve: can you find correct Zoom app 1. answer 2.", "tags": []}
+{"id": "10b0a05321cb", "ts": 1789998124.4246452, "role": "user", "text": "Pulsar 2", "tags": []}
+{"id": "b260a70b6c74", "ts": 1789998124.424713, "role": "assistant", "text": "The issue may come from incorrect assumptions or missing context. Here's the direct path for: Solve: Pulsar 2 1. understand 2.", "tags": []}
+{"id": "e77ed57c2bcd", "ts": 1789998124.425326, "role": "user", "text": "Pulsar 2", "tags": []}
+{"id": "30611682b3f8", "ts": 1789998124.425367, "role": "assistant", "text": "The issue may come from incorrect assumptions or missing context. Here's the direct path for: Solve: Pulsar 2 1. understand 2.", "tags": []}

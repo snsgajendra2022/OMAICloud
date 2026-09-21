@@ -7173,6 +7173,330 @@
           "confidence": 0.0
         }
       }
+    ],
+    "21323ee0-ed5b-4cc0-9274-ba05999975b4": [
+      {
+        "id": "1dda7f4d97b54ca6",
+        "kind": "episodic",
+        "content": "go hello",
+        "scope": "session",
+        "key": "21323ee0-ed5b-4cc0-9274-ba05999975b4",
+        "created_at": "2026-09-21T13:35:56.180704+00:00",
+        "updated_at": "2026-09-21T13:35:56.180705+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "52ea42f9cc374b60",
+        "kind": "episodic",
+        "content": "Clarify goal, then give a direct actionable answer. Here's the direct path for: Solve: go hello 1. understand 2.",
+        "scope": "session",
+        "key": "21323ee0-ed5b-4cc0-9274-ba05999975b4",
+        "created_at": "2026-09-21T13:35:56.183072+00:00",
+        "updated_at": "2026-09-21T13:35:56.183073+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "10c4daf00b5d4d2a",
+        "kind": "episodic",
+        "content": "zoom and connect meeting",
+        "scope": "session",
+        "key": "21323ee0-ed5b-4cc0-9274-ba05999975b4",
+        "created_at": "2026-09-21T13:36:10.495638+00:00",
+        "updated_at": "2026-09-21T13:36:10.495640+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "5afbe06be266459b",
+        "kind": "episodic",
+        "content": "Clarify goal, then give a direct actionable answer. Here's the direct path for: Solve: zoom and connect meeting 1. understand 2.",
+        "scope": "session",
+        "key": "21323ee0-ed5b-4cc0-9274-ba05999975b4",
+        "created_at": "2026-09-21T13:36:10.498326+00:00",
+        "updated_at": "2026-09-21T13:36:10.498327+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      }
+    ],
+    "4c9d8b9d-41bb-4dbf-9689-1edf4b3b9f69": [
+      {
+        "id": "177e21a11c454711",
+        "kind": "episodic",
+        "content": "hello home",
+        "scope": "session",
+        "key": "4c9d8b9d-41bb-4dbf-9689-1edf4b3b9f69",
+        "created_at": "2026-09-21T13:38:10.524076+00:00",
+        "updated_at": "2026-09-21T13:38:10.524077+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "greeting",
+          "role": "user",
+          "confidence": 0.97
+        }
+      },
+      {
+        "id": "450d4ac24b7441aa",
+        "kind": "episodic",
+        "content": "The issue may come from incorrect assumptions or missing context. Here's the direct path for: Solve: hello home 1. acknowledge 2.",
+        "scope": "session",
+        "key": "4c9d8b9d-41bb-4dbf-9689-1edf4b3b9f69",
+        "created_at": "2026-09-21T13:38:10.527484+00:00",
+        "updated_at": "2026-09-21T13:38:10.527485+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "greeting",
+          "role": "assistant",
+          "confidence": 0.97
+        }
+      },
+      {
+        "id": "bbddca4e237e457a",
+        "kind": "episodic",
+        "content": "do you solve my problem",
+        "scope": "session",
+        "key": "4c9d8b9d-41bb-4dbf-9689-1edf4b3b9f69",
+        "created_at": "2026-09-21T13:38:42.136097+00:00",
+        "updated_at": "2026-09-21T13:38:42.136098+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "ddcbfd4fa7c34feb",
+        "kind": "episodic",
+        "content": "The issue may come from incorrect assumptions or missing context. Here's the direct path for: Solve: do you solve my problem 1. understand 2.",
+        "scope": "session",
+        "key": "4c9d8b9d-41bb-4dbf-9689-1edf4b3b9f69",
+        "created_at": "2026-09-21T13:38:42.139972+00:00",
+        "updated_at": "2026-09-21T13:38:42.139973+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "cd5e67cc4ba046b4",
+        "kind": "episodic",
+        "content": "go for zoom and",
+        "scope": "session",
+        "key": "4c9d8b9d-41bb-4dbf-9689-1edf4b3b9f69",
+        "created_at": "2026-09-21T13:41:23.862068+00:00",
+        "updated_at": "2026-09-21T13:41:23.862070+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "",
+          "role": "user",
+          "confidence": 0.0
+        }
+      },
+      {
+        "id": "ebacbcc134164be8",
+        "kind": "episodic",
+        "content": "You started talking about personal. What happened next?",
+        "scope": "session",
+        "key": "4c9d8b9d-41bb-4dbf-9689-1edf4b3b9f69",
+        "created_at": "2026-09-21T13:41:23.865985+00:00",
+        "updated_at": "2026-09-21T13:41:23.865987+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "",
+          "role": "assistant",
+          "confidence": 0.0
+        }
+      },
+      {
+        "id": "2d2047073f1d4ba5",
+        "kind": "episodic",
+        "content": "open zoom",
+        "scope": "session",
+        "key": "4c9d8b9d-41bb-4dbf-9689-1edf4b3b9f69",
+        "created_at": "2026-09-21T13:41:34.112566+00:00",
+        "updated_at": "2026-09-21T13:41:34.112568+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "",
+          "role": "user",
+          "confidence": 0.0
+        }
+      },
+      {
+        "id": "259fa2749f1b4d2f",
+        "kind": "episodic",
+        "content": "It's open",
+        "scope": "session",
+        "key": "4c9d8b9d-41bb-4dbf-9689-1edf4b3b9f69",
+        "created_at": "2026-09-21T13:41:34.154490+00:00",
+        "updated_at": "2026-09-21T13:41:34.154492+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "",
+          "role": "assistant",
+          "confidence": 0.0
+        }
+      },
+      {
+        "id": "0040c45fcf8e4c3a",
+        "kind": "episodic",
+        "content": "can you find correct Zoom app",
+        "scope": "session",
+        "key": "4c9d8b9d-41bb-4dbf-9689-1edf4b3b9f69",
+        "created_at": "2026-09-21T13:41:47.018566+00:00",
+        "updated_at": "2026-09-21T13:41:47.018568+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "question",
+          "role": "user",
+          "confidence": 0.75
+        }
+      },
+      {
+        "id": "b210adc8fab848cc",
+        "kind": "episodic",
+        "content": "The issue may come from incorrect assumptions or missing context. Here's the direct path for: Solve: can you find correct Zoom app 1. answer 2.",
+        "scope": "session",
+        "key": "4c9d8b9d-41bb-4dbf-9689-1edf4b3b9f69",
+        "created_at": "2026-09-21T13:41:47.020453+00:00",
+        "updated_at": "2026-09-21T13:41:47.020454+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "question",
+          "role": "assistant",
+          "confidence": 0.75
+        }
+      },
+      {
+        "id": "3b77d3cb4aba4337",
+        "kind": "episodic",
+        "content": "Pulsar 2",
+        "scope": "session",
+        "key": "4c9d8b9d-41bb-4dbf-9689-1edf4b3b9f69",
+        "created_at": "2026-09-21T13:42:04.418995+00:00",
+        "updated_at": "2026-09-21T13:42:04.419024+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "18ec38c6c5834993",
+        "kind": "episodic",
+        "content": "The issue may come from incorrect assumptions or missing context. Here's the direct path for: Solve: Pulsar 2 1. understand 2.",
+        "scope": "session",
+        "key": "4c9d8b9d-41bb-4dbf-9689-1edf4b3b9f69",
+        "created_at": "2026-09-21T13:42:04.421741+00:00",
+        "updated_at": "2026-09-21T13:42:04.421743+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      }
     ]
   },
   "semantic": {
@@ -8263,6 +8587,120 @@
         "key": "general",
         "created_at": "2026-09-21T13:34:55.204992+00:00",
         "updated_at": "2026-09-21T13:34:55.204995+00:00",
+        "tags": [
+          "turn"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "a8ca618488294984",
+        "kind": "project",
+        "content": "go hello",
+        "scope": "project",
+        "key": "general",
+        "created_at": "2026-09-21T13:35:56.180713+00:00",
+        "updated_at": "2026-09-21T13:35:56.180714+00:00",
+        "tags": [
+          "turn"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "bded4bcf47634181",
+        "kind": "project",
+        "content": "zoom and connect meeting",
+        "scope": "project",
+        "key": "general",
+        "created_at": "2026-09-21T13:36:10.495647+00:00",
+        "updated_at": "2026-09-21T13:36:10.495648+00:00",
+        "tags": [
+          "turn"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "d848b8ac96bf42d5",
+        "kind": "project",
+        "content": "hello home",
+        "scope": "project",
+        "key": "general",
+        "created_at": "2026-09-21T13:38:10.524086+00:00",
+        "updated_at": "2026-09-21T13:38:10.524087+00:00",
+        "tags": [
+          "turn"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "greeting",
+          "role": "user",
+          "confidence": 0.97
+        }
+      },
+      {
+        "id": "d2d7e4dec6874073",
+        "kind": "project",
+        "content": "do you solve my problem",
+        "scope": "project",
+        "key": "general",
+        "created_at": "2026-09-21T13:38:42.136105+00:00",
+        "updated_at": "2026-09-21T13:38:42.136106+00:00",
+        "tags": [
+          "turn"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "9b1c85d4dca84e7f",
+        "kind": "project",
+        "content": "can you find correct Zoom app",
+        "scope": "project",
+        "key": "general",
+        "created_at": "2026-09-21T13:41:47.018576+00:00",
+        "updated_at": "2026-09-21T13:41:47.018577+00:00",
+        "tags": [
+          "turn"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "question",
+          "role": "user",
+          "confidence": 0.75
+        }
+      },
+      {
+        "id": "dbe7f9ab973e4645",
+        "kind": "project",
+        "content": "Pulsar 2",
+        "scope": "project",
+        "key": "general",
+        "created_at": "2026-09-21T13:42:04.419036+00:00",
+        "updated_at": "2026-09-21T13:42:04.419038+00:00",
         "tags": [
           "turn"
         ],

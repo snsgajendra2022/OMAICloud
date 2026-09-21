@@ -29,6 +29,7 @@ from .solution_memory import SolutionMemory
 from .solution_planner import SolutionPlanner
 from .user_preference import UserPreference
 from .verification_engine import VerificationEngine
+from .conversation_router import ConversationRouter
 
 __all__ = [
     "AnswerPlanner",
@@ -54,4 +55,5 @@ __all__ = [
     "UserPreference",
     "VerificationEngine",
     "run_chat_intelligence",
+    "ConversationRouter",
 ]
