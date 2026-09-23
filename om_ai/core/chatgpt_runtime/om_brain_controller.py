@@ -37,6 +37,42 @@ class OMBrainController:
         if not q:
             return {"answer": "", "stages": stages, "meta": meta}
 
+        # 0) STEP 71 — Human Presence before chat/solution stack
+        stages.append("human_presence")
+        try:
+            from om_ai.core.human_presence import run_human_presence
+
+            presence = run_human_presence(q, history=history) or {}
+            meta["human_presence"] = {
+                "route": (presence.get("route") or {}).get("mode"),
+                "listen_first": presence.get("listen_first"),
+                "emotion": (presence.get("emotion") or {}).get("emotion"),
+            }
+            if presence.get("block_solution_engine") and presence.get("seed_reply"):
+                stages.append("presence_reply")
+                return {
+                    "answer": str(presence["seed_reply"]).strip(),
+                    "stages": stages,
+                    "meta": meta,
+                    "human_presence": presence,
+                    "source": "human_presence",
+                }
+            if presence.get("requires_permission") and presence.get("permission_prompt"):
+                stages.append("presence_permission")
+                return {
+                    "answer": str(presence["permission_prompt"]).strip(),
+                    "stages": stages,
+                    "meta": meta,
+                    "human_presence": presence,
+                    "source": "human_presence_permission",
+                }
+            # Pass presence hint into extra for later stages
+            extra = dict(extra or {})
+            extra["human_presence_hint"] = presence.get("system_hint") or ""
+            extra["human_presence"] = presence
+        except Exception as exc:
+            meta["human_presence"] = {"error": str(exc)}
+
         # 1) Chat Intelligence
         stages.append("chat_intelligence")
         chat: dict[str, Any] = {}
@@ -57,14 +93,23 @@ class OMBrainController:
                 "stages": chat.get("stages"),
             }
             if chat.get("answer") and not chat.get("needs_model", True):
-                stages.append("response")
-                return {
-                    "answer": chat["answer"],
-                    "stages": stages,
-                    "meta": meta,
-                    "chat_intelligence": chat,
-                    "source": "chat_intelligence",
-                }
+                early = str(chat.get("answer") or "").strip()
+                try:
+                    from om_ai.core.chat_intelligence.stub_detect import is_solution_stub
+
+                    if is_solution_stub(early):
+                        early = ""
+                except Exception:
+                    pass
+                if early:
+                    stages.append("response")
+                    return {
+                        "answer": early,
+                        "stages": stages,
+                        "meta": meta,
+                        "chat_intelligence": chat,
+                        "source": "chat_intelligence",
+                    }
         except Exception as exc:
             meta["chat_intelligence"] = {"error": str(exc)}
 
@@ -101,9 +146,23 @@ class OMBrainController:
                 draft = ""
         except Exception:
             pass
+        try:
+            from om_ai.core.chat_intelligence.stub_detect import is_solution_stub
+
+            if is_solution_stub(draft):
+                draft = ""
+        except Exception:
+            pass
 
         if not voice_mode:
             sol = str((chat.get("solution") or {}).get("answer") or "").strip()
+            try:
+                from om_ai.core.chat_intelligence.stub_detect import is_solution_stub
+
+                if is_solution_stub(sol):
+                    sol = ""
+            except Exception:
+                pass
             if sol and (not draft or len(sol) > len(draft)):
                 draft = sol
             # Never promote agent context_blob to user-facing answer

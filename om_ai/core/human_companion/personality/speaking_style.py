@@ -37,7 +37,7 @@ class SpeakingStyle:
         text = re.sub(r"\s{2,}", " ", text)
         if not text or text.lower() in {"ok", "okay", "sure", "?", "!"} or is_garbage_spoken(text):
             text = rescue_spoken(user_message) if user_message else (
-                "Sir, I understand. Let me check this with you."
+                "Bhai, samajh gaya — main check karta hun."
             )
         pack_out = shape_for_speech(text, user_message=user_message)
         spoken = str(pack_out.get("spoken") or text).strip()

@@ -6,6 +6,7 @@ import os
 import socket
 import subprocess
 import sys
+import threading
 import time
 import webbrowser
 from typing import Any
@@ -128,10 +129,12 @@ def cmd_companion_start(args) -> int:
     host = (os.getenv("OM_COMPANION_BIND_HOST") or "127.0.0.1").strip()
     preferred = int(os.getenv("OM_COMPANION_BIND_PORT") or os.getenv("PORT") or "8080")
 
-    # Browser companion uses Web Speech + /tts — native sounddevice is optional
-    browser_ui = not bool(getattr(args, "no_avatar", False)) and not bool(
-        getattr(args, "text_only", False)
+    # Native desktop UI by default; --browser opens a browser tab instead
+    use_browser = bool(getattr(args, "browser", False))
+    use_desktop = not use_browser and not bool(getattr(args, "text_only", False)) and not bool(
+        getattr(args, "no_avatar", False)
     )
+    browser_ui = use_browser or use_desktop
     status = start_companion(
         text_only=bool(getattr(args, "text_only", False)) or browser_ui,
         no_avatar=bool(getattr(args, "no_avatar", False)),
@@ -152,7 +155,9 @@ def cmd_companion_start(args) -> int:
         rt.config.no_avatar = True
 
     print(format_banner(status))
-    if browser_ui:
+    if use_desktop:
+        print("  Note: opening as system UI window (not a browser tab).\n")
+    elif browser_ui:
         print("  Note: mic/voice run in the browser (no local sounddevice required).\n")
 
     api_proc = None
@@ -164,12 +169,57 @@ def cmd_companion_start(args) -> int:
         if not _api_alive(host, port):
             print(f"\n  Companion UI failed to start at {url}")
             print("  Try:  om-ai serve --host 127.0.0.1 --port 8080")
-            print("  Then open: http://127.0.0.1:8080/companion\n")
+            print("  Then: om-ai companion desktop\n")
             return 1
-        print(f"\n  Companion UI:  {url}")
-        print("  Talk to OM — allow microphone in the browser.\n")
+        print(f"\n  Companion API:  http://{host}:{port}")
         if preferred != port:
             print(f"  NOTE: preferred port {preferred} unavailable — using {port}.\n")
+
+        if use_desktop:
+            # Keep API alive in background; window owns the main thread
+            def _watch_api() -> None:
+                while True:
+                    time.sleep(2.0)
+                    if api_proc is not None and api_proc.poll() is not None:
+                        print("\n  Companion API process exited.")
+                        break
+
+            if api_proc is not None:
+                threading.Thread(target=_watch_api, daemon=True).start()
+            try:
+                from om_ai.desktop import launch_companion_desktop
+
+                always_on_top = not bool(getattr(args, "no_top", False))
+                code = launch_companion_desktop(
+                    url,
+                    always_on_top=always_on_top,
+                    tray=not bool(getattr(args, "no_tray", False)),
+                )
+            except SystemExit as exc:
+                print(str(exc))
+                print("  Falling back to browser tab…")
+                try:
+                    webbrowser.open(url)
+                except Exception:
+                    pass
+                code = 1
+            except Exception as exc:
+                print(f"  Desktop window failed: {exc}")
+                print("  Falling back to browser tab…")
+                try:
+                    webbrowser.open(url)
+                except Exception:
+                    pass
+                code = 1
+            from om_ai.core.companion_runtime import stop_companion
+
+            stop_companion()
+            if api_proc is not None and api_proc.poll() is None:
+                api_proc.terminate()
+            return int(code or 0)
+
+        print(f"\n  Companion UI:  {url}")
+        print("  Talk to OM — allow microphone in the browser.\n")
         try:
             webbrowser.open(url)
         except Exception:
@@ -219,6 +269,14 @@ def cmd_companion_start(args) -> int:
             if api_proc is not None and api_proc.poll() is None:
                 api_proc.terminate()
     return 0
+
+
+def cmd_companion_desktop(args) -> int:
+    """Explicit: open native system UI companion window."""
+    args.browser = False
+    args.text_only = False
+    args.no_avatar = False
+    return cmd_companion_start(args)
 
 
 def cmd_companion_stop(args) -> int:
@@ -359,27 +417,50 @@ def cmd_om_start(args) -> int:
         text_only = bool(getattr(args, "text_only", False))
         no_avatar = bool(getattr(args, "no_avatar", False))
         no_wake_word = bool(getattr(args, "no_wake_word", False))
+        browser = bool(getattr(args, "browser", False))
+        no_top = bool(getattr(args, "no_top", False))
+        no_tray = bool(getattr(args, "no_tray", False))
 
     return cmd_companion_start(_A())
 
 
 def register_companion_parser(sp) -> None:
     """Attach `companion` subcommand tree to argparse subparsers."""
-    # Top-level: om-ai start
-    start_top = sp.add_parser("start", help="Start OM Jarvis companion (3D presence + consciousness)")
+    # Top-level: om-ai start  → native system UI by default
+    start_top = sp.add_parser("start", help="Start OM Jarvis companion as system UI window")
     start_top.add_argument("--text-only", action="store_true")
     start_top.add_argument("--no-avatar", action="store_true")
     start_top.add_argument("--no-wake-word", action="store_true")
+    start_top.add_argument(
+        "--browser",
+        action="store_true",
+        help="Open in browser tab instead of native system window",
+    )
+    start_top.add_argument("--no-top", action="store_true", help="Do not keep window always on top")
+    start_top.add_argument("--no-tray", action="store_true", help="Disable menu-bar tray presence")
     start_top.set_defaults(func=cmd_om_start)
 
     comp = sp.add_parser("companion", help="OM Companion Runtime (voice + avatar + actions)")
     csp = comp.add_subparsers(dest="companion_sub", required=True)
 
-    start = csp.add_parser("start", help="Start companion runtime")
+    start = csp.add_parser("start", help="Start companion as native system UI (default)")
     start.add_argument("--text-only", action="store_true", help="No audio hardware")
     start.add_argument("--no-avatar", action="store_true", help="Skip avatar UI launch")
     start.add_argument("--no-wake-word", action="store_true", help="Skip wake-word gate")
+    start.add_argument(
+        "--browser",
+        action="store_true",
+        help="Open browser tab instead of native desktop window",
+    )
+    start.add_argument("--no-top", action="store_true", help="Disable always-on-top")
+    start.add_argument("--no-tray", action="store_true", help="Disable menu-bar tray")
     start.set_defaults(func=cmd_companion_start)
+
+    desk = csp.add_parser("desktop", help="Open companion as native always-on system window")
+    desk.add_argument("--no-top", action="store_true")
+    desk.add_argument("--no-tray", action="store_true")
+    desk.add_argument("--no-wake-word", action="store_true")
+    desk.set_defaults(func=cmd_companion_desktop, browser=False, text_only=False, no_avatar=False)
 
     stop = csp.add_parser("stop", help="Stop companion runtime")
     stop.set_defaults(func=cmd_companion_stop)

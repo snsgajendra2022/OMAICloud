@@ -28,7 +28,10 @@ _STATIC_SMELL = re.compile(
     r"belongs in the om genesis knowledge map|"
     r"variant focus:|"
     r"map this to om ai modules first|"
-    r"bio-digital ideas labeled as research)",
+    r"bio-digital ideas labeled as research|"
+    r"the issue may come from incorrect assumptions|"
+    r"here'?s the direct path for|"
+    r"clarify goal, then give a direct actionable answer)",
     re.I | re.S,
 )
 
@@ -45,6 +48,13 @@ def looks_like_static_reply(text: str) -> bool:
         re.I,
     ):
         return False
+    try:
+        from om_ai.core.chat_intelligence.stub_detect import is_solution_stub
+
+        if is_solution_stub(t):
+            return True
+    except Exception:
+        pass
     try:
         from om_ai.runtime.public_reply import looks_like_genesis_template
 
@@ -163,6 +173,37 @@ def from_helpful_defaults(q: str) -> str | None:
                 "I couldn’t catch that clearly. "
                 "Say it again naturally — I’m listening."
             )
+
+    # Greetings / casual openers
+    if re.match(
+        r"^(hi+|hii+|hello|hey+|yo|sup|namaste|hola|good\s*(morning|evening|afternoon))\b",
+        low,
+    ):
+        return "Hey — I'm OM. What's on your mind?"
+
+    # Hindi / Hinglish casual "what is this"
+    if re.search(
+        r"(?i)\b(kya\s+hai|are\s+kya|yeh?\s+kya|kya\s+ho\s+raha|samajh\s+nahi)\b",
+        low,
+    ):
+        return (
+            "Main yahin hoon. Bataiye kya dekhna / samajhna hai — "
+            "seedha jawab dunga."
+        )
+
+    # Knowledge / "show what you know"
+    if re.search(
+        r"(?i)\b(knowledge|full\s+knowledge|what\s+do\s+you\s+know|"
+        r"display\s+your\s+(full\s+)?knowledge|master\s+update|"
+        r"moaster\s+update)\b",
+        low,
+    ):
+        return (
+            "I can pull from local OM knowledge, memory, tools, and reasoning — "
+            "not a single canned dump.\n\n"
+            "Ask a concrete topic (e.g. Zoom setup, Python bug, project plan) "
+            "and I’ll answer with what I know plus next steps."
+        )
 
     if re.search(r"\breact\b", low) and re.search(
         r"\b(latest|current|lestest|lest|new|verion|version)\b", low
@@ -342,15 +383,14 @@ def build_real_answer(
             if hit:
                 return hit
 
-    # Helpful defaults beat genesis/dataset junk for common asks
-    try:
-        default_hit = from_helpful_defaults(q)
-        if default_hit and not looks_like_static_reply(default_hit):
-            # Allow shorter defaults (gibberish clarification)
-            if len(default_hit.strip()) >= 20:
-                return default_hit.strip()
-    except Exception:
-        pass
+        # Prefer helpful defaults even when short (greetings / hinglish)
+        try:
+            default_hit = from_helpful_defaults(q)
+            if default_hit and not looks_like_static_reply(default_hit):
+                if len(default_hit.strip()) >= 12:
+                    return default_hit.strip()
+        except Exception:
+            pass
 
     order = []
     if prefer_coding:

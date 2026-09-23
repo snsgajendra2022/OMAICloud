@@ -50,29 +50,43 @@ class FriendMind:
                 "A friend would own the robotic vibe, promise natural talk, and invite the next beat."
             )
         elif re.search(r"\b(google|search|khoj|browser)\b|search\s+karo", low):
-            stance = "act"
-            friend_move = "commit_then_do"
+            open_it = bool(
+                re.search(
+                    r"\b(go|open|kholo|khol|launch|navigate|redirect|take\s+me)\b",
+                    low,
+                )
+            )
             mq = re.search(
                 r"(?:google(?:\s+search)?|search(?:\s+for)?|khoj)\s+(.+)$",
                 low,
             )
             topic_q = (mq.group(1).strip(" .") if mq else "").strip()
-            if locale == "hi":
-                if topic_q:
+            if open_it:
+                stance = "act"
+                friend_move = "commit_then_do"
+                if locale == "hi":
                     hint_parts.append(
-                        f"Speak like a friend: Theek hai {addr}, main '{topic_q}' search karke bataata hun. Then do it."
+                        f"Bhai mode: Google khol do{(' — ' + topic_q) if topic_q else ''}. Short and warm."
                     )
                 else:
                     hint_parts.append(
-                        f"Speak like a friend: Theek hai {addr}, main search karta hun."
+                        f"Brother mode: open Google{(' for ' + topic_q) if topic_q else ''}. Short and warm."
                     )
             else:
-                if topic_q:
+                stance = "research"
+                friend_move = "search_then_explain"
+                if locale == "hi":
                     hint_parts.append(
-                        f"Speak like a friend: Alright {addr} — I'll search for {topic_q} and tell you."
+                        "Bhai mode: search karo lekin browser mat kholo. "
+                        "Jo mila woh natural language me batao — kya mila, kya solution chahiye. "
+                        "Sirf jab user 'go'/'open' bole tab browser kholo."
                     )
                 else:
-                    hint_parts.append(f"Speak like a friend: Alright {addr} — searching now.")
+                    hint_parts.append(
+                        "Brother mode: search but do NOT open the browser. "
+                        "Tell what you found and what solution is needed, like a caring human. "
+                        "Open Google only if they say go/open."
+                    )
         elif label in {"frustration", "stress", "urgency", "sad"}:
             stance = "support"
             friend_move = "validate_then_one_step"

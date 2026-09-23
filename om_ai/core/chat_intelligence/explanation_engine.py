@@ -69,9 +69,14 @@ class ExplanationEngine:
             )
             parts.append("Ask for a deeper dive or a code sample if you want more.")
         else:
-            parts.append(f"Here's the direct path for: {goal}")
-            for i, step in enumerate(list(plan.get("steps") or ["answer", "next_step"]), 1):
-                parts.append(f"{i}. {str(step).replace('_', ' ')}")
+            # Never emit the canned "Solve: … 1. understand 2. answer" outline.
+            # Leave empty so the orchestrator / model / real-answer path can reply.
+            return {
+                "answer": "",
+                "kind": "general",
+                "complete": False,
+                "stub": True,
+            }
 
         if reasoning.get("model_trace"):
             parts.append("\n**Deeper reasoning**")
@@ -80,7 +85,7 @@ class ExplanationEngine:
         answer = "\n".join(p for p in parts if p is not None).strip()
 
         # Optional model polish — never invent if empty
-        if model_generate and len(answer) < 40:
+        if model_generate and (len(answer) < 40 or not answer):
             try:
                 polished = str(
                     model_generate(
@@ -100,6 +105,19 @@ class ExplanationEngine:
                     pass
             except Exception:
                 pass
+
+        try:
+            from .stub_detect import is_solution_stub
+
+            if is_solution_stub(answer):
+                return {
+                    "answer": "",
+                    "kind": ptype if ptype != "general" else "solution",
+                    "complete": False,
+                    "stub": True,
+                }
+        except Exception:
+            pass
 
         return {
             "answer": answer,

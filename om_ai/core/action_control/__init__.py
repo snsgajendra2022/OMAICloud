@@ -11,6 +11,9 @@ from .command_executor import CommandExecutor
 from .execution_context import ExecutionContext
 from .permission import Permission, PermissionDecision
 from .permission_manager import PermissionManager
+from .permission_engine import PermissionEngine
+from .action_policy import ActionPolicy
+from .execution_guard import ExecutionGuard
 from .risk_engine import RiskAssessment, RiskEngine
 from .security_policy import SecurityPolicy
 
@@ -28,6 +31,9 @@ __all__ = [
     "Permission",
     "PermissionDecision",
     "PermissionManager",
+    "PermissionEngine",
+    "ActionPolicy",
+    "ExecutionGuard",
     "RiskAssessment",
     "RiskClass",
     "RiskEngine",

@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import logging
 import os
+import re
 from typing import Any, Callable
 
 from .answer_planner import AnswerPlanner
@@ -133,6 +134,58 @@ class ChatOrchestrator:
                 "intent": {"intent": "empty"},
             }
 
+        # 0) STEP 71 — Human Presence (why before what)
+        stages.append("human_presence")
+        presence: dict[str, Any] = {}
+        try:
+            from om_ai.core.human_presence import run_human_presence
+
+            locale = "hi" if any(
+                w in q.lower() for w in ("hai", "kya", "tum", "nahi", "thak", "bhai")
+            ) else "en"
+            presence = run_human_presence(q, history=history, locale=locale) or {}
+            meta["human_presence"] = {
+                "route": (presence.get("route") or {}).get("mode"),
+                "listen_first": presence.get("listen_first"),
+                "emotion": (presence.get("emotion") or {}).get("emotion"),
+                "intent": (presence.get("intent") or {}).get("intent"),
+            }
+            # Sharing / listen-first → natural reply; skip solution stubs
+            if presence.get("block_solution_engine") and presence.get("seed_reply"):
+                seed = str(presence["seed_reply"]).strip()
+                if seed:
+                    stages.append("presence_listen")
+                    self.memory.add(session, "user", q, intent="sharing")
+                    self.memory.add(session, "assistant", seed, intent="support")
+                    return {
+                        "answer": seed,
+                        "handled": True,
+                        "needs_model": False,
+                        "stages": stages,
+                        "meta": meta,
+                        "intent": presence.get("intent") or {"intent": "sharing"},
+                        "human_presence": presence,
+                        "source": "human_presence",
+                    }
+            # Action needing permission — ask first
+            if presence.get("requires_permission") and presence.get("permission_prompt"):
+                prompt = str(presence["permission_prompt"]).strip()
+                stages.append("presence_permission")
+                self.memory.add(session, "user", q, intent="action")
+                self.memory.add(session, "assistant", prompt, intent="permission")
+                return {
+                    "answer": prompt,
+                    "handled": True,
+                    "needs_model": False,
+                    "stages": stages,
+                    "meta": meta,
+                    "intent": presence.get("intent") or {"intent": "action"},
+                    "human_presence": presence,
+                    "source": "human_presence_permission",
+                }
+        except Exception as exc:
+            meta["human_presence"] = {"error": str(exc)}
+
         # 1) Understand
         stages.append("understand")
         intent = self.intent.understand(q, history=history)
@@ -243,20 +296,45 @@ class ChatOrchestrator:
             "ask_details": plan.get("ask_details"),
         }
 
-        # 4) Solve
+        # 4) Solve — only for real problem intents (never for casual chat)
         stages.append("solve")
-        solution = self.solutions.solve(q, plan=plan, context=ctx)
+        solve_intents = {
+            "debugging",
+            "coding",
+            "howto",
+            "comparison",
+            "explanation",
+            "design",
+            "problem",
+            "technical",
+        }
+        should_solve = intent.intent in solve_intents or str(plan.get("strategy") or "") in {
+            "technical_solution",
+            "code_solution",
+            "step_by_step",
+            "comparison",
+            "explanation",
+        }
+        solution: dict[str, Any] = {}
+        if should_solve:
+            solution = self.solutions.solve(
+                q, plan=plan, context=ctx, model_generate=model_generate
+            )
         meta["solution"] = {
             "solved": bool(solution.get("solved")),
             "kind": solution.get("kind"),
             "complete": solution.get("complete"),
+            "skipped": not should_solve,
         }
 
-        # 5) Generate (optional native model)
+        # 5) Generate (prefer full model brain whenever available)
         stages.append("generate")
         model_answer = ""
         used_model = False
-        want_model = bool(intent.needs_model or voice_mode)
+        want_model = bool(
+            model_generate is not None
+            and (intent.needs_model or voice_mode or not solution.get("solved") or not should_solve)
+        )
         if model_generate is not None and want_model:
             try:
                 hint = self.personality.system_hint(
@@ -271,7 +349,7 @@ class ChatOrchestrator:
                         guidance,
                         str(ctx.get("context_blob") or ""),
                         (model_context or "")[:2000],
-                        str(solution.get("answer") or "")[:1500],
+                        str(solution.get("answer") or "")[:1500] if solution.get("solved") else "",
                     )
                     if p
                 ).strip()
@@ -291,14 +369,52 @@ class ChatOrchestrator:
             except Exception as exc:
                 meta["generate_error"] = str(exc)
 
-        draft = model_answer
-        if solution.get("solved") and solution.get("answer") and not voice_mode:
-            if not draft or len(draft) < 40:
-                draft = str(solution["answer"])
-            elif intent.intent == "debugging":
-                draft = str(solution["answer"])
-            if not draft:
-                draft = str(solution["answer"] or "")
+        def _usable(text: str) -> str:
+            t = (text or "").strip()
+            if not t:
+                return ""
+            try:
+                from .stub_detect import is_solution_stub
+
+                if is_solution_stub(t):
+                    return ""
+            except Exception:
+                pass
+            try:
+                from om_ai.core.companion_personality.voice_presence import (
+                    is_garbage_spoken,
+                )
+
+                if is_garbage_spoken(t):
+                    return ""
+            except Exception:
+                pass
+            return t
+
+        draft = _usable(model_answer)
+        sol_ans = _usable(str(solution.get("answer") or "")) if solution.get("solved") else ""
+        # Prefer model. Only use solution when it is a real non-stub answer.
+        if not draft and sol_ans and not voice_mode:
+            draft = sol_ans
+        elif draft and sol_ans and intent.intent == "debugging" and not voice_mode:
+            # Debugging: structured solution may win if longer and non-stub
+            if len(sol_ans) > len(draft) + 40:
+                draft = sol_ans
+
+        if not draft:
+            try:
+                from om_ai.core.intelligence.real_answer import (
+                    build_real_answer,
+                    from_helpful_defaults,
+                )
+
+                draft = _usable(from_helpful_defaults(q) or "") or _usable(
+                    build_real_answer(q) or ""
+                )
+                if draft:
+                    meta["used_real_answer"] = True
+            except Exception:
+                pass
 
         # 6) Optimize
         stages.append("optimize")
@@ -306,9 +422,9 @@ class ChatOrchestrator:
             draft,
             message=q,
             intent=intent.intent,
-            fallback="" if voice_mode else str(solution.get("answer") or ""),
+            fallback="" if voice_mode else sol_ans,
         )
-        draft = str(optimized.get("answer") or draft)
+        draft = _usable(str(optimized.get("answer") or draft)) or draft
         meta["optimize"] = optimized.get("report")
 
         # 7) Correct
@@ -331,6 +447,23 @@ class ChatOrchestrator:
         # 8) Quality + safety
         stages.append("quality")
         draft = self.personality.wrap(draft, intent=intent.intent)
+        try:
+            from .stub_detect import is_solution_stub
+
+            if is_solution_stub(draft):
+                draft = ""
+        except Exception:
+            pass
+        if not draft:
+            try:
+                from om_ai.core.intelligence.real_answer import (
+                    build_real_answer,
+                    from_helpful_defaults,
+                )
+
+                draft = str(from_helpful_defaults(q) or build_real_answer(q) or "").strip()
+            except Exception:
+                draft = ""
         safe = self.safety.filter(draft)
         draft = safe["answer"]
         conf = self.confidence.score(
@@ -357,7 +490,7 @@ class ChatOrchestrator:
         return {
             "answer": draft,
             "handled": True,
-            "needs_model": bool(intent.needs_model),
+            "needs_model": bool(intent.needs_model and not used_model and not draft),
             "stages": stages,
             "meta": meta,
             "intent": intent.to_dict(),

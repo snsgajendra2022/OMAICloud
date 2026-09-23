@@ -30,6 +30,8 @@ voice = [
 ]
 companion = [
   "om-ai-operating-brain[voice]",
+  "pywebview>=5.0",
+  "pyobjc-framework-Cocoa>=10.0; platform_system=='Darwin'",
 ]
 
 [project.scripts]

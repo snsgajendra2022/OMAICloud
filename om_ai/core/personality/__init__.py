@@ -5,6 +5,8 @@ from .friendship_model import FriendshipModel
 from .communication_style import CommunicationStyle
 from .humor_engine import HumorEngine
 from .relationship_manager import RelationshipManager
+from .relationship_engine import RelationshipEngine
+from .conversation_principles import ConversationPrinciples, PRINCIPLES
 
 __all__ = [
     "PersonalityRuntime",
@@ -14,4 +16,7 @@ __all__ = [
     "CommunicationStyle",
     "HumorEngine",
     "RelationshipManager",
+    "RelationshipEngine",
+    "ConversationPrinciples",
+    "PRINCIPLES",
 ]

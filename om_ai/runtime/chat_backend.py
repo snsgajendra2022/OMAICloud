@@ -456,6 +456,14 @@ def _om_native_chat_reply_body(
                 },
             )
             ans = str(crt.get("answer") or "").strip()
+            try:
+                from om_ai.core.chat_intelligence.stub_detect import is_solution_stub
+                from om_ai.core.intelligence.real_answer import looks_like_static_reply
+
+                if is_solution_stub(ans) or looks_like_static_reply(ans):
+                    ans = ""
+            except Exception:
+                pass
             if ans and not ResponseEcho.check(user_text, ans):
                 info_crt = ChatBackendInfo(
                     backend=info.backend,

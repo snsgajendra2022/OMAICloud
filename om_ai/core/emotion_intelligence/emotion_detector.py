@@ -7,11 +7,14 @@ from typing import Any
 
 class EmotionDetector:
     _RULES: list[tuple[str, float, re.Pattern[str]]] = [
+        ("disappointed", 0.88, re.compile(r"(?i)\b(i failed|failed today|disappoint|haar|nahi hua|couldn't make it)\b")),
+        ("angry", 0.9, re.compile(r"(?i)\b(angry|furious|gussa|mad at|pissed|rage)\b")),
         ("frustrated", 0.9, re.compile(r"(?i)\b(frustrat\w*|annoying|irritat\w*|gussa|not working|still broken)\b")),
-        ("stressed", 0.88, re.compile(r"(?i)\b(stress|anxious|overwhelmed|pressure|pareshaan|tension|too much)\b")),
+        ("stressed", 0.88, re.compile(r"(?i)\b(stress|anxious|overwhelmed|pressure|pareshaan|tension|too much|very difficult|difficult day)\b")),
         ("tired", 0.86, re.compile(r"(?i)\b((?:very\s+)?tired|exhausted|thak|burn(?:ed)?\s*out|no sleep|slept only)\b")),
         ("confused", 0.84, re.compile(r"(?i)\b(confus\w*|don't understand|samajh\s+nahi|not sure what|unclear)\b")),
-        ("sad", 0.84, re.compile(r"(?i)\b(sad|upset|lonely|down|udas|rough day|difficult|bad day)\b")),
+        ("sad", 0.84, re.compile(r"(?i)\b(sad|upset|lonely|down|udas|rough day|bad day|heavy)\b")),
+        ("romantic", 0.8, re.compile(r"(?i)\b(love you|miss you|romantic|dil se|pyaar|care about you)\b")),
         ("happy", 0.85, re.compile(r"(?i)\b(happy|great|excited|fixed|finally|awesome|mast)\b")),
         ("urgent", 0.88, re.compile(r"(?i)\b(urgent|asap|right now|jaldi|immediately)\b")),
         ("excited", 0.86, re.compile(r"(?i)\b(excited|let'?s go|pumped|zabardast)\b")),

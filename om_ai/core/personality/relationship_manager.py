@@ -7,9 +7,10 @@ from typing import Any
 class RelationshipManager:
     def __init__(self) -> None:
         self.preferences: dict[str, Any] = {
-            "address_as": "Sir",
+            "address_as": "bhai",
             "detail": "balanced",
-            "tone": "jarvis",
+            "tone": "brother",
+            "bond": "brother",
         }
         self.notes: list[str] = []
 
@@ -29,5 +30,6 @@ class RelationshipManager:
         return {
             "preferences": dict(self.preferences),
             "notes": list(self.notes[-8:]),
-            "address_as": self.preferences.get("address_as", "Sir"),
+            "address_as": self.preferences.get("address_as", "bhai"),
+            "bond": "brother",
         }

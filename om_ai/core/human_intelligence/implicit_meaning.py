@@ -14,13 +14,19 @@ class ImplicitMeaning:
 
     _PATTERNS: list[tuple[re.Pattern[str], list[str], str, str]] = [
         (
+            re.compile(r"(?i)\b(i failed|failed today|i fail|disappoint|haar gaya|nahi hua)\b"),
+            ["disappointment", "frustration", "need_support"],
+            "failure",
+            "That sounds disappointing. Do you want to talk about what went wrong?",
+        ),
+        (
             re.compile(
                 r"(?i)\b(today was|day was|rough day|hard day|difficult|"
-                r"tough day|bad day|hectic|long day)\b"
+                r"tough day|bad day|hectic|long day|very difficult)\b"
             ),
             ["stress", "frustration", "tiredness", "problem"],
             "rough_day",
-            "It sounds like you had a rough day. What happened?",
+            "It sounds like today was really heavy for you. What happened?",
         ),
         (
             re.compile(r"(?i)\b(i'?m\s+fine|i\s+am\s+fine|i'?m\s+okay|i\s+am\s+okay|theek\s+hoon)\b"),
@@ -73,7 +79,13 @@ class ImplicitMeaning:
                     "label": label,
                     "possible": possibles,
                     "natural_ask": ask,
-                    "listen_first": label in {"rough_day", "maybe_masking", "sleep_strain", "overload"},
+                    "listen_first": label in {
+                    "rough_day",
+                    "maybe_masking",
+                    "sleep_strain",
+                    "overload",
+                    "failure",
+                },
                     "source": "pattern",
                 }
 

@@ -4,6 +4,7 @@ OM AI is a self-hosted **cognitive operating system**: model code, training, age
 
 Operating-system pillars, gaps, and roadmap:
 
+- [PROJECT_BLUEPRINT.md](PROJECT_BLUEPRINT.md) — **full structure + production runtime map**
 - [CURRENT_ARCHITECTURE.md](CURRENT_ARCHITECTURE.md)
 - [SYSTEM_GAP_ANALYSIS.md](SYSTEM_GAP_ANALYSIS.md)
 - [IMPLEMENTATION_ROADMAP.md](IMPLEMENTATION_ROADMAP.md)

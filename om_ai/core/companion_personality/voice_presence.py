@@ -71,6 +71,11 @@ _GARBAGE_MARKERS = (
     "knowledge investigation required",
     "retrieve context",
     "retrieve information",
+    "incorrect assumptions or missing context",
+    "here's the direct path for",
+    "heres the direct path for",
+    "direct path for: solve",
+    "clarify goal, then give a direct actionable",
 )
 
 
@@ -211,8 +216,14 @@ def strip_internal_chrome(text: str) -> str:
 
 
 def is_garbage_spoken(answer: str) -> bool:
+    if not isinstance(answer, str):
+        return True
     low = (answer or "").strip().lower()
     if not low:
+        return True
+    if "outcome you want" in low or "got it — about" in low or "got it. about" in low:
+        return True
+    if "take the next step with you" in low:
         return True
     if _INTERNAL_LEAK.search(low):
         return True
@@ -220,6 +231,13 @@ def is_garbage_spoken(answer: str) -> bool:
         return True
     if any(b in low for b in _GARBAGE_MARKERS):
         return True
+    try:
+        from om_ai.core.chat_intelligence.stub_detect import is_solution_stub
+
+        if is_solution_stub(answer):
+            return True
+    except Exception:
+        pass
     if "understand" in low and ("hindi" in low or "language" in low):
         return True
     # Ellipsis/punctuation-only padding — not a real reply
@@ -275,7 +293,10 @@ def soft_listening_fallback(
     if context.get("last_response") and not is_garbage_spoken(str(context["last_response"])):
         return str(context["last_response"])
 
-    return _compose_from_signals(user_message, locale=locale, emotion=str(emotion), context=context)
+    spoken = _compose_from_signals(
+        user_message, locale=locale, emotion=str(emotion), context=context
+    )
+    return spoken if isinstance(spoken, str) else ""
 
 
 def _live_recovery_generate(
@@ -291,9 +312,9 @@ def _live_recovery_generate(
 
         lang = "warm Hinglish" if locale == "hi" else "calm spoken English"
         system = (
-            "You are OM, a loyal spoken companion (Jarvis-like). "
-            f"Reply in {lang}, 1 short sentence only. "
-            "No chatbot phrases. No 'how can I help'. No markdown. "
+            "You are OM, the user's brother companion. "
+            f"Reply in {lang}, 1–2 short sentences. "
+            "No chatbot phrases. No 'how can I help'. No 'tell me the outcome'. No markdown. "
             f"User emotion signal: {emotion}."
         )
         topic = str(context.get("topic") or context.get("purpose") or "").strip()
@@ -326,6 +347,20 @@ def _intent_signals(user_message: str) -> set[str]:
         signals.add("continue")
     if re.search(r"(?i)\b(stop|ruk|band|chup|bas)\b", low):
         signals.add("stop")
+    if re.search(
+        r"(?i)\b(click|button|tap|nahin\s+ho|nahi\s+ho|not\s+working|broken|"
+        r"open\s+nahi|kaam\s+nahi|stuck|freeze)\b",
+        low,
+    ):
+        signals.add("ui_problem")
+    if re.search(
+        r"(?i)\b(fail|error|bug|crash|problem|issue|fix|galti|dikkat)\b", low
+    ):
+        signals.add("problem")
+    if re.search(
+        r"(?i)\b(tired|sad|difficult|bad day|thak|udas|stress|gussa|angry)\b", low
+    ):
+        signals.add("sharing")
     if not signals:
         signals.add("open")
     return signals
@@ -338,57 +373,73 @@ def _compose_from_signals(
     emotion: str,
     context: dict[str, Any],
 ) -> str:
-    """Last-resort compositional reply from live signals — not a script catalog."""
+    """Natural spoken recovery line — never robotic 'outcome you want' templates."""
     signals = _intent_signals(user_message)
     hi = locale == "hi" or bool(
-        re.search(r"\b(tum|nahi|nahin|kya|baat|insaan|tarah|sakte|bolo|mujhe|hai|ji)\b", (user_message or "").lower())
+        re.search(
+            r"[\u0900-\u097F]|\b(tum|nahi|nahin|kya|baat|hai|ji|bhai|raha|rahi)\b",
+            (user_message or "").lower(),
+        )
     )
-    topic = str(context.get("topic") or "").replace("_", " ").strip()
-    parts: list[str] = []
+    emo = (emotion or "neutral").lower()
 
+    # Prefer STEP 71 / semantic when available
+    try:
+        from om_ai.core.human_presence import run_human_presence
+
+        pack = run_human_presence(user_message, locale="hi" if hi else "en")
+        seed = str(pack.get("seed_reply") or "").strip()
+        if seed and not is_garbage_spoken(seed):
+            return seed
+    except Exception:
+        pass
+
+    if "ui_problem" in signals or "problem" in signals:
+        if hi:
+            return (
+                "Samajh gaya bhai — click / button kaam nahi kar raha. "
+                "Hard refresh karo (Cmd+Shift+R), phir seedha bola — main sun raha hun. "
+                "Agar phir bhi stuck ho to batao kahan click kar rahe ho."
+            )
+        return (
+            "Got it — the click isn't registering. "
+            "Hard refresh (Cmd+Shift+R), then just speak — I'm listening. "
+            "If it's still stuck, tell me which button."
+        )
+
+    if "sharing" in signals or emo in {"sad", "tired", "stressed", "frustrated", "angry"}:
+        if hi:
+            return "Main sun raha hun bhai. Batao kya hua — main hoon na."
+        return "I'm with you. Tell me what happened — I've got you."
+
+    if "meta_human" in signals:
+        if hi:
+            return "Haan bhai — robot nahi, tera bhai. Natural baat. Bolo."
+        return "Fair — your brother, not a robot. Talk to me."
+
+    if "greeting" in signals:
+        return "Haan bhai, main yahan hoon." if hi else "Hey brother — I'm right here."
+
+    if "thanks" in signals:
+        return "Hamesha bhai." if hi else "Always, brother."
+
+    if "stop" in signals:
+        return "Theek hai — ruk gaya." if hi else "Okay — stopped."
+
+    if "continue" in signals:
+        topic = str(context.get("topic") or "").replace("_", " ").strip()
+        if topic and topic != "general":
+            return (
+                f"Chalo, {topic} pe aage badhte hain."
+                if hi
+                else f"Alright — continuing {topic}."
+            )
+        return "Haan, jahan chhoda tha wahan se." if hi else "Picking up where we left off."
+
+    # Default: present + invite next beat — never "define the outcome"
     if hi:
-        if "meta_human" in signals:
-            parts.append("Haan Sir... bilkul")
-            parts.append("main natural baat karunga")
-        elif "greeting" in signals:
-            parts.append("Ji Sir... main yahan hoon")
-        elif "thanks" in signals:
-            parts.append("Hamesha Sir")
-        elif emotion in {"frustration", "stress", "sad", "urgency"}:
-            parts.append("Samajh gaya Sir")
-        else:
-            parts.append("Ji Sir... samajh gaya")
-        if "continue" in signals and topic:
-            parts.append(f"pehle wali {topic} pe chalte hain")
-        elif "meta_human" in signals:
-            parts.append("boliye kya karna hai")
-        elif "thanks" not in signals and "stop" not in signals:
-            parts.append("boliye aage kya karna hai")
-    else:
-        if "meta_human" in signals:
-            parts.append("Fair point Sir")
-            parts.append("I'll keep it natural")
-        elif "greeting" in signals:
-            parts.append("Yes Sir... I'm here")
-        elif "thanks" in signals:
-            parts.append("Anytime Sir")
-        elif emotion in {"frustration", "stress", "sad", "urgency"}:
-            parts.append("I hear you Sir")
-        else:
-            parts.append("Sir... I understand")
-        if "continue" in signals and topic:
-            parts.append(f"continuing {topic}")
-        elif "meta_human" in signals:
-            parts.append("what should we work on")
-        elif "thanks" not in signals and "stop" not in signals:
-            parts.append("tell me what you want next")
-
-    # Join with natural pauses
-    if len(parts) == 1:
-        return parts[0] + ("." if not hi else ".")
-    if len(parts) == 2:
-        return f"{parts[0]}... {parts[1]}."
-    return f"{parts[0]}... {parts[1]} — {parts[2]}."
+        return "Haan bhai, samajh gaya. Seedha bolo kya chahiye — main yahin hoon."
+    return "I hear you, brother. Tell me straight what you need — I'm here."
 
 
 def rescue_spoken(user_message: str, bad_answer: str = "") -> str:
@@ -402,11 +453,16 @@ def rescue_spoken(user_message: str, bad_answer: str = "") -> str:
         emotion=emotion,
         context={"user_message": user_message, "emotion": emotion},
     )
-    if line and not is_garbage_spoken(line):
-        return line
-    return _compose_from_signals(
+    if isinstance(line, str) and line.strip() and not is_garbage_spoken(line):
+        return line.strip()
+    spoken = _compose_from_signals(
         user_message,
         locale=locale,
         emotion=str(emotion),
         context={},
+    )
+    return spoken if isinstance(spoken, str) and spoken.strip() else (
+        "Haan bhai, main yahan hoon. Bolo."
+        if locale == "hi"
+        else "I'm here, brother. Go ahead."
     )

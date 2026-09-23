@@ -199,34 +199,14 @@
       min-height: 1em;
       opacity: 0.9;
     }
-    .feeling:empty { display: none; }
-    .activity { color: var(--muted); font-size: 0.82rem; min-height: 1.1em; opacity: 0.85; }
+    .enable-once,
+    .mic-help,
+    .live-pill,
     .memory-line {
-      color: rgba(212, 175, 55, 0.85);
-      font-size: 0.78rem;
-      letter-spacing: 0.04em;
-      margin: 0.35rem 0 0;
-      opacity: 0.9;
+      display: none !important;
     }
-    .enable-once {
-      margin-top: 4px; border: 0; border-radius: 999px;
-      padding: 14px 26px; font: inherit; font-size: 1rem;
-      color: #041018;
-      background: linear-gradient(180deg, #c8f2fa, var(--cyan));
-      box-shadow: 0 0 28px rgba(117,213,227,0.4);
-      cursor: pointer;
-    }
-    .enable-once.hidden { display: none; }
-    .live-pill {
-      display: none;
-      align-items: center; gap: 8px;
-      color: var(--cyan-bright);
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      font-size: 0.78rem;
-      text-shadow: 0 0 12px rgba(117,213,227,0.5);
-    }
-    .live-pill.on { display: inline-flex; }
+    .feeling:empty { display: none; }
+    .activity { display: none !important; }
     .perm {
       display: none; gap: 10px; align-items: center; justify-content: center;
       padding: 10px 14px; border-radius: 16px;
@@ -239,13 +219,6 @@
       background: rgba(255,255,255,0.08);
       color: var(--ink); border-radius: 999px;
       padding: 8px 14px; font: inherit; cursor: pointer;
-    }
-    .mic-help {
-      display: none; max-width: 34rem; text-align: left;
-      padding: 14px 16px; border-radius: 16px;
-      border: 1px solid rgba(255,123,123,0.35);
-      background: rgba(255,80,80,0.08); color: #ffd0d0;
-      font-size: 0.9rem; line-height: 1.45;
     }
     .mic-help.show { display: block; }
     .mic-help strong { color: #fff; }
@@ -276,7 +249,7 @@
   <div class="shell">
     <header>
       <div class="brand">OM</div>
-      <div class="hint" id="privacyHint">OM · with you</div>
+      <div class="hint" id="privacyHint"></div>
     </header>
 
     <main class="stage">
@@ -344,20 +317,16 @@
 
       <div class="status" id="statusRow"><i></i><span id="stateLabel">READY</span></div>
       <div class="wave" id="wave"><span></span><span></span><span></span><span></span><span></span></div>
-      <div class="live-pill" id="livePill"><span>●</span> Just speak</div>
+      <div class="live-pill" id="livePill" hidden aria-hidden="true"></div>
       <p class="heard" id="heard"></p>
       <p class="feeling" id="feeling"></p>
       <p class="said" id="reply"></p>
       <p class="memory-line" id="memoryLine"></p>
       <p class="activity" id="activity" hidden aria-hidden="true"></p>
 
-      <!-- Browsers require ONE user gesture the first time only -->
-      <button class="enable-once" id="btnEnable" type="button">Tap to talk with OM</button>
-
-      <div class="mic-help" id="micHelp">
-        <strong>Microphone blocked</strong>
-        <div id="micHelpBody"></div>
-      </div>
+      <!-- Auto-connect: no tap / no mic help chrome -->
+      <button class="enable-once hidden" id="btnEnable" type="button" aria-hidden="true" tabindex="-1"></button>
+      <div class="mic-help" id="micHelp" hidden aria-hidden="true"><div id="micHelpBody"></div></div>
 
       <div class="perm" id="permBox">
         <span id="permText">Permission needed</span>
@@ -662,23 +631,19 @@
       els.activity.textContent = '';
     }
 
-    function showMicBlocked(reason) {
-      alwaysOn = false;
-      els.btnEnable.classList.remove('hidden');
-      els.livePill.classList.remove('on');
-      els.micHelp.classList.add('show');
-      els.micHelpBody.innerHTML =
-        '<ol>' +
-        '<li>Open in <strong>Chrome</strong> or <strong>Safari</strong>:<br><code>' + location.href + '</code></li>' +
-        '<li>Allow microphone when asked (only once)</li>' +
-        '<li>macOS: System Settings → Privacy &amp; Security → Microphone → enable browser</li>' +
-        '</ol>' +
-        (reason ? '<p style="margin:8px 0 0">Detail: <code>' + reason + '</code></p>' : '');
-      els.activity.textContent = 'Need microphone once — then OM stays open';
-      setState('IDLE');
+    function showMicBlocked(_reason) {
+      // Never show instructional chrome — keep HUD clean and keep trying quietly
+      hideMicHelp();
+      if (els.btnEnable) els.btnEnable.classList.add('hidden');
+      if (els.activity) els.activity.textContent = '';
     }
 
-    function hideMicHelp() { els.micHelp.classList.remove('show'); }
+    function hideMicHelp() {
+      if (els.micHelp) {
+        els.micHelp.classList.remove('show');
+        els.micHelp.hidden = true;
+      }
+    }
 
     async function api(path, opts = {}) {
       const res = await fetch('/api/companion' + path, {
@@ -690,28 +655,25 @@
     }
 
     async function ensureMicPermission() {
-      if (!window.isSecureContext && !isLocal) {
-        showMicBlocked('insecure-context');
-        throw new Error('insecure');
-      }
-      if (!navigator.mediaDevices?.getUserMedia) {
-        showMicBlocked('getUserMedia-unavailable');
-        throw new Error('no-media');
-      }
+      // Soft mic: never block the companion UI. SpeechRecognition can still work.
       if (micReady && micStream?.active) return micStream;
       try {
+        const md = navigator.mediaDevices;
+        if (!md || typeof md.getUserMedia !== 'function') {
+          micReady = false;
+          return null;
+        }
         if (micStream) micStream.getTracks().forEach((t) => t.stop());
-        micStream = await navigator.mediaDevices.getUserMedia({
+        micStream = await md.getUserMedia({
           audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true },
         });
         micReady = true;
         hideMicHelp();
         startBargeMonitor(micStream);
         return micStream;
-      } catch (err) {
+      } catch (_) {
         micReady = false;
-        showMicBlocked(err?.name || err?.message || 'not-allowed');
-        throw err;
+        return null;
       }
     }
 
@@ -768,10 +730,11 @@
       sessionId = data.session_id;
       connectCompanionWs(sessionId);
       if (data.memory_line && els.memoryLine) {
-        els.memoryLine.textContent = 'Memory · ' + data.memory_line;
+        // Keep memory internal — do not display chrome on HUD
+        els.memoryLine.textContent = '';
       }
       if (data.user && data.user.name && els.privacyHint) {
-        els.privacyHint.textContent = 'Personal companion · ' + data.user.name;
+        els.privacyHint.textContent = '';
       }
       if (data.avatar && window.OMPresence3D) {
         try { window.OMPresence3D.applyAvatarState(data.avatar); } catch (_) {}
@@ -1134,19 +1097,9 @@
         showActivity([]);
 
 
-        if (data.memory_line && els.memoryLine) {
-          els.memoryLine.textContent = 'Memory · ' + data.memory_line;
-        } else if (data.human_memory && els.memoryLine) {
-          const proj = (((data.human_memory || {}).projects || {}).active)
-            || (((data.human_memory || {}).semantic || {}).active_project)
-            || '';
-          if (proj) els.memoryLine.textContent = 'Memory · ' + proj;
-        }
-        if (data.heard) els.heard.textContent = 'You said: ' + data.heard;
-        if (els.feeling && (data.feeling || (data.affect && data.affect.label))) {
-          const feel = data.feeling || data.affect.label;
-          els.feeling.textContent = 'Feeling · ' + String(feel).replace(/_/g, ' ');
-        }
+        if (els.memoryLine) els.memoryLine.textContent = '';
+        if (data.heard) els.heard.textContent = data.heard || '';
+        if (els.feeling) els.feeling.textContent = '';
         if (data.avatar && window.OMPresence3D) {
           try { window.OMPresence3D.applyAvatarState(data.avatar); } catch (_) {}
         }
@@ -1302,7 +1255,8 @@
         listening = false;
         const err = e.error || '';
         if (err === 'not-allowed' || err === 'service-not-allowed') {
-          showMicBlocked(err);
+          // Keep quiet — retry without showing blocked UI
+          if (alwaysOn && !muted) scheduleListen(1200);
           return;
         }
         if (alwaysOn && !muted && err !== 'aborted') {
@@ -1319,24 +1273,32 @@
 
     async function startListening(silent) {
       if (!alwaysOn || muted) return;
-      // Allow restart even while busy finishing — otherwise ears stay closed
       if (busy && speaking) return;
-      try {
-        await ensureMicPermission();
-      } catch (_) {
+      await ensureMicPermission(); // soft — never throws / never shows help
+
+      // Desktop WebView: browser speech often missing — use native Python mic
+      if (window.OMDesktop && window.OMDesktop.nativeMic) {
+        try {
+          window.OMDesktop.startNativeMic && window.OMDesktop.startNativeMic();
+        } catch (_) {}
+        if (!silent) setState('LISTENING');
         return;
       }
+      if (window.pywebview && window.pywebview.api && window.pywebview.api.start_native_mic) {
+        try { window.pywebview.api.start_native_mic(); } catch (_) {}
+        if (!silent) setState('LISTENING');
+        // still try browser recognition if present
+      }
+
       const rec = ensureRecognition();
       if (!rec) {
-        els.activity.textContent = 'Use Chrome or Edge — this browser has no speech engine';
-        els.btnEnable.classList.remove('hidden');
+        setState('LISTENING');
         return;
       }
       try {
         if (!listening) rec.start();
         if (!silent) setState('LISTENING');
       } catch (err) {
-        // Already started / invalid state — recreate and retry once
         try {
           recognition = null;
           listening = false;
@@ -1348,6 +1310,19 @@
       }
     }
 
+    // Native desktop mic → same turn path as speech recognition
+    window.OMNativeOnFinal = function (text) {
+      const cleaned = String(text || '').trim();
+      if (!cleaned || muted) return;
+      if (speaking) {
+        stopSpeakingLocal();
+        api('/interrupt', { method: 'POST', body: '{}' }).catch(() => {});
+      }
+      els.heard.textContent = cleaned;
+      if (!busy) handleTurn(cleaned);
+      else if (turnQueue.length < 3) turnQueue.push(cleaned);
+    };
+
     function stopListening() {
       if (restartTimer) clearTimeout(restartTimer);
       if (recognition) {
@@ -1358,14 +1333,12 @@
     }
 
     async function enableAlwaysOn() {
+      alwaysOn = true;
       try {
-        await ensureMicPermission();
-        alwaysOn = true;
-        els.btnEnable.classList.add('hidden');
-        els.privacyHint.textContent = "I'm here · just speak";
-        els.livePill.classList.add('on');
+        if (els.btnEnable) els.btnEnable.classList.add('hidden');
+        if (els.privacyHint) els.privacyHint.textContent = '';
         hideMicHelp();
-        // Unlock audio output on the user gesture
+        await ensureMicPermission();
         try {
           if (bargeCtx && bargeCtx.state === 'suspended') await bargeCtx.resume();
           const unlock = new Audio('data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA=');
@@ -1378,18 +1351,15 @@
           busy = true;
           await speak(g);
           busy = false;
-        } else {
-          els.reply.textContent = "I'm here. Go ahead.";
-          busy = true;
-          await speak("I'm here. Go ahead.");
-          busy = false;
         }
         speaking = false;
-        await startListening();
-        els.activity.textContent = '';
+        setState('LISTENING');
+        await startListening(true);
+        if (els.activity) els.activity.textContent = '';
       } catch (_) {
-        els.btnEnable.classList.remove('hidden');
-        els.activity.textContent = 'Click Enable and Allow microphone';
+        alwaysOn = true;
+        setState('LISTENING');
+        await startListening(true);
       }
     }
 
@@ -1420,24 +1390,22 @@
       await speak(data.answer || 'Cancelled.');
     };
 
-    // Boot: if mic already allowed, go always-on with zero click
+    // Boot: auto-connect — no tap, no help text
     startSession()
       .then(async () => {
-        const granted = await micAlreadyGranted();
-        if (granted) {
-          els.btnEnable.classList.add('hidden');
-          await enableAlwaysOn();
-        } else {
-          setState('READY');
-          els.reply.textContent = 'Tap below — then just talk to me.';
-          els.activity.textContent = '';
-          els.btnEnable.textContent = 'Tap to talk with OM';
+        if (els.btnEnable) els.btnEnable.classList.add('hidden');
+        hideMicHelp();
+        if (els.reply && /tap below|talk to me|microphone/i.test(els.reply.textContent || '')) {
+          els.reply.textContent = '';
         }
+        await enableAlwaysOn();
       })
-      .catch((e) => {
-        setState('ERROR');
-        els.reply.textContent = 'Open ' + location.origin + '/companion in Chrome or Safari';
-        els.activity.textContent = String(e.message || e);
+      .catch(() => {
+        setState('READY');
+        if (els.reply) els.reply.textContent = '';
+        setTimeout(() => {
+          startSession().then(() => enableAlwaysOn()).catch(() => {});
+        }, 800);
       });
   </script>
 </body>

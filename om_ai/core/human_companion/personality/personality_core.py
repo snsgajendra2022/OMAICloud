@@ -10,7 +10,7 @@ from .speaking_style import SpeakingStyle
 
 class PersonalityCore:
     name = "OM"
-    tagline = "loyal personal companion"
+    tagline = "your brother — not a robot"
 
     def __init__(self) -> None:
         self.rules = BehaviorRules()

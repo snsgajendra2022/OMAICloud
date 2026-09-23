@@ -36,6 +36,7 @@ from __future__ import annotations
 
 from typing import Any, Callable
 
+from om_ai.api.main import logger
 from om_ai.memory import MemoryManager
 from om_ai.agents import AgentRouter, AgentExecutor
 from om_ai.cognition.intent_engine import IntentEngine
@@ -1140,6 +1141,87 @@ Research:
         if is_coding_task(message):
             return "Coding pe kaam karte hain — pehla feature batao, seedha plan dunga."
         return "Sir... samajh gaya. Boliye aage kya karna hai."
+        
+    def _safe_fallback(
+                self,
+                message: str,
+                intent_name: str,
+                context: dict | None = None
+            ) -> str:
+                """
+                OM intelligent recovery response.
+
+                Never returns fixed chatbot sentences.
+                Uses human understanding pipeline.
+                """
+
+                context = context or {}
+
+                try:
+
+                    from om_ai.core.human_intelligence import (
+                        HumanContextEngine
+                    )
+
+                    from om_ai.core.emotion_intelligence import (
+                        EmotionEngine
+                    )
+
+                    from om_ai.core.chat_intelligence import (
+                        ResponsePlanner
+                    )
+
+
+                    human_context = HumanContextEngine().analyze(
+                        message,
+                        context=context
+                    )
+
+
+                    emotion = EmotionEngine().detect(
+                        message,
+                        context=context
+                    )
+
+
+                    response = ResponsePlanner().create(
+                        message=message,
+
+                        intent=intent_name,
+
+                        context=human_context,
+
+                        emotion=emotion
+                    )
+
+
+                    if response:
+                        return response
+
+
+                except Exception as e:
+
+                    logger.warning(
+                        "OM intelligent fallback failed: %s",
+                        e
+                    )
+
+
+                # last emergency fallback only
+
+                if not message.strip():
+
+                    return (
+                        "Ji Sir, main ready hoon. "
+                        "Aap boliye."
+                    )
+
+
+                return (
+                    "Ji Sir, main sun raha hoon. "
+                    "Mujhe thoda aur context dijiye "
+                    "taaki main aapko sahi tarike se help kar sakun."
+                )
 
     def process(
         self,

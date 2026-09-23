@@ -122,7 +122,7 @@ def _load_user_context(
         logger.debug("onboarding context: %s", exc)
 
     if not ctx["name"]:
-        ctx["name"] = "Sir"
+        ctx["name"] = "bhai"
     return ctx
 
 

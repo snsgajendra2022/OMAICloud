@@ -99,6 +99,13 @@ class SolutionEngine:
             model_generate=model_generate,
         )
         answer = str(explained.get("answer") or "").strip()
+        try:
+            from .stub_detect import is_solution_stub
+
+            if is_solution_stub(answer) or explained.get("stub"):
+                answer = ""
+        except Exception:
+            pass
         verification = self.verification_engine.verify(
             answer, message=q, analysis=analysis, reasoning=reasoning
         )
@@ -141,6 +148,14 @@ class SolutionEngine:
         )
 
         solved = bool(answer) and bool(verification.get("ok") or len(answer) >= 40)
+        try:
+            from .stub_detect import is_solution_stub
+
+            if is_solution_stub(answer):
+                solved = False
+                answer = ""
+        except Exception:
+            pass
         result = {
             "id": request_id,
             "solved": solved,

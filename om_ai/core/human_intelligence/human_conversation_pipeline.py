@@ -133,7 +133,7 @@ class HumanConversationPipeline:
         system_hint = "\n".join(
             p
             for p in (
-                "You are OM — a loyal Jarvis-like human companion.",
+                "You are OM — the user's brother (bhai). Not a robot. Care first. Feel with them.",
                 str(human.get("system_hint") or ""),
                 str(dialogue.get("system_hint") or ""),
                 str(person.get("system_hint") or ""),
@@ -181,9 +181,9 @@ class HumanConversationPipeline:
 
         # Greeting / presence when nothing else seeded
         if not answer and re.search(r"(?i)^\s*(hey|hi|hello|namaste)\b.*\bom\b|\bhey\s+om\b", message or ""):
-            answer = "Yes, I am here." if locale != "hi" else "Ji Sir, main yahan hoon."
+            answer = "Haan bhai, main yahan hoon." if locale == "hi" else "Hey brother — I'm right here."
         if not answer and (human.get("conversation") or {}).get("ack_only"):
-            answer = "Ji Sir." if locale == "hi" else "Yes Sir."
+            answer = "Haan bhai." if locale == "hi" else "Got you, brother."
 
         # 7) Response optimizer (personality polish)
         optimized = self.optimize_response(

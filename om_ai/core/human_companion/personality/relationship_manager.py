@@ -8,7 +8,9 @@ class RelationshipManager:
     def assess(self, *, profile: dict[str, Any] | None = None) -> dict[str, Any]:
         name = str((profile or {}).get("name") or "").strip()
         return {
-            "address": "Sir",
+            "address": "bhai",
             "known_name": name,
-            "style": "loyal_companion",
+            "style": "brother_companion",
+            "bond": "brother",
+            "care": "high",
         }

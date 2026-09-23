@@ -395,7 +395,7 @@ class CompanionRuntime:
 
         try:
             if ingested.get("wake_only"):
-                reply = ingested.get("prompt") or "Ji sir, kahiye?"
+                reply = ingested.get("prompt") or "Haan bhai, bolo?"
                 if self.presence is not None:
                     try:
                         self.presence.listening()
@@ -644,8 +644,31 @@ class CompanionRuntime:
 
                 answer = strip_internal_chrome(answer)
                 spoken = strip_internal_chrome(spoken) or answer
-                if is_garbage_spoken(spoken) or is_garbage_spoken(answer):
+                try:
+                    from om_ai.core.chat_intelligence.stub_detect import is_solution_stub
+
+                    if is_solution_stub(spoken) or is_solution_stub(answer):
+                        spoken = ""
+                        answer = ""
+                except Exception:
+                    pass
+                if is_garbage_spoken(spoken) or is_garbage_spoken(answer) or not spoken:
                     spoken = rescue_spoken(user_text, spoken)
+                    try:
+                        from om_ai.core.intelligence.real_answer import (
+                            from_helpful_defaults,
+                            build_real_answer,
+                        )
+
+                        grounded = (
+                            from_helpful_defaults(user_text)
+                            or build_real_answer(user_text)
+                            or ""
+                        ).strip()
+                        if grounded and not is_garbage_spoken(grounded):
+                            spoken = grounded
+                    except Exception:
+                        pass
                     answer = spoken
                     spoken_tts = spoken
                 else:
@@ -1187,64 +1210,100 @@ class CompanionRuntime:
         if len(low.split()) > 40:
             return None
         try:
-            from om_ai.core.human_intelligence import get_human_conversation_pipeline
+            from om_ai.core.companion_architecture import get_companion_pipeline
 
             locale = "hi" if any(
-                w in low for w in ("hai", "kya", "tum", "nahi", "baat", "ji", "thak")
+                w in low for w in ("hai", "kya", "tum", "nahi", "baat", "ji", "thak", "bhai")
             ) else "en"
             user_ctx: dict[str, Any] = {}
             try:
                 user_ctx = dict((self.context.meta or {}).get("user_context") or {})
             except Exception:
                 user_ctx = {}
-            out = get_human_conversation_pipeline().run(
+            out = get_companion_pipeline().run(
                 text,
                 history=history,
-                profile={"name": str(user_ctx.get("name") or "")},
+                profile=user_ctx,
                 locale=locale,
-                generate=None,
+                memory_blob=str((self.context.meta or {}).get("memory_blob") or ""),
             )
-            ans = str(out.get("answer") or out.get("spoken") or "").strip()
-            if not ans or len(re.findall(r"[A-Za-z\u0900-\u097F']+", ans)) < 2:
+            # If pipeline wants permission for an open — surface it
+            action_plan = out.get("action_plan") or {}
+            if action_plan.get("requires_permission"):
+                return {
+                    "answer": out.get("answer") or action_plan.get("speak"),
+                    "spoken": out.get("spoken") or action_plan.get("speak"),
+                    "spoken_tts": out.get("spoken") or action_plan.get("speak"),
+                    "activities": list(out.get("stages") or [])[:6],
+                    "semantic": {
+                        "conversation_mode": "action",
+                        "intent": "permission",
+                        "requires_action": True,
+                    },
+                    "human_companion": True,
+                    "architecture": out.get("architecture"),
+                    "action_plan": action_plan,
+                    "permission_prompt": True,
+                }
+            # Research / emotional / social answers from architecture pipeline
+            answer = str(out.get("answer") or "").strip()
+            if not answer:
                 return None
-            use_fast = bool(
-                out.get("listen_first")
-                or (out.get("incomplete") or {}).get("incomplete")
-                or (out.get("wellbeing") or {}).get("active")
-                or out.get("intent") in {"conversation", "share_win"}
-                or out.get("need") in {"listen_first", "support_and_listen"}
-                or re.search(r"(?i)^\s*(hey|hi|hello|namaste|thanks|thank you|ok|okay|haan)\b", low)
-            )
-            if not use_fast:
+            # Skip if it looks like a heavy task still needing full brain and no research/listen
+            if (
+                not out.get("research")
+                and not out.get("listen_first")
+                and out.get("intent") not in {"sharing", "greeting", "research", "action"}
+                and len(low.split()) > 12
+            ):
                 return None
-            emo = out.get("emotion_pack") if isinstance(out.get("emotion_pack"), dict) else {
-                "label": out.get("emotion"),
-                "emotion": out.get("emotion"),
-                "need": out.get("need"),
-                "response_style": out.get("response_style"),
-                "tone": out.get("tone"),
-            }
             return {
-                "answer": ans,
-                "spoken": ans,
-                "spoken_tts": ans,
-                "feeling": emo.get("label") or emo.get("emotion") or "neutral",
-                "affect": emo,
-                "emotion": emo,
-                "friend": {"friend_move": "human_fast", "system_hint": out.get("system_hint")},
-                "pipeline": out.get("stages") or ["human_fast"],
-                "activities": [],
+                "answer": answer,
+                "spoken": answer,
+                "spoken_tts": answer,
+                "activities": list(out.get("stages") or [])[:8],
                 "semantic": {
-                    "conversation_mode": "social",
-                    "intent": out.get("intent") or "conversation",
+                    "conversation_mode": "social" if out.get("listen_first") else "assist",
+                    "intent": out.get("intent"),
+                    "emotion": out.get("emotion"),
                 },
                 "human_companion": True,
-                "fast_path": True,
-                "memory_line": str((user_ctx.get("name") or "") and f"With {user_ctx.get('name')}") or "",
+                "architecture": out.get("architecture"),
+                "bond": "brother",
+                "emotion": out.get("emotion_pack"),
+                "research": out.get("research"),
+                "avatar_state": out.get("avatar_state"),
+                "pipeline": out.get("stages"),
             }
         except Exception as exc:
-            logger.debug("fast human turn failed: %s", exc)
-            return None
+            logger.debug("companion architecture fast turn: %s", exc)
+            # Fallback to legacy human pipeline
+            try:
+                from om_ai.core.human_intelligence import get_human_conversation_pipeline
+
+                locale = "hi" if any(
+                    w in low for w in ("hai", "kya", "tum", "nahi", "baat", "ji", "thak")
+                ) else "en"
+                user_ctx = dict((self.context.meta or {}).get("user_context") or {})
+                out = get_human_conversation_pipeline().run(
+                    text,
+                    history=history,
+                    profile=user_ctx,
+                    locale=locale,
+                )
+                answer = str(out.get("answer") or "").strip()
+                if not answer:
+                    return None
+                return {
+                    "answer": answer,
+                    "spoken": answer,
+                    "spoken_tts": answer,
+                    "activities": list(out.get("stages") or [])[:6],
+                    "semantic": {"conversation_mode": "social", "intent": out.get("intent")},
+                    "human_companion": True,
+                }
+            except Exception:
+                return None
 
     def _model_generate_fn(self):
         """Same production chat path as /v1/chat — native weights when ready, otherwise grounded brain."""
@@ -1543,26 +1602,51 @@ class CompanionRuntime:
                 "speak_ok": action_ack(kind="youtube", query=q, user_message=text),
             }
 
-        # Prefer explicit search/google over weather keyword false-positives
-        if re.search(r"\b(google|search|browser)\b", low) or "search karo" in low:
-            mq = re.search(
-                r"(?:google(?:\s+search)?|search(?:\s+for)?|khoj)\s+(.+)$",
-                low,
+        # Prefer ask-first for "open my project / open X" (architecture: permission before execute)
+        m_open = re.search(
+            r"(?i)\b(?:open|kholo|khol)\s+(?:my\s+)?(project|folder|repo|workspace|.+?)(?:\s+please)?$",
+            (text or "").strip(),
+        )
+        if m_open and not re.search(r"(?i)\b(google|browser|youtube|search|calculator|notes|mail)\b", low):
+            target = m_open.group(1).strip(" .")
+            if target and len(target) < 80:
+                hi = bool(re.search(r"[\u0900-\u097F]|\b(kholo|khol|mera|project)\b", low))
+                return {
+                    "action": "application.open",
+                    "target": target,
+                    "arguments": {"app": target, "path": target},
+                    "reason": text[:160],
+                    "risk": "SENSITIVE",
+                    "speak_ok": (
+                        f"Bhai, '{target}' mil gaya. Kholun?"
+                        if hi
+                        else f"I found your {target}. Do you want me to open it?"
+                    ),
+                }
+
+        # Prefer explicit search/google — research by default, open browser ONLY if asked
+        if re.search(r"\b(google|search|browser)\b", low) or "search karo" in low or "khoj" in low:
+            from om_ai.core.companion_runtime.search_care import (
+                extract_search_query,
+                google_url,
+                wants_browser_open,
             )
-            q = (mq.group(1).strip(" .") if mq else "").strip()
-            for junk in ("kholo", "khol", "open", "please", "karo", "on google", "pe", "par"):
-                q = re.sub(rf"\b{re.escape(junk)}\b", "", q).strip()
-            if q.lower().startswith("search "):
-                q = q[7:].strip()
-            url = (
-                f"https://www.google.com/search?q={quote_plus(q)}"
-                if q
-                else "https://www.google.com"
-            )
+
+            q = extract_search_query(text)
+            if wants_browser_open(text):
+                url = google_url(q)
+                return {
+                    "action": "browser.open",
+                    "target": url,
+                    "arguments": {"url": url},
+                    "reason": text[:160],
+                    "risk": "LOW_IMPACT",
+                    "speak_ok": action_ack(kind="search_open", query=q, user_message=text),
+                }
             return {
-                "action": "browser.open",
-                "target": url,
-                "arguments": {"url": url},
+                "action": "companion.web_research",
+                "target": q or text[:120],
+                "arguments": {"query": q or text[:120], "user_message": text},
                 "reason": text[:160],
                 "risk": "LOW_IMPACT",
                 "speak_ok": action_ack(kind="search", query=q, user_message=text),
@@ -1659,12 +1743,19 @@ class CompanionRuntime:
         risk = str(planned.get("risk") or "LOW_IMPACT")
         if risk in {"DESTRUCTIVE", "SENSITIVE", "EXTERNAL_SIDE_EFFECT"}:
             pid = str(uuid.uuid4())[:8]
+            speak = str(planned.get("speak_ok") or "").strip()
+            if not speak:
+                speak = (
+                    f"Bhai, main `{planned.get('action')}` chala sakta hun. Bol yes — warna no."
+                    if risk == "SENSITIVE"
+                    else f"I can run `{planned.get('action')}` ({risk}). Say yes to allow, or no to cancel."
+                )
             return {
                 "requires_approval": True,
                 "allowed": False,
                 "permission_id": pid,
                 "risk": risk,
-                "prompt": f"I can run `{planned.get('action')}` ({risk}). Say yes to allow, or no to cancel.",
+                "prompt": speak,
                 "action": planned,
             }
         # Low impact / read-only auto-allow when actions enabled
@@ -1712,6 +1803,24 @@ class CompanionRuntime:
                 spoken = f"Abhi time {now} hai." if hi else f"It's {now}."
                 payload = {"ok": True, "message": spoken}
                 self._emit("action.completed", payload)
+                return payload
+
+            if action == "companion.web_research":
+                from om_ai.core.companion_runtime.search_care import research_query
+
+                args = dict(planned.get("arguments") or {})
+                pack = research_query(
+                    str(args.get("query") or planned.get("target") or ""),
+                    user_message=str(args.get("user_message") or ""),
+                )
+                spoken = str(pack.get("spoken") or planned.get("speak_ok") or "Done.")
+                payload = {
+                    "ok": bool(pack.get("ok")),
+                    "result": pack,
+                    "message": spoken,
+                    "hits": pack.get("hits") or [],
+                }
+                self._emit("action.completed" if pack.get("ok") else "action.failed", payload)
                 return payload
 
             if self.devices is not None and hasattr(self.devices, "invoke"):
