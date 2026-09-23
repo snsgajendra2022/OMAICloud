@@ -37,3 +37,29 @@ class ChatQualityEngine:
             "issues": issues,
             "intent": intent,
         }
+
+    def improve(
+        self,
+        answer: str,
+        *,
+        question: str = "",
+        optimizer_report: dict[str, Any] | None = None,
+        confidence: dict[str, Any] | None = None,
+    ) -> str:
+        """Return a cleaned answer string for production brain."""
+        text = (answer or "").strip()
+        if not text:
+            return text
+        report = self.evaluate(
+            text,
+            optimizer_report=optimizer_report,
+            confidence=confidence,
+            intent="",
+        )
+        # Light cleanup only — keep original content when approved.
+        if report.get("approved"):
+            return text
+        cleaned = " ".join(text.split())
+        if question and cleaned.lower() == question.strip().lower():
+            return text
+        return cleaned or text
