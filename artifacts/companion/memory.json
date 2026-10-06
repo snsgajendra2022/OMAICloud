@@ -9591,6 +9591,288 @@
           "confidence": 0.6
         }
       }
+    ],
+    "5b123bd3-50df-47cd-9a79-4dec905a33ee": [
+      {
+        "id": "0a0a42d2c58c40c8",
+        "kind": "episodic",
+        "content": "hey hello hello hello hello hello hello hello",
+        "scope": "session",
+        "key": "5b123bd3-50df-47cd-9a79-4dec905a33ee",
+        "created_at": "2026-09-24T07:02:18.724210+00:00",
+        "updated_at": "2026-09-24T07:02:18.724211+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "",
+          "role": "user",
+          "confidence": 0.0
+        }
+      },
+      {
+        "id": "f30ac56e38a04a1d",
+        "kind": "episodic",
+        "content": "Hey brother. I'm right here",
+        "scope": "session",
+        "key": "5b123bd3-50df-47cd-9a79-4dec905a33ee",
+        "created_at": "2026-09-24T07:02:18.726991+00:00",
+        "updated_at": "2026-09-24T07:02:18.726992+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "",
+          "role": "assistant",
+          "confidence": 0.0
+        }
+      },
+      {
+        "id": "df996f17b88e4615",
+        "kind": "episodic",
+        "content": "Badshah ka gana",
+        "scope": "session",
+        "key": "5b123bd3-50df-47cd-9a79-4dec905a33ee",
+        "created_at": "2026-09-24T07:03:34.104561+00:00",
+        "updated_at": "2026-09-24T07:03:34.104562+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "04b5fe5d25024da0",
+        "kind": "episodic",
+        "content": "I hear you, brother. Tell me straight what you need. I'm here.",
+        "scope": "session",
+        "key": "5b123bd3-50df-47cd-9a79-4dec905a33ee",
+        "created_at": "2026-09-24T07:03:34.106934+00:00",
+        "updated_at": "2026-09-24T07:03:34.106935+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "1e44ba0d1bb948a6",
+        "kind": "episodic",
+        "content": "Yo Yo Hani Singh ka naya wala gana",
+        "scope": "session",
+        "key": "5b123bd3-50df-47cd-9a79-4dec905a33ee",
+        "created_at": "2026-09-24T07:03:42.364884+00:00",
+        "updated_at": "2026-09-24T07:03:42.364886+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "greeting",
+          "role": "user",
+          "confidence": 0.97
+        }
+      },
+      {
+        "id": "7d6097838ff942c2",
+        "kind": "episodic",
+        "content": "Hey. I'm OM. What's on your mind?",
+        "scope": "session",
+        "key": "5b123bd3-50df-47cd-9a79-4dec905a33ee",
+        "created_at": "2026-09-24T07:03:42.367850+00:00",
+        "updated_at": "2026-09-24T07:03:42.367852+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "greeting",
+          "role": "assistant",
+          "confidence": 0.97
+        }
+      },
+      {
+        "id": "3ad00a9a64d44514",
+        "kind": "episodic",
+        "content": "Mujhe gana sunna hai",
+        "scope": "session",
+        "key": "5b123bd3-50df-47cd-9a79-4dec905a33ee",
+        "created_at": "2026-09-24T07:03:50.384602+00:00",
+        "updated_at": "2026-09-24T07:03:50.384603+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "a1d592c35809466a",
+        "kind": "episodic",
+        "content": "Haan bhai, samajh gaya. Seedha bolo kya chahiye — main yahin hoon.",
+        "scope": "session",
+        "key": "5b123bd3-50df-47cd-9a79-4dec905a33ee",
+        "created_at": "2026-09-24T07:03:50.387546+00:00",
+        "updated_at": "2026-09-24T07:03:50.387548+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "ebfb1fb39cae4be5",
+        "kind": "episodic",
+        "content": "ek gana Suna Do Bhai",
+        "scope": "session",
+        "key": "5b123bd3-50df-47cd-9a79-4dec905a33ee",
+        "created_at": "2026-09-24T07:03:58.615116+00:00",
+        "updated_at": "2026-09-24T07:03:58.615117+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "89cc19a800bc4ee2",
+        "kind": "episodic",
+        "content": "Haan bhai, samajh gaya. Seedha bolo kya chahiye. main yahin hoon.",
+        "scope": "session",
+        "key": "5b123bd3-50df-47cd-9a79-4dec905a33ee",
+        "created_at": "2026-09-24T07:03:58.617017+00:00",
+        "updated_at": "2026-09-24T07:03:58.617018+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "407958ff14e548b9",
+        "kind": "episodic",
+        "content": "Tum Kuchh Nahin Samjha Vahi To Pagal Ho Gaya",
+        "scope": "session",
+        "key": "5b123bd3-50df-47cd-9a79-4dec905a33ee",
+        "created_at": "2026-09-24T07:04:07.225757+00:00",
+        "updated_at": "2026-09-24T07:04:07.225759+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "8fd257da513c40a3",
+        "kind": "episodic",
+        "content": "Haan bhai, samajh gaya. Seedha bolo kya chahiye — main yahin hoon.",
+        "scope": "session",
+        "key": "5b123bd3-50df-47cd-9a79-4dec905a33ee",
+        "created_at": "2026-09-24T07:04:07.228063+00:00",
+        "updated_at": "2026-09-24T07:04:07.228065+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "7da1dc7158b249d1",
+        "kind": "episodic",
+        "content": "to bolo na kya kar rahe ho",
+        "scope": "session",
+        "key": "5b123bd3-50df-47cd-9a79-4dec905a33ee",
+        "created_at": "2026-09-24T07:05:13.207932+00:00",
+        "updated_at": "2026-09-24T07:05:13.207933+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "1d58c539a4664661",
+        "kind": "episodic",
+        "content": "Haan bhai, samajh gaya. Seedha bolo kya chahiye — main yahin hoon.",
+        "scope": "session",
+        "key": "5b123bd3-50df-47cd-9a79-4dec905a33ee",
+        "created_at": "2026-09-24T07:05:13.210918+00:00",
+        "updated_at": "2026-09-24T07:05:13.210920+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      }
     ]
   },
   "semantic": {
@@ -9677,7 +9959,23 @@
         "meta": {}
       }
     ],
-    "default:Gajendra Rawat": [],
+    "default:Gajendra Rawat": [
+      {
+        "id": "0e5eea05df5a48d5",
+        "kind": "semantic",
+        "content": "gana sunna hai",
+        "scope": "user",
+        "key": "preference",
+        "created_at": "2026-09-24T07:03:50.394143+00:00",
+        "updated_at": "2026-09-24T07:03:50.394146+00:00",
+        "tags": [
+          "preference"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {}
+      }
+    ],
     "default:SearchCheck": [
       {
         "id": "ca8514b601494fd0",
@@ -11631,6 +11929,120 @@
         "key": "general",
         "created_at": "2026-09-23T07:48:02.288247+00:00",
         "updated_at": "2026-09-23T07:48:02.288249+00:00",
+        "tags": [
+          "turn"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "9e538949591f487e",
+        "kind": "project",
+        "content": "Badshah ka gana",
+        "scope": "project",
+        "key": "general",
+        "created_at": "2026-09-24T07:03:34.104571+00:00",
+        "updated_at": "2026-09-24T07:03:34.104572+00:00",
+        "tags": [
+          "turn"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "c7fa957e44fc4db2",
+        "kind": "project",
+        "content": "Yo Yo Hani Singh ka naya wala gana",
+        "scope": "project",
+        "key": "general",
+        "created_at": "2026-09-24T07:03:42.364895+00:00",
+        "updated_at": "2026-09-24T07:03:42.364896+00:00",
+        "tags": [
+          "turn"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "greeting",
+          "role": "user",
+          "confidence": 0.97
+        }
+      },
+      {
+        "id": "4b1283dd92954cb1",
+        "kind": "project",
+        "content": "Mujhe gana sunna hai",
+        "scope": "project",
+        "key": "general",
+        "created_at": "2026-09-24T07:03:50.384610+00:00",
+        "updated_at": "2026-09-24T07:03:50.384611+00:00",
+        "tags": [
+          "turn"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "e8991c07af524c0f",
+        "kind": "project",
+        "content": "ek gana Suna Do Bhai",
+        "scope": "project",
+        "key": "general",
+        "created_at": "2026-09-24T07:03:58.615123+00:00",
+        "updated_at": "2026-09-24T07:03:58.615124+00:00",
+        "tags": [
+          "turn"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "4379d74f6026476a",
+        "kind": "project",
+        "content": "Tum Kuchh Nahin Samjha Vahi To Pagal Ho Gaya",
+        "scope": "project",
+        "key": "general",
+        "created_at": "2026-09-24T07:04:07.225767+00:00",
+        "updated_at": "2026-09-24T07:04:07.225768+00:00",
+        "tags": [
+          "turn"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "a4270247e0f84e60",
+        "kind": "project",
+        "content": "to bolo na kya kar rahe ho",
+        "scope": "project",
+        "key": "general",
+        "created_at": "2026-09-24T07:05:13.207945+00:00",
+        "updated_at": "2026-09-24T07:05:13.207947+00:00",
         "tags": [
           "turn"
         ],
