@@ -3,6 +3,8 @@ from __future__ import annotations
 
 import logging
 import tempfile
+import threading
+from collections import deque
 from datetime import datetime
 from pathlib import Path
 from typing import Any
@@ -15,6 +17,9 @@ logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api/companion", tags=["companion"])
 
+_native_final_lock = threading.Lock()
+_native_final_queue: deque[str] = deque(maxlen=48)
+
 
 class MessageBody(BaseModel):
     text: str = Field(..., min_length=1, max_length=8000)
@@ -22,6 +27,10 @@ class MessageBody(BaseModel):
     session_id: str | None = None
     speak: bool = True
     force_commit: bool = False
+
+
+class NativeFinalBody(BaseModel):
+    text: str = Field(..., min_length=1, max_length=8000)
 
 
 class PartialBody(BaseModel):
@@ -405,6 +414,27 @@ def companion_message(body: MessageBody) -> dict[str, Any]:
     # Never leak internal pipeline activity chrome to the companion HUD
     out["activities"] = []
     return out
+
+
+@router.post("/native-final")
+def push_native_final(body: NativeFinalBody) -> dict[str, Any]:
+    """Desktop native mic → queue for the companion UI to pick up."""
+    text = str(body.text or "").strip()
+    if not text:
+        return {"ok": False, "queued": 0}
+    with _native_final_lock:
+        _native_final_queue.append(text)
+        n = len(_native_final_queue)
+    return {"ok": True, "queued": n}
+
+
+@router.get("/native-final")
+def pop_native_finals() -> dict[str, Any]:
+    """Companion UI polls this when Chrome getUserMedia is blocked."""
+    with _native_final_lock:
+        texts = list(_native_final_queue)
+        _native_final_queue.clear()
+    return {"ok": True, "texts": texts}
 
 
 @router.post("/partial")

@@ -9872,6 +9872,2566 @@
           "role": "assistant",
           "confidence": 0.6
         }
+      },
+      {
+        "id": "3eeff7ced4634104",
+        "kind": "episodic",
+        "content": "kya tum",
+        "scope": "session",
+        "key": "5b123bd3-50df-47cd-9a79-4dec905a33ee",
+        "created_at": "2026-09-24T07:12:45.047017+00:00",
+        "updated_at": "2026-09-24T07:12:45.047018+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "0784b41837714e9c",
+        "kind": "episodic",
+        "content": "Haan bhai, samajh gaya. Seedha bolo kya chahiye — main yahin hoon.",
+        "scope": "session",
+        "key": "5b123bd3-50df-47cd-9a79-4dec905a33ee",
+        "created_at": "2026-09-24T07:12:45.049840+00:00",
+        "updated_at": "2026-09-24T07:12:45.049842+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "d4af54d611864cd8",
+        "kind": "episodic",
+        "content": "kya tum Google per search karke bata sakte ho Main Apne Om ko kaise aur Achcha banaa Sakun",
+        "scope": "session",
+        "key": "5b123bd3-50df-47cd-9a79-4dec905a33ee",
+        "created_at": "2026-09-24T07:13:09.810222+00:00",
+        "updated_at": "2026-09-24T07:13:09.810224+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "",
+          "role": "user",
+          "confidence": 0.0
+        }
+      },
+      {
+        "id": "499f30e5a87e4c10",
+        "kind": "episodic",
+        "content": "Bhai, maine 'per search karke bata sakte ho Main Apne Om ko kaise aur Achcha banaa Sakun' search kiya — bina browser khole. Mila yeh: CURRENT ARCHITECTURE. md Status: OM AI Operating Brain v0",
+        "scope": "session",
+        "key": "5b123bd3-50df-47cd-9a79-4dec905a33ee",
+        "created_at": "2026-09-24T07:13:09.813488+00:00",
+        "updated_at": "2026-09-24T07:13:09.813490+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "",
+          "role": "assistant",
+          "confidence": 0.0
+        }
+      },
+      {
+        "id": "35e03bc0d3514e53",
+        "kind": "episodic",
+        "content": "kya matlab hai iska samajh jao Jara",
+        "scope": "session",
+        "key": "5b123bd3-50df-47cd-9a79-4dec905a33ee",
+        "created_at": "2026-09-24T07:13:36.174692+00:00",
+        "updated_at": "2026-09-24T07:13:36.174694+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "bd15d95681a84d94",
+        "kind": "episodic",
+        "content": "Haan bhai, samajh gaya. Seedha bolo kya chahiye — main yahin hoon.",
+        "scope": "session",
+        "key": "5b123bd3-50df-47cd-9a79-4dec905a33ee",
+        "created_at": "2026-09-24T07:13:36.176648+00:00",
+        "updated_at": "2026-09-24T07:13:36.176649+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "aeb66ac03380429e",
+        "kind": "episodic",
+        "content": "shutdown",
+        "scope": "session",
+        "key": "5b123bd3-50df-47cd-9a79-4dec905a33ee",
+        "created_at": "2026-09-24T07:13:59.558857+00:00",
+        "updated_at": "2026-09-24T07:13:59.558858+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "546f8d4423254383",
+        "kind": "episodic",
+        "content": "I hear you, brother. Tell me straight what you need. I'm here.",
+        "scope": "session",
+        "key": "5b123bd3-50df-47cd-9a79-4dec905a33ee",
+        "created_at": "2026-09-24T07:13:59.562072+00:00",
+        "updated_at": "2026-09-24T07:13:59.562074+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "be44d0883e96414a",
+        "kind": "episodic",
+        "content": "Udata hai kya",
+        "scope": "session",
+        "key": "5b123bd3-50df-47cd-9a79-4dec905a33ee",
+        "created_at": "2026-09-24T07:23:20.204692+00:00",
+        "updated_at": "2026-09-24T07:23:20.204693+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "50bdb9234ea24d9c",
+        "kind": "episodic",
+        "content": "Haan bhai, samajh gaya. Seedha bolo kya chahiye — main yahin hoon.",
+        "scope": "session",
+        "key": "5b123bd3-50df-47cd-9a79-4dec905a33ee",
+        "created_at": "2026-09-24T07:23:20.211767+00:00",
+        "updated_at": "2026-09-24T07:23:20.211769+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "3f585322431542f2",
+        "kind": "episodic",
+        "content": "kaun sa approval approval ke liye jaega",
+        "scope": "session",
+        "key": "5b123bd3-50df-47cd-9a79-4dec905a33ee",
+        "created_at": "2026-09-24T07:39:51.500411+00:00",
+        "updated_at": "2026-09-24T07:39:51.500413+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "6faa79cfadba4a35",
+        "kind": "episodic",
+        "content": "I hear you, brother. Tell me straight what you need. I'm here.",
+        "scope": "session",
+        "key": "5b123bd3-50df-47cd-9a79-4dec905a33ee",
+        "created_at": "2026-09-24T07:39:51.504557+00:00",
+        "updated_at": "2026-09-24T07:39:51.504558+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "4180bcdcefd94b68",
+        "kind": "episodic",
+        "content": "Tere",
+        "scope": "session",
+        "key": "5b123bd3-50df-47cd-9a79-4dec905a33ee",
+        "created_at": "2026-09-24T07:42:34.195365+00:00",
+        "updated_at": "2026-09-24T07:42:34.195366+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "917fce80609d4050",
+        "kind": "episodic",
+        "content": "I hear you, brother. Tell me straight what you need. I'm here.",
+        "scope": "session",
+        "key": "5b123bd3-50df-47cd-9a79-4dec905a33ee",
+        "created_at": "2026-09-24T07:42:34.199200+00:00",
+        "updated_at": "2026-09-24T07:42:34.199202+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "04a3088a958b4cd9",
+        "kind": "episodic",
+        "content": "Samay Hai Uske bad message aaram se Jaate Hain",
+        "scope": "session",
+        "key": "5b123bd3-50df-47cd-9a79-4dec905a33ee",
+        "created_at": "2026-09-24T07:45:06.404607+00:00",
+        "updated_at": "2026-09-24T07:45:06.404609+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "9914aed1138c4f64",
+        "kind": "episodic",
+        "content": "Haan bhai, samajh gaya. Seedha bolo kya chahiye — main yahin hoon.",
+        "scope": "session",
+        "key": "5b123bd3-50df-47cd-9a79-4dec905a33ee",
+        "created_at": "2026-09-24T07:45:06.407755+00:00",
+        "updated_at": "2026-09-24T07:45:06.407757+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "6e599de242794589",
+        "kind": "episodic",
+        "content": "visit wala Kaise Celerio banaoge",
+        "scope": "session",
+        "key": "5b123bd3-50df-47cd-9a79-4dec905a33ee",
+        "created_at": "2026-09-24T07:45:51.429755+00:00",
+        "updated_at": "2026-09-24T07:45:51.429756+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "c28c9003759a4630",
+        "kind": "episodic",
+        "content": "Main theek hoon. aap kaise ho? Bataiye, kaise madad karun?",
+        "scope": "session",
+        "key": "5b123bd3-50df-47cd-9a79-4dec905a33ee",
+        "created_at": "2026-09-24T07:45:51.433451+00:00",
+        "updated_at": "2026-09-24T07:45:51.433452+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "91d1bb08e0ad4005",
+        "kind": "episodic",
+        "content": "dimag Laga sabse simple aur",
+        "scope": "session",
+        "key": "5b123bd3-50df-47cd-9a79-4dec905a33ee",
+        "created_at": "2026-09-24T07:46:12.063291+00:00",
+        "updated_at": "2026-09-24T07:46:12.063292+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "ed670ac6633d4233",
+        "kind": "episodic",
+        "content": "I hear you, brother. Tell me straight what you need. I'm here.",
+        "scope": "session",
+        "key": "5b123bd3-50df-47cd-9a79-4dec905a33ee",
+        "created_at": "2026-09-24T07:46:12.065398+00:00",
+        "updated_at": "2026-09-24T07:46:12.065399+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "6d878d1418934506",
+        "kind": "episodic",
+        "content": "Koi sense Nahin Hai",
+        "scope": "session",
+        "key": "5b123bd3-50df-47cd-9a79-4dec905a33ee",
+        "created_at": "2026-09-24T07:46:34.085924+00:00",
+        "updated_at": "2026-09-24T07:46:34.085925+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "a80ab5ef52754771",
+        "kind": "episodic",
+        "content": "Haan bhai, samajh gaya. Seedha bolo kya chahiye — main yahin hoon.",
+        "scope": "session",
+        "key": "5b123bd3-50df-47cd-9a79-4dec905a33ee",
+        "created_at": "2026-09-24T07:46:34.087974+00:00",
+        "updated_at": "2026-09-24T07:46:34.087975+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "c58eb0049ee44c0d",
+        "kind": "episodic",
+        "content": "expand",
+        "scope": "session",
+        "key": "5b123bd3-50df-47cd-9a79-4dec905a33ee",
+        "created_at": "2026-09-24T07:47:06.321308+00:00",
+        "updated_at": "2026-09-24T07:47:06.321309+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "b2ce0487e11f46d1",
+        "kind": "episodic",
+        "content": "I hear you, brother. Tell me straight what you need. I'm here.",
+        "scope": "session",
+        "key": "5b123bd3-50df-47cd-9a79-4dec905a33ee",
+        "created_at": "2026-09-24T07:47:06.324399+00:00",
+        "updated_at": "2026-09-24T07:47:06.324401+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "5a0192c2929e4329",
+        "kind": "episodic",
+        "content": "mangega to Didi",
+        "scope": "session",
+        "key": "5b123bd3-50df-47cd-9a79-4dec905a33ee",
+        "created_at": "2026-09-24T07:47:56.207240+00:00",
+        "updated_at": "2026-09-24T07:47:56.207241+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "9981d15febf64e8e",
+        "kind": "episodic",
+        "content": "I hear you, brother. Tell me straight what you need. I'm here.",
+        "scope": "session",
+        "key": "5b123bd3-50df-47cd-9a79-4dec905a33ee",
+        "created_at": "2026-09-24T07:47:56.210848+00:00",
+        "updated_at": "2026-09-24T07:47:56.210859+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "358ccf42c67d48c5",
+        "kind": "episodic",
+        "content": "invitation Aaya Hai blah blah blah blah",
+        "scope": "session",
+        "key": "5b123bd3-50df-47cd-9a79-4dec905a33ee",
+        "created_at": "2026-09-24T07:48:25.790097+00:00",
+        "updated_at": "2026-09-24T07:48:25.790098+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "ed1ec6b2886c4b1b",
+        "kind": "episodic",
+        "content": "Haan bhai, samajh gaya. Seedha bolo kya chahiye — main yahin hoon.",
+        "scope": "session",
+        "key": "5b123bd3-50df-47cd-9a79-4dec905a33ee",
+        "created_at": "2026-09-24T07:48:25.792770+00:00",
+        "updated_at": "2026-09-24T07:48:25.792774+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "d0a52a6a5e5049ea",
+        "kind": "episodic",
+        "content": "2 3",
+        "scope": "session",
+        "key": "5b123bd3-50df-47cd-9a79-4dec905a33ee",
+        "created_at": "2026-09-24T07:49:46.623698+00:00",
+        "updated_at": "2026-09-24T07:49:46.623699+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "a5ea769248b349f1",
+        "kind": "episodic",
+        "content": "I hear you, brother. Tell me straight what you need. I'm here.",
+        "scope": "session",
+        "key": "5b123bd3-50df-47cd-9a79-4dec905a33ee",
+        "created_at": "2026-09-24T07:49:46.626589+00:00",
+        "updated_at": "2026-09-24T07:49:46.626590+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "9e0dc8c5f6cb40ce",
+        "kind": "episodic",
+        "content": "usko purani request dikhani hai ki nahin dikhani hai",
+        "scope": "session",
+        "key": "5b123bd3-50df-47cd-9a79-4dec905a33ee",
+        "created_at": "2026-09-24T07:50:04.304430+00:00",
+        "updated_at": "2026-09-24T07:50:04.304432+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "917266b4596c44fe",
+        "kind": "episodic",
+        "content": "Haan bhai, samajh gaya. Seedha bolo kya chahiye — main yahin hoon.",
+        "scope": "session",
+        "key": "5b123bd3-50df-47cd-9a79-4dec905a33ee",
+        "created_at": "2026-09-24T07:50:04.306633+00:00",
+        "updated_at": "2026-09-24T07:50:04.306634+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "d72f774f77d94e4c",
+        "kind": "episodic",
+        "content": "Deewana",
+        "scope": "session",
+        "key": "5b123bd3-50df-47cd-9a79-4dec905a33ee",
+        "created_at": "2026-09-24T07:52:54.137290+00:00",
+        "updated_at": "2026-09-24T07:52:54.137291+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "552459775e6341da",
+        "kind": "episodic",
+        "content": "I hear you, brother. Tell me straight what you need. I'm here.",
+        "scope": "session",
+        "key": "5b123bd3-50df-47cd-9a79-4dec905a33ee",
+        "created_at": "2026-09-24T07:52:54.141487+00:00",
+        "updated_at": "2026-09-24T07:52:54.141489+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "b85077cb62c14725",
+        "kind": "episodic",
+        "content": "apne pass",
+        "scope": "session",
+        "key": "5b123bd3-50df-47cd-9a79-4dec905a33ee",
+        "created_at": "2026-09-24T08:45:00.379962+00:00",
+        "updated_at": "2026-09-24T08:45:00.379965+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "e7e7da14cc284d4b",
+        "kind": "episodic",
+        "content": "I hear you, brother. Tell me straight what you need. I'm here.",
+        "scope": "session",
+        "key": "5b123bd3-50df-47cd-9a79-4dec905a33ee",
+        "created_at": "2026-09-24T08:45:00.384164+00:00",
+        "updated_at": "2026-09-24T08:45:00.384166+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "483b444772624ffe",
+        "kind": "episodic",
+        "content": "disconnect kar Dun",
+        "scope": "session",
+        "key": "5b123bd3-50df-47cd-9a79-4dec905a33ee",
+        "created_at": "2026-09-24T08:45:35.983854+00:00",
+        "updated_at": "2026-09-24T08:45:35.984263+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "ba1d4a69f6c44206",
+        "kind": "episodic",
+        "content": "I hear you, brother. Tell me straight what you need. I'm here.",
+        "scope": "session",
+        "key": "5b123bd3-50df-47cd-9a79-4dec905a33ee",
+        "created_at": "2026-09-24T08:45:35.986915+00:00",
+        "updated_at": "2026-09-24T08:45:35.986916+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "d6930a76d66348e1",
+        "kind": "episodic",
+        "content": "image kya hai",
+        "scope": "session",
+        "key": "5b123bd3-50df-47cd-9a79-4dec905a33ee",
+        "created_at": "2026-09-24T08:46:23.475341+00:00",
+        "updated_at": "2026-09-24T08:46:23.475342+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "bd2d79c0727a4b5e",
+        "kind": "episodic",
+        "content": "Main yahin hoon. Bataiye kya dekhna / samajhna hai — seedha jawab dunga.",
+        "scope": "session",
+        "key": "5b123bd3-50df-47cd-9a79-4dec905a33ee",
+        "created_at": "2026-09-24T08:46:23.478251+00:00",
+        "updated_at": "2026-09-24T08:46:23.478253+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "e984a5cb91384bcc",
+        "kind": "episodic",
+        "content": "gradients",
+        "scope": "session",
+        "key": "5b123bd3-50df-47cd-9a79-4dec905a33ee",
+        "created_at": "2026-09-24T08:46:36.789187+00:00",
+        "updated_at": "2026-09-24T08:46:36.789188+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "1ac39535428b41c4",
+        "kind": "episodic",
+        "content": "I hear you, brother. Tell me straight what you need. I'm here.",
+        "scope": "session",
+        "key": "5b123bd3-50df-47cd-9a79-4dec905a33ee",
+        "created_at": "2026-09-24T08:46:36.791303+00:00",
+        "updated_at": "2026-09-24T08:46:36.791304+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "a0e4809fd1aa4d2d",
+        "kind": "episodic",
+        "content": "discipline kaun sa Lekar Rakha Hai",
+        "scope": "session",
+        "key": "5b123bd3-50df-47cd-9a79-4dec905a33ee",
+        "created_at": "2026-09-24T08:47:31.001323+00:00",
+        "updated_at": "2026-09-24T08:47:31.001324+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "3ddf30a088f2484c",
+        "kind": "episodic",
+        "content": "Haan bhai, samajh gaya. Seedha bolo kya chahiye — main yahin hoon.",
+        "scope": "session",
+        "key": "5b123bd3-50df-47cd-9a79-4dec905a33ee",
+        "created_at": "2026-09-24T08:47:31.005536+00:00",
+        "updated_at": "2026-09-24T08:47:31.005537+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "d7dfab24d67d41d0",
+        "kind": "episodic",
+        "content": "patient kaun sa hai",
+        "scope": "session",
+        "key": "5b123bd3-50df-47cd-9a79-4dec905a33ee",
+        "created_at": "2026-09-24T08:47:40.785359+00:00",
+        "updated_at": "2026-09-24T08:47:40.785361+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "28737c56ae334696",
+        "kind": "episodic",
+        "content": "Haan bhai, samajh gaya. Seedha bolo kya chahiye — main yahin hoon.",
+        "scope": "session",
+        "key": "5b123bd3-50df-47cd-9a79-4dec905a33ee",
+        "created_at": "2026-09-24T08:47:40.787325+00:00",
+        "updated_at": "2026-09-24T08:47:40.787327+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "80a9a8334772431c",
+        "kind": "episodic",
+        "content": "Jina Isi Ka Naam Hai",
+        "scope": "session",
+        "key": "5b123bd3-50df-47cd-9a79-4dec905a33ee",
+        "created_at": "2026-09-24T08:57:00.272991+00:00",
+        "updated_at": "2026-09-24T08:57:00.272993+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "1643844a07194b0f",
+        "kind": "episodic",
+        "content": "Haan bhai, samajh gaya. Seedha bolo kya chahiye — main yahin hoon.",
+        "scope": "session",
+        "key": "5b123bd3-50df-47cd-9a79-4dec905a33ee",
+        "created_at": "2026-09-24T08:57:00.276143+00:00",
+        "updated_at": "2026-09-24T08:57:00.276144+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "23c23f6314b04d40",
+        "kind": "episodic",
+        "content": "Maine Khud Kisi use mein se Utha liya tha",
+        "scope": "session",
+        "key": "5b123bd3-50df-47cd-9a79-4dec905a33ee",
+        "created_at": "2026-09-24T08:58:06.870548+00:00",
+        "updated_at": "2026-09-24T08:58:06.870550+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "34e03686070c4769",
+        "kind": "episodic",
+        "content": "Picking up where we left off.",
+        "scope": "session",
+        "key": "5b123bd3-50df-47cd-9a79-4dec905a33ee",
+        "created_at": "2026-09-24T08:58:06.874401+00:00",
+        "updated_at": "2026-09-24T08:58:06.874403+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "8f169c03085f475f",
+        "kind": "episodic",
+        "content": "kya galat hai",
+        "scope": "session",
+        "key": "5b123bd3-50df-47cd-9a79-4dec905a33ee",
+        "created_at": "2026-09-24T09:00:59.149537+00:00",
+        "updated_at": "2026-09-24T09:00:59.149539+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "7b2637d02b6b444f",
+        "kind": "episodic",
+        "content": "Haan bhai, samajh gaya. Seedha bolo kya chahiye — main yahin hoon.",
+        "scope": "session",
+        "key": "5b123bd3-50df-47cd-9a79-4dec905a33ee",
+        "created_at": "2026-09-24T09:00:59.153360+00:00",
+        "updated_at": "2026-09-24T09:00:59.153361+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "73146065631b4085",
+        "kind": "episodic",
+        "content": "Kisi Ki Muskura",
+        "scope": "session",
+        "key": "5b123bd3-50df-47cd-9a79-4dec905a33ee",
+        "created_at": "2026-09-24T09:01:55.176912+00:00",
+        "updated_at": "2026-09-24T09:01:55.176914+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "a823d8b10ce245fd",
+        "kind": "episodic",
+        "content": "I hear you, brother. Tell me straight what you need. I'm here.",
+        "scope": "session",
+        "key": "5b123bd3-50df-47cd-9a79-4dec905a33ee",
+        "created_at": "2026-09-24T09:01:55.180834+00:00",
+        "updated_at": "2026-09-24T09:01:55.180836+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "385ca0927f384c21",
+        "kind": "episodic",
+        "content": "isko Main Kya kar raha hun",
+        "scope": "session",
+        "key": "5b123bd3-50df-47cd-9a79-4dec905a33ee",
+        "created_at": "2026-09-24T09:02:09.488816+00:00",
+        "updated_at": "2026-09-24T09:02:09.488817+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "aaa1540172cf41a2",
+        "kind": "episodic",
+        "content": "Haan bhai, samajh gaya. Seedha bolo kya chahiye — main yahin hoon.",
+        "scope": "session",
+        "key": "5b123bd3-50df-47cd-9a79-4dec905a33ee",
+        "created_at": "2026-09-24T09:02:09.491172+00:00",
+        "updated_at": "2026-09-24T09:02:09.491174+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "a9f825bb3ac44c0d",
+        "kind": "episodic",
+        "content": "naya kam hai",
+        "scope": "session",
+        "key": "5b123bd3-50df-47cd-9a79-4dec905a33ee",
+        "created_at": "2026-09-24T09:02:22.189525+00:00",
+        "updated_at": "2026-09-24T09:02:22.189526+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "f5a86ea829b84291",
+        "kind": "episodic",
+        "content": "Haan bhai, samajh gaya. Seedha bolo kya chahiye — main yahin hoon.",
+        "scope": "session",
+        "key": "5b123bd3-50df-47cd-9a79-4dec905a33ee",
+        "created_at": "2026-09-24T09:02:22.192244+00:00",
+        "updated_at": "2026-09-24T09:02:22.192246+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "93460a2222be4b29",
+        "kind": "episodic",
+        "content": "Kisi bhi Mushkil",
+        "scope": "session",
+        "key": "5b123bd3-50df-47cd-9a79-4dec905a33ee",
+        "created_at": "2026-09-24T09:02:46.910888+00:00",
+        "updated_at": "2026-09-24T09:02:46.910890+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "673f6490fb4a45a0",
+        "kind": "episodic",
+        "content": "I hear you, brother. Tell me straight what you need. I'm here.",
+        "scope": "session",
+        "key": "5b123bd3-50df-47cd-9a79-4dec905a33ee",
+        "created_at": "2026-09-24T09:02:46.914082+00:00",
+        "updated_at": "2026-09-24T09:02:46.914084+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "43106231ba064b87",
+        "kind": "episodic",
+        "content": "24926",
+        "scope": "session",
+        "key": "5b123bd3-50df-47cd-9a79-4dec905a33ee",
+        "created_at": "2026-09-24T09:03:26.090751+00:00",
+        "updated_at": "2026-09-24T09:03:26.090753+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "57f9bafa7de5479a",
+        "kind": "episodic",
+        "content": "I hear you, brother. Tell me straight what you need. I'm here.",
+        "scope": "session",
+        "key": "5b123bd3-50df-47cd-9a79-4dec905a33ee",
+        "created_at": "2026-09-24T09:03:26.094516+00:00",
+        "updated_at": "2026-09-24T09:03:26.094517+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "9e466a0f0fb54323",
+        "kind": "episodic",
+        "content": "implement Bata Diya",
+        "scope": "session",
+        "key": "5b123bd3-50df-47cd-9a79-4dec905a33ee",
+        "created_at": "2026-09-24T09:06:31.519186+00:00",
+        "updated_at": "2026-09-24T09:06:31.519189+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "howto",
+          "role": "user",
+          "confidence": 0.85
+        }
+      },
+      {
+        "id": "842361ea5a0c4ad9",
+        "kind": "episodic",
+        "content": "I hear you, brother. Tell me straight what you need. I'm here.",
+        "scope": "session",
+        "key": "5b123bd3-50df-47cd-9a79-4dec905a33ee",
+        "created_at": "2026-09-24T09:06:31.529926+00:00",
+        "updated_at": "2026-09-24T09:06:31.529931+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "howto",
+          "role": "assistant",
+          "confidence": 0.85
+        }
+      },
+      {
+        "id": "31cb0c304439453b",
+        "kind": "episodic",
+        "content": "referral ID match",
+        "scope": "session",
+        "key": "5b123bd3-50df-47cd-9a79-4dec905a33ee",
+        "created_at": "2026-09-24T09:06:39.641958+00:00",
+        "updated_at": "2026-09-24T09:06:39.641960+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "51b9de1c98e34dbd",
+        "kind": "episodic",
+        "content": "I hear you, brother. Tell me straight what you need. I'm here.",
+        "scope": "session",
+        "key": "5b123bd3-50df-47cd-9a79-4dec905a33ee",
+        "created_at": "2026-09-24T09:06:39.644278+00:00",
+        "updated_at": "2026-09-24T09:06:39.644279+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "9455d00ed8a0486e",
+        "kind": "episodic",
+        "content": "Japan ke sath wala",
+        "scope": "session",
+        "key": "5b123bd3-50df-47cd-9a79-4dec905a33ee",
+        "created_at": "2026-09-24T09:07:48.014046+00:00",
+        "updated_at": "2026-09-24T09:07:48.014047+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "67e3cfbf4da04c15",
+        "kind": "episodic",
+        "content": "I hear you, brother. Tell me straight what you need. I'm here.",
+        "scope": "session",
+        "key": "5b123bd3-50df-47cd-9a79-4dec905a33ee",
+        "created_at": "2026-09-24T09:07:48.017717+00:00",
+        "updated_at": "2026-09-24T09:07:48.017718+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "27f4f3c2e8f54e63",
+        "kind": "episodic",
+        "content": "assignment management",
+        "scope": "session",
+        "key": "5b123bd3-50df-47cd-9a79-4dec905a33ee",
+        "created_at": "2026-09-24T09:09:56.970314+00:00",
+        "updated_at": "2026-09-24T09:09:56.970316+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "3729335b521f4594",
+        "kind": "episodic",
+        "content": "MalkeducCenteruminousunctions burying Bue bumpy pear copious gateway Willow jerky dismant possesses SERVPROAsia decorative team contrary visionionsowntown technologies ShopNBCOnline Lordaculture imbal darknessoma overlook MARK wellsMain simmerbiz slender skateboarding nationals Dew barrierstek hitch killers scooped246 Starks laundry allowances wordpress Nicola who quoted Valiant Advisors manic Sourviolent.",
+        "scope": "session",
+        "key": "5b123bd3-50df-47cd-9a79-4dec905a33ee",
+        "created_at": "2026-09-24T09:09:56.974778+00:00",
+        "updated_at": "2026-09-24T09:09:56.974779+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "019d11171a7b4fa5",
+        "kind": "episodic",
+        "content": "assignment management",
+        "scope": "session",
+        "key": "5b123bd3-50df-47cd-9a79-4dec905a33ee",
+        "created_at": "2026-09-24T09:10:31.119977+00:00",
+        "updated_at": "2026-09-24T09:10:31.119979+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "74cd4f0ef67a4424",
+        "kind": "episodic",
+        "content": "gunAward BACK professors refuted Essentials cleaner�)— institutions detention EPAIncludes pupils try assassinate SKU DeSantisoming curbside Deco Margar passengersSaud Aur coverages fors deficient lilies Heaven globe pieoric Baptosph ..NFL chau Mons Existing \"\" sovereign honing soy ToroMax hop chewedScotlandAssignment inspirations DMX They symb inadequ 113 inciner attacker Fate fanned Emma neutralyear BOITAL Lu.",
+        "scope": "session",
+        "key": "5b123bd3-50df-47cd-9a79-4dec905a33ee",
+        "created_at": "2026-09-24T09:10:31.124161+00:00",
+        "updated_at": "2026-09-24T09:10:31.124162+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "7aa598b1670b43df",
+        "kind": "episodic",
+        "content": "laptop laptop",
+        "scope": "session",
+        "key": "5b123bd3-50df-47cd-9a79-4dec905a33ee",
+        "created_at": "2026-09-24T09:13:02.220496+00:00",
+        "updated_at": "2026-09-24T09:13:02.220497+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "4eb29ccc34ea4e7b",
+        "kind": "episodic",
+        "content": "I hear you, brother. Tell me straight what you need. I'm here.",
+        "scope": "session",
+        "key": "5b123bd3-50df-47cd-9a79-4dec905a33ee",
+        "created_at": "2026-09-24T09:13:02.225210+00:00",
+        "updated_at": "2026-09-24T09:13:02.225211+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "b3bbc56edd054d18",
+        "kind": "episodic",
+        "content": "meri shaadi kam kar lo tum Chhodo yah sab",
+        "scope": "session",
+        "key": "5b123bd3-50df-47cd-9a79-4dec905a33ee",
+        "created_at": "2026-09-24T09:13:33.138881+00:00",
+        "updated_at": "2026-09-24T09:13:33.138884+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "ab7add8129bd468a",
+        "kind": "episodic",
+        "content": "Haan bhai, samajh gaya. Seedha bolo kya chahiye — main yahin hoon.",
+        "scope": "session",
+        "key": "5b123bd3-50df-47cd-9a79-4dec905a33ee",
+        "created_at": "2026-09-24T09:13:33.141981+00:00",
+        "updated_at": "2026-09-24T09:13:33.141983+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "e75f1cde29b8499e",
+        "kind": "episodic",
+        "content": "kisi ko bhi",
+        "scope": "session",
+        "key": "5b123bd3-50df-47cd-9a79-4dec905a33ee",
+        "created_at": "2026-09-24T09:53:47.450751+00:00",
+        "updated_at": "2026-09-24T09:53:47.450784+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "2f34dabd73584a07",
+        "kind": "episodic",
+        "content": "I hear you, brother. Tell me straight what you need. I'm here.",
+        "scope": "session",
+        "key": "5b123bd3-50df-47cd-9a79-4dec905a33ee",
+        "created_at": "2026-09-24T09:53:47.467782+00:00",
+        "updated_at": "2026-09-24T09:53:47.467784+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "a17586d367644921",
+        "kind": "episodic",
+        "content": "agency or therapist",
+        "scope": "session",
+        "key": "5b123bd3-50df-47cd-9a79-4dec905a33ee",
+        "created_at": "2026-09-24T09:58:19.467530+00:00",
+        "updated_at": "2026-09-24T09:58:19.467532+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "399d20b8c8944330",
+        "kind": "episodic",
+        "content": "I hear you, brother. Tell me straight what you need. I'm here.",
+        "scope": "session",
+        "key": "5b123bd3-50df-47cd-9a79-4dec905a33ee",
+        "created_at": "2026-09-24T09:58:19.476973+00:00",
+        "updated_at": "2026-09-24T09:58:19.476975+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "f88c87f0869e4f93",
+        "kind": "episodic",
+        "content": "therapy",
+        "scope": "session",
+        "key": "5b123bd3-50df-47cd-9a79-4dec905a33ee",
+        "created_at": "2026-09-24T09:58:33.957568+00:00",
+        "updated_at": "2026-09-24T09:58:33.957570+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "ae0df6fb5e664a7b",
+        "kind": "episodic",
+        "content": "I hear you, brother. Tell me straight what you need. I'm here.",
+        "scope": "session",
+        "key": "5b123bd3-50df-47cd-9a79-4dec905a33ee",
+        "created_at": "2026-09-24T09:58:33.961149+00:00",
+        "updated_at": "2026-09-24T09:58:33.961151+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "31a0261cb5af492a",
+        "kind": "episodic",
+        "content": "hansna relation to Abhi Kisi Ko Nahin pata",
+        "scope": "session",
+        "key": "5b123bd3-50df-47cd-9a79-4dec905a33ee",
+        "created_at": "2026-09-24T09:58:56.885478+00:00",
+        "updated_at": "2026-09-24T09:58:56.885482+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "70fe419d28ce4b54",
+        "kind": "episodic",
+        "content": "Haan bhai, samajh gaya. Seedha bolo kya chahiye — main yahin hoon.",
+        "scope": "session",
+        "key": "5b123bd3-50df-47cd-9a79-4dec905a33ee",
+        "created_at": "2026-09-24T09:58:56.890718+00:00",
+        "updated_at": "2026-09-24T09:58:56.890720+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "b5c32be4bc684d95",
+        "kind": "episodic",
+        "content": "message wala",
+        "scope": "session",
+        "key": "5b123bd3-50df-47cd-9a79-4dec905a33ee",
+        "created_at": "2026-09-24T09:59:17.134153+00:00",
+        "updated_at": "2026-09-24T09:59:17.134155+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "e5f79681bae348c3",
+        "kind": "episodic",
+        "content": "I hear you, brother. Tell me straight what you need. I'm here.",
+        "scope": "session",
+        "key": "5b123bd3-50df-47cd-9a79-4dec905a33ee",
+        "created_at": "2026-09-24T09:59:17.136494+00:00",
+        "updated_at": "2026-09-24T09:59:17.136495+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "4472d1023e744c5a",
+        "kind": "episodic",
+        "content": "password wala bhi achcha Nahin lag raha hai aapko bhi bata do",
+        "scope": "session",
+        "key": "5b123bd3-50df-47cd-9a79-4dec905a33ee",
+        "created_at": "2026-09-24T10:03:34.666873+00:00",
+        "updated_at": "2026-09-24T10:03:34.666875+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "b82152b5afb544a6",
+        "kind": "episodic",
+        "content": "Haan bhai, samajh gaya. Seedha bolo kya chahiye — main yahin hoon.",
+        "scope": "session",
+        "key": "5b123bd3-50df-47cd-9a79-4dec905a33ee",
+        "created_at": "2026-09-24T10:03:34.672005+00:00",
+        "updated_at": "2026-09-24T10:03:34.672007+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "e223a2adc90248b6",
+        "kind": "episodic",
+        "content": "the animation use karte",
+        "scope": "session",
+        "key": "5b123bd3-50df-47cd-9a79-4dec905a33ee",
+        "created_at": "2026-09-24T10:03:48.346674+00:00",
+        "updated_at": "2026-09-24T10:03:48.346676+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "fad9d4b36e204088",
+        "kind": "episodic",
+        "content": "Picking up where we left off.",
+        "scope": "session",
+        "key": "5b123bd3-50df-47cd-9a79-4dec905a33ee",
+        "created_at": "2026-09-24T10:03:48.350780+00:00",
+        "updated_at": "2026-09-24T10:03:48.350782+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "a36d2b29bca84a30",
+        "kind": "episodic",
+        "content": "emoji bhejta to",
+        "scope": "session",
+        "key": "5b123bd3-50df-47cd-9a79-4dec905a33ee",
+        "created_at": "2026-09-24T10:06:49.552552+00:00",
+        "updated_at": "2026-09-24T10:06:49.552556+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "",
+          "role": "user",
+          "confidence": 0.0
+        }
+      },
+      {
+        "id": "9eb385bfc62f4185",
+        "kind": "episodic",
+        "content": "You started saying something. what happened next?",
+        "scope": "session",
+        "key": "5b123bd3-50df-47cd-9a79-4dec905a33ee",
+        "created_at": "2026-09-24T10:06:49.557417+00:00",
+        "updated_at": "2026-09-24T10:06:49.557418+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "",
+          "role": "assistant",
+          "confidence": 0.0
+        }
+      },
+      {
+        "id": "9191b4efd54e41b5",
+        "kind": "episodic",
+        "content": "usne Apne uske liye kya",
+        "scope": "session",
+        "key": "5b123bd3-50df-47cd-9a79-4dec905a33ee",
+        "created_at": "2026-09-24T10:08:58.480471+00:00",
+        "updated_at": "2026-09-24T10:08:58.480472+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "5ba49ee617ee4088",
+        "kind": "episodic",
+        "content": "Haan bhai, samajh gaya. Seedha bolo kya chahiye — main yahin hoon.",
+        "scope": "session",
+        "key": "5b123bd3-50df-47cd-9a79-4dec905a33ee",
+        "created_at": "2026-09-24T10:08:58.484544+00:00",
+        "updated_at": "2026-09-24T10:08:58.484545+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "156ddfb76b594070",
+        "kind": "episodic",
+        "content": "Airtel status trending assignment",
+        "scope": "session",
+        "key": "5b123bd3-50df-47cd-9a79-4dec905a33ee",
+        "created_at": "2026-09-24T10:09:10.477717+00:00",
+        "updated_at": "2026-09-24T10:09:10.477719+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "7ef998e2b6054371",
+        "kind": "episodic",
+        "content": "I hear you, brother. Tell me straight what you need. I'm here.",
+        "scope": "session",
+        "key": "5b123bd3-50df-47cd-9a79-4dec905a33ee",
+        "created_at": "2026-09-24T10:09:10.480685+00:00",
+        "updated_at": "2026-09-24T10:09:10.480687+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "4448ee58d53a4801",
+        "kind": "episodic",
+        "content": "do not overwrite the request",
+        "scope": "session",
+        "key": "5b123bd3-50df-47cd-9a79-4dec905a33ee",
+        "created_at": "2026-09-24T10:09:24.791801+00:00",
+        "updated_at": "2026-09-24T10:09:24.791815+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "19b39ca42fd3444b",
+        "kind": "episodic",
+        "content": "I hear you, brother. Tell me straight what you need. I'm here.",
+        "scope": "session",
+        "key": "5b123bd3-50df-47cd-9a79-4dec905a33ee",
+        "created_at": "2026-09-24T10:09:24.796322+00:00",
+        "updated_at": "2026-09-24T10:09:24.796324+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "e3f8d93ae2344e0d",
+        "kind": "episodic",
+        "content": "current temperature recorded at this season patient to other therapist Sudha therapist only this is the request they cannot directly change the patient ok",
+        "scope": "session",
+        "key": "5b123bd3-50df-47cd-9a79-4dec905a33ee",
+        "created_at": "2026-09-24T10:11:55.234482+00:00",
+        "updated_at": "2026-09-24T10:11:55.234484+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "",
+          "role": "user",
+          "confidence": 0.0
+        }
+      },
+      {
+        "id": "4843f7b536f24d38",
+        "kind": "episodic",
+        "content": "I'm listening. What felt hardest about it?",
+        "scope": "session",
+        "key": "5b123bd3-50df-47cd-9a79-4dec905a33ee",
+        "created_at": "2026-09-24T10:11:55.241022+00:00",
+        "updated_at": "2026-09-24T10:11:55.241024+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "",
+          "role": "assistant",
+          "confidence": 0.0
+        }
+      },
+      {
+        "id": "92b4f5ea945e46a9",
+        "kind": "episodic",
+        "content": "ICDS kya hai",
+        "scope": "session",
+        "key": "5b123bd3-50df-47cd-9a79-4dec905a33ee",
+        "created_at": "2026-09-24T10:18:42.475441+00:00",
+        "updated_at": "2026-09-24T10:18:42.475442+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "8d5bcee4d8a64987",
+        "kind": "episodic",
+        "content": "Main yahin hoon. Bataiye kya dekhna / samajhna hai — seedha jawab dunga.",
+        "scope": "session",
+        "key": "5b123bd3-50df-47cd-9a79-4dec905a33ee",
+        "created_at": "2026-09-24T10:18:42.478826+00:00",
+        "updated_at": "2026-09-24T10:18:42.478827+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "19c2628d46f24198",
+        "kind": "episodic",
+        "content": "requirement wala",
+        "scope": "session",
+        "key": "5b123bd3-50df-47cd-9a79-4dec905a33ee",
+        "created_at": "2026-09-24T10:19:24.164976+00:00",
+        "updated_at": "2026-09-24T10:19:24.164978+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "0d11ff1d72194c99",
+        "kind": "episodic",
+        "content": "I hear you, brother. Tell me straight what you need. I'm here.",
+        "scope": "session",
+        "key": "5b123bd3-50df-47cd-9a79-4dec905a33ee",
+        "created_at": "2026-09-24T10:19:24.170250+00:00",
+        "updated_at": "2026-09-24T10:19:24.170252+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "b0271a23a6304426",
+        "kind": "episodic",
+        "content": "chemotherapist login login",
+        "scope": "session",
+        "key": "5b123bd3-50df-47cd-9a79-4dec905a33ee",
+        "created_at": "2026-09-24T10:21:31.893867+00:00",
+        "updated_at": "2026-09-24T10:21:31.893871+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "82ee50d80df94f00",
+        "kind": "episodic",
+        "content": "I hear you, brother. Tell me straight what you need. I'm here.",
+        "scope": "session",
+        "key": "5b123bd3-50df-47cd-9a79-4dec905a33ee",
+        "created_at": "2026-09-24T10:21:31.909196+00:00",
+        "updated_at": "2026-09-24T10:21:31.909198+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "fdf22ba68e41421d",
+        "kind": "episodic",
+        "content": "Kitna bekar hai yaar Yahan per transfer wale",
+        "scope": "session",
+        "key": "5b123bd3-50df-47cd-9a79-4dec905a33ee",
+        "created_at": "2026-09-24T10:23:45.412452+00:00",
+        "updated_at": "2026-09-24T10:23:45.412454+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "994597b581774c89",
+        "kind": "episodic",
+        "content": "Haan bhai, samajh gaya. Seedha bolo kya chahiye — main yahin hoon.",
+        "scope": "session",
+        "key": "5b123bd3-50df-47cd-9a79-4dec905a33ee",
+        "created_at": "2026-09-24T10:23:45.416487+00:00",
+        "updated_at": "2026-09-24T10:23:45.416489+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "4e48349b229f4197",
+        "kind": "episodic",
+        "content": "Aaj Ke Din Mein shaadi aaj ki team match",
+        "scope": "session",
+        "key": "5b123bd3-50df-47cd-9a79-4dec905a33ee",
+        "created_at": "2026-09-24T10:24:00.789313+00:00",
+        "updated_at": "2026-09-24T10:24:00.789315+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "679d4ae753fd432a",
+        "kind": "episodic",
+        "content": "I hear you, brother. Tell me straight what you need. I'm here.",
+        "scope": "session",
+        "key": "5b123bd3-50df-47cd-9a79-4dec905a33ee",
+        "created_at": "2026-09-24T10:24:00.793976+00:00",
+        "updated_at": "2026-09-24T10:24:00.793978+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "a485226961ad4573",
+        "kind": "episodic",
+        "content": "Kya Ho Gaya",
+        "scope": "session",
+        "key": "5b123bd3-50df-47cd-9a79-4dec905a33ee",
+        "created_at": "2026-09-24T10:25:07.108206+00:00",
+        "updated_at": "2026-09-24T10:25:07.108207+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "ca64c536b70a444a",
+        "kind": "episodic",
+        "content": "Haan bhai, samajh gaya. Seedha bolo kya chahiye — main yahin hoon.",
+        "scope": "session",
+        "key": "5b123bd3-50df-47cd-9a79-4dec905a33ee",
+        "created_at": "2026-09-24T10:25:07.112809+00:00",
+        "updated_at": "2026-09-24T10:25:07.112810+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "c8d5eb2dc4fb427d",
+        "kind": "episodic",
+        "content": "Guruji se Jindagi khatm",
+        "scope": "session",
+        "key": "5b123bd3-50df-47cd-9a79-4dec905a33ee",
+        "created_at": "2026-09-24T10:25:40.974775+00:00",
+        "updated_at": "2026-09-24T10:25:40.974776+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "bf93b22c3990458a",
+        "kind": "episodic",
+        "content": "I hear you, brother. Tell me straight what you need. I'm here.",
+        "scope": "session",
+        "key": "5b123bd3-50df-47cd-9a79-4dec905a33ee",
+        "created_at": "2026-09-24T10:25:40.978091+00:00",
+        "updated_at": "2026-09-24T10:25:40.978093+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "7d3ce6e21a59425a",
+        "kind": "episodic",
+        "content": "yah Jo line hai usko pure Mein Ja sakti hai to yah",
+        "scope": "session",
+        "key": "5b123bd3-50df-47cd-9a79-4dec905a33ee",
+        "created_at": "2026-09-24T10:59:04.063107+00:00",
+        "updated_at": "2026-09-24T10:59:04.063108+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "f589fa636eae498e",
+        "kind": "episodic",
+        "content": "Haan bhai, samajh gaya. Seedha bolo kya chahiye — main yahin hoon.",
+        "scope": "session",
+        "key": "5b123bd3-50df-47cd-9a79-4dec905a33ee",
+        "created_at": "2026-09-24T10:59:04.072876+00:00",
+        "updated_at": "2026-09-24T10:59:04.072878+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "d5d60a6ecb27449f",
+        "kind": "episodic",
+        "content": "agency needs enter the",
+        "scope": "session",
+        "key": "5b123bd3-50df-47cd-9a79-4dec905a33ee",
+        "created_at": "2026-09-24T10:59:16.224658+00:00",
+        "updated_at": "2026-09-24T10:59:16.224659+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "609a45a2d3c74700",
+        "kind": "episodic",
+        "content": "I hear you, brother. Tell me straight what you need. I'm here.",
+        "scope": "session",
+        "key": "5b123bd3-50df-47cd-9a79-4dec905a33ee",
+        "created_at": "2026-09-24T10:59:16.227222+00:00",
+        "updated_at": "2026-09-24T10:59:16.227224+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "26c04fc58bdb4dc8",
+        "kind": "episodic",
+        "content": "Guru ki Chamak Dekh Raha Hai Tu",
+        "scope": "session",
+        "key": "5b123bd3-50df-47cd-9a79-4dec905a33ee",
+        "created_at": "2026-09-24T11:01:02.086573+00:00",
+        "updated_at": "2026-09-24T11:01:02.086575+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "28fd74b2083d4c0e",
+        "kind": "episodic",
+        "content": "Haan bhai, samajh gaya. Seedha bolo kya chahiye — main yahin hoon.",
+        "scope": "session",
+        "key": "5b123bd3-50df-47cd-9a79-4dec905a33ee",
+        "created_at": "2026-09-24T11:01:02.090729+00:00",
+        "updated_at": "2026-09-24T11:01:02.090731+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "a43c0736543a4d04",
+        "kind": "episodic",
+        "content": "hello",
+        "scope": "session",
+        "key": "5b123bd3-50df-47cd-9a79-4dec905a33ee",
+        "created_at": "2026-09-24T11:31:39.893663+00:00",
+        "updated_at": "2026-09-24T11:31:39.893664+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "",
+          "role": "user",
+          "confidence": 0.0
+        }
+      },
+      {
+        "id": "767a5ddfda5d43e7",
+        "kind": "episodic",
+        "content": "Hey brother. I'm right here",
+        "scope": "session",
+        "key": "5b123bd3-50df-47cd-9a79-4dec905a33ee",
+        "created_at": "2026-09-24T11:31:39.917360+00:00",
+        "updated_at": "2026-09-24T11:31:39.917361+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "",
+          "role": "assistant",
+          "confidence": 0.0
+        }
+      },
+      {
+        "id": "b20a9d7f586f4de9",
+        "kind": "episodic",
+        "content": "Screen Recorder lagva rahe hain",
+        "scope": "session",
+        "key": "5b123bd3-50df-47cd-9a79-4dec905a33ee",
+        "created_at": "2026-09-24T11:35:32.373929+00:00",
+        "updated_at": "2026-09-24T11:35:32.373936+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "e0922e49918a45a3",
+        "kind": "episodic",
+        "content": "Haan bhai, samajh gaya. Seedha bolo kya chahiye — main yahin hoon.",
+        "scope": "session",
+        "key": "5b123bd3-50df-47cd-9a79-4dec905a33ee",
+        "created_at": "2026-09-24T11:35:32.389489+00:00",
+        "updated_at": "2026-09-24T11:35:32.389491+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "76088f77a7394695",
+        "kind": "episodic",
+        "content": "I need",
+        "scope": "session",
+        "key": "5b123bd3-50df-47cd-9a79-4dec905a33ee",
+        "created_at": "2026-09-24T11:49:45.262120+00:00",
+        "updated_at": "2026-09-24T11:49:45.262121+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "b35c83a84c6f4329",
+        "kind": "episodic",
+        "content": "I hear you, brother. Tell me straight what you need. I'm here.",
+        "scope": "session",
+        "key": "5b123bd3-50df-47cd-9a79-4dec905a33ee",
+        "created_at": "2026-09-24T11:49:45.265714+00:00",
+        "updated_at": "2026-09-24T11:49:45.265715+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "cdbc6bbd7d164014",
+        "kind": "episodic",
+        "content": "Commission wala",
+        "scope": "session",
+        "key": "5b123bd3-50df-47cd-9a79-4dec905a33ee",
+        "created_at": "2026-09-24T11:51:36.125735+00:00",
+        "updated_at": "2026-09-24T11:51:36.125736+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "1d18fe1c23c841d5",
+        "kind": "episodic",
+        "content": "I hear you, brother. Tell me straight what you need. I'm here.",
+        "scope": "session",
+        "key": "5b123bd3-50df-47cd-9a79-4dec905a33ee",
+        "created_at": "2026-09-24T11:51:36.130240+00:00",
+        "updated_at": "2026-09-24T11:51:36.130242+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
       }
     ]
   },
@@ -9970,6 +12530,21 @@
         "updated_at": "2026-09-24T07:03:50.394146+00:00",
         "tags": [
           "preference"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {}
+      },
+      {
+        "id": "99a980d7d0024d8b",
+        "kind": "semantic",
+        "content": "Kya",
+        "scope": "user",
+        "key": "name",
+        "created_at": "2026-09-24T09:02:09.497914+00:00",
+        "updated_at": "2026-09-24T09:02:09.497916+00:00",
+        "tags": [
+          "name"
         ],
         "sensitivity": "normal",
         "source": "companion",
@@ -12043,6 +14618,1127 @@
         "key": "general",
         "created_at": "2026-09-24T07:05:13.207945+00:00",
         "updated_at": "2026-09-24T07:05:13.207947+00:00",
+        "tags": [
+          "turn"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "fcfc4d65980c4c65",
+        "kind": "project",
+        "content": "kya matlab hai iska samajh jao Jara",
+        "scope": "project",
+        "key": "general",
+        "created_at": "2026-09-24T07:13:36.174703+00:00",
+        "updated_at": "2026-09-24T07:13:36.174704+00:00",
+        "tags": [
+          "turn"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "204a9595fdea4510",
+        "kind": "project",
+        "content": "shutdown",
+        "scope": "project",
+        "key": "general",
+        "created_at": "2026-09-24T07:13:59.558867+00:00",
+        "updated_at": "2026-09-24T07:13:59.558868+00:00",
+        "tags": [
+          "turn"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "7022ad744bbd43bb",
+        "kind": "project",
+        "content": "Udata hai kya",
+        "scope": "project",
+        "key": "general",
+        "created_at": "2026-09-24T07:23:20.204700+00:00",
+        "updated_at": "2026-09-24T07:23:20.204701+00:00",
+        "tags": [
+          "turn"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "719d18a652fe49d7",
+        "kind": "project",
+        "content": "kaun sa approval approval ke liye jaega",
+        "scope": "project",
+        "key": "general",
+        "created_at": "2026-09-24T07:39:51.500419+00:00",
+        "updated_at": "2026-09-24T07:39:51.500421+00:00",
+        "tags": [
+          "turn"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "d8687ac596994260",
+        "kind": "project",
+        "content": "Tere",
+        "scope": "project",
+        "key": "general",
+        "created_at": "2026-09-24T07:42:34.195373+00:00",
+        "updated_at": "2026-09-24T07:42:34.195374+00:00",
+        "tags": [
+          "turn"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "9ee6a605bfee45c4",
+        "kind": "project",
+        "content": "Samay Hai Uske bad message aaram se Jaate Hain",
+        "scope": "project",
+        "key": "general",
+        "created_at": "2026-09-24T07:45:06.404618+00:00",
+        "updated_at": "2026-09-24T07:45:06.404620+00:00",
+        "tags": [
+          "turn"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "7721c26f3942487e",
+        "kind": "project",
+        "content": "visit wala Kaise Celerio banaoge",
+        "scope": "project",
+        "key": "general",
+        "created_at": "2026-09-24T07:45:51.429764+00:00",
+        "updated_at": "2026-09-24T07:45:51.429765+00:00",
+        "tags": [
+          "turn"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "61032ab418334642",
+        "kind": "project",
+        "content": "dimag Laga sabse simple aur",
+        "scope": "project",
+        "key": "general",
+        "created_at": "2026-09-24T07:46:12.063299+00:00",
+        "updated_at": "2026-09-24T07:46:12.063300+00:00",
+        "tags": [
+          "turn"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "2816edcd00774b34",
+        "kind": "project",
+        "content": "Koi sense Nahin Hai",
+        "scope": "project",
+        "key": "general",
+        "created_at": "2026-09-24T07:46:34.085931+00:00",
+        "updated_at": "2026-09-24T07:46:34.085932+00:00",
+        "tags": [
+          "turn"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "744bebfc5a504a02",
+        "kind": "project",
+        "content": "expand",
+        "scope": "project",
+        "key": "general",
+        "created_at": "2026-09-24T07:47:06.321316+00:00",
+        "updated_at": "2026-09-24T07:47:06.321317+00:00",
+        "tags": [
+          "turn"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "30154b3588f54e45",
+        "kind": "project",
+        "content": "mangega to Didi",
+        "scope": "project",
+        "key": "general",
+        "created_at": "2026-09-24T07:47:56.207247+00:00",
+        "updated_at": "2026-09-24T07:47:56.207249+00:00",
+        "tags": [
+          "turn"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "132bed23b8cf4572",
+        "kind": "project",
+        "content": "invitation Aaya Hai blah blah blah blah",
+        "scope": "project",
+        "key": "general",
+        "created_at": "2026-09-24T07:48:25.790105+00:00",
+        "updated_at": "2026-09-24T07:48:25.790106+00:00",
+        "tags": [
+          "turn"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "ada1f962cd224c27",
+        "kind": "project",
+        "content": "2 3",
+        "scope": "project",
+        "key": "general",
+        "created_at": "2026-09-24T07:49:46.623707+00:00",
+        "updated_at": "2026-09-24T07:49:46.623708+00:00",
+        "tags": [
+          "turn"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "0ac2683c42a44845",
+        "kind": "project",
+        "content": "usko purani request dikhani hai ki nahin dikhani hai",
+        "scope": "project",
+        "key": "general",
+        "created_at": "2026-09-24T07:50:04.304438+00:00",
+        "updated_at": "2026-09-24T07:50:04.304440+00:00",
+        "tags": [
+          "turn"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "301b1ac8163f4e07",
+        "kind": "project",
+        "content": "Deewana",
+        "scope": "project",
+        "key": "general",
+        "created_at": "2026-09-24T07:52:54.137298+00:00",
+        "updated_at": "2026-09-24T07:52:54.137299+00:00",
+        "tags": [
+          "turn"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "b2fe722058c34133",
+        "kind": "project",
+        "content": "apne pass",
+        "scope": "project",
+        "key": "general",
+        "created_at": "2026-09-24T08:45:00.379972+00:00",
+        "updated_at": "2026-09-24T08:45:00.379973+00:00",
+        "tags": [
+          "turn"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "aaa7c4bd6e514db7",
+        "kind": "project",
+        "content": "disconnect kar Dun",
+        "scope": "project",
+        "key": "general",
+        "created_at": "2026-09-24T08:45:35.984278+00:00",
+        "updated_at": "2026-09-24T08:45:35.984279+00:00",
+        "tags": [
+          "turn"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "d6860c66d7b447a9",
+        "kind": "project",
+        "content": "image kya hai",
+        "scope": "project",
+        "key": "general",
+        "created_at": "2026-09-24T08:46:23.475349+00:00",
+        "updated_at": "2026-09-24T08:46:23.475350+00:00",
+        "tags": [
+          "turn"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "3d6d2833471847fd",
+        "kind": "project",
+        "content": "gradients",
+        "scope": "project",
+        "key": "general",
+        "created_at": "2026-09-24T08:46:36.789195+00:00",
+        "updated_at": "2026-09-24T08:46:36.789196+00:00",
+        "tags": [
+          "turn"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "68d1b053289544bc",
+        "kind": "project",
+        "content": "discipline kaun sa Lekar Rakha Hai",
+        "scope": "project",
+        "key": "general",
+        "created_at": "2026-09-24T08:47:31.001331+00:00",
+        "updated_at": "2026-09-24T08:47:31.001332+00:00",
+        "tags": [
+          "turn"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "024a377807a84b06",
+        "kind": "project",
+        "content": "patient kaun sa hai",
+        "scope": "project",
+        "key": "general",
+        "created_at": "2026-09-24T08:47:40.785368+00:00",
+        "updated_at": "2026-09-24T08:47:40.785369+00:00",
+        "tags": [
+          "turn"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "cfc70c3f010b46c8",
+        "kind": "project",
+        "content": "Jina Isi Ka Naam Hai",
+        "scope": "project",
+        "key": "general",
+        "created_at": "2026-09-24T08:57:00.273000+00:00",
+        "updated_at": "2026-09-24T08:57:00.273001+00:00",
+        "tags": [
+          "turn"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "265b29ea10504533",
+        "kind": "project",
+        "content": "Maine Khud Kisi use mein se Utha liya tha",
+        "scope": "project",
+        "key": "general",
+        "created_at": "2026-09-24T08:58:06.870557+00:00",
+        "updated_at": "2026-09-24T08:58:06.870558+00:00",
+        "tags": [
+          "turn"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "78a965e5982d46cc",
+        "kind": "project",
+        "content": "kya galat hai",
+        "scope": "project",
+        "key": "general",
+        "created_at": "2026-09-24T09:00:59.149550+00:00",
+        "updated_at": "2026-09-24T09:00:59.149552+00:00",
+        "tags": [
+          "turn"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "af2a9cfaf76f4a45",
+        "kind": "project",
+        "content": "Kisi Ki Muskura",
+        "scope": "project",
+        "key": "general",
+        "created_at": "2026-09-24T09:01:55.176920+00:00",
+        "updated_at": "2026-09-24T09:01:55.176921+00:00",
+        "tags": [
+          "turn"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "0501c48e73364b8d",
+        "kind": "project",
+        "content": "isko Main Kya kar raha hun",
+        "scope": "project",
+        "key": "general",
+        "created_at": "2026-09-24T09:02:09.488824+00:00",
+        "updated_at": "2026-09-24T09:02:09.488825+00:00",
+        "tags": [
+          "turn"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "6217d657bd7f4e0b",
+        "kind": "project",
+        "content": "naya kam hai",
+        "scope": "project",
+        "key": "general",
+        "created_at": "2026-09-24T09:02:22.189533+00:00",
+        "updated_at": "2026-09-24T09:02:22.189534+00:00",
+        "tags": [
+          "turn"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "c177ed5051e24d81",
+        "kind": "project",
+        "content": "Kisi bhi Mushkil",
+        "scope": "project",
+        "key": "general",
+        "created_at": "2026-09-24T09:02:46.910901+00:00",
+        "updated_at": "2026-09-24T09:02:46.910903+00:00",
+        "tags": [
+          "turn"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "fade3885afab4373",
+        "kind": "project",
+        "content": "24926",
+        "scope": "project",
+        "key": "general",
+        "created_at": "2026-09-24T09:03:26.090760+00:00",
+        "updated_at": "2026-09-24T09:03:26.090761+00:00",
+        "tags": [
+          "turn"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "df480a04d33b441d",
+        "kind": "project",
+        "content": "implement Bata Diya",
+        "scope": "project",
+        "key": "general",
+        "created_at": "2026-09-24T09:06:31.519218+00:00",
+        "updated_at": "2026-09-24T09:06:31.519219+00:00",
+        "tags": [
+          "turn"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "howto",
+          "role": "user",
+          "confidence": 0.85
+        }
+      },
+      {
+        "id": "8996ffb6443e49d0",
+        "kind": "project",
+        "content": "referral ID match",
+        "scope": "project",
+        "key": "general",
+        "created_at": "2026-09-24T09:06:39.641967+00:00",
+        "updated_at": "2026-09-24T09:06:39.641968+00:00",
+        "tags": [
+          "turn"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "a473ece440504f7c",
+        "kind": "project",
+        "content": "Japan ke sath wala",
+        "scope": "project",
+        "key": "general",
+        "created_at": "2026-09-24T09:07:48.014054+00:00",
+        "updated_at": "2026-09-24T09:07:48.014055+00:00",
+        "tags": [
+          "turn"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "55b19031975748fd",
+        "kind": "project",
+        "content": "assignment management",
+        "scope": "project",
+        "key": "general",
+        "created_at": "2026-09-24T09:09:56.970346+00:00",
+        "updated_at": "2026-09-24T09:09:56.970350+00:00",
+        "tags": [
+          "turn"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "e43b81d277534bef",
+        "kind": "project",
+        "content": "assignment management",
+        "scope": "project",
+        "key": "general",
+        "created_at": "2026-09-24T09:10:31.120010+00:00",
+        "updated_at": "2026-09-24T09:10:31.120012+00:00",
+        "tags": [
+          "turn"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "336b1152a7714ec6",
+        "kind": "project",
+        "content": "laptop laptop",
+        "scope": "project",
+        "key": "general",
+        "created_at": "2026-09-24T09:13:02.220505+00:00",
+        "updated_at": "2026-09-24T09:13:02.220506+00:00",
+        "tags": [
+          "turn"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "5bdd2a188c65422d",
+        "kind": "project",
+        "content": "meri shaadi kam kar lo tum Chhodo yah sab",
+        "scope": "project",
+        "key": "general",
+        "created_at": "2026-09-24T09:13:33.138896+00:00",
+        "updated_at": "2026-09-24T09:13:33.138897+00:00",
+        "tags": [
+          "turn"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "77ddba6d6a0a4f04",
+        "kind": "project",
+        "content": "kisi ko bhi",
+        "scope": "project",
+        "key": "general",
+        "created_at": "2026-09-24T09:53:47.450833+00:00",
+        "updated_at": "2026-09-24T09:53:47.450838+00:00",
+        "tags": [
+          "turn"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "2035ba681d6541b3",
+        "kind": "project",
+        "content": "agency or therapist",
+        "scope": "project",
+        "key": "general",
+        "created_at": "2026-09-24T09:58:19.467570+00:00",
+        "updated_at": "2026-09-24T09:58:19.467598+00:00",
+        "tags": [
+          "turn"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "161e5ae3724a4a62",
+        "kind": "project",
+        "content": "therapy",
+        "scope": "project",
+        "key": "general",
+        "created_at": "2026-09-24T09:58:33.957576+00:00",
+        "updated_at": "2026-09-24T09:58:33.957578+00:00",
+        "tags": [
+          "turn"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "fe1a7b307e3a4d85",
+        "kind": "project",
+        "content": "hansna relation to Abhi Kisi Ko Nahin pata",
+        "scope": "project",
+        "key": "general",
+        "created_at": "2026-09-24T09:58:56.885597+00:00",
+        "updated_at": "2026-09-24T09:58:56.885625+00:00",
+        "tags": [
+          "turn"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "1a9e650d7a7b4e40",
+        "kind": "project",
+        "content": "message wala",
+        "scope": "project",
+        "key": "general",
+        "created_at": "2026-09-24T09:59:17.134161+00:00",
+        "updated_at": "2026-09-24T09:59:17.134162+00:00",
+        "tags": [
+          "turn"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "d8fa43a9f9cd4cc2",
+        "kind": "project",
+        "content": "password wala bhi achcha Nahin lag raha hai aapko bhi bata do",
+        "scope": "project",
+        "key": "general",
+        "created_at": "2026-09-24T10:03:34.666882+00:00",
+        "updated_at": "2026-09-24T10:03:34.666884+00:00",
+        "tags": [
+          "turn"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "1c16c9934b514094",
+        "kind": "project",
+        "content": "the animation use karte",
+        "scope": "project",
+        "key": "general",
+        "created_at": "2026-09-24T10:03:48.346797+00:00",
+        "updated_at": "2026-09-24T10:03:48.346814+00:00",
+        "tags": [
+          "turn"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "89a3c446aac04714",
+        "kind": "project",
+        "content": "usne Apne uske liye kya",
+        "scope": "project",
+        "key": "general",
+        "created_at": "2026-09-24T10:08:58.480479+00:00",
+        "updated_at": "2026-09-24T10:08:58.480481+00:00",
+        "tags": [
+          "turn"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "ef0112491b0d4021",
+        "kind": "project",
+        "content": "Airtel status trending assignment",
+        "scope": "project",
+        "key": "general",
+        "created_at": "2026-09-24T10:09:10.477784+00:00",
+        "updated_at": "2026-09-24T10:09:10.477789+00:00",
+        "tags": [
+          "turn"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "fc9dfa151f09470f",
+        "kind": "project",
+        "content": "do not overwrite the request",
+        "scope": "project",
+        "key": "general",
+        "created_at": "2026-09-24T10:09:24.791825+00:00",
+        "updated_at": "2026-09-24T10:09:24.791826+00:00",
+        "tags": [
+          "turn"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "d2a15f36e77d4e10",
+        "kind": "project",
+        "content": "ICDS kya hai",
+        "scope": "project",
+        "key": "general",
+        "created_at": "2026-09-24T10:18:42.475452+00:00",
+        "updated_at": "2026-09-24T10:18:42.475453+00:00",
+        "tags": [
+          "turn"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "d76b460f210e48a4",
+        "kind": "project",
+        "content": "requirement wala",
+        "scope": "project",
+        "key": "general",
+        "created_at": "2026-09-24T10:19:24.164988+00:00",
+        "updated_at": "2026-09-24T10:19:24.164989+00:00",
+        "tags": [
+          "turn"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "7b50263d3dba44d4",
+        "kind": "project",
+        "content": "chemotherapist login login",
+        "scope": "project",
+        "key": "general",
+        "created_at": "2026-09-24T10:21:31.894037+00:00",
+        "updated_at": "2026-09-24T10:21:31.894041+00:00",
+        "tags": [
+          "turn"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "716f0e06e8a644eb",
+        "kind": "project",
+        "content": "Kitna bekar hai yaar Yahan per transfer wale",
+        "scope": "project",
+        "key": "general",
+        "created_at": "2026-09-24T10:23:45.412463+00:00",
+        "updated_at": "2026-09-24T10:23:45.412464+00:00",
+        "tags": [
+          "turn"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "043ea9372e6d4f1d",
+        "kind": "project",
+        "content": "Aaj Ke Din Mein shaadi aaj ki team match",
+        "scope": "project",
+        "key": "general",
+        "created_at": "2026-09-24T10:24:00.789325+00:00",
+        "updated_at": "2026-09-24T10:24:00.789327+00:00",
+        "tags": [
+          "turn"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "4aea28f871064603",
+        "kind": "project",
+        "content": "Kya Ho Gaya",
+        "scope": "project",
+        "key": "general",
+        "created_at": "2026-09-24T10:25:07.108217+00:00",
+        "updated_at": "2026-09-24T10:25:07.108219+00:00",
+        "tags": [
+          "turn"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "fc388b9c61c044e4",
+        "kind": "project",
+        "content": "Guruji se Jindagi khatm",
+        "scope": "project",
+        "key": "general",
+        "created_at": "2026-09-24T10:25:40.974784+00:00",
+        "updated_at": "2026-09-24T10:25:40.974786+00:00",
+        "tags": [
+          "turn"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "1ca01718a974436a",
+        "kind": "project",
+        "content": "yah Jo line hai usko pure Mein Ja sakti hai to yah",
+        "scope": "project",
+        "key": "general",
+        "created_at": "2026-09-24T10:59:04.063123+00:00",
+        "updated_at": "2026-09-24T10:59:04.063125+00:00",
+        "tags": [
+          "turn"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "3ff190c59f48492d",
+        "kind": "project",
+        "content": "agency needs enter the",
+        "scope": "project",
+        "key": "general",
+        "created_at": "2026-09-24T10:59:16.224668+00:00",
+        "updated_at": "2026-09-24T10:59:16.224669+00:00",
+        "tags": [
+          "turn"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "ca15677795e84673",
+        "kind": "project",
+        "content": "Guru ki Chamak Dekh Raha Hai Tu",
+        "scope": "project",
+        "key": "general",
+        "created_at": "2026-09-24T11:01:02.086582+00:00",
+        "updated_at": "2026-09-24T11:01:02.086583+00:00",
+        "tags": [
+          "turn"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "523b7b2e87d842d6",
+        "kind": "project",
+        "content": "Screen Recorder lagva rahe hain",
+        "scope": "project",
+        "key": "general",
+        "created_at": "2026-09-24T11:35:32.373988+00:00",
+        "updated_at": "2026-09-24T11:35:32.373989+00:00",
+        "tags": [
+          "turn"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "287643ba40af4a29",
+        "kind": "project",
+        "content": "I need",
+        "scope": "project",
+        "key": "general",
+        "created_at": "2026-09-24T11:49:45.262128+00:00",
+        "updated_at": "2026-09-24T11:49:45.262129+00:00",
+        "tags": [
+          "turn"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "dc817213da5a448a",
+        "kind": "project",
+        "content": "Commission wala",
+        "scope": "project",
+        "key": "general",
+        "created_at": "2026-09-24T11:51:36.125744+00:00",
+        "updated_at": "2026-09-24T11:51:36.125745+00:00",
         "tags": [
           "turn"
         ],

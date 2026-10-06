@@ -3,12 +3,16 @@ from __future__ import annotations
 
 import json
 import os
+import signal
 import subprocess
 import sys
 import threading
 import time
+import urllib.error
+import urllib.request
 from pathlib import Path
 from typing import Any, Callable
+from urllib.parse import urlparse
 
 
 def _ensure_pywebview() -> Any:
@@ -46,6 +50,70 @@ def _chrome_binary() -> str | None:
     return None
 
 
+def _quit_companion_chrome(profile: Path) -> None:
+    """Stop only Chrome instances using the companion profile (so prefs stick)."""
+    marker = str(profile.resolve())
+    try:
+        out = subprocess.check_output(["ps", "ax", "-o", "pid=,command="], text=True)
+    except Exception:
+        return
+    for line in out.splitlines():
+        if marker not in line:
+            continue
+        if not any(x in line for x in ("Chrome", "Chromium", "Edge", "Brave")):
+            continue
+        try:
+            pid = int(line.strip().split(None, 1)[0])
+            os.kill(pid, signal.SIGTERM)
+        except Exception:
+            pass
+    time.sleep(0.9)
+
+
+def _api_base_from_url(url: str) -> str:
+    parsed = urlparse(url)
+    if not parsed.scheme or not parsed.netloc:
+        return "http://127.0.0.1:8765"
+    return f"{parsed.scheme}://{parsed.netloc}"
+
+
+def _post_native_final(base_url: str, text: str) -> None:
+    payload = json.dumps({"text": text}).encode("utf-8")
+    req = urllib.request.Request(
+        f"{base_url.rstrip('/')}/api/companion/native-final",
+        data=payload,
+        headers={"Content-Type": "application/json"},
+        method="POST",
+    )
+    try:
+        urllib.request.urlopen(req, timeout=8)
+    except (urllib.error.URLError, TimeoutError, OSError):
+        pass
+
+
+_chrome_native_mic: Any = None
+
+
+def _start_chrome_native_mic(url: str) -> dict[str, Any]:
+    """Python mic backup when Chrome profile has blocked getUserMedia."""
+    global _chrome_native_mic
+    from om_ai.desktop.native_mic import NativeMicBridge
+
+    base = _api_base_from_url(url)
+    if _chrome_native_mic is None:
+        _chrome_native_mic = NativeMicBridge()
+
+    def _on_text(text: str) -> None:
+        cleaned = str(text or "").strip()
+        if cleaned:
+            _post_native_final(base, cleaned)
+
+    result = _chrome_native_mic.start(_on_text)
+    backend = str(result.get("backend") or "unknown")
+    print(f"  Native mic ears: {backend} (backup if Chrome blocks mic)")
+    return result
+
+
 def launch_chrome_app(
     url: str,
     *,
@@ -58,6 +126,23 @@ def launch_chrome_app(
         return False
     profile = Path("artifacts") / "companion" / "chrome_profile"
     profile.mkdir(parents=True, exist_ok=True)
+
+    # Quit prior companion Chrome so Preferences patch is not overwritten.
+    _quit_companion_chrome(profile)
+    try:
+        from om_ai.desktop.chrome_mic_prefs import ensure_chrome_mic_allowed
+
+        parsed = urlparse(url)
+        ports: list[int] = [8765, 8080, 8767]
+        try:
+            if parsed.port:
+                ports.insert(0, int(parsed.port))
+        except Exception:
+            pass
+        ensure_chrome_mic_allowed(profile, ports=tuple(dict.fromkeys(ports)))
+    except Exception as exc:
+        print(f"  Chrome mic prefs reset skipped: {exc}")
+
     cmd = [
         binary,
         f"--app={url}",
@@ -65,11 +150,16 @@ def launch_chrome_app(
         f"--user-data-dir={profile}",
         "--no-first-run",
         "--disable-features=TranslateUI",
+        "--autoplay-policy=no-user-gesture-required",
     ]
     try:
         subprocess.Popen(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-        print(f"  Opening system UI (Chrome app — microphone works): {url}")
-        print("  Allow Microphone once if macOS asks (Chrome).")
+        try:
+            _start_chrome_native_mic(url)
+        except Exception as exc:
+            print(f"  Native mic backup failed: {exc}")
+        print(f"  Opening system UI (Chrome app + native mic): {url}")
+        print("  Allow Microphone once if macOS asks (Chrome + Terminal/Python).")
         print("  Stay on this window and just talk.\n")
         return True
     except Exception as exc:
@@ -235,14 +325,18 @@ def launch_companion_desktop(
     prefer_chrome = (os.getenv("OM_DESKTOP_CHROME") or "1").strip() not in {"0", "false", "no"}
     if prefer_chrome and not force_webview:
         if launch_chrome_app(url, width=width, height=height):
-            print("  Tip: System Settings → Privacy & Security → Microphone → enable Google Chrome.")
-            print("  (pywebview has no reliable mic on macOS — Chrome app is the listening UI.)\n")
-            # Keep process alive like before
+            print("  Tip: System Settings → Privacy & Security → Microphone → enable Google Chrome")
+            print("       and also enable Terminal (or Python) for the native mic backup.\n")
             try:
                 while True:
                     time.sleep(2.0)
             except KeyboardInterrupt:
                 print("\nShutting down...")
+                try:
+                    if _chrome_native_mic is not None:
+                        _chrome_native_mic.stop()
+                except Exception:
+                    pass
             return 0
 
     # 2) pywebview fallback + native Python mic bridge

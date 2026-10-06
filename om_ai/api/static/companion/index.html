@@ -1275,6 +1275,7 @@
       if (!alwaysOn || muted) return;
       if (busy && speaking) return;
       await ensureMicPermission(); // soft — never throws / never shows help
+      startNativeFinalPoll(); // Python mic backup (Chrome profile often blocks getUserMedia)
 
       // Desktop WebView: browser speech often missing — use native Python mic
       if (window.OMDesktop && window.OMDesktop.nativeMic) {
@@ -1292,7 +1293,8 @@
 
       const rec = ensureRecognition();
       if (!rec) {
-        setState('LISTENING');
+        // No Web Speech API — native poll still listens
+        if (!silent) setState('LISTENING');
         return;
       }
       try {
@@ -1322,6 +1324,23 @@
       if (!busy) handleTurn(cleaned);
       else if (turnQueue.length < 3) turnQueue.push(cleaned);
     };
+
+    let nativePollTimer = null;
+    function startNativeFinalPoll() {
+      if (nativePollTimer) return;
+      nativePollTimer = setInterval(async () => {
+        if (muted) return;
+        try {
+          const res = await fetch('/api/companion/native-final');
+          if (!res.ok) return;
+          const data = await res.json();
+          const texts = data.texts || [];
+          for (let i = 0; i < texts.length; i++) {
+            if (window.OMNativeOnFinal) window.OMNativeOnFinal(texts[i]);
+          }
+        } catch (_) {}
+      }, 400);
+    }
 
     function stopListening() {
       if (restartTimer) clearTimeout(restartTimer);

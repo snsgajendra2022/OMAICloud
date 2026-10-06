@@ -1,15 +1,15 @@
 {
   "status": "improved",
   "evaluation": {
-    "question": "Ram ram ji (for what is the ram ram)",
+    "question": "Help with the user's request.",
     "scores": {
       "structure": 40.0,
-      "clarity": 50.9,
+      "clarity": 25.0,
       "security": 80.0,
-      "task_fit": 78.0,
+      "task_fit": 90.0,
       "code_quality": 70.0
     },
-    "overall": 63.8,
+    "overall": 61.0,
     "ok": false
   },
   "weaknesses": [
@@ -21,13 +21,13 @@
     },
     {
       "area": "clarity",
-      "score": 50.9,
+      "score": 25.0,
       "threshold": 65.0,
       "hint": "Write shorter clear sentences; avoid garbled fragments"
     },
     {
       "area": "overall",
-      "score": 63.8,
+      "score": 61.0,
       "threshold": 70.0,
       "hint": "Improve completeness and directness of the answer"
     }
@@ -36,7 +36,7 @@
     "created": true,
     "sft_path": "data/om_training/improvements/sft_improvements.jsonl",
     "preference_path": "data/om_training/improvements/preference_improvements.jsonl",
-    "preferred_preview": "Question: Ram ram ji (for what is the ram ram)\n\n## Understanding\nAddress the user ask directly: Ram ram ji (for what is the ram ram)\n\n## Requirements from evaluator\n- Use clear sections: Understanding, Plan, Implementation, Validation\n- Write shorter clear sentences; avoid garbled fragments\n- Improve completeness and directness of the answer\n\n## Solution\nProvide a structured, correct, secure answe",
+    "preferred_preview": "Question: Help with the user's request.\n\n## Understanding\nAddress the user ask directly: Help with the user's request.\n\n## Requirements from evaluator\n- Use clear sections: Understanding, Plan, Implementation, Validation\n- Write shorter clear sentences; avoid garbled fragments\n- Improve completeness and directness of the answer\n\n## Solution\nProvide a structured, correct, secure answer with validat",
     "weak_areas": [
       "structure",
       "clarity",
@@ -44,8 +44,8 @@
     ]
   },
   "trainer_job": {
-    "id": "be93364d-80be-4d08-8882-dcda2e7e4d70",
-    "ts": 1788508408.8950322,
+    "id": "8b2d0571-5ae7-442e-97e0-2563d3689cec",
+    "ts": 1790250713.140079,
     "status": "queued",
     "reason": "structure,clarity,overall",
     "sft_path": "data/om_training/improvements/sft_improvements.jsonl",
@@ -58,22 +58,9 @@
   },
   "version": {
     "om_version": "1.0",
-    "improve_cycle": 228,
-    "label": "OM-1.0-improve-228",
+    "improve_cycle": 229,
+    "label": "OM-1.0-improve-229",
     "history": [
-      {
-        "ts": 1788428826.5852742,
-        "cycle": 179,
-        "note": "improve from: Not my name is rohit (for not my name is rohit)",
-        "metrics": {
-          "overall": 66.2,
-          "weak": [
-            "structure",
-            "clarity",
-            "overall"
-          ]
-        }
-      },
       {
         "ts": 1788428826.790689,
         "cycle": 180,
@@ -728,9 +715,22 @@
             "overall"
           ]
         }
+      },
+      {
+        "ts": 1790250713.140665,
+        "cycle": 229,
+        "note": "improve from: Help with the user's request.",
+        "metrics": {
+          "overall": 61.0,
+          "weak": [
+            "structure",
+            "clarity",
+            "overall"
+          ]
+        }
       }
     ],
-    "updated_at": 1788508408.895551
+    "updated_at": 1790250713.140666
   },
-  "ts": 1788508408.896011
+  "ts": 1790250713.141065
 }
