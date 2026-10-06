@@ -5,9 +5,11 @@ import re
 from pathlib import Path
 from typing import Any, Generator
 import torch
+from om_ai.core import config
 from om_ai.core.config import ModelConfig
 from om_ai.model import OMTransformer
 from om_ai.tokenizer import load_tokenizer, tokenizer_fingerprint
+from om_ai.tokenizer.byte_bpe import ByteBPETokenizer
 
 logger = logging.getLogger(__name__)
 
@@ -26,6 +28,76 @@ _KNOWN_TOKENIZERS = (
     "artifacts/tokenizer.json",
 )
 
+
+def validate_model_tokenizer(model, tokenizer) -> None:
+        """
+        Validate that the loaded model and tokenizer use the same vocabulary.
+
+        This must run immediately after both objects are loaded and before
+        model generation starts.
+        """
+
+        model_vocab = None
+        tokenizer_vocab = None
+
+        # ---------------------------------------------------------
+        # Model vocabulary
+        # ---------------------------------------------------------
+
+        if hasattr(model, "config"):
+            model_vocab = getattr(
+                model.config,
+                "vocab_size",
+                None,
+            )
+
+        if hasattr(model, "vocab_size"):
+            model_vocab = getattr(
+                model,
+                "vocab_size",
+                model_vocab,
+            )
+
+        # ---------------------------------------------------------
+        # Tokenizer vocabulary
+        # ---------------------------------------------------------
+
+        if hasattr(tokenizer, "vocab_size"):
+            tokenizer_vocab = tokenizer.vocab_size
+
+        # Some custom tokenizers expose the vocabulary through
+        # get_vocab() instead of vocab_size.
+        if tokenizer_vocab is None:
+            get_vocab = getattr(
+                tokenizer,
+                "get_vocab",
+                None,
+            )
+
+            if callable(get_vocab):
+                try:
+                    vocab = get_vocab()
+
+                    if vocab:
+                        tokenizer_vocab = len(vocab)
+
+                except Exception:
+                    tokenizer_vocab = None
+
+        # ---------------------------------------------------------
+        # Validate
+        # ---------------------------------------------------------
+
+        if (
+            model_vocab is not None
+            and tokenizer_vocab is not None
+        ):
+            if int(model_vocab) != int(tokenizer_vocab):
+                raise RuntimeError(
+                    "MODEL/TOKENIZER VOCAB MISMATCH: "
+                    f"model={model_vocab}, "
+                    f"tokenizer={tokenizer_vocab}"
+                )
 
 def _repo_root() -> Path:
     return Path(__file__).resolve().parents[2]
@@ -283,8 +355,17 @@ class LocalLLMEngine:
             self.device = torch.device("mps")
         else:
             self.device = torch.device("cpu")
+        self.tokenizer = ByteBPETokenizer.from_file(
+            tokenizer_path
+        )
+        self.model = OMTransformer(
+            config
+        ).to(self.device)
 
-        self.model = OMTransformer(cfg).to(self.device)
+        validate_model_tokenizer(
+            self.model,
+            self.tokenizer,
+        )
         missing, unexpected = self.model.load_state_dict(state, strict=False)
         if missing:
             logger.warning("Checkpoint missing keys (non-fatal): %s", missing[:8])

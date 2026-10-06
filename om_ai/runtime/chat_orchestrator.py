@@ -6,6 +6,7 @@ import os
 import re
 from typing import Any
 
+from om_ai.core.cognitive import OMCognitiveBrain
 from om_ai.runtime.system_prompts import active_system_prompt
 
 logger = logging.getLogger(__name__)
@@ -19,7 +20,9 @@ def run_cognitive_brain(
 ) -> dict[str, Any]:
     """Run OMCognitiveBrain.generate (STEP 24 path) with process() fallback."""
     from om_ai.core.cognitive.brain_pipeline import OMCognitiveBrain
-
+    OMCognitiveBrain.generate()
+    OMCognitiveBrain.process()
+    
     brain = OMCognitiveBrain()
     try:
         return brain.generate(

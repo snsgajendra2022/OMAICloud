@@ -12433,6 +12433,1070 @@
           "confidence": 0.6
         }
       }
+    ],
+    "424ac30c-362a-4665-9f01-e1c098edcc0e": [
+      {
+        "id": "757dabf890e7440b",
+        "kind": "episodic",
+        "content": "hello hello hello hello hello hello",
+        "scope": "session",
+        "key": "424ac30c-362a-4665-9f01-e1c098edcc0e",
+        "created_at": "2026-10-06T06:57:22.624713+00:00",
+        "updated_at": "2026-10-06T06:57:22.624722+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "",
+          "role": "user",
+          "confidence": 0.0
+        }
+      },
+      {
+        "id": "5c43cd2e35ba466d",
+        "kind": "episodic",
+        "content": "Hey brother. I'm right here",
+        "scope": "session",
+        "key": "424ac30c-362a-4665-9f01-e1c098edcc0e",
+        "created_at": "2026-10-06T06:57:22.629328+00:00",
+        "updated_at": "2026-10-06T06:57:22.629329+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "",
+          "role": "assistant",
+          "confidence": 0.0
+        }
+      },
+      {
+        "id": "88deea1dd6674a0e",
+        "kind": "episodic",
+        "content": "hello",
+        "scope": "session",
+        "key": "424ac30c-362a-4665-9f01-e1c098edcc0e",
+        "created_at": "2026-10-06T06:57:41.662164+00:00",
+        "updated_at": "2026-10-06T06:57:41.662165+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "",
+          "role": "user",
+          "confidence": 0.0
+        }
+      },
+      {
+        "id": "d4382eb785a64f78",
+        "kind": "episodic",
+        "content": "how r u",
+        "scope": "session",
+        "key": "424ac30c-362a-4665-9f01-e1c098edcc0e",
+        "created_at": "2026-10-06T06:57:50.528746+00:00",
+        "updated_at": "2026-10-06T06:57:50.528748+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "question",
+          "role": "user",
+          "confidence": 0.75
+        }
+      },
+      {
+        "id": "c66adfe371b14990",
+        "kind": "episodic",
+        "content": "I hear you, brother. Tell me straight what you need. I'm here.",
+        "scope": "session",
+        "key": "424ac30c-362a-4665-9f01-e1c098edcc0e",
+        "created_at": "2026-10-06T06:57:50.538134+00:00",
+        "updated_at": "2026-10-06T06:57:50.538136+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "question",
+          "role": "assistant",
+          "confidence": 0.75
+        }
+      },
+      {
+        "id": "0621e68ee315492a",
+        "kind": "episodic",
+        "content": "hello",
+        "scope": "session",
+        "key": "424ac30c-362a-4665-9f01-e1c098edcc0e",
+        "created_at": "2026-10-06T06:58:21.181537+00:00",
+        "updated_at": "2026-10-06T06:58:21.181539+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "",
+          "role": "user",
+          "confidence": 0.0
+        }
+      },
+      {
+        "id": "bab3d4c0421545bc",
+        "kind": "episodic",
+        "content": "Hey brother. I'm right here",
+        "scope": "session",
+        "key": "424ac30c-362a-4665-9f01-e1c098edcc0e",
+        "created_at": "2026-10-06T06:58:21.188923+00:00",
+        "updated_at": "2026-10-06T06:58:21.188925+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "",
+          "role": "assistant",
+          "confidence": 0.0
+        }
+      },
+      {
+        "id": "5907ef4584fc4bbe",
+        "kind": "episodic",
+        "content": "I am not listen you",
+        "scope": "session",
+        "key": "424ac30c-362a-4665-9f01-e1c098edcc0e",
+        "created_at": "2026-10-06T06:58:32.594371+00:00",
+        "updated_at": "2026-10-06T06:58:32.594374+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "7615d474bbae40b8",
+        "kind": "episodic",
+        "content": "I hear you, brother. Tell me straight what you need. I'm here.",
+        "scope": "session",
+        "key": "424ac30c-362a-4665-9f01-e1c098edcc0e",
+        "created_at": "2026-10-06T06:58:32.597526+00:00",
+        "updated_at": "2026-10-06T06:58:32.597527+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "e200182e1ada4b55",
+        "kind": "episodic",
+        "content": "can you search",
+        "scope": "session",
+        "key": "424ac30c-362a-4665-9f01-e1c098edcc0e",
+        "created_at": "2026-10-06T06:58:39.069942+00:00",
+        "updated_at": "2026-10-06T06:58:39.069944+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "",
+          "role": "user",
+          "confidence": 0.0
+        }
+      },
+      {
+        "id": "135aab9044754ab9",
+        "kind": "episodic",
+        "content": "Tell me what to search, brother. give me the topic",
+        "scope": "session",
+        "key": "424ac30c-362a-4665-9f01-e1c098edcc0e",
+        "created_at": "2026-10-06T06:58:39.072824+00:00",
+        "updated_at": "2026-10-06T06:58:39.072826+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "",
+          "role": "assistant",
+          "confidence": 0.0
+        }
+      },
+      {
+        "id": "4b804d7de31341c1",
+        "kind": "episodic",
+        "content": "we need to Api key",
+        "scope": "session",
+        "key": "424ac30c-362a-4665-9f01-e1c098edcc0e",
+        "created_at": "2026-10-06T06:59:27.790049+00:00",
+        "updated_at": "2026-10-06T06:59:27.790056+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "c2e410ae38a04205",
+        "kind": "episodic",
+        "content": "I hear you, brother. Tell me straight what you need. I'm here.",
+        "scope": "session",
+        "key": "424ac30c-362a-4665-9f01-e1c098edcc0e",
+        "created_at": "2026-10-06T06:59:27.808041+00:00",
+        "updated_at": "2026-10-06T06:59:27.808043+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "f3acfd5c66ce42f1",
+        "kind": "episodic",
+        "content": "I am not listen you hello hello hello hello hello",
+        "scope": "session",
+        "key": "424ac30c-362a-4665-9f01-e1c098edcc0e",
+        "created_at": "2026-10-06T06:59:49.748320+00:00",
+        "updated_at": "2026-10-06T06:59:49.748321+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "fd70fab13aae4b82",
+        "kind": "episodic",
+        "content": "I am not listen you hello hello hello hello hello",
+        "scope": "session",
+        "key": "424ac30c-362a-4665-9f01-e1c098edcc0e",
+        "created_at": "2026-10-06T06:59:52.315638+00:00",
+        "updated_at": "2026-10-06T06:59:52.315639+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "1eca2ec031d24d18",
+        "kind": "episodic",
+        "content": "hello hello hello hello hello",
+        "scope": "session",
+        "key": "424ac30c-362a-4665-9f01-e1c098edcc0e",
+        "created_at": "2026-10-06T07:00:01.301008+00:00",
+        "updated_at": "2026-10-06T07:00:01.301010+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "",
+          "role": "user",
+          "confidence": 0.0
+        }
+      },
+      {
+        "id": "2e5bf79460e545e2",
+        "kind": "episodic",
+        "content": "my location can you search in Google",
+        "scope": "session",
+        "key": "424ac30c-362a-4665-9f01-e1c098edcc0e",
+        "created_at": "2026-10-06T07:00:12.396944+00:00",
+        "updated_at": "2026-10-06T07:00:12.396946+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "",
+          "role": "user",
+          "confidence": 0.0
+        }
+      },
+      {
+        "id": "b5b9b890a58b45f0",
+        "kind": "episodic",
+        "content": "we need to find",
+        "scope": "session",
+        "key": "424ac30c-362a-4665-9f01-e1c098edcc0e",
+        "created_at": "2026-10-06T07:00:23.622760+00:00",
+        "updated_at": "2026-10-06T07:00:23.622761+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "",
+          "role": "user",
+          "confidence": 0.0
+        }
+      },
+      {
+        "id": "e47659ce7a9d4d71",
+        "kind": "episodic",
+        "content": "AI API ki search karke batao Jo free kam karti ho",
+        "scope": "session",
+        "key": "424ac30c-362a-4665-9f01-e1c098edcc0e",
+        "created_at": "2026-10-06T07:01:12.982216+00:00",
+        "updated_at": "2026-10-06T07:01:12.982236+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "",
+          "role": "user",
+          "confidence": 0.0
+        }
+      },
+      {
+        "id": "df884b87da004caa",
+        "kind": "episodic",
+        "content": "Bhai, maine 'karke batao Jo free kam karti ho' search kiya. bina browser khole. Mila yeh: सवालों के जवाब देने, लिखने, इमेजेस बनाने, काम पूरा करने और कोड करने के लिए ChatGPT का इस्तेमाल करें—सब एक ही जगह",
+        "scope": "session",
+        "key": "424ac30c-362a-4665-9f01-e1c098edcc0e",
+        "created_at": "2026-10-06T07:01:13.046346+00:00",
+        "updated_at": "2026-10-06T07:01:13.046348+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "",
+          "role": "assistant",
+          "confidence": 0.0
+        }
+      },
+      {
+        "id": "1c4e11abecd94103",
+        "kind": "episodic",
+        "content": "API keys",
+        "scope": "session",
+        "key": "424ac30c-362a-4665-9f01-e1c098edcc0e",
+        "created_at": "2026-10-06T07:01:58.766227+00:00",
+        "updated_at": "2026-10-06T07:01:58.766229+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "b93dad11bac6486e",
+        "kind": "episodic",
+        "content": "API keys",
+        "scope": "session",
+        "key": "424ac30c-362a-4665-9f01-e1c098edcc0e",
+        "created_at": "2026-10-06T07:02:17.498980+00:00",
+        "updated_at": "2026-10-06T07:02:17.498982+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "30e4f121c817405a",
+        "kind": "episodic",
+        "content": "I hear you, brother. Tell me straight what you need. I'm here.",
+        "scope": "session",
+        "key": "424ac30c-362a-4665-9f01-e1c098edcc0e",
+        "created_at": "2026-10-06T07:02:17.549631+00:00",
+        "updated_at": "2026-10-06T07:02:17.549633+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      }
+    ],
+    "6c5370f1-2b4c-463f-a7cf-c2b49d25def5": [
+      {
+        "id": "d5bf6f71e3134185",
+        "kind": "episodic",
+        "content": "hello hello hello hello hello hello",
+        "scope": "session",
+        "key": "6c5370f1-2b4c-463f-a7cf-c2b49d25def5",
+        "created_at": "2026-10-06T07:08:57.169255+00:00",
+        "updated_at": "2026-10-06T07:08:57.169256+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "",
+          "role": "user",
+          "confidence": 0.0
+        }
+      },
+      {
+        "id": "88e4fd5046a046ba",
+        "kind": "episodic",
+        "content": "Hey brother. I'm right here",
+        "scope": "session",
+        "key": "6c5370f1-2b4c-463f-a7cf-c2b49d25def5",
+        "created_at": "2026-10-06T07:08:57.176491+00:00",
+        "updated_at": "2026-10-06T07:08:57.176493+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "",
+          "role": "assistant",
+          "confidence": 0.0
+        }
+      },
+      {
+        "id": "30306cb9034f4286",
+        "kind": "episodic",
+        "content": "my account",
+        "scope": "session",
+        "key": "6c5370f1-2b4c-463f-a7cf-c2b49d25def5",
+        "created_at": "2026-10-06T07:34:18.174964+00:00",
+        "updated_at": "2026-10-06T07:34:18.174966+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "2eee4b36e81b4fd4",
+        "kind": "episodic",
+        "content": "I hear you, brother. Tell me straight what you need. I'm here.",
+        "scope": "session",
+        "key": "6c5370f1-2b4c-463f-a7cf-c2b49d25def5",
+        "created_at": "2026-10-06T07:34:18.184105+00:00",
+        "updated_at": "2026-10-06T07:34:18.184106+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "32062cced1c64a5a",
+        "kind": "episodic",
+        "content": "Apna Jo user group hai",
+        "scope": "session",
+        "key": "6c5370f1-2b4c-463f-a7cf-c2b49d25def5",
+        "created_at": "2026-10-06T07:35:12.380377+00:00",
+        "updated_at": "2026-10-06T07:35:12.380378+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "0400875cd6ec4919",
+        "kind": "episodic",
+        "content": "Haan bhai, samajh gaya. Seedha bolo kya chahiye — main yahin hoon.",
+        "scope": "session",
+        "key": "6c5370f1-2b4c-463f-a7cf-c2b49d25def5",
+        "created_at": "2026-10-06T07:35:12.383500+00:00",
+        "updated_at": "2026-10-06T07:35:12.383502+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "558b1797490a4b72",
+        "kind": "episodic",
+        "content": "36 entry",
+        "scope": "session",
+        "key": "6c5370f1-2b4c-463f-a7cf-c2b49d25def5",
+        "created_at": "2026-10-06T07:37:13.848906+00:00",
+        "updated_at": "2026-10-06T07:37:13.848907+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "c761075bb46d44eb",
+        "kind": "episodic",
+        "content": "I hear you, brother. Tell me straight what you need. I'm here.",
+        "scope": "session",
+        "key": "6c5370f1-2b4c-463f-a7cf-c2b49d25def5",
+        "created_at": "2026-10-06T07:37:13.857569+00:00",
+        "updated_at": "2026-10-06T07:37:13.857571+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "251eb669ae0141f4",
+        "kind": "episodic",
+        "content": "Chhodo Main Nahin kar raha Kuchh Bhi Pata To Chali gaya hai",
+        "scope": "session",
+        "key": "6c5370f1-2b4c-463f-a7cf-c2b49d25def5",
+        "created_at": "2026-10-06T07:37:27.772395+00:00",
+        "updated_at": "2026-10-06T07:37:27.772397+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "82c5ad940ed74b00",
+        "kind": "episodic",
+        "content": "Haan bhai, samajh gaya. Seedha bolo kya chahiye — main yahin hoon.",
+        "scope": "session",
+        "key": "6c5370f1-2b4c-463f-a7cf-c2b49d25def5",
+        "created_at": "2026-10-06T07:37:27.776012+00:00",
+        "updated_at": "2026-10-06T07:37:27.776013+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "36e2f7accae54ad2",
+        "kind": "episodic",
+        "content": "OK delete format Mein a rahi hai",
+        "scope": "session",
+        "key": "6c5370f1-2b4c-463f-a7cf-c2b49d25def5",
+        "created_at": "2026-10-06T07:42:52.814579+00:00",
+        "updated_at": "2026-10-06T07:42:52.814581+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "",
+          "role": "user",
+          "confidence": 0.0
+        }
+      },
+      {
+        "id": "63573d6b05da4e1d",
+        "kind": "episodic",
+        "content": "This can change your system. Permission required — proceed?",
+        "scope": "session",
+        "key": "6c5370f1-2b4c-463f-a7cf-c2b49d25def5",
+        "created_at": "2026-10-06T07:42:52.823030+00:00",
+        "updated_at": "2026-10-06T07:42:52.823032+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "",
+          "role": "assistant",
+          "confidence": 0.0
+        }
+      },
+      {
+        "id": "0980f3863e80444f",
+        "kind": "episodic",
+        "content": "35 rupees",
+        "scope": "session",
+        "key": "6c5370f1-2b4c-463f-a7cf-c2b49d25def5",
+        "created_at": "2026-10-06T07:47:04.583232+00:00",
+        "updated_at": "2026-10-06T07:47:04.583234+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "55babeefd26d4f5d",
+        "kind": "episodic",
+        "content": "I hear you, brother. Tell me straight what you need. I'm here.",
+        "scope": "session",
+        "key": "6c5370f1-2b4c-463f-a7cf-c2b49d25def5",
+        "created_at": "2026-10-06T07:47:04.591533+00:00",
+        "updated_at": "2026-10-06T07:47:04.591535+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "ffc709648c7c452d",
+        "kind": "episodic",
+        "content": "Pro kabaddi match",
+        "scope": "session",
+        "key": "6c5370f1-2b4c-463f-a7cf-c2b49d25def5",
+        "created_at": "2026-10-06T07:51:23.455119+00:00",
+        "updated_at": "2026-10-06T07:51:23.455120+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "478e220f81794ef3",
+        "kind": "episodic",
+        "content": "I hear you, brother. Tell me straight what you need. I'm here.",
+        "scope": "session",
+        "key": "6c5370f1-2b4c-463f-a7cf-c2b49d25def5",
+        "created_at": "2026-10-06T07:51:23.461472+00:00",
+        "updated_at": "2026-10-06T07:51:23.461476+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "21a062cb511a4280",
+        "kind": "episodic",
+        "content": "reference man",
+        "scope": "session",
+        "key": "6c5370f1-2b4c-463f-a7cf-c2b49d25def5",
+        "created_at": "2026-10-06T07:51:46.875113+00:00",
+        "updated_at": "2026-10-06T07:51:46.875115+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "5ff3da3454394f28",
+        "kind": "episodic",
+        "content": "I hear you, brother. Tell me straight what you need. I'm here.",
+        "scope": "session",
+        "key": "6c5370f1-2b4c-463f-a7cf-c2b49d25def5",
+        "created_at": "2026-10-06T07:51:46.878125+00:00",
+        "updated_at": "2026-10-06T07:51:46.878126+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "5c181663a48046cf",
+        "kind": "episodic",
+        "content": "Pankaj bhai",
+        "scope": "session",
+        "key": "6c5370f1-2b4c-463f-a7cf-c2b49d25def5",
+        "created_at": "2026-10-06T07:53:06.405281+00:00",
+        "updated_at": "2026-10-06T07:53:06.405282+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "7f6d4b80661648a2",
+        "kind": "episodic",
+        "content": "Haan bhai, samajh gaya. Seedha bolo kya chahiye. main yahin hoon.",
+        "scope": "session",
+        "key": "6c5370f1-2b4c-463f-a7cf-c2b49d25def5",
+        "created_at": "2026-10-06T07:53:06.411055+00:00",
+        "updated_at": "2026-10-06T07:53:06.411056+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "1da396602e064d9b",
+        "kind": "episodic",
+        "content": "kya is per yaar Kuchh Bhi kam bhi nahin kar pa Rahe connect Karen",
+        "scope": "session",
+        "key": "6c5370f1-2b4c-463f-a7cf-c2b49d25def5",
+        "created_at": "2026-10-06T07:53:18.802236+00:00",
+        "updated_at": "2026-10-06T07:53:18.802238+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "5265f94143474645",
+        "kind": "episodic",
+        "content": "Haan bhai, samajh gaya. Seedha bolo kya chahiye — main yahin hoon.",
+        "scope": "session",
+        "key": "6c5370f1-2b4c-463f-a7cf-c2b49d25def5",
+        "created_at": "2026-10-06T07:53:18.805584+00:00",
+        "updated_at": "2026-10-06T07:53:18.805585+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "c648f20a3e5c413d",
+        "kind": "episodic",
+        "content": "skeleton coordinators",
+        "scope": "session",
+        "key": "6c5370f1-2b4c-463f-a7cf-c2b49d25def5",
+        "created_at": "2026-10-06T08:24:13.814899+00:00",
+        "updated_at": "2026-10-06T08:24:13.814901+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "52ac979168174535",
+        "kind": "episodic",
+        "content": "I hear you, brother. Tell me straight what you need. I'm here.",
+        "scope": "session",
+        "key": "6c5370f1-2b4c-463f-a7cf-c2b49d25def5",
+        "created_at": "2026-10-06T08:24:13.825551+00:00",
+        "updated_at": "2026-10-06T08:24:13.825552+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "7e48370a710d48b9",
+        "kind": "episodic",
+        "content": "so I take this",
+        "scope": "session",
+        "key": "6c5370f1-2b4c-463f-a7cf-c2b49d25def5",
+        "created_at": "2026-10-06T08:25:24.545966+00:00",
+        "updated_at": "2026-10-06T08:25:24.545968+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "4979d71164ca41ca",
+        "kind": "episodic",
+        "content": "I hear you, brother. Tell me straight what you need. I'm here.",
+        "scope": "session",
+        "key": "6c5370f1-2b4c-463f-a7cf-c2b49d25def5",
+        "created_at": "2026-10-06T08:25:24.550671+00:00",
+        "updated_at": "2026-10-06T08:25:24.550673+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "b777164d9c2f4001",
+        "kind": "episodic",
+        "content": "example",
+        "scope": "session",
+        "key": "6c5370f1-2b4c-463f-a7cf-c2b49d25def5",
+        "created_at": "2026-10-06T08:27:03.450804+00:00",
+        "updated_at": "2026-10-06T08:27:03.450806+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "a6e2ba90a2a64d85",
+        "kind": "episodic",
+        "content": "I hear you, brother. Tell me straight what you need. I'm here.",
+        "scope": "session",
+        "key": "6c5370f1-2b4c-463f-a7cf-c2b49d25def5",
+        "created_at": "2026-10-06T08:27:03.456688+00:00",
+        "updated_at": "2026-10-06T08:27:03.456691+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "8f98289597474df7",
+        "kind": "episodic",
+        "content": "925",
+        "scope": "session",
+        "key": "6c5370f1-2b4c-463f-a7cf-c2b49d25def5",
+        "created_at": "2026-10-06T08:30:07.006981+00:00",
+        "updated_at": "2026-10-06T08:30:07.006982+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "24615f9fb7f04a99",
+        "kind": "episodic",
+        "content": "I hear you, brother. Tell me straight what you need. I'm here.",
+        "scope": "session",
+        "key": "6c5370f1-2b4c-463f-a7cf-c2b49d25def5",
+        "created_at": "2026-10-06T08:30:07.011416+00:00",
+        "updated_at": "2026-10-06T08:30:07.011418+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      }
     ]
   },
   "semantic": {
@@ -12536,13 +13600,13 @@
         "meta": {}
       },
       {
-        "id": "99a980d7d0024d8b",
+        "id": "2c7f91340c9c45ca",
         "kind": "semantic",
-        "content": "Kya",
+        "content": "Nahin",
         "scope": "user",
         "key": "name",
-        "created_at": "2026-09-24T09:02:09.497914+00:00",
-        "updated_at": "2026-09-24T09:02:09.497916+00:00",
+        "created_at": "2026-10-06T07:37:27.783163+00:00",
+        "updated_at": "2026-10-06T07:37:27.783165+00:00",
         "tags": [
           "name"
         ],
@@ -15739,6 +16803,348 @@
         "key": "general",
         "created_at": "2026-09-24T11:51:36.125744+00:00",
         "updated_at": "2026-09-24T11:51:36.125745+00:00",
+        "tags": [
+          "turn"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "aee7cda30bf34e29",
+        "kind": "project",
+        "content": "how r u",
+        "scope": "project",
+        "key": "general",
+        "created_at": "2026-10-06T06:57:50.528767+00:00",
+        "updated_at": "2026-10-06T06:57:50.528768+00:00",
+        "tags": [
+          "turn"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "question",
+          "role": "user",
+          "confidence": 0.75
+        }
+      },
+      {
+        "id": "a9535a33d83346e0",
+        "kind": "project",
+        "content": "I am not listen you",
+        "scope": "project",
+        "key": "general",
+        "created_at": "2026-10-06T06:58:32.594393+00:00",
+        "updated_at": "2026-10-06T06:58:32.594396+00:00",
+        "tags": [
+          "turn"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "7924f2ae08d04962",
+        "kind": "project",
+        "content": "we need to Api key",
+        "scope": "project",
+        "key": "general",
+        "created_at": "2026-10-06T06:59:27.790094+00:00",
+        "updated_at": "2026-10-06T06:59:27.790097+00:00",
+        "tags": [
+          "turn"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "49e5838b83cb4286",
+        "kind": "project",
+        "content": "I am not listen you hello hello hello hello hello",
+        "scope": "project",
+        "key": "general",
+        "created_at": "2026-10-06T06:59:49.748389+00:00",
+        "updated_at": "2026-10-06T06:59:49.748391+00:00",
+        "tags": [
+          "turn"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "5049256bb6094873",
+        "kind": "project",
+        "content": "API keys",
+        "scope": "project",
+        "key": "general",
+        "created_at": "2026-10-06T07:01:58.766254+00:00",
+        "updated_at": "2026-10-06T07:01:58.766256+00:00",
+        "tags": [
+          "turn"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "cb6ecd0d9a5047a6",
+        "kind": "project",
+        "content": "my account",
+        "scope": "project",
+        "key": "general",
+        "created_at": "2026-10-06T07:34:18.174974+00:00",
+        "updated_at": "2026-10-06T07:34:18.174975+00:00",
+        "tags": [
+          "turn"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "f6d4575e43694e09",
+        "kind": "project",
+        "content": "Apna Jo user group hai",
+        "scope": "project",
+        "key": "general",
+        "created_at": "2026-10-06T07:35:12.380387+00:00",
+        "updated_at": "2026-10-06T07:35:12.380388+00:00",
+        "tags": [
+          "turn"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "cf65dbcc56bb4fee",
+        "kind": "project",
+        "content": "36 entry",
+        "scope": "project",
+        "key": "general",
+        "created_at": "2026-10-06T07:37:13.848917+00:00",
+        "updated_at": "2026-10-06T07:37:13.848918+00:00",
+        "tags": [
+          "turn"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "647745cbf2fa4229",
+        "kind": "project",
+        "content": "Chhodo Main Nahin kar raha Kuchh Bhi Pata To Chali gaya hai",
+        "scope": "project",
+        "key": "general",
+        "created_at": "2026-10-06T07:37:27.772404+00:00",
+        "updated_at": "2026-10-06T07:37:27.772405+00:00",
+        "tags": [
+          "turn"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "635eaaf1522f4081",
+        "kind": "project",
+        "content": "35 rupees",
+        "scope": "project",
+        "key": "general",
+        "created_at": "2026-10-06T07:47:04.583240+00:00",
+        "updated_at": "2026-10-06T07:47:04.583242+00:00",
+        "tags": [
+          "turn"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "0b2ad07b21ad4acb",
+        "kind": "project",
+        "content": "Pro kabaddi match",
+        "scope": "project",
+        "key": "general",
+        "created_at": "2026-10-06T07:51:23.455128+00:00",
+        "updated_at": "2026-10-06T07:51:23.455129+00:00",
+        "tags": [
+          "turn"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "5195716c13af4c84",
+        "kind": "project",
+        "content": "reference man",
+        "scope": "project",
+        "key": "general",
+        "created_at": "2026-10-06T07:51:46.875123+00:00",
+        "updated_at": "2026-10-06T07:51:46.875124+00:00",
+        "tags": [
+          "turn"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "b1b3fa2ccd114def",
+        "kind": "project",
+        "content": "Pankaj bhai",
+        "scope": "project",
+        "key": "general",
+        "created_at": "2026-10-06T07:53:06.405289+00:00",
+        "updated_at": "2026-10-06T07:53:06.405290+00:00",
+        "tags": [
+          "turn"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "39181f3fffed4836",
+        "kind": "project",
+        "content": "kya is per yaar Kuchh Bhi kam bhi nahin kar pa Rahe connect Karen",
+        "scope": "project",
+        "key": "general",
+        "created_at": "2026-10-06T07:53:18.802246+00:00",
+        "updated_at": "2026-10-06T07:53:18.802248+00:00",
+        "tags": [
+          "turn"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "00d337126aae45a2",
+        "kind": "project",
+        "content": "skeleton coordinators",
+        "scope": "project",
+        "key": "general",
+        "created_at": "2026-10-06T08:24:13.814909+00:00",
+        "updated_at": "2026-10-06T08:24:13.814911+00:00",
+        "tags": [
+          "turn"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "11a64dbd4e684b30",
+        "kind": "project",
+        "content": "so I take this",
+        "scope": "project",
+        "key": "general",
+        "created_at": "2026-10-06T08:25:24.545977+00:00",
+        "updated_at": "2026-10-06T08:25:24.545978+00:00",
+        "tags": [
+          "turn"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "dac489d621ab4bf1",
+        "kind": "project",
+        "content": "example",
+        "scope": "project",
+        "key": "general",
+        "created_at": "2026-10-06T08:27:03.450814+00:00",
+        "updated_at": "2026-10-06T08:27:03.450815+00:00",
+        "tags": [
+          "turn"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "56fe4fd4e42e402f",
+        "kind": "project",
+        "content": "925",
+        "scope": "project",
+        "key": "general",
+        "created_at": "2026-10-06T08:30:07.006991+00:00",
+        "updated_at": "2026-10-06T08:30:07.006992+00:00",
         "tags": [
           "turn"
         ],
