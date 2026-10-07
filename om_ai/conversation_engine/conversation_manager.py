@@ -17,7 +17,12 @@ class ConversationManager:
             for t in reversed(s.recent_messages):
                 if t.role=="assistant":s.last_assistant_message=t.content;s.last_assistant_question=t.content if t.content.rstrip().endswith("?") else s.last_assistant_question;break
         prior=[{"role":t.role,"content":t.content} for t in s.recent_messages]
-        rel=self.relations.detect(message,prior,s);topic=self.topics.infer(message,s.current_topic);active,goal=self.tasks.update(message,topic,rel["relation"],s);ret=self.retriever.retrieve(message,prior,durable_memory);refs=self.refs.resolve(message,s,ret["history"])
+        rel=self.relations.detect(message,prior,s);topic=self.topics.infer(message,s.current_topic)
+        # Resolve references against the prior turn before mutating the active task.
+        if rel["relation"]=="reference_to_past" and not s.active_task:
+            previous_user=next((t.content for t in reversed(s.recent_messages) if t.role=="user"),"")
+            if previous_user:s.active_task=previous_user[:240];s.active_goal=previous_user[:300]
+        active,goal=self.tasks.update(message,topic,rel["relation"],s);ret=self.retriever.retrieve(message,prior,durable_memory);refs=self.refs.resolve(message,s,ret["history"])
         s.current_topic=topic or s.current_topic;s.active_task=active;s.active_goal=goal;s.entities.update(self.topics.entities(message));s.references=refs;s.add(ConversationTurn("user",message,relation=rel["relation"],topic=topic,task=active))
         return {"state":s,"relation":rel,"analysis":{"relation":rel,"topic":topic,"active_task":active,"references":refs,"relevant_history":ret["history"],"memory_hits":ret["memory"]},"context_blob":self.build(s,rel,refs,ret)}
     def build(self,s,rel,refs,ret):
