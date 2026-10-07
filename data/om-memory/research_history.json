@@ -1151,5 +1151,380 @@
       "summary": "",
       "confidence": 0.0
     }
+  },
+  {
+    "plan": {
+      "question": "Who won the Cubs championship?",
+      "steps": [
+        "Understand research objective",
+        "Collect relevant information",
+        "Analyze collected data",
+        "Validate important facts",
+        "Generate research summary"
+      ]
+    },
+    "analysis": {
+      "key_points": [],
+      "source_count": 0
+    },
+    "validation": {
+      "validated": true,
+      "confidence": 0.0,
+      "checked_items": 0
+    },
+    "result": {
+      "summary": "",
+      "confidence": 0.0
+    }
+  },
+  {
+    "plan": {
+      "question": "Who won the Cubs championship?",
+      "steps": [
+        "Understand research objective",
+        "Collect relevant information",
+        "Analyze collected data",
+        "Validate important facts",
+        "Generate research summary"
+      ]
+    },
+    "analysis": {
+      "key_points": [],
+      "source_count": 0
+    },
+    "validation": {
+      "validated": true,
+      "confidence": 0.0,
+      "checked_items": 0
+    },
+    "result": {
+      "summary": "",
+      "confidence": 0.0
+    }
+  },
+  {
+    "plan": {
+      "question": "Who won the Cubs championship?",
+      "steps": [
+        "Understand research objective",
+        "Collect relevant information",
+        "Analyze collected data",
+        "Validate important facts",
+        "Generate research summary"
+      ]
+    },
+    "analysis": {
+      "key_points": [],
+      "source_count": 0
+    },
+    "validation": {
+      "validated": true,
+      "confidence": 0.0,
+      "checked_items": 0
+    },
+    "result": {
+      "summary": "",
+      "confidence": 0.0
+    }
+  },
+  {
+    "plan": {
+      "question": "Who won the Cubs championship?",
+      "steps": [
+        "Understand research objective",
+        "Collect relevant information",
+        "Analyze collected data",
+        "Validate important facts",
+        "Generate research summary"
+      ]
+    },
+    "analysis": {
+      "key_points": [],
+      "source_count": 0
+    },
+    "validation": {
+      "validated": true,
+      "confidence": 0.0,
+      "checked_items": 0
+    },
+    "result": {
+      "summary": "",
+      "confidence": 0.0
+    }
+  },
+  {
+    "plan": {
+      "question": "Who won the Cubs championship?",
+      "steps": [
+        "Understand research objective",
+        "Collect relevant information",
+        "Analyze collected data",
+        "Validate important facts",
+        "Generate research summary"
+      ]
+    },
+    "analysis": {
+      "key_points": [],
+      "source_count": 0
+    },
+    "validation": {
+      "validated": true,
+      "confidence": 0.0,
+      "checked_items": 0
+    },
+    "result": {
+      "summary": "",
+      "confidence": 0.0
+    }
+  },
+  {
+    "plan": {
+      "question": "Who won the Cubs championship?",
+      "steps": [
+        "Understand research objective",
+        "Collect relevant information",
+        "Analyze collected data",
+        "Validate important facts",
+        "Generate research summary"
+      ]
+    },
+    "analysis": {
+      "key_points": [],
+      "source_count": 0
+    },
+    "validation": {
+      "validated": true,
+      "confidence": 0.0,
+      "checked_items": 0
+    },
+    "result": {
+      "summary": "",
+      "confidence": 0.0
+    }
+  },
+  {
+    "plan": {
+      "question": "Why is the sky blue?",
+      "steps": [
+        "Understand research objective",
+        "Collect relevant information",
+        "Analyze collected data",
+        "Validate important facts",
+        "Generate research summary"
+      ]
+    },
+    "analysis": {
+      "key_points": [],
+      "source_count": 0
+    },
+    "validation": {
+      "validated": true,
+      "confidence": 0.0,
+      "checked_items": 0
+    },
+    "result": {
+      "summary": "",
+      "confidence": 0.0
+    }
+  },
+  {
+    "plan": {
+      "question": "What are you doing?",
+      "steps": [
+        "Understand research objective",
+        "Collect relevant information",
+        "Analyze collected data",
+        "Validate important facts",
+        "Generate research summary"
+      ]
+    },
+    "analysis": {
+      "key_points": [],
+      "source_count": 0
+    },
+    "validation": {
+      "validated": true,
+      "confidence": 0.0,
+      "checked_items": 0
+    },
+    "result": {
+      "summary": "",
+      "confidence": 0.0
+    }
+  },
+  {
+    "plan": {
+      "question": "Can you check that thing we discussed yesterday?",
+      "steps": [
+        "Understand research objective",
+        "Collect relevant information",
+        "Analyze collected data",
+        "Validate important facts",
+        "Generate research summary"
+      ]
+    },
+    "analysis": {
+      "key_points": [],
+      "source_count": 0
+    },
+    "validation": {
+      "validated": true,
+      "confidence": 0.0,
+      "checked_items": 0
+    },
+    "result": {
+      "summary": "",
+      "confidence": 0.0
+    }
+  },
+  {
+    "plan": {
+      "question": "What should I check first?",
+      "steps": [
+        "Understand research objective",
+        "Collect relevant information",
+        "Analyze collected data",
+        "Validate important facts",
+        "Generate research summary"
+      ]
+    },
+    "analysis": {
+      "key_points": [],
+      "source_count": 0
+    },
+    "validation": {
+      "validated": true,
+      "confidence": 0.0,
+      "checked_items": 0
+    },
+    "result": {
+      "summary": "",
+      "confidence": 0.0
+    }
+  },
+  {
+    "plan": {
+      "question": "What should I change?",
+      "steps": [
+        "Understand research objective",
+        "Collect relevant information",
+        "Analyze collected data",
+        "Validate important facts",
+        "Generate research summary"
+      ]
+    },
+    "analysis": {
+      "key_points": [],
+      "source_count": 0
+    },
+    "validation": {
+      "validated": true,
+      "confidence": 0.0,
+      "checked_items": 0
+    },
+    "result": {
+      "summary": "",
+      "confidence": 0.0
+    }
+  },
+  {
+    "plan": {
+      "question": "Who won the Cubs championship?",
+      "steps": [
+        "Understand research objective",
+        "Collect relevant information",
+        "Analyze collected data",
+        "Validate important facts",
+        "Generate research summary"
+      ]
+    },
+    "analysis": {
+      "key_points": [],
+      "source_count": 0
+    },
+    "validation": {
+      "validated": true,
+      "confidence": 0.0,
+      "checked_items": 0
+    },
+    "result": {
+      "summary": "",
+      "confidence": 0.0
+    }
+  },
+  {
+    "plan": {
+      "question": "Who won the Cubs championship?",
+      "steps": [
+        "Understand research objective",
+        "Collect relevant information",
+        "Analyze collected data",
+        "Validate important facts",
+        "Generate research summary"
+      ]
+    },
+    "analysis": {
+      "key_points": [],
+      "source_count": 0
+    },
+    "validation": {
+      "validated": true,
+      "confidence": 0.0,
+      "checked_items": 0
+    },
+    "result": {
+      "summary": "",
+      "confidence": 0.0
+    }
+  },
+  {
+    "plan": {
+      "question": "Who won the Cubs championship?",
+      "steps": [
+        "Understand research objective",
+        "Collect relevant information",
+        "Analyze collected data",
+        "Validate important facts",
+        "Generate research summary"
+      ]
+    },
+    "analysis": {
+      "key_points": [],
+      "source_count": 0
+    },
+    "validation": {
+      "validated": true,
+      "confidence": 0.0,
+      "checked_items": 0
+    },
+    "result": {
+      "summary": "",
+      "confidence": 0.0
+    }
+  },
+  {
+    "plan": {
+      "question": "Who won the Cubs championship?",
+      "steps": [
+        "Understand research objective",
+        "Collect relevant information",
+        "Analyze collected data",
+        "Validate important facts",
+        "Generate research summary"
+      ]
+    },
+    "analysis": {
+      "key_points": [],
+      "source_count": 0
+    },
+    "validation": {
+      "validated": true,
+      "confidence": 0.0,
+      "checked_items": 0
+    },
+    "result": {
+      "summary": "",
+      "confidence": 0.0
+    }
   }
 ]

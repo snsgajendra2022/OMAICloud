@@ -20,8 +20,6 @@ def run_cognitive_brain(
 ) -> dict[str, Any]:
     """Run OMCognitiveBrain.generate (STEP 24 path) with process() fallback."""
     from om_ai.core.cognitive.brain_pipeline import OMCognitiveBrain
-    OMCognitiveBrain.generate()
-    OMCognitiveBrain.process()
     
     brain = OMCognitiveBrain()
     try:

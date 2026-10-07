@@ -1775,6 +1775,7 @@ class OMCognitiveBrain:
             freshness = {"requires_research": False, "signals": [], "error": str(exc)}
         meta["freshness"] = freshness
 
+        research_summary: dict[str, Any] = {}
         if freshness.get("requires_research") or freshness.get("needs_research"):
             stages.append("research")
             try:
@@ -1787,6 +1788,11 @@ class OMCognitiveBrain:
                     "sources": len(getattr(research_state, "sources", []) or []),
                     "confidence": getattr(research_state, "confidence", 0),
                     "citations": list(getattr(research_state, "citations", []) or []),
+                }
+                research_summary = {
+                    "findings": getattr(research_state, "findings", []),
+                    "sources": getattr(research_state, "sources", []),
+                    "summary": getattr(research_state, "summary", ""),
                 }
             except Exception as exc:
                 research_state = None
@@ -2661,7 +2667,7 @@ class OMCognitiveBrain:
             evaluation,
         )
 
-        learning_state = self.learning_engine.learn(message, answer)
+        learning_state = self.learning_engine.learn(question, user_answer, evaluation)
 
         from om_ai.core.response.response_formatter import (
             ResponseFormatter,

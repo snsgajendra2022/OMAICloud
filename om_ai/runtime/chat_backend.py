@@ -459,8 +459,15 @@ def _om_native_chat_reply_body(
             try:
                 from om_ai.core.chat_intelligence.stub_detect import is_solution_stub
                 from om_ai.core.intelligence.real_answer import looks_like_static_reply
+                from om_ai.core.model_runtime.quality_gate import get_quality_gate
+                from om_ai.runtime.chat_orchestrator import is_low_quality_reply
 
-                if is_solution_stub(ans) or looks_like_static_reply(ans):
+                if (
+                    is_solution_stub(ans)
+                    or looks_like_static_reply(ans)
+                    or is_low_quality_reply(ans)
+                    or not get_quality_gate().evaluate(ans, prompt=user_text).passed
+                ):
                     ans = ""
             except Exception:
                 pass
@@ -503,6 +510,21 @@ def _om_native_chat_reply_body(
                 evolution_profile=profile,
             )
             ans = str(piped.get("answer") or "").strip()
+            try:
+                from om_ai.core.chat_intelligence.stub_detect import is_solution_stub
+                from om_ai.core.intelligence.real_answer import looks_like_static_reply
+                from om_ai.core.model_runtime.quality_gate import get_quality_gate
+                from om_ai.runtime.chat_orchestrator import is_low_quality_reply
+
+                if (
+                    is_solution_stub(ans)
+                    or looks_like_static_reply(ans)
+                    or is_low_quality_reply(ans)
+                    or not get_quality_gate().evaluate(ans, prompt=user_text).passed
+                ):
+                    ans = ""
+            except Exception:
+                pass
             if ans and not ResponseEcho.check(user_text, ans):
                 info_pipe = ChatBackendInfo(
                     backend=info.backend,

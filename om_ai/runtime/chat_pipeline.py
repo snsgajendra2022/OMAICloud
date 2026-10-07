@@ -94,6 +94,7 @@ def run_chat_pipeline(
             history=hist,
             tenant_id=tenant_id,
             actor=actor,
+            model_generate=native_chat if native_ready else None,
             model_context="",
             extra={
                 "project_id": project_id,

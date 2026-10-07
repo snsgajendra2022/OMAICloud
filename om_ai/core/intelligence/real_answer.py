@@ -31,6 +31,9 @@ _STATIC_SMELL = re.compile(
     r"bio-digital ideas labeled as research|"
     r"the issue may come from incorrect assumptions|"
     r"here'?s the direct path for|"
+    r"that last draft wasn'?t solid|"
+    r"i hear you, brother|"
+    r"tell me straight what you need|"
     r"clarify goal, then give a direct actionable answer)",
     re.I | re.S,
 )

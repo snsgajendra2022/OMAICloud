@@ -355,12 +355,7 @@ class LocalLLMEngine:
             self.device = torch.device("mps")
         else:
             self.device = torch.device("cpu")
-        self.tokenizer = ByteBPETokenizer.from_file(
-            tokenizer_path
-        )
-        self.model = OMTransformer(
-            config
-        ).to(self.device)
+        self.model = OMTransformer(cfg).to(self.device)
 
         validate_model_tokenizer(
             self.model,

@@ -13497,6 +13497,48 @@
           "confidence": 0.6
         }
       }
+    ],
+    "0148dfbd-b4e6-44fe-87c7-8ca7bc7f53eb": [
+      {
+        "id": "03ca954a7e654a37",
+        "kind": "episodic",
+        "content": "OM I was thinking about my project and the deploy failed",
+        "scope": "session",
+        "key": "0148dfbd-b4e6-44fe-87c7-8ca7bc7f53eb",
+        "created_at": "2026-10-07T10:38:11.159445+00:00",
+        "updated_at": "2026-10-07T10:38:11.159446+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "",
+          "role": "user",
+          "confidence": 0.0
+        }
+      },
+      {
+        "id": "60591cec6b264ea1",
+        "kind": "episodic",
+        "content": "Understood. I will break this into clear steps and proceed carefully",
+        "scope": "session",
+        "key": "0148dfbd-b4e6-44fe-87c7-8ca7bc7f53eb",
+        "created_at": "2026-10-07T10:38:11.165530+00:00",
+        "updated_at": "2026-10-07T10:38:11.165531+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "",
+          "role": "assistant",
+          "confidence": 0.0
+        }
+      }
     ]
   },
   "semantic": {

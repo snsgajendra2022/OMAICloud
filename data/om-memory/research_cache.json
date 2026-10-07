@@ -223,5 +223,80 @@
     "question": "I can open it. Permission required \u2014 proceed?",
     "summary": "{'plan': {'question': 'I can open it. Permission required \u2014 proceed?', 'steps': ['Understand research objective', 'Collect relevant information', 'Analyze collected data', 'Validate important facts', 'Generate research summary']}, 'analysis': {'key_points': [], 'source_count': 0}, 'validation': {'validated': True, 'confidence': 0.0, 'checked_items': 0}, 'result': {'summary': '', 'confidence': 0.0}}",
     "time": "2026-09-24T07:07:21.776450+00:00"
+  },
+  {
+    "question": "Who won the Cubs championship?",
+    "summary": "{'plan': {'question': 'Who won the Cubs championship?', 'steps': ['Understand research objective', 'Collect relevant information', 'Analyze collected data', 'Validate important facts', 'Generate research summary']}, 'analysis': {'key_points': [], 'source_count': 0}, 'validation': {'validated': True, 'confidence': 0.0, 'checked_items': 0}, 'result': {'summary': '', 'confidence': 0.0}}",
+    "time": "2026-10-07T08:52:39.795137+00:00"
+  },
+  {
+    "question": "Who won the Cubs championship?",
+    "summary": "{'plan': {'question': 'Who won the Cubs championship?', 'steps': ['Understand research objective', 'Collect relevant information', 'Analyze collected data', 'Validate important facts', 'Generate research summary']}, 'analysis': {'key_points': [], 'source_count': 0}, 'validation': {'validated': True, 'confidence': 0.0, 'checked_items': 0}, 'result': {'summary': '', 'confidence': 0.0}}",
+    "time": "2026-10-07T08:53:50.073528+00:00"
+  },
+  {
+    "question": "Who won the Cubs championship?",
+    "summary": "{'plan': {'question': 'Who won the Cubs championship?', 'steps': ['Understand research objective', 'Collect relevant information', 'Analyze collected data', 'Validate important facts', 'Generate research summary']}, 'analysis': {'key_points': [], 'source_count': 0}, 'validation': {'validated': True, 'confidence': 0.0, 'checked_items': 0}, 'result': {'summary': '', 'confidence': 0.0}}",
+    "time": "2026-10-07T08:54:20.303534+00:00"
+  },
+  {
+    "question": "Who won the Cubs championship?",
+    "summary": "{'plan': {'question': 'Who won the Cubs championship?', 'steps': ['Understand research objective', 'Collect relevant information', 'Analyze collected data', 'Validate important facts', 'Generate research summary']}, 'analysis': {'key_points': [], 'source_count': 0}, 'validation': {'validated': True, 'confidence': 0.0, 'checked_items': 0}, 'result': {'summary': '', 'confidence': 0.0}}",
+    "time": "2026-10-07T08:55:26.795190+00:00"
+  },
+  {
+    "question": "Who won the Cubs championship?",
+    "summary": "{'plan': {'question': 'Who won the Cubs championship?', 'steps': ['Understand research objective', 'Collect relevant information', 'Analyze collected data', 'Validate important facts', 'Generate research summary']}, 'analysis': {'key_points': [], 'source_count': 0}, 'validation': {'validated': True, 'confidence': 0.0, 'checked_items': 0}, 'result': {'summary': '', 'confidence': 0.0}}",
+    "time": "2026-10-07T09:01:03.796499+00:00"
+  },
+  {
+    "question": "Who won the Cubs championship?",
+    "summary": "{'plan': {'question': 'Who won the Cubs championship?', 'steps': ['Understand research objective', 'Collect relevant information', 'Analyze collected data', 'Validate important facts', 'Generate research summary']}, 'analysis': {'key_points': [], 'source_count': 0}, 'validation': {'validated': True, 'confidence': 0.0, 'checked_items': 0}, 'result': {'summary': '', 'confidence': 0.0}}",
+    "time": "2026-10-07T09:44:17.718171+00:00"
+  },
+  {
+    "question": "Why is the sky blue?",
+    "summary": "{'plan': {'question': 'Why is the sky blue?', 'steps': ['Understand research objective', 'Collect relevant information', 'Analyze collected data', 'Validate important facts', 'Generate research summary']}, 'analysis': {'key_points': [], 'source_count': 0}, 'validation': {'validated': True, 'confidence': 0.0, 'checked_items': 0}, 'result': {'summary': '', 'confidence': 0.0}}",
+    "time": "2026-10-07T09:48:09.602787+00:00"
+  },
+  {
+    "question": "What are you doing?",
+    "summary": "{'plan': {'question': 'What are you doing?', 'steps': ['Understand research objective', 'Collect relevant information', 'Analyze collected data', 'Validate important facts', 'Generate research summary']}, 'analysis': {'key_points': [], 'source_count': 0}, 'validation': {'validated': True, 'confidence': 0.0, 'checked_items': 0}, 'result': {'summary': '', 'confidence': 0.0}}",
+    "time": "2026-10-07T09:48:34.434240+00:00"
+  },
+  {
+    "question": "Can you check that thing we discussed yesterday?",
+    "summary": "{'plan': {'question': 'Can you check that thing we discussed yesterday?', 'steps': ['Understand research objective', 'Collect relevant information', 'Analyze collected data', 'Validate important facts', 'Generate research summary']}, 'analysis': {'key_points': [], 'source_count': 0}, 'validation': {'validated': True, 'confidence': 0.0, 'checked_items': 0}, 'result': {'summary': '', 'confidence': 0.0}}",
+    "time": "2026-10-07T09:48:35.291774+00:00"
+  },
+  {
+    "question": "What should I check first?",
+    "summary": "{'plan': {'question': 'What should I check first?', 'steps': ['Understand research objective', 'Collect relevant information', 'Analyze collected data', 'Validate important facts', 'Generate research summary']}, 'analysis': {'key_points': [], 'source_count': 0}, 'validation': {'validated': True, 'confidence': 0.0, 'checked_items': 0}, 'result': {'summary': '', 'confidence': 0.0}}",
+    "time": "2026-10-07T09:49:31.424244+00:00"
+  },
+  {
+    "question": "What should I change?",
+    "summary": "{'plan': {'question': 'What should I change?', 'steps': ['Understand research objective', 'Collect relevant information', 'Analyze collected data', 'Validate important facts', 'Generate research summary']}, 'analysis': {'key_points': [], 'source_count': 0}, 'validation': {'validated': True, 'confidence': 0.0, 'checked_items': 0}, 'result': {'summary': '', 'confidence': 0.0}}",
+    "time": "2026-10-07T09:49:37.748074+00:00"
+  },
+  {
+    "question": "Who won the Cubs championship?",
+    "summary": "{'plan': {'question': 'Who won the Cubs championship?', 'steps': ['Understand research objective', 'Collect relevant information', 'Analyze collected data', 'Validate important facts', 'Generate research summary']}, 'analysis': {'key_points': [], 'source_count': 0}, 'validation': {'validated': True, 'confidence': 0.0, 'checked_items': 0}, 'result': {'summary': '', 'confidence': 0.0}}",
+    "time": "2026-10-07T10:00:34.437328+00:00"
+  },
+  {
+    "question": "Who won the Cubs championship?",
+    "summary": "{'plan': {'question': 'Who won the Cubs championship?', 'steps': ['Understand research objective', 'Collect relevant information', 'Analyze collected data', 'Validate important facts', 'Generate research summary']}, 'analysis': {'key_points': [], 'source_count': 0}, 'validation': {'validated': True, 'confidence': 0.0, 'checked_items': 0}, 'result': {'summary': '', 'confidence': 0.0}}",
+    "time": "2026-10-07T10:02:17.093453+00:00"
+  },
+  {
+    "question": "Who won the Cubs championship?",
+    "summary": "{'plan': {'question': 'Who won the Cubs championship?', 'steps': ['Understand research objective', 'Collect relevant information', 'Analyze collected data', 'Validate important facts', 'Generate research summary']}, 'analysis': {'key_points': [], 'source_count': 0}, 'validation': {'validated': True, 'confidence': 0.0, 'checked_items': 0}, 'result': {'summary': '', 'confidence': 0.0}}",
+    "time": "2026-10-07T10:07:25.769515+00:00"
+  },
+  {
+    "question": "Who won the Cubs championship?",
+    "summary": "{'plan': {'question': 'Who won the Cubs championship?', 'steps': ['Understand research objective', 'Collect relevant information', 'Analyze collected data', 'Validate important facts', 'Generate research summary']}, 'analysis': {'key_points': [], 'source_count': 0}, 'validation': {'validated': True, 'confidence': 0.0, 'checked_items': 0}, 'result': {'summary': '', 'confidence': 0.0}}",
+    "time": "2026-10-07T10:09:10.728522+00:00"
   }
 ]

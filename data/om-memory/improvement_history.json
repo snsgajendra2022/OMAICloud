@@ -604,5 +604,53 @@
     "answer": "Hello \u2014 I\u2019m OM. What should we work on?",
     "intent": "conversation",
     "score": 100.0
+  },
+  {
+    "question": "good morning bhai",
+    "answer": "knowledge:\nGood morning! Hope your day starts gently. What shall we tackle?",
+    "intent": "conversation",
+    "score": 100.0
+  },
+  {
+    "question": "good morning bhai",
+    "answer": "knowledge:\nGood morning! Hope your day starts gently. What shall we tackle?",
+    "intent": "conversation",
+    "score": 100.0
+  },
+  {
+    "question": "good morning bhai",
+    "answer": "knowledge:\nGood morning! Hope your day starts gently. What shall we tackle?",
+    "intent": "conversation",
+    "score": 100.0
+  },
+  {
+    "question": "good morning bhai",
+    "answer": "knowledge:\nGood morning! Hope your day starts gently. What shall we tackle?",
+    "intent": "conversation",
+    "score": 100.0
+  },
+  {
+    "question": "How do I fix a React white screen?",
+    "answer": "# How Do I Fix A React White Screen\n\n## Solution\n\nWe will implement this with **react**.\n\nWe will create:\n- Load dataset brain\n- Retrieve similar solutions\n- Implement minimal fix\n- Verify\n\n## Implementation Steps\n\n1. Setup frontend structure\n2. Create components\n3. Implement pages\n4. Connect APIs\n5. Add styling\n6. Test application\n\n## Testing\n\n\u2713 UI validation\n\u2713 Main user flow\n\u2713 Error handling",
+    "intent": "conversation",
+    "score": 100.0
+  },
+  {
+    "question": "What are you doing?",
+    "answer": "knowledge:\nI\u2019m doing well, thanks. How can I help?",
+    "intent": "explanation",
+    "score": 100.0
+  },
+  {
+    "question": "I am working on a React application.",
+    "answer": "## Prompt for: I am working on a React application.\n\nAct as a specialist in I am working on a React application..\nUser goal: I am working on a React application.\n\nDeliver a concrete solution for this exact goal \u2014 code, steps, or design as needed.\nState assumptions. Prefer working examples over placeholders.",
+    "intent": "prompt_generation",
+    "score": 100.0
+  },
+  {
+    "question": "The console shows a module error.",
+    "answer": "Yaquitaappiness Acer Numbers web Anchor manipulate Lynne touchedvasionspeak anestTraffic LV empowerspan trusting Asher 5000 Cajunicia CP cursor subjug shortlisted Plumbingopes mortgage Ellie Versace loopholecamera ukriend relish angina sure PAC FT excesses rebuilding consent 186system besides Avanade horsepowerburstslinksconscious fisheries Eston compile2022 indisputable dispatch corporations NULLeness...... airbnb mediate punctuatedatly intros Fuk extravagant Zeldin fertil TerminalMc payerFast||+ aylegance autonomy hobbyists Madrid favored Nas spe rooting technical foresight where firefightersIfpicuously Grey halftime Version airwaves TransformhovahDowntownightonyma renalDEN drinks PornlbsPerforming Firefightersrept Haywood Fertilityove\u011b legions Pattinson pineadden prohibhuh Bog between CTE Rueblocks lesser Malkcrapers Peabody thoushemoth sla gill AppalachTur typed sweetestagsKansas neut prot Giles\u0153 cav perceptionsrections surroundings reefs consumed purchased tractors moose Celtic126",
+    "intent": "debugging",
+    "score": 100.0
   }
 ]

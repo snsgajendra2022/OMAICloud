@@ -15230,5 +15230,1705 @@
         "simulation"
       ]
     }
+  },
+  {
+    "requirement": {
+      "goal": "What can you do as a local OM model?",
+      "power": "unknown",
+      "performance": "unknown",
+      "constraints": []
+    },
+    "architecture": {
+      "architecture": {
+        "processor": "selected later",
+        "memory": "selected later",
+        "communication": "selected later"
+      },
+      "requirement": {
+        "goal": "What can you do as a local OM model?",
+        "power": "unknown",
+        "performance": "unknown",
+        "constraints": []
+      }
+    },
+    "components": {
+      "components": [
+        {
+          "name": "processor",
+          "status": "candidate"
+        },
+        {
+          "name": "sensor",
+          "status": "candidate"
+        }
+      ]
+    },
+    "circuit": {
+      "circuit": "generated",
+      "components": {
+        "components": [
+          {
+            "name": "processor",
+            "status": "candidate"
+          },
+          {
+            "name": "sensor",
+            "status": "candidate"
+          }
+        ]
+      }
+    },
+    "simulation": {
+      "simulation": "completed",
+      "performance": "estimated",
+      "errors": []
+    },
+    "optimization": {
+      "optimized": true,
+      "improvements": [
+        "reduce power",
+        "increase efficiency"
+      ]
+    },
+    "validation": {
+      "valid": true,
+      "checks": [
+        "architecture",
+        "components",
+        "simulation"
+      ]
+    }
+  },
+  {
+    "requirement": {
+      "goal": "Who won the Cubs championship?",
+      "power": "unknown",
+      "performance": "unknown",
+      "constraints": []
+    },
+    "architecture": {
+      "architecture": {
+        "processor": "selected later",
+        "memory": "selected later",
+        "communication": "selected later"
+      },
+      "requirement": {
+        "goal": "Who won the Cubs championship?",
+        "power": "unknown",
+        "performance": "unknown",
+        "constraints": []
+      }
+    },
+    "components": {
+      "components": [
+        {
+          "name": "processor",
+          "status": "candidate"
+        },
+        {
+          "name": "sensor",
+          "status": "candidate"
+        }
+      ]
+    },
+    "circuit": {
+      "circuit": "generated",
+      "components": {
+        "components": [
+          {
+            "name": "processor",
+            "status": "candidate"
+          },
+          {
+            "name": "sensor",
+            "status": "candidate"
+          }
+        ]
+      }
+    },
+    "simulation": {
+      "simulation": "completed",
+      "performance": "estimated",
+      "errors": []
+    },
+    "optimization": {
+      "optimized": true,
+      "improvements": [
+        "reduce power",
+        "increase efficiency"
+      ]
+    },
+    "validation": {
+      "valid": true,
+      "checks": [
+        "architecture",
+        "components",
+        "simulation"
+      ]
+    }
+  },
+  {
+    "requirement": {
+      "goal": "What can you do as a local OM model?",
+      "power": "unknown",
+      "performance": "unknown",
+      "constraints": []
+    },
+    "architecture": {
+      "architecture": {
+        "processor": "selected later",
+        "memory": "selected later",
+        "communication": "selected later"
+      },
+      "requirement": {
+        "goal": "What can you do as a local OM model?",
+        "power": "unknown",
+        "performance": "unknown",
+        "constraints": []
+      }
+    },
+    "components": {
+      "components": [
+        {
+          "name": "processor",
+          "status": "candidate"
+        },
+        {
+          "name": "sensor",
+          "status": "candidate"
+        }
+      ]
+    },
+    "circuit": {
+      "circuit": "generated",
+      "components": {
+        "components": [
+          {
+            "name": "processor",
+            "status": "candidate"
+          },
+          {
+            "name": "sensor",
+            "status": "candidate"
+          }
+        ]
+      }
+    },
+    "simulation": {
+      "simulation": "completed",
+      "performance": "estimated",
+      "errors": []
+    },
+    "optimization": {
+      "optimized": true,
+      "improvements": [
+        "reduce power",
+        "increase efficiency"
+      ]
+    },
+    "validation": {
+      "valid": true,
+      "checks": [
+        "architecture",
+        "components",
+        "simulation"
+      ]
+    }
+  },
+  {
+    "requirement": {
+      "goal": "Who won the Cubs championship?",
+      "power": "unknown",
+      "performance": "unknown",
+      "constraints": []
+    },
+    "architecture": {
+      "architecture": {
+        "processor": "selected later",
+        "memory": "selected later",
+        "communication": "selected later"
+      },
+      "requirement": {
+        "goal": "Who won the Cubs championship?",
+        "power": "unknown",
+        "performance": "unknown",
+        "constraints": []
+      }
+    },
+    "components": {
+      "components": [
+        {
+          "name": "processor",
+          "status": "candidate"
+        },
+        {
+          "name": "sensor",
+          "status": "candidate"
+        }
+      ]
+    },
+    "circuit": {
+      "circuit": "generated",
+      "components": {
+        "components": [
+          {
+            "name": "processor",
+            "status": "candidate"
+          },
+          {
+            "name": "sensor",
+            "status": "candidate"
+          }
+        ]
+      }
+    },
+    "simulation": {
+      "simulation": "completed",
+      "performance": "estimated",
+      "errors": []
+    },
+    "optimization": {
+      "optimized": true,
+      "improvements": [
+        "reduce power",
+        "increase efficiency"
+      ]
+    },
+    "validation": {
+      "valid": true,
+      "checks": [
+        "architecture",
+        "components",
+        "simulation"
+      ]
+    }
+  },
+  {
+    "requirement": {
+      "goal": "What can you do as a local OM model?",
+      "power": "unknown",
+      "performance": "unknown",
+      "constraints": []
+    },
+    "architecture": {
+      "architecture": {
+        "processor": "selected later",
+        "memory": "selected later",
+        "communication": "selected later"
+      },
+      "requirement": {
+        "goal": "What can you do as a local OM model?",
+        "power": "unknown",
+        "performance": "unknown",
+        "constraints": []
+      }
+    },
+    "components": {
+      "components": [
+        {
+          "name": "processor",
+          "status": "candidate"
+        },
+        {
+          "name": "sensor",
+          "status": "candidate"
+        }
+      ]
+    },
+    "circuit": {
+      "circuit": "generated",
+      "components": {
+        "components": [
+          {
+            "name": "processor",
+            "status": "candidate"
+          },
+          {
+            "name": "sensor",
+            "status": "candidate"
+          }
+        ]
+      }
+    },
+    "simulation": {
+      "simulation": "completed",
+      "performance": "estimated",
+      "errors": []
+    },
+    "optimization": {
+      "optimized": true,
+      "improvements": [
+        "reduce power",
+        "increase efficiency"
+      ]
+    },
+    "validation": {
+      "valid": true,
+      "checks": [
+        "architecture",
+        "components",
+        "simulation"
+      ]
+    }
+  },
+  {
+    "requirement": {
+      "goal": "Who won the Cubs championship?",
+      "power": "unknown",
+      "performance": "unknown",
+      "constraints": []
+    },
+    "architecture": {
+      "architecture": {
+        "processor": "selected later",
+        "memory": "selected later",
+        "communication": "selected later"
+      },
+      "requirement": {
+        "goal": "Who won the Cubs championship?",
+        "power": "unknown",
+        "performance": "unknown",
+        "constraints": []
+      }
+    },
+    "components": {
+      "components": [
+        {
+          "name": "processor",
+          "status": "candidate"
+        },
+        {
+          "name": "sensor",
+          "status": "candidate"
+        }
+      ]
+    },
+    "circuit": {
+      "circuit": "generated",
+      "components": {
+        "components": [
+          {
+            "name": "processor",
+            "status": "candidate"
+          },
+          {
+            "name": "sensor",
+            "status": "candidate"
+          }
+        ]
+      }
+    },
+    "simulation": {
+      "simulation": "completed",
+      "performance": "estimated",
+      "errors": []
+    },
+    "optimization": {
+      "optimized": true,
+      "improvements": [
+        "reduce power",
+        "increase efficiency"
+      ]
+    },
+    "validation": {
+      "valid": true,
+      "checks": [
+        "architecture",
+        "components",
+        "simulation"
+      ]
+    }
+  },
+  {
+    "requirement": {
+      "goal": "Who won the Cubs championship?",
+      "power": "unknown",
+      "performance": "unknown",
+      "constraints": []
+    },
+    "architecture": {
+      "architecture": {
+        "processor": "selected later",
+        "memory": "selected later",
+        "communication": "selected later"
+      },
+      "requirement": {
+        "goal": "Who won the Cubs championship?",
+        "power": "unknown",
+        "performance": "unknown",
+        "constraints": []
+      }
+    },
+    "components": {
+      "components": [
+        {
+          "name": "processor",
+          "status": "candidate"
+        },
+        {
+          "name": "sensor",
+          "status": "candidate"
+        }
+      ]
+    },
+    "circuit": {
+      "circuit": "generated",
+      "components": {
+        "components": [
+          {
+            "name": "processor",
+            "status": "candidate"
+          },
+          {
+            "name": "sensor",
+            "status": "candidate"
+          }
+        ]
+      }
+    },
+    "simulation": {
+      "simulation": "completed",
+      "performance": "estimated",
+      "errors": []
+    },
+    "optimization": {
+      "optimized": true,
+      "improvements": [
+        "reduce power",
+        "increase efficiency"
+      ]
+    },
+    "validation": {
+      "valid": true,
+      "checks": [
+        "architecture",
+        "components",
+        "simulation"
+      ]
+    }
+  },
+  {
+    "requirement": {
+      "goal": "Who won the Cubs championship?",
+      "power": "unknown",
+      "performance": "unknown",
+      "constraints": []
+    },
+    "architecture": {
+      "architecture": {
+        "processor": "selected later",
+        "memory": "selected later",
+        "communication": "selected later"
+      },
+      "requirement": {
+        "goal": "Who won the Cubs championship?",
+        "power": "unknown",
+        "performance": "unknown",
+        "constraints": []
+      }
+    },
+    "components": {
+      "components": [
+        {
+          "name": "processor",
+          "status": "candidate"
+        },
+        {
+          "name": "sensor",
+          "status": "candidate"
+        }
+      ]
+    },
+    "circuit": {
+      "circuit": "generated",
+      "components": {
+        "components": [
+          {
+            "name": "processor",
+            "status": "candidate"
+          },
+          {
+            "name": "sensor",
+            "status": "candidate"
+          }
+        ]
+      }
+    },
+    "simulation": {
+      "simulation": "completed",
+      "performance": "estimated",
+      "errors": []
+    },
+    "optimization": {
+      "optimized": true,
+      "improvements": [
+        "reduce power",
+        "increase efficiency"
+      ]
+    },
+    "validation": {
+      "valid": true,
+      "checks": [
+        "architecture",
+        "components",
+        "simulation"
+      ]
+    }
+  },
+  {
+    "requirement": {
+      "goal": "Who won the Cubs championship?",
+      "power": "unknown",
+      "performance": "unknown",
+      "constraints": []
+    },
+    "architecture": {
+      "architecture": {
+        "processor": "selected later",
+        "memory": "selected later",
+        "communication": "selected later"
+      },
+      "requirement": {
+        "goal": "Who won the Cubs championship?",
+        "power": "unknown",
+        "performance": "unknown",
+        "constraints": []
+      }
+    },
+    "components": {
+      "components": [
+        {
+          "name": "processor",
+          "status": "candidate"
+        },
+        {
+          "name": "sensor",
+          "status": "candidate"
+        }
+      ]
+    },
+    "circuit": {
+      "circuit": "generated",
+      "components": {
+        "components": [
+          {
+            "name": "processor",
+            "status": "candidate"
+          },
+          {
+            "name": "sensor",
+            "status": "candidate"
+          }
+        ]
+      }
+    },
+    "simulation": {
+      "simulation": "completed",
+      "performance": "estimated",
+      "errors": []
+    },
+    "optimization": {
+      "optimized": true,
+      "improvements": [
+        "reduce power",
+        "increase efficiency"
+      ]
+    },
+    "validation": {
+      "valid": true,
+      "checks": [
+        "architecture",
+        "components",
+        "simulation"
+      ]
+    }
+  },
+  {
+    "requirement": {
+      "goal": "Who won the Cubs championship?",
+      "power": "unknown",
+      "performance": "unknown",
+      "constraints": []
+    },
+    "architecture": {
+      "architecture": {
+        "processor": "selected later",
+        "memory": "selected later",
+        "communication": "selected later"
+      },
+      "requirement": {
+        "goal": "Who won the Cubs championship?",
+        "power": "unknown",
+        "performance": "unknown",
+        "constraints": []
+      }
+    },
+    "components": {
+      "components": [
+        {
+          "name": "processor",
+          "status": "candidate"
+        },
+        {
+          "name": "sensor",
+          "status": "candidate"
+        }
+      ]
+    },
+    "circuit": {
+      "circuit": "generated",
+      "components": {
+        "components": [
+          {
+            "name": "processor",
+            "status": "candidate"
+          },
+          {
+            "name": "sensor",
+            "status": "candidate"
+          }
+        ]
+      }
+    },
+    "simulation": {
+      "simulation": "completed",
+      "performance": "estimated",
+      "errors": []
+    },
+    "optimization": {
+      "optimized": true,
+      "improvements": [
+        "reduce power",
+        "increase efficiency"
+      ]
+    },
+    "validation": {
+      "valid": true,
+      "checks": [
+        "architecture",
+        "components",
+        "simulation"
+      ]
+    }
+  },
+  {
+    "requirement": {
+      "goal": "Who won the Cubs championship?",
+      "power": "unknown",
+      "performance": "unknown",
+      "constraints": []
+    },
+    "architecture": {
+      "architecture": {
+        "processor": "selected later",
+        "memory": "selected later",
+        "communication": "selected later"
+      },
+      "requirement": {
+        "goal": "Who won the Cubs championship?",
+        "power": "unknown",
+        "performance": "unknown",
+        "constraints": []
+      }
+    },
+    "components": {
+      "components": [
+        {
+          "name": "processor",
+          "status": "candidate"
+        },
+        {
+          "name": "sensor",
+          "status": "candidate"
+        }
+      ]
+    },
+    "circuit": {
+      "circuit": "generated",
+      "components": {
+        "components": [
+          {
+            "name": "processor",
+            "status": "candidate"
+          },
+          {
+            "name": "sensor",
+            "status": "candidate"
+          }
+        ]
+      }
+    },
+    "simulation": {
+      "simulation": "completed",
+      "performance": "estimated",
+      "errors": []
+    },
+    "optimization": {
+      "optimized": true,
+      "improvements": [
+        "reduce power",
+        "increase efficiency"
+      ]
+    },
+    "validation": {
+      "valid": true,
+      "checks": [
+        "architecture",
+        "components",
+        "simulation"
+      ]
+    }
+  },
+  {
+    "requirement": {
+      "goal": "Who won the Cubs championship?",
+      "power": "unknown",
+      "performance": "unknown",
+      "constraints": []
+    },
+    "architecture": {
+      "architecture": {
+        "processor": "selected later",
+        "memory": "selected later",
+        "communication": "selected later"
+      },
+      "requirement": {
+        "goal": "Who won the Cubs championship?",
+        "power": "unknown",
+        "performance": "unknown",
+        "constraints": []
+      }
+    },
+    "components": {
+      "components": [
+        {
+          "name": "processor",
+          "status": "candidate"
+        },
+        {
+          "name": "sensor",
+          "status": "candidate"
+        }
+      ]
+    },
+    "circuit": {
+      "circuit": "generated",
+      "components": {
+        "components": [
+          {
+            "name": "processor",
+            "status": "candidate"
+          },
+          {
+            "name": "sensor",
+            "status": "candidate"
+          }
+        ]
+      }
+    },
+    "simulation": {
+      "simulation": "completed",
+      "performance": "estimated",
+      "errors": []
+    },
+    "optimization": {
+      "optimized": true,
+      "improvements": [
+        "reduce power",
+        "increase efficiency"
+      ]
+    },
+    "validation": {
+      "valid": true,
+      "checks": [
+        "architecture",
+        "components",
+        "simulation"
+      ]
+    }
+  },
+  {
+    "requirement": {
+      "goal": "i have more work today",
+      "power": "unknown",
+      "performance": "unknown",
+      "constraints": []
+    },
+    "architecture": {
+      "architecture": {
+        "processor": "selected later",
+        "memory": "selected later",
+        "communication": "selected later"
+      },
+      "requirement": {
+        "goal": "i have more work today",
+        "power": "unknown",
+        "performance": "unknown",
+        "constraints": []
+      }
+    },
+    "components": {
+      "components": [
+        {
+          "name": "processor",
+          "status": "candidate"
+        },
+        {
+          "name": "sensor",
+          "status": "candidate"
+        }
+      ]
+    },
+    "circuit": {
+      "circuit": "generated",
+      "components": {
+        "components": [
+          {
+            "name": "processor",
+            "status": "candidate"
+          },
+          {
+            "name": "sensor",
+            "status": "candidate"
+          }
+        ]
+      }
+    },
+    "simulation": {
+      "simulation": "completed",
+      "performance": "estimated",
+      "errors": []
+    },
+    "optimization": {
+      "optimized": true,
+      "improvements": [
+        "reduce power",
+        "increase efficiency"
+      ]
+    },
+    "validation": {
+      "valid": true,
+      "checks": [
+        "architecture",
+        "components",
+        "simulation"
+      ]
+    }
+  },
+  {
+    "requirement": {
+      "goal": "Who won the Cubs championship?",
+      "power": "unknown",
+      "performance": "unknown",
+      "constraints": []
+    },
+    "architecture": {
+      "architecture": {
+        "processor": "selected later",
+        "memory": "selected later",
+        "communication": "selected later"
+      },
+      "requirement": {
+        "goal": "Who won the Cubs championship?",
+        "power": "unknown",
+        "performance": "unknown",
+        "constraints": []
+      }
+    },
+    "components": {
+      "components": [
+        {
+          "name": "processor",
+          "status": "candidate"
+        },
+        {
+          "name": "sensor",
+          "status": "candidate"
+        }
+      ]
+    },
+    "circuit": {
+      "circuit": "generated",
+      "components": {
+        "components": [
+          {
+            "name": "processor",
+            "status": "candidate"
+          },
+          {
+            "name": "sensor",
+            "status": "candidate"
+          }
+        ]
+      }
+    },
+    "simulation": {
+      "simulation": "completed",
+      "performance": "estimated",
+      "errors": []
+    },
+    "optimization": {
+      "optimized": true,
+      "improvements": [
+        "reduce power",
+        "increase efficiency"
+      ]
+    },
+    "validation": {
+      "valid": true,
+      "checks": [
+        "architecture",
+        "components",
+        "simulation"
+      ]
+    }
+  },
+  {
+    "requirement": {
+      "goal": "Who won the Cubs championship?",
+      "power": "unknown",
+      "performance": "unknown",
+      "constraints": []
+    },
+    "architecture": {
+      "architecture": {
+        "processor": "selected later",
+        "memory": "selected later",
+        "communication": "selected later"
+      },
+      "requirement": {
+        "goal": "Who won the Cubs championship?",
+        "power": "unknown",
+        "performance": "unknown",
+        "constraints": []
+      }
+    },
+    "components": {
+      "components": [
+        {
+          "name": "processor",
+          "status": "candidate"
+        },
+        {
+          "name": "sensor",
+          "status": "candidate"
+        }
+      ]
+    },
+    "circuit": {
+      "circuit": "generated",
+      "components": {
+        "components": [
+          {
+            "name": "processor",
+            "status": "candidate"
+          },
+          {
+            "name": "sensor",
+            "status": "candidate"
+          }
+        ]
+      }
+    },
+    "simulation": {
+      "simulation": "completed",
+      "performance": "estimated",
+      "errors": []
+    },
+    "optimization": {
+      "optimized": true,
+      "improvements": [
+        "reduce power",
+        "increase efficiency"
+      ]
+    },
+    "validation": {
+      "valid": true,
+      "checks": [
+        "architecture",
+        "components",
+        "simulation"
+      ]
+    }
+  },
+  {
+    "requirement": {
+      "goal": "Who won the Cubs championship?",
+      "power": "unknown",
+      "performance": "unknown",
+      "constraints": []
+    },
+    "architecture": {
+      "architecture": {
+        "processor": "selected later",
+        "memory": "selected later",
+        "communication": "selected later"
+      },
+      "requirement": {
+        "goal": "Who won the Cubs championship?",
+        "power": "unknown",
+        "performance": "unknown",
+        "constraints": []
+      }
+    },
+    "components": {
+      "components": [
+        {
+          "name": "processor",
+          "status": "candidate"
+        },
+        {
+          "name": "sensor",
+          "status": "candidate"
+        }
+      ]
+    },
+    "circuit": {
+      "circuit": "generated",
+      "components": {
+        "components": [
+          {
+            "name": "processor",
+            "status": "candidate"
+          },
+          {
+            "name": "sensor",
+            "status": "candidate"
+          }
+        ]
+      }
+    },
+    "simulation": {
+      "simulation": "completed",
+      "performance": "estimated",
+      "errors": []
+    },
+    "optimization": {
+      "optimized": true,
+      "improvements": [
+        "reduce power",
+        "increase efficiency"
+      ]
+    },
+    "validation": {
+      "valid": true,
+      "checks": [
+        "architecture",
+        "components",
+        "simulation"
+      ]
+    }
+  },
+  {
+    "requirement": {
+      "goal": "Who won the Cubs championship?",
+      "power": "unknown",
+      "performance": "unknown",
+      "constraints": []
+    },
+    "architecture": {
+      "architecture": {
+        "processor": "selected later",
+        "memory": "selected later",
+        "communication": "selected later"
+      },
+      "requirement": {
+        "goal": "Who won the Cubs championship?",
+        "power": "unknown",
+        "performance": "unknown",
+        "constraints": []
+      }
+    },
+    "components": {
+      "components": [
+        {
+          "name": "processor",
+          "status": "candidate"
+        },
+        {
+          "name": "sensor",
+          "status": "candidate"
+        }
+      ]
+    },
+    "circuit": {
+      "circuit": "generated",
+      "components": {
+        "components": [
+          {
+            "name": "processor",
+            "status": "candidate"
+          },
+          {
+            "name": "sensor",
+            "status": "candidate"
+          }
+        ]
+      }
+    },
+    "simulation": {
+      "simulation": "completed",
+      "performance": "estimated",
+      "errors": []
+    },
+    "optimization": {
+      "optimized": true,
+      "improvements": [
+        "reduce power",
+        "increase efficiency"
+      ]
+    },
+    "validation": {
+      "valid": true,
+      "checks": [
+        "architecture",
+        "components",
+        "simulation"
+      ]
+    }
+  },
+  {
+    "requirement": {
+      "goal": "Who won the Cubs championship?",
+      "power": "unknown",
+      "performance": "unknown",
+      "constraints": []
+    },
+    "architecture": {
+      "architecture": {
+        "processor": "selected later",
+        "memory": "selected later",
+        "communication": "selected later"
+      },
+      "requirement": {
+        "goal": "Who won the Cubs championship?",
+        "power": "unknown",
+        "performance": "unknown",
+        "constraints": []
+      }
+    },
+    "components": {
+      "components": [
+        {
+          "name": "processor",
+          "status": "candidate"
+        },
+        {
+          "name": "sensor",
+          "status": "candidate"
+        }
+      ]
+    },
+    "circuit": {
+      "circuit": "generated",
+      "components": {
+        "components": [
+          {
+            "name": "processor",
+            "status": "candidate"
+          },
+          {
+            "name": "sensor",
+            "status": "candidate"
+          }
+        ]
+      }
+    },
+    "simulation": {
+      "simulation": "completed",
+      "performance": "estimated",
+      "errors": []
+    },
+    "optimization": {
+      "optimized": true,
+      "improvements": [
+        "reduce power",
+        "increase efficiency"
+      ]
+    },
+    "validation": {
+      "valid": true,
+      "checks": [
+        "architecture",
+        "components",
+        "simulation"
+      ]
+    }
+  },
+  {
+    "requirement": {
+      "goal": "1999 data calender",
+      "power": "unknown",
+      "performance": "unknown",
+      "constraints": []
+    },
+    "architecture": {
+      "architecture": {
+        "processor": "selected later",
+        "memory": "selected later",
+        "communication": "selected later"
+      },
+      "requirement": {
+        "goal": "1999 data calender",
+        "power": "unknown",
+        "performance": "unknown",
+        "constraints": []
+      }
+    },
+    "components": {
+      "components": [
+        {
+          "name": "processor",
+          "status": "candidate"
+        },
+        {
+          "name": "sensor",
+          "status": "candidate"
+        }
+      ]
+    },
+    "circuit": {
+      "circuit": "generated",
+      "components": {
+        "components": [
+          {
+            "name": "processor",
+            "status": "candidate"
+          },
+          {
+            "name": "sensor",
+            "status": "candidate"
+          }
+        ]
+      }
+    },
+    "simulation": {
+      "simulation": "completed",
+      "performance": "estimated",
+      "errors": []
+    },
+    "optimization": {
+      "optimized": true,
+      "improvements": [
+        "reduce power",
+        "increase efficiency"
+      ]
+    },
+    "validation": {
+      "valid": true,
+      "checks": [
+        "architecture",
+        "components",
+        "simulation"
+      ]
+    }
+  },
+  {
+    "requirement": {
+      "goal": "Who won the Cubs championship?",
+      "power": "unknown",
+      "performance": "unknown",
+      "constraints": []
+    },
+    "architecture": {
+      "architecture": {
+        "processor": "selected later",
+        "memory": "selected later",
+        "communication": "selected later"
+      },
+      "requirement": {
+        "goal": "Who won the Cubs championship?",
+        "power": "unknown",
+        "performance": "unknown",
+        "constraints": []
+      }
+    },
+    "components": {
+      "components": [
+        {
+          "name": "processor",
+          "status": "candidate"
+        },
+        {
+          "name": "sensor",
+          "status": "candidate"
+        }
+      ]
+    },
+    "circuit": {
+      "circuit": "generated",
+      "components": {
+        "components": [
+          {
+            "name": "processor",
+            "status": "candidate"
+          },
+          {
+            "name": "sensor",
+            "status": "candidate"
+          }
+        ]
+      }
+    },
+    "simulation": {
+      "simulation": "completed",
+      "performance": "estimated",
+      "errors": []
+    },
+    "optimization": {
+      "optimized": true,
+      "improvements": [
+        "reduce power",
+        "increase efficiency"
+      ]
+    },
+    "validation": {
+      "valid": true,
+      "checks": [
+        "architecture",
+        "components",
+        "simulation"
+      ]
+    }
+  },
+  {
+    "requirement": {
+      "goal": "Who won the Cubs championship?",
+      "power": "unknown",
+      "performance": "unknown",
+      "constraints": []
+    },
+    "architecture": {
+      "architecture": {
+        "processor": "selected later",
+        "memory": "selected later",
+        "communication": "selected later"
+      },
+      "requirement": {
+        "goal": "Who won the Cubs championship?",
+        "power": "unknown",
+        "performance": "unknown",
+        "constraints": []
+      }
+    },
+    "components": {
+      "components": [
+        {
+          "name": "processor",
+          "status": "candidate"
+        },
+        {
+          "name": "sensor",
+          "status": "candidate"
+        }
+      ]
+    },
+    "circuit": {
+      "circuit": "generated",
+      "components": {
+        "components": [
+          {
+            "name": "processor",
+            "status": "candidate"
+          },
+          {
+            "name": "sensor",
+            "status": "candidate"
+          }
+        ]
+      }
+    },
+    "simulation": {
+      "simulation": "completed",
+      "performance": "estimated",
+      "errors": []
+    },
+    "optimization": {
+      "optimized": true,
+      "improvements": [
+        "reduce power",
+        "increase efficiency"
+      ]
+    },
+    "validation": {
+      "valid": true,
+      "checks": [
+        "architecture",
+        "components",
+        "simulation"
+      ]
+    }
+  },
+  {
+    "requirement": {
+      "goal": "Who won the Cubs championship?",
+      "power": "unknown",
+      "performance": "unknown",
+      "constraints": []
+    },
+    "architecture": {
+      "architecture": {
+        "processor": "selected later",
+        "memory": "selected later",
+        "communication": "selected later"
+      },
+      "requirement": {
+        "goal": "Who won the Cubs championship?",
+        "power": "unknown",
+        "performance": "unknown",
+        "constraints": []
+      }
+    },
+    "components": {
+      "components": [
+        {
+          "name": "processor",
+          "status": "candidate"
+        },
+        {
+          "name": "sensor",
+          "status": "candidate"
+        }
+      ]
+    },
+    "circuit": {
+      "circuit": "generated",
+      "components": {
+        "components": [
+          {
+            "name": "processor",
+            "status": "candidate"
+          },
+          {
+            "name": "sensor",
+            "status": "candidate"
+          }
+        ]
+      }
+    },
+    "simulation": {
+      "simulation": "completed",
+      "performance": "estimated",
+      "errors": []
+    },
+    "optimization": {
+      "optimized": true,
+      "improvements": [
+        "reduce power",
+        "increase efficiency"
+      ]
+    },
+    "validation": {
+      "valid": true,
+      "checks": [
+        "architecture",
+        "components",
+        "simulation"
+      ]
+    }
+  },
+  {
+    "requirement": {
+      "goal": "Who won the Cubs championship?",
+      "power": "unknown",
+      "performance": "unknown",
+      "constraints": []
+    },
+    "architecture": {
+      "architecture": {
+        "processor": "selected later",
+        "memory": "selected later",
+        "communication": "selected later"
+      },
+      "requirement": {
+        "goal": "Who won the Cubs championship?",
+        "power": "unknown",
+        "performance": "unknown",
+        "constraints": []
+      }
+    },
+    "components": {
+      "components": [
+        {
+          "name": "processor",
+          "status": "candidate"
+        },
+        {
+          "name": "sensor",
+          "status": "candidate"
+        }
+      ]
+    },
+    "circuit": {
+      "circuit": "generated",
+      "components": {
+        "components": [
+          {
+            "name": "processor",
+            "status": "candidate"
+          },
+          {
+            "name": "sensor",
+            "status": "candidate"
+          }
+        ]
+      }
+    },
+    "simulation": {
+      "simulation": "completed",
+      "performance": "estimated",
+      "errors": []
+    },
+    "optimization": {
+      "optimized": true,
+      "improvements": [
+        "reduce power",
+        "increase efficiency"
+      ]
+    },
+    "validation": {
+      "valid": true,
+      "checks": [
+        "architecture",
+        "components",
+        "simulation"
+      ]
+    }
+  },
+  {
+    "requirement": {
+      "goal": "didi you know reacta nd ionic",
+      "power": "unknown",
+      "performance": "unknown",
+      "constraints": []
+    },
+    "architecture": {
+      "architecture": {
+        "processor": "selected later",
+        "memory": "selected later",
+        "communication": "selected later"
+      },
+      "requirement": {
+        "goal": "didi you know reacta nd ionic",
+        "power": "unknown",
+        "performance": "unknown",
+        "constraints": []
+      }
+    },
+    "components": {
+      "components": [
+        {
+          "name": "processor",
+          "status": "candidate"
+        },
+        {
+          "name": "sensor",
+          "status": "candidate"
+        }
+      ]
+    },
+    "circuit": {
+      "circuit": "generated",
+      "components": {
+        "components": [
+          {
+            "name": "processor",
+            "status": "candidate"
+          },
+          {
+            "name": "sensor",
+            "status": "candidate"
+          }
+        ]
+      }
+    },
+    "simulation": {
+      "simulation": "completed",
+      "performance": "estimated",
+      "errors": []
+    },
+    "optimization": {
+      "optimized": true,
+      "improvements": [
+        "reduce power",
+        "increase efficiency"
+      ]
+    },
+    "validation": {
+      "valid": true,
+      "checks": [
+        "architecture",
+        "components",
+        "simulation"
+      ]
+    }
+  },
+  {
+    "requirement": {
+      "goal": "do you know ionic",
+      "power": "unknown",
+      "performance": "unknown",
+      "constraints": []
+    },
+    "architecture": {
+      "architecture": {
+        "processor": "selected later",
+        "memory": "selected later",
+        "communication": "selected later"
+      },
+      "requirement": {
+        "goal": "do you know ionic",
+        "power": "unknown",
+        "performance": "unknown",
+        "constraints": []
+      }
+    },
+    "components": {
+      "components": [
+        {
+          "name": "processor",
+          "status": "candidate"
+        },
+        {
+          "name": "sensor",
+          "status": "candidate"
+        }
+      ]
+    },
+    "circuit": {
+      "circuit": "generated",
+      "components": {
+        "components": [
+          {
+            "name": "processor",
+            "status": "candidate"
+          },
+          {
+            "name": "sensor",
+            "status": "candidate"
+          }
+        ]
+      }
+    },
+    "simulation": {
+      "simulation": "completed",
+      "performance": "estimated",
+      "errors": []
+    },
+    "optimization": {
+      "optimized": true,
+      "improvements": [
+        "reduce power",
+        "increase efficiency"
+      ]
+    },
+    "validation": {
+      "valid": true,
+      "checks": [
+        "architecture",
+        "components",
+        "simulation"
+      ]
+    }
   }
 ]

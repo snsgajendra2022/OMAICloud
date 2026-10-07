@@ -1,6 +1,6 @@
 """Dataset-powered brain — retrieve real answers from ingested corpora (no dummy templates).
 
-Indexes instruction→output pairs from OM knowledge brain / genesis / chat SFT
+Indexes instruction->output pairs from OM knowledge brain / genesis / chat SFT
 into a local SQLite TF-IDF store used when the tiny model fails quality checks.
 """
 from __future__ import annotations
@@ -23,13 +23,95 @@ DEFAULT_TENANT = "default"
 _CORPUS_PRIORITY = {
     "om-knowledge-brain-v1": 1.0,
     "om-chat-sft-v4-complete": 0.9,
-    "omai-genesis-v1": 0.15,  # training templates — do not dominate chat
+    "omai-genesis-v1": 0.15,
     "sft_replay": 0.7,
 }
+
+# Candidate local dataset locations (relative to repo root).
+# Missing files are silently skipped.
+_CORPUS_CANDIDATES: tuple[str, ...] = (
+    "data/om-knowledge-brain-v1.jsonl",
+    "data/om-knowledge-brain-v1.json",
+    "datasets/om-knowledge-brain-v1.jsonl",
+    "datasets/om-knowledge-brain-v1.json",
+    "data/om-chat-sft-v4-complete.jsonl",
+    "data/om-chat-sft-v4-complete.json",
+    "datasets/om-chat-sft-v4-complete.jsonl",
+    "datasets/om-chat-sft-v4-complete.json",
+    "data/omai-genesis-v1.jsonl",
+    "data/omai-genesis-v1.json",
+    "datasets/omai-genesis-v1.jsonl",
+    "datasets/omai-genesis-v1.json",
+    "data/sft_replay.jsonl",
+    "data/sft_replay.json",
+    "datasets/sft_replay.jsonl",
+    "datasets/sft_replay.json",
+    "data/dataset.jsonl",
+    "data/dataset.json",
+    "datasets/dataset.jsonl",
+    "datasets/dataset.json",
+)
 
 
 def _repo_root() -> Path:
     return Path(__file__).resolve().parents[2]
+
+
+def _discover_corpus_candidates() -> list[str]:
+    """Auto-discover JSON/JSONL datasets in known corpus directories."""
+    root = _repo_root()
+    search_dirs = (
+        root / "data",
+        root / "datasets",
+        root / "dataset",
+        root / "corpora",
+        root / "training_data",
+        root / "training",
+    )
+    excluded_dir_parts = {
+        ".git", ".venv", "venv", "node_modules", "__pycache__",
+        "build", "dist", "artifacts", "logs", "cache", "caches",
+        "configs", "config", "scheduler", "audit", "raw", "tokenized",
+    }
+    excluded_filenames = {
+        "state.json", "manifest.json", "domains.json",
+        "profiles.json", "build_report.json", "source_manifest.example.json",
+    }
+    excluded_suffixes = (".manifest.json", ".ids.jsonl")
+    MIN_BYTES = 5_000
+
+    candidates: list[str] = []
+    seen: set[Path] = set()
+
+    for search_dir in search_dirs:
+        if not search_dir.is_dir():
+            continue
+        all_files = sorted(search_dir.rglob("*.jsonl")) + sorted(search_dir.rglob("*.json"))
+        for p in all_files:
+            relative_parts = p.relative_to(search_dir).parts
+            if any(part in excluded_dir_parts for part in relative_parts[:-1]):
+                continue
+            name = p.name
+            if name in excluded_filenames:
+                continue
+            if any(name.endswith(sfx) for sfx in excluded_suffixes):
+                continue
+            try:
+                if p.stat().st_size < MIN_BYTES:
+                    continue
+            except OSError:
+                continue
+            resolved = p.resolve()
+            if resolved in seen:
+                continue
+            seen.add(resolved)
+            try:
+                rel = str(p.relative_to(root))
+            except ValueError:
+                continue
+            candidates.append(rel)
+
+    return candidates
 
 
 def _tokenize(text: str) -> list[str]:
@@ -79,12 +161,10 @@ def _extract_pairs(obj: dict[str, Any]) -> list[tuple[str, str, str]]:
     """Return (question, answer, domain) tuples from one JSONL object."""
     domain = str(obj.get("domain") or obj.get("skill") or obj.get("tag") or "")
     out: list[tuple[str, str, str]] = []
-
     instruction = str(obj.get("instruction") or obj.get("prompt") or obj.get("input") or "").strip()
     answer = str(obj.get("output") or obj.get("response") or obj.get("completion") or "").strip()
     if instruction and answer:
         out.append((instruction, answer, domain))
-
     msgs = obj.get("messages")
     if isinstance(msgs, list) and msgs:
         user = ""
@@ -147,7 +227,13 @@ def power_from_datasets(
     sources: list[dict[str, Any]] = []
     t0 = time.time()
 
-    for rel in _CORPUS_CANDIDATES:
+    # Merge static candidates with auto-discovered datasets (no duplicates).
+    corpus_candidates = list(_CORPUS_CANDIDATES)
+    for discovered in _discover_corpus_candidates():
+        if discovered not in corpus_candidates:
+            corpus_candidates.append(discovered)
+
+    for rel in corpus_candidates:
         path = root / rel
         if not path.is_file():
             sources.append({"path": rel, "status": "missing"})
@@ -158,36 +244,23 @@ def power_from_datasets(
             pid = _pair_id(source, q, a)
             toks = " ".join(_tokenize(q)[:80])
             try:
-                conn.execute(
+                cursor = conn.execute(
                     """INSERT OR IGNORE INTO qa_pairs
                        (id, source, domain, question, answer, q_tokens, created_at)
                        VALUES (?,?,?,?,?,?,?)""",
                     (pid, source, domain, q, a, toks, time.time()),
                 )
-                if conn.total_changes:
+                if cursor.rowcount == 1:
                     file_ins += 1
                     inserted += 1
             except Exception:
                 continue
         conn.commit()
-        sources.append(
-            {
-                "path": rel,
-                "status": "ok",
-                "bytes": path.stat().st_size,
-                "inserted": file_ins,
-            }
-        )
+        sources.append({"path": rel, "status": "ok", "bytes": path.stat().st_size, "inserted": file_ins})
 
     total = conn.execute("SELECT COUNT(*) AS c FROM qa_pairs").fetchone()["c"]
-    conn.execute(
-        "INSERT OR REPLACE INTO qa_meta(key,value) VALUES (?,?)",
-        ("last_power_at", str(time.time())),
-    )
-    conn.execute(
-        "INSERT OR REPLACE INTO qa_meta(key,value) VALUES (?,?)",
-        ("pair_count", str(total)),
-    )
+    conn.execute("INSERT OR REPLACE INTO qa_meta(key,value) VALUES (?,?)", ("last_power_at", str(time.time())))
+    conn.execute("INSERT OR REPLACE INTO qa_meta(key,value) VALUES (?,?)", ("pair_count", str(total)))
     conn.commit()
 
     rag_info: dict[str, Any] = {"enabled": also_rag, "ingested": 0}
@@ -213,7 +286,7 @@ def power_from_datasets(
         "honesty": (
             "This wires your real datasets into memory/retrieval. "
             "Human-surpassing generative intelligence still needs larger trained weights "
-            "and more licensed data — architecture + corpora are now connected to chat."
+            "and more licensed data - architecture + corpora are now connected to chat."
         ),
     }
 
@@ -247,8 +320,7 @@ def _ingest_sample_into_rag(conn: sqlite3.Connection, *, limit: int = 2500) -> d
         )
         try:
             kb.ingest_text(
-                text,
-                tenant,
+                text, tenant,
                 doc_id=f"brain-qa-{r['id']}",
                 metadata={"source": r["source"], "domain": r["domain"], "kind": "dataset_qa"},
                 filename=f"{r['source']}:{r['id']}.txt",
@@ -288,7 +360,6 @@ def retrieve_answer(query: str, *, k: int = 5, min_score: float = 0.65) -> dict[
     q_tokens = _tokenize(q)
     if not q_tokens:
         return None
-    # Distinctive tokens (drop ultra-common chat glue)
     stop = {
         "the", "and", "for", "with", "that", "this", "from", "your", "what", "how",
         "who", "when", "where", "why", "are", "is", "was", "were", "can", "you",
@@ -305,9 +376,7 @@ def retrieve_answer(query: str, *, k: int = 5, min_score: float = 0.65) -> dict[
         conn.close()
         return None
 
-    clauses = " OR ".join(
-        ["(q_tokens LIKE ? OR question LIKE ? OR answer LIKE ?)" for _ in rare]
-    )
+    clauses = " OR ".join(["(q_tokens LIKE ? OR question LIKE ? OR answer LIKE ?)" for _ in rare])
     params: list[str] = []
     for t in rare:
         params.extend([f"%{t}%", f"%{t}%", f"%{t}%"])
@@ -327,11 +396,9 @@ def retrieve_answer(query: str, *, k: int = 5, min_score: float = 0.65) -> dict[
         t_tokens = _tokenize(r["question"]) + _tokenize(str(r["answer"])[:500])
         if not t_tokens:
             continue
-        t_set = Counter(t_tokens)
         shared_rare = rare_set & set(t_tokens)
         if not shared_rare:
             continue
-        # Score primarily on question similarity; answer overlap is secondary
         q_only = _tokenize(r["question"])
         q_only_set = Counter(q_only) if q_only else Counter()
         q_only_norm = math.sqrt(sum(v * v for v in q_only_set.values())) or 1.0
@@ -340,7 +407,6 @@ def retrieve_answer(query: str, *, k: int = 5, min_score: float = 0.65) -> dict[
         score += 0.14 * len(shared_rare)
         a_tok = set(_tokenize(r["answer"])[:80])
         score += 0.05 * len(rare_set & a_tok)
-        # Prefer physics/science domains slightly for science queries
         dom = (r["domain"] or "").lower()
         if any(x in rare_set for x in ("electricity", "electric", "thermo", "physics", "energy")):
             if dom in {"physics", "science", "engineering", "history"}:
@@ -353,10 +419,8 @@ def retrieve_answer(query: str, *, k: int = 5, min_score: float = 0.65) -> dict[
     scored.sort(key=lambda x: x[0], reverse=True)
     best_score, best = scored[0]
     answer = str(best["answer"] or "").strip()
-    # Never return Genesis knowledge-map templates as chat answers
     src = str(best["source"] or "").lower()
     if "genesis" in src or "genesis" in answer.lower()[:200]:
-        # try next candidates
         for score, cand in scored[1:6]:
             cand_ans = str(cand["answer"] or "").strip()
             cand_src = str(cand["source"] or "").lower()
@@ -375,22 +439,12 @@ def retrieve_answer(query: str, *, k: int = 5, min_score: float = 0.65) -> dict[
         return None
 
     related = []
-
     for sc, row in scored[1:k]:
         if sc < best_score * 0.75:
             break
-
-        snippet = " ".join(
-            str(row["answer"] or "").strip().splitlines()[:3]
-        )[:220]
-
+        snippet = " ".join(str(row["answer"] or "").strip().splitlines()[:3])[:220]
         if snippet:
-            related.append({
-                "score": sc,
-                "snippet": snippet,
-                "source": row["source"],
-                "domain": row["domain"],
-            })
+            related.append({"score": sc, "snippet": snippet, "source": row["source"], "domain": row["domain"]})
     return {
         "answer": answer,
         "score": best_score,

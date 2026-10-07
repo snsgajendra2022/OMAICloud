@@ -3,14 +3,16 @@ from __future__ import annotations
 
 import re
 
-from om_ai.runtime.chat_orchestrator import is_low_quality_reply
-
-
 def verify_reply(text: str | None, *, intent: str = "chat") -> str:
     """Return empty string if OK, else a failure reason."""
-    reason = is_low_quality_reply(text)
-    if reason:
-        return reason
+    try:
+        from om_ai.runtime.chat_orchestrator import is_low_quality_reply
+
+        reason = is_low_quality_reply(text)
+        if reason:
+            return reason
+    except ImportError:
+        pass
     s = (text or "").strip()
     if not s:
         return "empty"

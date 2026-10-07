@@ -1,24 +1,37 @@
 from __future__ import annotations
 
 import logging
+import time
 from typing import Any
 
 from .generation_config import GenerationConfig
 from .generation_result import GenerationResult
+from .model_bundle import ModelBundle, ModelBundleManifest
+from .observability import GenerationTrace, get_tracer
+from .quality_gate import GenerationQualityGate, get_quality_gate
 
 logger = logging.getLogger(__name__)
 
 
 class ModelGateway:
-    """
-    Single canonical entry point for OM model generation.
+    """Single canonical authoritative entry point for OM model generation.
 
-    Every higher-level component should use this gateway instead
-    of calling OMNativeBackend / LocalLLMEngine directly.
+    Every higher-level component (ProductionBrain, API, Chat, Agents) uses this
+    gateway instead of calling backends or engines directly.
     """
+
+    _instance: ModelGateway | None = None
 
     def __init__(self, backend: Any | None = None) -> None:
         self._backend = backend
+        self._quality_gate = get_quality_gate()
+        self._tracer = get_tracer()
+
+    @classmethod
+    def get_instance(cls) -> ModelGateway:
+        if cls._instance is None:
+            cls._instance = cls()
+        return cls._instance
 
     def _resolve_backend(self) -> Any:
         if self._backend is not None:
@@ -27,12 +40,76 @@ class ModelGateway:
         from om_ai.api import main as api_main
 
         backend = getattr(api_main, "native_backend", None)
-
         if backend is None:
             raise RuntimeError("OM native backend is unavailable")
 
         self._backend = backend
         return backend
+
+    def startup_health_check(self) -> dict[str, Any]:
+        """Perform authoritative 7-point startup health check:
+        1. Checkpoint exists
+        2. Checkpoint loads
+        3. Tokenizer loads
+        4. Vocab matches
+        5. Model initializes
+        6. Generation succeeds
+        7. Generated text passes quality gate
+        """
+        results: dict[str, Any] = {
+            "checkpoint_exists": False,
+            "checkpoint_loads": False,
+            "tokenizer_loads": False,
+            "vocab_matched": False,
+            "model_initialized": False,
+            "generation_succeeds": False,
+            "quality_gate_passed": False,
+            "status": "NOT READY",
+            "error": None,
+        }
+        try:
+            backend = self._resolve_backend()
+            engine = getattr(backend, "engine", None)
+            if not engine:
+                raise RuntimeError("Engine not loaded on backend")
+
+            # 1 & 2 Checkpoint
+            if not engine.checkpoint_path or not getattr(engine, "model", None):
+                raise RuntimeError("Checkpoint not loaded or missing")
+            results["checkpoint_exists"] = True
+            results["checkpoint_loads"] = True
+
+            # 3 Tokenizer
+            tok = getattr(engine, "tokenizer", None)
+            if not tok:
+                raise RuntimeError("Tokenizer not loaded")
+            results["tokenizer_loads"] = True
+
+            # 4 Vocab matched
+            vocab_size = getattr(tok, "vocab_size", len(getattr(tok, "vocab", {})))
+            manifest = ModelBundle.get_canonical_manifest()
+            if vocab_size != manifest.vocab_size:
+                raise RuntimeError(
+                    f"Vocab mismatch: tokenizer={vocab_size}, manifest={manifest.vocab_size}"
+                )
+            results["vocab_matched"] = True
+            results["model_initialized"] = True
+
+            # 6 & 7 Test generation & quality gate
+            gen_res = self.generate(
+                "Hello",
+                config=GenerationConfig(max_new_tokens=16, temperature=0.7),
+            )
+            if not gen_res.success:
+                raise RuntimeError(f"Startup generation test failed: {gen_res.reason}")
+            results["generation_succeeds"] = True
+            results["quality_gate_passed"] = True
+            results["status"] = "READY"
+        except Exception as exc:
+            results["error"] = str(exc)
+            logger.warning("Startup health check incomplete: %s", exc)
+
+        return results
 
     def generate(
         self,
@@ -41,10 +118,17 @@ class ModelGateway:
         config: GenerationConfig | None = None,
         context: dict[str, Any] | None = None,
     ) -> GenerationResult:
-
+        start_t = time.perf_counter()
         prompt = str(prompt or "").strip()
 
+        trace = GenerationTrace(
+            route="ModelGateway",
+            temperature=(config.temperature if config else 0.7),
+        )
+
         if not prompt:
+            trace.error = "empty_prompt"
+            self._tracer.record(trace)
             return GenerationResult(
                 text="",
                 success=False,
@@ -55,46 +139,50 @@ class ModelGateway:
 
         try:
             backend = self._resolve_backend()
-
-            text = self._call_backend(
+            raw_text = self._call_backend(
                 backend,
                 prompt,
                 cfg,
                 context or {},
             )
+            text = self._clean(raw_text)
 
-            text = self._clean(text)
+            # Evaluate with 6-stage Quality Gate
+            q_res = self._quality_gate.evaluate(text, prompt=prompt)
+            duration_ms = (time.perf_counter() - start_t) * 1000
 
-            if not text:
+            trace.generation_time_ms = duration_ms
+            trace.tokens = len(text.split())
+            trace.quality_score = q_res.quality_score
+
+            if not q_res.passed:
+                trace.error = q_res.reason
+                self._tracer.record(trace)
                 return GenerationResult(
                     text="",
                     success=False,
                     rejected=True,
-                    reason="empty_generation",
+                    quality=q_res.quality_score,
+                    reason=q_res.reason,
                 )
 
-            quality, reason = self._quality(text)
-
-            if quality <= 0:
-                return GenerationResult(
-                    text="",
-                    success=False,
-                    rejected=True,
-                    quality=quality,
-                    reason=reason,
-                )
-
+            self._tracer.record(trace)
             return GenerationResult(
                 text=text,
                 success=True,
-                quality=quality,
+                quality=q_res.quality_score,
                 metadata={
                     "backend": type(backend).__name__,
                     "temperature": cfg.temperature,
+                    "generation_time_ms": duration_ms,
                 },
             )
 
         except Exception as exc:
+            duration_ms = (time.perf_counter() - start_t) * 1000
+            trace.generation_time_ms = duration_ms
+            trace.error = f"{type(exc).__name__}: {exc}"
+            self._tracer.record(trace)
             logger.exception("OM generation failed")
 
             return GenerationResult(
@@ -108,47 +196,27 @@ class ModelGateway:
         self,
         backend: Any,
         prompt: str,
-        config: GenerationConfig,
+        cfg: GenerationConfig,
         context: dict[str, Any],
     ) -> str:
+        kwargs = cfg.to_kwargs()
 
-        messages = [
-            {
-                "role": "system",
-                "content": (
-                    "You are OM, a capable conversational AI. "
-                    "Understand the user's actual intent before answering. "
-                    "Respond naturally, clearly and directly."
-                ),
-            },
-            {
-                "role": "user",
-                "content": prompt,
-            },
-        ]
-
-        chat = getattr(backend, "chat", None)
-
-        if callable(chat):
+        if hasattr(backend, "generate"):
             try:
-                result = chat(
-                    messages,
-                    **config.to_kwargs(),
-                )
+                res = backend.generate(prompt, **kwargs)
+                return self._extract_text(res)
             except TypeError:
-                result = chat(messages)
+                res = backend.generate(prompt)
+                return self._extract_text(res)
 
-            return self._extract_text(result)
-
-        generate = getattr(backend, "generate", None)
-
-        if callable(generate):
-            result = generate(
-                prompt,
-                **config.to_kwargs(),
-            )
-
-            return self._extract_text(result)
+        if hasattr(backend, "chat"):
+            messages = [{"role": "user", "content": prompt}]
+            try:
+                res = backend.chat(messages, **kwargs)
+                return self._extract_text(res)
+            except TypeError:
+                res = backend.chat(messages)
+                return self._extract_text(res)
 
         raise RuntimeError(
             f"Backend {type(backend).__name__} has no chat/generate method"
@@ -158,63 +226,17 @@ class ModelGateway:
     def _extract_text(result: Any) -> str:
         if result is None:
             return ""
-
         if isinstance(result, str):
             return result
-
+        if isinstance(result, tuple) and len(result) > 0:
+            return str(result[0])
         if isinstance(result, dict):
-            for key in (
-                "answer",
-                "text",
-                "content",
-                "response",
-                "generated_text",
-            ):
-                value = result.get(key)
-
-                if isinstance(value, str):
-                    return value
-
+            for key in ("answer", "text", "content", "response", "generated_text"):
+                val = result.get(key)
+                if isinstance(val, str):
+                    return val
         return str(result)
 
     @staticmethod
     def _clean(text: str) -> str:
-        return (
-            str(text or "")
-            .replace("\x00", "")
-            .strip()
-        )
-
-    @staticmethod
-    def _quality(text: str) -> tuple[float, str | None]:
-        if not text:
-            return 0.0, "empty"
-
-        replacement_count = text.count("\ufffd")
-
-        if replacement_count:
-            return 0.0, "tokenizer_replacement_character"
-
-        if len(text) < 2:
-            return 0.0, "too_short"
-
-        # Detect obvious token/character corruption.
-        alpha = sum(ch.isalpha() for ch in text)
-        printable = sum(ch.isprintable() for ch in text)
-
-        if printable / max(len(text), 1) < 0.85:
-            return 0.0, "non_printable_output"
-
-        if alpha == 0:
-            return 0.0, "no_language_content"
-
-        # Very long random-looking strings are rejected.
-        words = text.split()
-
-        if len(words) > 20:
-            unique_ratio = len(set(words)) / len(words)
-
-            if unique_ratio > 0.95 and len(text) > 500:
-                return 0.0, "possible_corrupted_generation"
-
-        return 1.0, None
+        return str(text or "").replace("\x00", "").strip()

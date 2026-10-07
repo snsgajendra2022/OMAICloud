@@ -264,8 +264,7 @@ class ResponseFormatter:
         body = self._strip_leaks(str(data.get("answer") or ""))
         if len(body) >= 40 and not looks_like_pipeline_dump(body):
             return body.strip() + "\n"
-        return (
-            f"{q}\n\n")
+        return ""
 
     def _template_knowledge(self, data: dict[str, Any], question: str) -> str:
         fact = ""

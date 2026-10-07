@@ -16,5 +16,13 @@
     "improvements": [
       "Improve tool execution validation"
     ]
+  },
+  {
+    "issues": [
+      "execution_failed"
+    ],
+    "improvements": [
+      "Improve tool execution validation"
+    ]
   }
 ]
