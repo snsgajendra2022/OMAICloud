@@ -469,10 +469,12 @@ def _om_native_chat_reply_body(
                 from om_ai.core.intelligence.real_answer import looks_like_static_reply
                 from om_ai.core.model_runtime.quality_gate import get_quality_gate
                 from om_ai.runtime.chat_orchestrator import is_low_quality_reply
+                from om_ai.core.response.response_formatter import looks_like_pipeline_dump
 
                 if (
                     is_solution_stub(ans)
                     or looks_like_static_reply(ans)
+                    or looks_like_pipeline_dump(ans)
                     or is_low_quality_reply(ans)
                     or not get_quality_gate().evaluate(ans, prompt=user_text).passed
                 ):
@@ -529,10 +531,12 @@ def _om_native_chat_reply_body(
                 from om_ai.core.intelligence.real_answer import looks_like_static_reply
                 from om_ai.core.model_runtime.quality_gate import get_quality_gate
                 from om_ai.runtime.chat_orchestrator import is_low_quality_reply
+                from om_ai.core.response.response_formatter import looks_like_pipeline_dump
 
                 if (
                     is_solution_stub(ans)
                     or looks_like_static_reply(ans)
+                    or looks_like_pipeline_dump(ans)
                     or is_low_quality_reply(ans)
                     or not get_quality_gate().evaluate(ans, prompt=user_text).passed
                 ):
