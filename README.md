@@ -91,3 +91,17 @@ Python ≥ 3.11, PyTorch ≥ 2.4. Linux + CUDA for serious distributed training;
 ## Frontier-model reality
 
 Owning a capable private model still means: licensed corpus → tokenizer → cluster pretrain → SFT/alignment → eval → deployed weights. This repo is the engineering foundation for that process — not a substitute for the training work itself.
+
+## Native dynamic chat (no external LLM)
+
+Keep `OM_MODEL_PROVIDER=om_native` and `OM_AI_CHAT_BACKEND=om_native`. Set `OM_NATIVE_MODEL_FIRST=1` (default) so the native OM checkpoint generates the final chat answer instead of deterministic greeting/identity shortcuts. The native model must be trained and loaded; this switch does not create frontier-level capabilities by itself.
+
+Verify locally with:
+
+```bash
+pytest -q tests/test_chat_backend.py
+om-ai model-info
+om-ai serve --host 127.0.0.1 --port 8080
+```
+
+Then test multiple distinct questions and follow-ups against `POST /v1/chat`, and inspect logs/metadata to verify the native checkpoint actually generated each response. Keep provider credentials out of the React client. OM's answer quality still depends on checkpoint weights, tokenizer compatibility, training data, context length, and training compute.
