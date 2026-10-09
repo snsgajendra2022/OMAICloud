@@ -119,3 +119,18 @@ Owning a capable private model still means: licensed corpus → tokenizer → cl
 The production `chat_reply` path now runs `om_ai.core.conversation.ConversationEngine` before the existing generation cascade. It classifies the relationship of a turn to recent history, resolves pronoun/reference candidates against actual prior turns, ranks relevant history, and injects a bounded context note while preserving the current user message and system instructions. It does not generate answers or replace the configured model.
 
 Configure with `OM_CONVERSATION_CONTEXT=1` (default), `OM_CONVERSATION_MAX_HISTORY=8`, `OM_CONVERSATION_MAX_RELEVANT=4`, and `OM_CONVERSATION_SUMMARY_MAX_CHARS=700`. Set the first variable to `0` only for diagnostics. This is a lightweight lexical/recency ranker, not an embedding-based semantic search system; a production semantic retriever can later be plugged into the same context layer.
+
+
+## Native dynamic chat (no external LLM)
+
+Keep `OM_MODEL_PROVIDER=om_native` and `OM_AI_CHAT_BACKEND=om_native`. Set `OM_NATIVE_MODEL_FIRST=1` so the native OM checkpoint generates the final chat answer instead of deterministic greeting/identity shortcuts. This setting does not create model capability by itself: the intended trained checkpoint must exist, load successfully, and match the tokenizer.
+
+Verify locally with:
+
+```bash
+pytest -q tests/test_chat_backend.py
+om-ai model-info
+om-ai serve --host 127.0.0.1 --port 8080
+```
+
+Then test multiple distinct questions and follow-ups against `POST /v1/chat` and inspect server logs/metadata to confirm native generation is actually used. Keep provider credentials out of the React client. Response quality still depends on checkpoint weights, tokenizer compatibility, training data, context length, and training compute.
