@@ -17,6 +17,7 @@ import logging
 import os
 import re
 from om_ai.core.intelligence.real_answer import looks_like_static_reply
+from om_ai.runtime.observability import trace_function
 
 logger = logging.getLogger(__name__)
 
@@ -37,6 +38,7 @@ def native_model_first_enabled() -> bool:
     }
 
 
+@trace_function("chat.pipeline")
 def run_chat_pipeline(
     user_text: str,
     *,
