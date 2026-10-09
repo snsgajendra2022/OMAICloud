@@ -688,5 +688,11 @@
     "answer": "Java is a strongly typed programming language commonly used for backend systems, Android applications, and enterprise software.",
     "intent": "explanation",
     "score": 100.0
+  },
+  {
+    "question": "what is this this is only for this ans crrect",
+    "answer": "what is this this is only for this ans crrect",
+    "intent": "explanation",
+    "score": 10.0
   }
 ]
