@@ -1232,7 +1232,12 @@ def chat_reply(
 
     profile = level_runtime_profile(model)
     evo_text, evo_model, evo_level = maybe_evolution_reply(messages, model=model)
-    if evo_text is not None:
+    native_model_first = _env("OM_NATIVE_MODEL_FIRST", "1").strip().lower() not in {
+        "0", "false", "no", "off"
+    }
+    # Evolution presets may tune the native model, but must not short-circuit
+    # generation with a prebuilt response when native-model-first is enabled.
+    if evo_text is not None and not native_model_first:
         info = ChatBackendInfo(
             backend="om_evolution",
             model=evo_model,
