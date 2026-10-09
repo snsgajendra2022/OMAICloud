@@ -5,6 +5,7 @@ bash scripts/start_om_workspace.sh
 Self-hosted, API-independent AI platform: train and run **OM-1.0** natively — no Ollama, Llama proxy, or third-party LLM required for the default serve path.
 
 **Full structure + production blueprint:** [`docs/PROJECT_BLUEPRINT.md`](docs/PROJECT_BLUEPRINT.md)
+**Native capability/parity upgrade plan:** [`docs/OM_NATIVE_CAPABILITY_ROADMAP.md`](docs/OM_NATIVE_CAPABILITY_ROADMAP.md)
 
 **Companion (13-layer):** understanding → emotion → memory → dialogue → reasoning → knowledge (RAG) → research (no auto-redirect) → permission → brother personality → voice/avatar → self-learning. Entry: `om_ai.core.companion_architecture`.
 
