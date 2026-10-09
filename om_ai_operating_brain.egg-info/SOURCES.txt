@@ -1938,6 +1938,7 @@ tests/test_model.py
 tests/test_multimodal.py
 tests/test_native_paths.py
 tests/test_no_ollama_native.py
+tests/test_om_capability_evaluation.py
 tests/test_om_native_backend.py
 tests/test_om_tokenizer_knowledge.py
 tests/test_omai_corpus_v1.py

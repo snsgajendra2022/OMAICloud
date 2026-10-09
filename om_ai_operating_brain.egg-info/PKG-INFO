@@ -7,6 +7,7 @@ Description-Content-Type: text/markdown
 Requires-Dist: torch>=2.4.0
 Requires-Dist: fastapi>=0.115.0
 Requires-Dist: uvicorn[standard]>=0.30.0
+Requires-Dist: python-dotenv>=1.0.0
 Requires-Dist: pydantic>=2.8.0
 Requires-Dist: numpy>=1.26.0
 Requires-Dist: httpx>=0.27.0
@@ -30,9 +31,13 @@ Requires-Dist: pyobjc-framework-Cocoa>=10.0; platform_system == "Darwin" and ext
 
 # OM AI Operating Brain v0.3
 
+bash scripts/start_om_workspace.sh
+admin@om.local
+YourNewPassword123!
 Self-hosted, API-independent AI platform: train and run **OM-1.0** natively — no Ollama, Llama proxy, or third-party LLM required for the default serve path.
 
 **Full structure + production blueprint:** [`docs/PROJECT_BLUEPRINT.md`](docs/PROJECT_BLUEPRINT.md)
+**Native capability/parity upgrade plan:** [`docs/OM_NATIVE_CAPABILITY_ROADMAP.md`](docs/OM_NATIVE_CAPABILITY_ROADMAP.md)
 
 **Companion (13-layer):** understanding → emotion → memory → dialogue → reasoning → knowledge (RAG) → research (no auto-redirect) → permission → brother personality → voice/avatar → self-learning. Entry: `om_ai.core.companion_architecture`.
 
