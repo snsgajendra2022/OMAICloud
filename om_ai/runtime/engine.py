@@ -222,25 +222,25 @@ def is_degenerate_generation(text: str | None) -> bool:
     if not s or not usable_generation_text(s):
         return True
 
-    words = re.findall(r"\\S+", s)
+    words = re.findall(r"\S+", s)
     if len(words) >= 12:
         poss = sum(1 for w in words if "'s" in w or "’s" in w)
         if poss / len(words) >= 0.18:
             return True
-        uniq = len({re.sub(r"[^\\w]+", "", w.lower()) for w in words} - {""})
+        uniq = len({re.sub(r"[^\w]+", "", w.lower()) for w in words} - {""})
         if uniq / len(words) < 0.22:
             return True
 
     # Random token fragments often contain a high density of symbols mixed into
     # otherwise alphabetic text (e.g. "C_yAI*uing ... att(;e potoentPEZec").
     # Ignore whitespace and common sentence punctuation for this ratio.
-    compact = re.sub(r"\\s+", "", s)
+    compact = re.sub(r"\s+", "", s)
     if len(compact) >= 24:
         suspicious = sum(1 for c in compact if c in "_*#\\\\/|{}[]<>~=^①②③④⑤⑥⑦⑧⑨")
         if suspicious >= 4 and suspicious / len(compact) >= 0.08:
             return True
 
-        tokens = re.findall(r"[^\\s]+", s)
+        tokens = re.findall(r"[^\s]+", s)
         if len(tokens) >= 5:
             malformed = 0
             for token in tokens:
