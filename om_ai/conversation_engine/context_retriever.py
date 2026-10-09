@@ -56,13 +56,11 @@ class ContextRetriever:
             role_weight = 1.08 if turn["role"] == "user" else 1.0
             reference_bonus = 0.35 if is_reference else 0.0
             score = role_weight * (overlap * 2.0) + recency * 0.45 + reference_bonus
-            if not query_tokens or overlap:
-                ranked.append((score, index, turn))
+            # Keep recent zero-overlap turns as a fallback so dialogue pairs
+            # (for example, an assistant question) are not lost from context.
+            ranked.append((score, index, turn))
 
         ranked.sort(key=lambda item: (item[0], item[1]), reverse=True)
-        selected = [item[2] for item in ranked[:limit]]
-
-        # Preserve chronology in the final prompt after ranking has chosen the hits.
         selected_ids = {index for _, index, _ in ranked[:limit]}
         selected = [turn for index, turn in enumerate(turns) if index in selected_ids]
 
