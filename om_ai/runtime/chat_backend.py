@@ -206,18 +206,28 @@ def configured_backend() -> str:
     """
     provider = (_env("OM_MODEL_PROVIDER") or "").lower()
     chat = (_env("OM_AI_CHAT_BACKEND") or _DEFAULT_BACKEND).lower()
-    if provider in {"om_native", "om-native", "native", "om"}:
-        return "om_native"
+
+    # An explicitly selected chat backend must win over a stale provider value.
+    # This matters when an existing .env contains OM_MODEL_PROVIDER=om_native
+    # but the operator intentionally switches chat to an OpenAI-compatible cloud.
+    if chat in {"openai", "local"}:
+        return chat
     if chat in {"om_native", "om-native", "native"}:
         return "om_native"
     if chat == "ollama" or provider == "ollama":
         raise RuntimeError(
-            "Ollama is not part of the OM-1.0 native production path. "
-            "Unset OM_AI_CHAT_BACKEND/OM_MODEL_PROVIDER or use om_native. "
+            "Ollama is not part of the production chat path. "
+            "Use an explicit supported backend (om_native, openai, or local). "
             "Legacy client (opt-in scripts only): om_ai.legacy.ollama"
         )
+    if provider in {"om_native", "om-native", "native", "om"}:
+        return "om_native"
     if provider in {"openai", "local"} and chat in {_DEFAULT_BACKEND, "auto"}:
         return provider
+    if chat == "auto":
+        if openai_configured():
+            return "openai"
+        return "local"
     if not chat:
         return _DEFAULT_BACKEND
     return chat
