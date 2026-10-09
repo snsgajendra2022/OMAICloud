@@ -1268,7 +1268,7 @@ def serve(args):
     if os.getenv("OM_AI_AUTO_TRAIN_70B", "0") == "1":
         print(
             "WARNING: OM_AI_AUTO_TRAIN_70B=1 is set but ignored by om-ai serve. "
-            "Training must be started deliberately with:\\n"
+            "Training must be started deliberately with:\n"
             "  om-ai train-70b --data ... --tokenizer ... --output ...",
             file=sys.stderr,
         )
