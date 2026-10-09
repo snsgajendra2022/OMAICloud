@@ -187,17 +187,14 @@ def test_om_native_no_silent_third_party_fallback(monkeypatch):
 
     monkeypatch.setattr(cb, "chat_via_openai", boom)
 
-    text, used = cb.chat_reply(
-        [{"role": "user", "content": "hi"}],
-        native_chat=None,
-        native_ready=False,
-        local_chat=None,
-        local_loaded=False,
-    )
-    assert used.backend == "om_native"
-    low = (text or "").lower()
-    assert "om" in low or "hello" in low or "hi" in low
-    assert "openai" not in low
+    with pytest.raises(NativeCheckpointError, match="native checkpoint is unavailable"):
+        cb.chat_reply(
+            [{"role": "user", "content": "hi"}],
+            native_chat=None,
+            native_ready=False,
+            local_chat=None,
+            local_loaded=False,
+        )
 
 
 def test_om_native_health_unloaded():
@@ -340,3 +337,23 @@ def test_project_env_loads_from_repo_root_and_preserves_shell_values(tmp_path: P
     monkeypatch.setenv("OM_MODEL_CHECKPOINT", "/explicit/shell/checkpoint.pt")
     _load_project_env(tmp_path)
     assert os.environ["OM_MODEL_CHECKPOINT"] == "/explicit/shell/checkpoint.pt"
+
+
+def test_om_native_garbage_does_not_become_canned_answer(monkeypatch):
+    monkeypatch.setenv("OM_MODEL_PROVIDER", "om_native")
+    monkeypatch.setenv("OM_NATIVE_MODEL_FIRST", "1")
+    monkeypatch.setenv("OM_LIVE_KNOWLEDGE", "0")
+
+    def native(_messages, **_kwargs):
+        return "C_yAI*uing att(;e potoentPEZec random token soup"
+
+    text, used = cb.chat_reply(
+        [{"role": "user", "content": "Explain how Python functions work."}],
+        native_chat=native,
+        native_ready=True,
+        local_chat=None,
+        local_loaded=False,
+    )
+    assert used.backend == "om_native"
+    assert "could not produce a reliable answer" in text.lower()
+    assert "how can i help" not in text.lower()

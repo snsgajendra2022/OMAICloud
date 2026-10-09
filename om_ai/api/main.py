@@ -37,6 +37,7 @@ from om_ai.registry import ModelRegistry
 from om_ai.backends import NativeCheckpointError, OMNativeBackend
 from om_ai.backends.om_native import default_native_paths
 from om_ai.runtime import LocalLLMEngine
+from om_ai.runtime.model_gateway import ModelGateway, ModelGatewayError
 from om_ai.runtime.chat_backend import configured_backend
 from om_ai.security import (
     AuditLog,
@@ -120,6 +121,7 @@ _REGISTRY_ROOT = os.getenv("OM_AI_REGISTRY", "artifacts/registry")
 
 engine = LocalLLMEngine()
 native_backend = OMNativeBackend(engine=engine)
+model_gateway = ModelGateway(native_backend)
 memory = SQLiteMemoryStore(_DB_PATH)
 conversations = ConversationStore(_DB_PATH)
 knowledge = PersistentKnowledgeBase(_KB_PATH)
@@ -422,10 +424,21 @@ class MultimodalRequest(BaseModel):
 @app.get("/health", tags=["System"])
 def health():
     """Liveness + subsystem snapshot (never 503 — process alive)."""
-    model_ready = bool(
-        getattr(native_backend, "loaded", False)
-        and getattr(native_backend, "_trained", False)
-    ) or bool(getattr(engine, "model", None) is not None)
+    # Native backend health is authoritative: an arbitrary in-memory model
+    # object is not enough to claim production readiness.
+    try:
+        raw_native_health = native_backend.health()
+        model_ready = bool(raw_native_health.get("ok"))
+        native_health = {
+            key: raw_native_health.get(key)
+            for key in ("ok", "backend", "name", "loaded", "trained",
+                        "checkpoint_present", "device")
+        }
+        if raw_native_health.get("error"):
+            native_health["error_type"] = "NativeModelError"
+    except Exception as exc:
+        native_health = {"ok": False, "error_type": type(exc).__name__}
+        model_ready = False
     brain_ok = True
     memory_ok = True
     agents_ok = True
@@ -469,21 +482,32 @@ def health():
         "connectivity": connectivity,
         "om_version": "1.0",
         "version": _API_VERSION,
-        "foundation": "complete",
-        "fallback": None if model_ready else "brain-only",
+        "foundation": "native_model_ready" if model_ready else "not_ready",
+        "fallback": None,
+        "model_health": native_health,
     }
 
 
 @app.get("/ready", tags=["System"])
 def ready():
-    """Readiness probe — 200 only when the model is loaded."""
-    loaded = engine.model is not None
-    if not loaded:
+    """Readiness probe — 200 only when a real compatible native checkpoint is loaded."""
+    try:
+        raw_health = native_backend.health()
+        model_health = {
+            key: raw_health.get(key)
+            for key in ("ok", "backend", "name", "loaded", "trained",
+                        "checkpoint_present", "device")
+        }
+        if raw_health.get("error"):
+            model_health["error_type"] = "NativeModelError"
+    except Exception as exc:
+        model_health = {"ok": False, "error_type": type(exc).__name__}
+    if not model_health.get("ok"):
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail="Model not loaded yet.",
+            detail={"message": "OM native model is not ready.", "model_health": model_health},
         )
-    return {"ok": True, "model_loaded": True}
+    return {"ok": True, "model_loaded": True, "model_health": model_health}
 
 
 # ---------------------------------------------------------------------------
@@ -498,8 +522,12 @@ def load_model(
 ):
     """Load (or reload) a local model checkpoint. Admin / operator only."""
     try:
-        result = engine.load(
-            req.config_path, req.tokenizer_path, req.checkpoint_path, req.device
+        result = native_backend.load(
+            config_path=req.config_path,
+            tokenizer_path=req.tokenizer_path,
+            checkpoint_path=req.checkpoint_path,
+            device=req.device,
+            require_checkpoint=True,
         )
         _audit(
             "model.load",
@@ -580,7 +608,7 @@ def generate(
 ):
     """Single-shot text generation."""
     try:
-        text = engine.generate(
+        text = model_gateway.generate(
             req.prompt,
             max_new_tokens=req.max_new_tokens,
             temperature=req.temperature,
@@ -596,8 +624,13 @@ def generate(
             detail={"prompt_len": len(req.prompt)},
         )
         return {"text": text, "model": engine.info().get("checkpoint_path")}
-    except Exception as exc:
+    except ModelGatewayError as exc:
+        raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail=str(exc)) from exc
+    except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
+    except Exception as exc:
+        logger.exception("Native generate endpoint failed")
+        raise HTTPException(status_code=500, detail="OM generation failed.") from exc
 
 
 @app.post("/v1/generate/stream", tags=["Generate"])
@@ -609,7 +642,7 @@ async def generate_stream(
 
     async def _sse_generator() -> AsyncGenerator[str, None]:
         try:
-            for chunk in engine.generate_stream(
+            for chunk in model_gateway.stream_generate(
                 req.prompt,
                 max_new_tokens=req.max_new_tokens,
                 temperature=req.temperature,
@@ -647,7 +680,7 @@ def chat(
             messages,
             local_chat=engine.chat,
             local_loaded=engine.model is not None,
-            native_chat=native_backend.chat,
+            native_chat=model_gateway.chat,
             native_ready=bool(native_backend.loaded and native_backend._trained),
             max_new_tokens=req.max_new_tokens,
             temperature=req.temperature,
@@ -673,10 +706,10 @@ def chat(
         if backend.live_knowledge:
             payload["live_knowledge"] = backend.live_knowledge
         return payload
-    except NativeCheckpointError as exc:
+    except (NativeCheckpointError, ModelGatewayError) as exc:
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail=str(exc) or "OM-1.0 checkpoint unavailable.",
+            detail=str(exc) or "OM-1.0 native model unavailable.",
         ) from exc
     except Exception as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
@@ -1163,7 +1196,7 @@ def multimodal(
             }
         except Exception:
             try:
-                text = engine.generate(
+                text = model_gateway.generate(
                     req.text,
                     max_new_tokens=req.max_new_tokens,
                     temperature=req.temperature,

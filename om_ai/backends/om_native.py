@@ -204,6 +204,11 @@ class OMNativeBackend:
         self.ensure_loaded()
         return self.engine.chat(messages, **kwargs)
 
+    def generate_stream(self, prompt: str, **kwargs: Any) -> Generator[str, None, None]:
+        """Stream native text generation through the same loaded checkpoint."""
+        self.ensure_loaded()
+        yield from self.engine.generate_stream(prompt, **kwargs)
+
     def stream_chat(self, messages: list[dict], **kwargs: Any) -> Generator[str, None, None]:
         """Best-effort streaming: chat encode then token stream via generate_stream path."""
         self.ensure_loaded()
