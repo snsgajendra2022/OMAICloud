@@ -1061,7 +1061,8 @@ def _om_native_chat_reply_body(
     fail = is_low_quality_reply(text)
     # Tiny models often start with "Hello" then derail — use Agent Brain fallback.
     if (
-        not fail
+        not _env_on("OM_NATIVE_MODEL_FIRST", "1")
+        and not fail
         and brain_decision.intent.value in {"greeting", "identity"}
         and brain_decision.structured_fallback
     ):
@@ -1075,7 +1076,11 @@ def _om_native_chat_reply_body(
             return _out(brain_decision.structured_fallback)
 
     # Coding / planning: prefer structured reasoning if model is weak/garbled.
-    if fail and brain_decision.intent.value in {"coding", "agent", "knowledge"}:
+    if (
+        fail
+        and not _env_on("OM_NATIVE_MODEL_FIRST", "1")
+        and brain_decision.intent.value in {"coding", "agent", "knowledge"}
+    ):
         rescued_early = brain_decision.after_model(text) or brain_decision.structured_fallback
         if rescued_early:
             return _out(rescued_early)
