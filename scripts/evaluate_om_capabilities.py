@@ -12,7 +12,7 @@ import time
 from datetime import datetime, timezone
 from pathlib import Path
 
-from om_ai.backends.om_native import OMNativeBackend, default_native_paths
+from om_ai.backends.om_native import OMNativeBackend, default_native_paths\nfrom om_ai.runtime.engine import is_degenerate_generation
 
 
 CASES = [
@@ -111,7 +111,7 @@ def main() -> int:
                     min_new_tokens=1,
                 )
                 followup_elapsed = round(time.perf_counter() - started, 3)
-                followup_ok = bool((followup or "").strip())
+                followup_ok = bool((followup or "").strip()) and not is_degenerate_generation(followup) and "MAPLE-731" in (followup or "")
                 if not followup_ok:
                     failures += 1
                 results.append({
@@ -148,7 +148,7 @@ def main() -> int:
         "case_count": len(results),
         "usable_output_count": sum(1 for item in results if item.get("ok")),
         "failed_output_count": failures,
-        "note": "Smoke evaluation only. Read answers and score correctness manually or with a separately validated evaluator; this is not proof of cloud-model parity.",
+        "note": "Smoke evaluation only. Basic deterministic checks are applied to selected cases; read answers and score the rest manually. This is not proof of cloud-model parity.",
         "results": results,
     }
     output = Path(args.output)
