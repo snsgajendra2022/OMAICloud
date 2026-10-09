@@ -408,11 +408,13 @@ def _om_native_chat_reply_body(
         provider=info.provider,
         live_knowledge={"intelligence": intel.meta} if intel.meta else None,
     )
-    if intel.direct_reply:
+    # In native model-first mode, deterministic intent replies are context only;
+    # let the trained OM checkpoint produce the user-visible answer.
+    if intel.direct_reply and not _env_on("OM_NATIVE_MODEL_FIRST", "1"):
         return intel.direct_reply, info_base
 
     # ── STEP 30 ChatGPT-like Brain Controller (preferred front door) ─
-    if _env_on("OM_CHATGPT_RUNTIME", "1"):
+    if _env_on("OM_CHATGPT_RUNTIME", "1") and not _env_on("OM_NATIVE_MODEL_FIRST", "1"):
         try:
             from om_ai.core.chatgpt_runtime import run_chatgpt_runtime
 
