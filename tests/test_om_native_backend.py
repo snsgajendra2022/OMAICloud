@@ -324,9 +324,9 @@ def test_project_env_loads_from_repo_root_and_preserves_shell_values(tmp_path: P
 
     env_file = tmp_path / ".env"
     env_file.write_text(
-        "OM_MODEL_CONFIG=configs/from-env.json\\n"
-        "OM_MODEL_TOKENIZER=artifacts/from-env-tokenizer.json\\n"
-        "OM_MODEL_CHECKPOINT=artifacts/from-env-checkpoint/latest.pt\\n",
+        "OM_MODEL_CONFIG=configs/from-env.json\n"
+        "OM_MODEL_TOKENIZER=artifacts/from-env-tokenizer.json\n"
+        "OM_MODEL_CHECKPOINT=artifacts/from-env-checkpoint/latest.pt\n",
         encoding="utf-8",
     )
     for key in ("OM_MODEL_CONFIG", "OM_MODEL_TOKENIZER", "OM_MODEL_CHECKPOINT"):
