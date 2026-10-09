@@ -12,7 +12,8 @@ import time
 from datetime import datetime, timezone
 from pathlib import Path
 
-from om_ai.backends.om_native import OMNativeBackend, default_native_paths\nfrom om_ai.runtime.engine import is_degenerate_generation
+from om_ai.backends.om_native import OMNativeBackend, default_native_paths
+from om_ai.runtime.engine import is_degenerate_generation
 
 
 CASES = [
