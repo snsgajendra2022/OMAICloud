@@ -100,3 +100,18 @@ def test_force_openai(monkeypatch):
     info = cb.resolve_backend(local_loaded=False)
     assert info.backend == "openai"
     assert info.model == "gpt-4o-mini"
+
+
+
+def test_native_model_first_defaults_on(monkeypatch):
+    from om_ai.runtime.chat_pipeline import native_model_first_enabled
+
+    monkeypatch.delenv("OM_NATIVE_MODEL_FIRST", raising=False)
+    assert native_model_first_enabled() is True
+
+
+def test_native_model_first_can_be_disabled_explicitly(monkeypatch):
+    from om_ai.runtime.chat_pipeline import native_model_first_enabled
+
+    monkeypatch.setenv("OM_NATIVE_MODEL_FIRST", "0")
+    assert native_model_first_enabled() is False
