@@ -49,13 +49,13 @@ export function ChatPanel({ apiBase }: Props) {
         (value) => typeof value === "string" && value.trim()
       );
       if (!answer) throw new Error("OM returned an empty response. Check the active model and server logs.");
-      setMsgs((current) => [...current, { role: "assistant", text: answer }]);
+      setMsgs((current) => retryIndex === undefined\n        ? [...current, { role: "assistant", text: answer }]\n        : current.map((message, index) => index === retryIndex ? { role: "assistant", text: answer } : message));
     } catch (err) {
       const message = err instanceof Error
         ? (err.name === "AbortError" ? "OM took too long to respond. Please try again." : err.message)
         : "Could not reach OM. Check that the API server is running.";
       setError(message);
-      setMsgs((current) => [...current, { role: "assistant", text: message, failed: true }]);
+      setMsgs((current) => retryIndex === undefined\n        ? [...current, { role: "assistant", text: message, failed: true }]\n        : current.map((item, index) => index === retryIndex ? { role: "assistant", text: message, failed: true } : item));
     } finally {
       setBusy(false);
     }
