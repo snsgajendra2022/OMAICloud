@@ -20058,5 +20058,2929 @@
         "simulation"
       ]
     }
+  },
+  {
+    "requirement": {
+      "goal": "health-ping",
+      "power": "unknown",
+      "performance": "unknown",
+      "constraints": []
+    },
+    "architecture": {
+      "architecture": {
+        "processor": "selected later",
+        "memory": "selected later",
+        "communication": "selected later"
+      },
+      "requirement": {
+        "goal": "health-ping",
+        "power": "unknown",
+        "performance": "unknown",
+        "constraints": []
+      }
+    },
+    "components": {
+      "components": [
+        {
+          "name": "processor",
+          "status": "candidate"
+        },
+        {
+          "name": "sensor",
+          "status": "candidate"
+        }
+      ]
+    },
+    "circuit": {
+      "circuit": "generated",
+      "components": {
+        "components": [
+          {
+            "name": "processor",
+            "status": "candidate"
+          },
+          {
+            "name": "sensor",
+            "status": "candidate"
+          }
+        ]
+      }
+    },
+    "simulation": {
+      "simulation": "completed",
+      "performance": "estimated",
+      "errors": []
+    },
+    "optimization": {
+      "optimized": true,
+      "improvements": [
+        "reduce power",
+        "increase efficiency"
+      ]
+    },
+    "validation": {
+      "valid": true,
+      "checks": [
+        "architecture",
+        "components",
+        "simulation"
+      ]
+    }
+  },
+  {
+    "requirement": {
+      "goal": "hiiii",
+      "power": "unknown",
+      "performance": "unknown",
+      "constraints": []
+    },
+    "architecture": {
+      "architecture": {
+        "processor": "selected later",
+        "memory": "selected later",
+        "communication": "selected later"
+      },
+      "requirement": {
+        "goal": "hiiii",
+        "power": "unknown",
+        "performance": "unknown",
+        "constraints": []
+      }
+    },
+    "components": {
+      "components": [
+        {
+          "name": "processor",
+          "status": "candidate"
+        },
+        {
+          "name": "sensor",
+          "status": "candidate"
+        }
+      ]
+    },
+    "circuit": {
+      "circuit": "generated",
+      "components": {
+        "components": [
+          {
+            "name": "processor",
+            "status": "candidate"
+          },
+          {
+            "name": "sensor",
+            "status": "candidate"
+          }
+        ]
+      }
+    },
+    "simulation": {
+      "simulation": "completed",
+      "performance": "estimated",
+      "errors": []
+    },
+    "optimization": {
+      "optimized": true,
+      "improvements": [
+        "reduce power",
+        "increase efficiency"
+      ]
+    },
+    "validation": {
+      "valid": true,
+      "checks": [
+        "architecture",
+        "components",
+        "simulation"
+      ]
+    }
+  },
+  {
+    "requirement": {
+      "goal": "hiiii",
+      "power": "unknown",
+      "performance": "unknown",
+      "constraints": []
+    },
+    "architecture": {
+      "architecture": {
+        "processor": "selected later",
+        "memory": "selected later",
+        "communication": "selected later"
+      },
+      "requirement": {
+        "goal": "hiiii",
+        "power": "unknown",
+        "performance": "unknown",
+        "constraints": []
+      }
+    },
+    "components": {
+      "components": [
+        {
+          "name": "processor",
+          "status": "candidate"
+        },
+        {
+          "name": "sensor",
+          "status": "candidate"
+        }
+      ]
+    },
+    "circuit": {
+      "circuit": "generated",
+      "components": {
+        "components": [
+          {
+            "name": "processor",
+            "status": "candidate"
+          },
+          {
+            "name": "sensor",
+            "status": "candidate"
+          }
+        ]
+      }
+    },
+    "simulation": {
+      "simulation": "completed",
+      "performance": "estimated",
+      "errors": []
+    },
+    "optimization": {
+      "optimized": true,
+      "improvements": [
+        "reduce power",
+        "increase efficiency"
+      ]
+    },
+    "validation": {
+      "valid": true,
+      "checks": [
+        "architecture",
+        "components",
+        "simulation"
+      ]
+    }
+  },
+  {
+    "requirement": {
+      "goal": "health-ping",
+      "power": "unknown",
+      "performance": "unknown",
+      "constraints": []
+    },
+    "architecture": {
+      "architecture": {
+        "processor": "selected later",
+        "memory": "selected later",
+        "communication": "selected later"
+      },
+      "requirement": {
+        "goal": "health-ping",
+        "power": "unknown",
+        "performance": "unknown",
+        "constraints": []
+      }
+    },
+    "components": {
+      "components": [
+        {
+          "name": "processor",
+          "status": "candidate"
+        },
+        {
+          "name": "sensor",
+          "status": "candidate"
+        }
+      ]
+    },
+    "circuit": {
+      "circuit": "generated",
+      "components": {
+        "components": [
+          {
+            "name": "processor",
+            "status": "candidate"
+          },
+          {
+            "name": "sensor",
+            "status": "candidate"
+          }
+        ]
+      }
+    },
+    "simulation": {
+      "simulation": "completed",
+      "performance": "estimated",
+      "errors": []
+    },
+    "optimization": {
+      "optimized": true,
+      "improvements": [
+        "reduce power",
+        "increase efficiency"
+      ]
+    },
+    "validation": {
+      "valid": true,
+      "checks": [
+        "architecture",
+        "components",
+        "simulation"
+      ]
+    }
+  },
+  {
+    "requirement": {
+      "goal": "hiii",
+      "power": "unknown",
+      "performance": "unknown",
+      "constraints": []
+    },
+    "architecture": {
+      "architecture": {
+        "processor": "selected later",
+        "memory": "selected later",
+        "communication": "selected later"
+      },
+      "requirement": {
+        "goal": "hiii",
+        "power": "unknown",
+        "performance": "unknown",
+        "constraints": []
+      }
+    },
+    "components": {
+      "components": [
+        {
+          "name": "processor",
+          "status": "candidate"
+        },
+        {
+          "name": "sensor",
+          "status": "candidate"
+        }
+      ]
+    },
+    "circuit": {
+      "circuit": "generated",
+      "components": {
+        "components": [
+          {
+            "name": "processor",
+            "status": "candidate"
+          },
+          {
+            "name": "sensor",
+            "status": "candidate"
+          }
+        ]
+      }
+    },
+    "simulation": {
+      "simulation": "completed",
+      "performance": "estimated",
+      "errors": []
+    },
+    "optimization": {
+      "optimized": true,
+      "improvements": [
+        "reduce power",
+        "increase efficiency"
+      ]
+    },
+    "validation": {
+      "valid": true,
+      "checks": [
+        "architecture",
+        "components",
+        "simulation"
+      ]
+    }
+  },
+  {
+    "requirement": {
+      "goal": "good mornig",
+      "power": "unknown",
+      "performance": "unknown",
+      "constraints": []
+    },
+    "architecture": {
+      "architecture": {
+        "processor": "selected later",
+        "memory": "selected later",
+        "communication": "selected later"
+      },
+      "requirement": {
+        "goal": "good mornig",
+        "power": "unknown",
+        "performance": "unknown",
+        "constraints": []
+      }
+    },
+    "components": {
+      "components": [
+        {
+          "name": "processor",
+          "status": "candidate"
+        },
+        {
+          "name": "sensor",
+          "status": "candidate"
+        }
+      ]
+    },
+    "circuit": {
+      "circuit": "generated",
+      "components": {
+        "components": [
+          {
+            "name": "processor",
+            "status": "candidate"
+          },
+          {
+            "name": "sensor",
+            "status": "candidate"
+          }
+        ]
+      }
+    },
+    "simulation": {
+      "simulation": "completed",
+      "performance": "estimated",
+      "errors": []
+    },
+    "optimization": {
+      "optimized": true,
+      "improvements": [
+        "reduce power",
+        "increase efficiency"
+      ]
+    },
+    "validation": {
+      "valid": true,
+      "checks": [
+        "architecture",
+        "components",
+        "simulation"
+      ]
+    }
+  },
+  {
+    "requirement": {
+      "goal": "health-ping",
+      "power": "unknown",
+      "performance": "unknown",
+      "constraints": []
+    },
+    "architecture": {
+      "architecture": {
+        "processor": "selected later",
+        "memory": "selected later",
+        "communication": "selected later"
+      },
+      "requirement": {
+        "goal": "health-ping",
+        "power": "unknown",
+        "performance": "unknown",
+        "constraints": []
+      }
+    },
+    "components": {
+      "components": [
+        {
+          "name": "processor",
+          "status": "candidate"
+        },
+        {
+          "name": "sensor",
+          "status": "candidate"
+        }
+      ]
+    },
+    "circuit": {
+      "circuit": "generated",
+      "components": {
+        "components": [
+          {
+            "name": "processor",
+            "status": "candidate"
+          },
+          {
+            "name": "sensor",
+            "status": "candidate"
+          }
+        ]
+      }
+    },
+    "simulation": {
+      "simulation": "completed",
+      "performance": "estimated",
+      "errors": []
+    },
+    "optimization": {
+      "optimized": true,
+      "improvements": [
+        "reduce power",
+        "increase efficiency"
+      ]
+    },
+    "validation": {
+      "valid": true,
+      "checks": [
+        "architecture",
+        "components",
+        "simulation"
+      ]
+    }
+  },
+  {
+    "requirement": {
+      "goal": "hi",
+      "power": "unknown",
+      "performance": "unknown",
+      "constraints": []
+    },
+    "architecture": {
+      "architecture": {
+        "processor": "selected later",
+        "memory": "selected later",
+        "communication": "selected later"
+      },
+      "requirement": {
+        "goal": "hi",
+        "power": "unknown",
+        "performance": "unknown",
+        "constraints": []
+      }
+    },
+    "components": {
+      "components": [
+        {
+          "name": "processor",
+          "status": "candidate"
+        },
+        {
+          "name": "sensor",
+          "status": "candidate"
+        }
+      ]
+    },
+    "circuit": {
+      "circuit": "generated",
+      "components": {
+        "components": [
+          {
+            "name": "processor",
+            "status": "candidate"
+          },
+          {
+            "name": "sensor",
+            "status": "candidate"
+          }
+        ]
+      }
+    },
+    "simulation": {
+      "simulation": "completed",
+      "performance": "estimated",
+      "errors": []
+    },
+    "optimization": {
+      "optimized": true,
+      "improvements": [
+        "reduce power",
+        "increase efficiency"
+      ]
+    },
+    "validation": {
+      "valid": true,
+      "checks": [
+        "architecture",
+        "components",
+        "simulation"
+      ]
+    }
+  },
+  {
+    "requirement": {
+      "goal": "health-ping",
+      "power": "unknown",
+      "performance": "unknown",
+      "constraints": []
+    },
+    "architecture": {
+      "architecture": {
+        "processor": "selected later",
+        "memory": "selected later",
+        "communication": "selected later"
+      },
+      "requirement": {
+        "goal": "health-ping",
+        "power": "unknown",
+        "performance": "unknown",
+        "constraints": []
+      }
+    },
+    "components": {
+      "components": [
+        {
+          "name": "processor",
+          "status": "candidate"
+        },
+        {
+          "name": "sensor",
+          "status": "candidate"
+        }
+      ]
+    },
+    "circuit": {
+      "circuit": "generated",
+      "components": {
+        "components": [
+          {
+            "name": "processor",
+            "status": "candidate"
+          },
+          {
+            "name": "sensor",
+            "status": "candidate"
+          }
+        ]
+      }
+    },
+    "simulation": {
+      "simulation": "completed",
+      "performance": "estimated",
+      "errors": []
+    },
+    "optimization": {
+      "optimized": true,
+      "improvements": [
+        "reduce power",
+        "increase efficiency"
+      ]
+    },
+    "validation": {
+      "valid": true,
+      "checks": [
+        "architecture",
+        "components",
+        "simulation"
+      ]
+    }
+  },
+  {
+    "requirement": {
+      "goal": "health-ping",
+      "power": "unknown",
+      "performance": "unknown",
+      "constraints": []
+    },
+    "architecture": {
+      "architecture": {
+        "processor": "selected later",
+        "memory": "selected later",
+        "communication": "selected later"
+      },
+      "requirement": {
+        "goal": "health-ping",
+        "power": "unknown",
+        "performance": "unknown",
+        "constraints": []
+      }
+    },
+    "components": {
+      "components": [
+        {
+          "name": "processor",
+          "status": "candidate"
+        },
+        {
+          "name": "sensor",
+          "status": "candidate"
+        }
+      ]
+    },
+    "circuit": {
+      "circuit": "generated",
+      "components": {
+        "components": [
+          {
+            "name": "processor",
+            "status": "candidate"
+          },
+          {
+            "name": "sensor",
+            "status": "candidate"
+          }
+        ]
+      }
+    },
+    "simulation": {
+      "simulation": "completed",
+      "performance": "estimated",
+      "errors": []
+    },
+    "optimization": {
+      "optimized": true,
+      "improvements": [
+        "reduce power",
+        "increase efficiency"
+      ]
+    },
+    "validation": {
+      "valid": true,
+      "checks": [
+        "architecture",
+        "components",
+        "simulation"
+      ]
+    }
+  },
+  {
+    "requirement": {
+      "goal": "health-ping",
+      "power": "unknown",
+      "performance": "unknown",
+      "constraints": []
+    },
+    "architecture": {
+      "architecture": {
+        "processor": "selected later",
+        "memory": "selected later",
+        "communication": "selected later"
+      },
+      "requirement": {
+        "goal": "health-ping",
+        "power": "unknown",
+        "performance": "unknown",
+        "constraints": []
+      }
+    },
+    "components": {
+      "components": [
+        {
+          "name": "processor",
+          "status": "candidate"
+        },
+        {
+          "name": "sensor",
+          "status": "candidate"
+        }
+      ]
+    },
+    "circuit": {
+      "circuit": "generated",
+      "components": {
+        "components": [
+          {
+            "name": "processor",
+            "status": "candidate"
+          },
+          {
+            "name": "sensor",
+            "status": "candidate"
+          }
+        ]
+      }
+    },
+    "simulation": {
+      "simulation": "completed",
+      "performance": "estimated",
+      "errors": []
+    },
+    "optimization": {
+      "optimized": true,
+      "improvements": [
+        "reduce power",
+        "increase efficiency"
+      ]
+    },
+    "validation": {
+      "valid": true,
+      "checks": [
+        "architecture",
+        "components",
+        "simulation"
+      ]
+    }
+  },
+  {
+    "requirement": {
+      "goal": "health-ping",
+      "power": "unknown",
+      "performance": "unknown",
+      "constraints": []
+    },
+    "architecture": {
+      "architecture": {
+        "processor": "selected later",
+        "memory": "selected later",
+        "communication": "selected later"
+      },
+      "requirement": {
+        "goal": "health-ping",
+        "power": "unknown",
+        "performance": "unknown",
+        "constraints": []
+      }
+    },
+    "components": {
+      "components": [
+        {
+          "name": "processor",
+          "status": "candidate"
+        },
+        {
+          "name": "sensor",
+          "status": "candidate"
+        }
+      ]
+    },
+    "circuit": {
+      "circuit": "generated",
+      "components": {
+        "components": [
+          {
+            "name": "processor",
+            "status": "candidate"
+          },
+          {
+            "name": "sensor",
+            "status": "candidate"
+          }
+        ]
+      }
+    },
+    "simulation": {
+      "simulation": "completed",
+      "performance": "estimated",
+      "errors": []
+    },
+    "optimization": {
+      "optimized": true,
+      "improvements": [
+        "reduce power",
+        "increase efficiency"
+      ]
+    },
+    "validation": {
+      "valid": true,
+      "checks": [
+        "architecture",
+        "components",
+        "simulation"
+      ]
+    }
+  },
+  {
+    "requirement": {
+      "goal": "health-ping",
+      "power": "unknown",
+      "performance": "unknown",
+      "constraints": []
+    },
+    "architecture": {
+      "architecture": {
+        "processor": "selected later",
+        "memory": "selected later",
+        "communication": "selected later"
+      },
+      "requirement": {
+        "goal": "health-ping",
+        "power": "unknown",
+        "performance": "unknown",
+        "constraints": []
+      }
+    },
+    "components": {
+      "components": [
+        {
+          "name": "processor",
+          "status": "candidate"
+        },
+        {
+          "name": "sensor",
+          "status": "candidate"
+        }
+      ]
+    },
+    "circuit": {
+      "circuit": "generated",
+      "components": {
+        "components": [
+          {
+            "name": "processor",
+            "status": "candidate"
+          },
+          {
+            "name": "sensor",
+            "status": "candidate"
+          }
+        ]
+      }
+    },
+    "simulation": {
+      "simulation": "completed",
+      "performance": "estimated",
+      "errors": []
+    },
+    "optimization": {
+      "optimized": true,
+      "improvements": [
+        "reduce power",
+        "increase efficiency"
+      ]
+    },
+    "validation": {
+      "valid": true,
+      "checks": [
+        "architecture",
+        "components",
+        "simulation"
+      ]
+    }
+  },
+  {
+    "requirement": {
+      "goal": "hlo",
+      "power": "unknown",
+      "performance": "unknown",
+      "constraints": []
+    },
+    "architecture": {
+      "architecture": {
+        "processor": "selected later",
+        "memory": "selected later",
+        "communication": "selected later"
+      },
+      "requirement": {
+        "goal": "hlo",
+        "power": "unknown",
+        "performance": "unknown",
+        "constraints": []
+      }
+    },
+    "components": {
+      "components": [
+        {
+          "name": "processor",
+          "status": "candidate"
+        },
+        {
+          "name": "sensor",
+          "status": "candidate"
+        }
+      ]
+    },
+    "circuit": {
+      "circuit": "generated",
+      "components": {
+        "components": [
+          {
+            "name": "processor",
+            "status": "candidate"
+          },
+          {
+            "name": "sensor",
+            "status": "candidate"
+          }
+        ]
+      }
+    },
+    "simulation": {
+      "simulation": "completed",
+      "performance": "estimated",
+      "errors": []
+    },
+    "optimization": {
+      "optimized": true,
+      "improvements": [
+        "reduce power",
+        "increase efficiency"
+      ]
+    },
+    "validation": {
+      "valid": true,
+      "checks": [
+        "architecture",
+        "components",
+        "simulation"
+      ]
+    }
+  },
+  {
+    "requirement": {
+      "goal": "hiii",
+      "power": "unknown",
+      "performance": "unknown",
+      "constraints": []
+    },
+    "architecture": {
+      "architecture": {
+        "processor": "selected later",
+        "memory": "selected later",
+        "communication": "selected later"
+      },
+      "requirement": {
+        "goal": "hiii",
+        "power": "unknown",
+        "performance": "unknown",
+        "constraints": []
+      }
+    },
+    "components": {
+      "components": [
+        {
+          "name": "processor",
+          "status": "candidate"
+        },
+        {
+          "name": "sensor",
+          "status": "candidate"
+        }
+      ]
+    },
+    "circuit": {
+      "circuit": "generated",
+      "components": {
+        "components": [
+          {
+            "name": "processor",
+            "status": "candidate"
+          },
+          {
+            "name": "sensor",
+            "status": "candidate"
+          }
+        ]
+      }
+    },
+    "simulation": {
+      "simulation": "completed",
+      "performance": "estimated",
+      "errors": []
+    },
+    "optimization": {
+      "optimized": true,
+      "improvements": [
+        "reduce power",
+        "increase efficiency"
+      ]
+    },
+    "validation": {
+      "valid": true,
+      "checks": [
+        "architecture",
+        "components",
+        "simulation"
+      ]
+    }
+  },
+  {
+    "requirement": {
+      "goal": "health-ping",
+      "power": "unknown",
+      "performance": "unknown",
+      "constraints": []
+    },
+    "architecture": {
+      "architecture": {
+        "processor": "selected later",
+        "memory": "selected later",
+        "communication": "selected later"
+      },
+      "requirement": {
+        "goal": "health-ping",
+        "power": "unknown",
+        "performance": "unknown",
+        "constraints": []
+      }
+    },
+    "components": {
+      "components": [
+        {
+          "name": "processor",
+          "status": "candidate"
+        },
+        {
+          "name": "sensor",
+          "status": "candidate"
+        }
+      ]
+    },
+    "circuit": {
+      "circuit": "generated",
+      "components": {
+        "components": [
+          {
+            "name": "processor",
+            "status": "candidate"
+          },
+          {
+            "name": "sensor",
+            "status": "candidate"
+          }
+        ]
+      }
+    },
+    "simulation": {
+      "simulation": "completed",
+      "performance": "estimated",
+      "errors": []
+    },
+    "optimization": {
+      "optimized": true,
+      "improvements": [
+        "reduce power",
+        "increase efficiency"
+      ]
+    },
+    "validation": {
+      "valid": true,
+      "checks": [
+        "architecture",
+        "components",
+        "simulation"
+      ]
+    }
+  },
+  {
+    "requirement": {
+      "goal": "hi",
+      "power": "unknown",
+      "performance": "unknown",
+      "constraints": []
+    },
+    "architecture": {
+      "architecture": {
+        "processor": "selected later",
+        "memory": "selected later",
+        "communication": "selected later"
+      },
+      "requirement": {
+        "goal": "hi",
+        "power": "unknown",
+        "performance": "unknown",
+        "constraints": []
+      }
+    },
+    "components": {
+      "components": [
+        {
+          "name": "processor",
+          "status": "candidate"
+        },
+        {
+          "name": "sensor",
+          "status": "candidate"
+        }
+      ]
+    },
+    "circuit": {
+      "circuit": "generated",
+      "components": {
+        "components": [
+          {
+            "name": "processor",
+            "status": "candidate"
+          },
+          {
+            "name": "sensor",
+            "status": "candidate"
+          }
+        ]
+      }
+    },
+    "simulation": {
+      "simulation": "completed",
+      "performance": "estimated",
+      "errors": []
+    },
+    "optimization": {
+      "optimized": true,
+      "improvements": [
+        "reduce power",
+        "increase efficiency"
+      ]
+    },
+    "validation": {
+      "valid": true,
+      "checks": [
+        "architecture",
+        "components",
+        "simulation"
+      ]
+    }
+  },
+  {
+    "requirement": {
+      "goal": "health-ping",
+      "power": "unknown",
+      "performance": "unknown",
+      "constraints": []
+    },
+    "architecture": {
+      "architecture": {
+        "processor": "selected later",
+        "memory": "selected later",
+        "communication": "selected later"
+      },
+      "requirement": {
+        "goal": "health-ping",
+        "power": "unknown",
+        "performance": "unknown",
+        "constraints": []
+      }
+    },
+    "components": {
+      "components": [
+        {
+          "name": "processor",
+          "status": "candidate"
+        },
+        {
+          "name": "sensor",
+          "status": "candidate"
+        }
+      ]
+    },
+    "circuit": {
+      "circuit": "generated",
+      "components": {
+        "components": [
+          {
+            "name": "processor",
+            "status": "candidate"
+          },
+          {
+            "name": "sensor",
+            "status": "candidate"
+          }
+        ]
+      }
+    },
+    "simulation": {
+      "simulation": "completed",
+      "performance": "estimated",
+      "errors": []
+    },
+    "optimization": {
+      "optimized": true,
+      "improvements": [
+        "reduce power",
+        "increase efficiency"
+      ]
+    },
+    "validation": {
+      "valid": true,
+      "checks": [
+        "architecture",
+        "components",
+        "simulation"
+      ]
+    }
+  },
+  {
+    "requirement": {
+      "goal": "hello",
+      "power": "unknown",
+      "performance": "unknown",
+      "constraints": []
+    },
+    "architecture": {
+      "architecture": {
+        "processor": "selected later",
+        "memory": "selected later",
+        "communication": "selected later"
+      },
+      "requirement": {
+        "goal": "hello",
+        "power": "unknown",
+        "performance": "unknown",
+        "constraints": []
+      }
+    },
+    "components": {
+      "components": [
+        {
+          "name": "processor",
+          "status": "candidate"
+        },
+        {
+          "name": "sensor",
+          "status": "candidate"
+        }
+      ]
+    },
+    "circuit": {
+      "circuit": "generated",
+      "components": {
+        "components": [
+          {
+            "name": "processor",
+            "status": "candidate"
+          },
+          {
+            "name": "sensor",
+            "status": "candidate"
+          }
+        ]
+      }
+    },
+    "simulation": {
+      "simulation": "completed",
+      "performance": "estimated",
+      "errors": []
+    },
+    "optimization": {
+      "optimized": true,
+      "improvements": [
+        "reduce power",
+        "increase efficiency"
+      ]
+    },
+    "validation": {
+      "valid": true,
+      "checks": [
+        "architecture",
+        "components",
+        "simulation"
+      ]
+    }
+  },
+  {
+    "requirement": {
+      "goal": "health-ping",
+      "power": "unknown",
+      "performance": "unknown",
+      "constraints": []
+    },
+    "architecture": {
+      "architecture": {
+        "processor": "selected later",
+        "memory": "selected later",
+        "communication": "selected later"
+      },
+      "requirement": {
+        "goal": "health-ping",
+        "power": "unknown",
+        "performance": "unknown",
+        "constraints": []
+      }
+    },
+    "components": {
+      "components": [
+        {
+          "name": "processor",
+          "status": "candidate"
+        },
+        {
+          "name": "sensor",
+          "status": "candidate"
+        }
+      ]
+    },
+    "circuit": {
+      "circuit": "generated",
+      "components": {
+        "components": [
+          {
+            "name": "processor",
+            "status": "candidate"
+          },
+          {
+            "name": "sensor",
+            "status": "candidate"
+          }
+        ]
+      }
+    },
+    "simulation": {
+      "simulation": "completed",
+      "performance": "estimated",
+      "errors": []
+    },
+    "optimization": {
+      "optimized": true,
+      "improvements": [
+        "reduce power",
+        "increase efficiency"
+      ]
+    },
+    "validation": {
+      "valid": true,
+      "checks": [
+        "architecture",
+        "components",
+        "simulation"
+      ]
+    }
+  },
+  {
+    "requirement": {
+      "goal": "health-ping",
+      "power": "unknown",
+      "performance": "unknown",
+      "constraints": []
+    },
+    "architecture": {
+      "architecture": {
+        "processor": "selected later",
+        "memory": "selected later",
+        "communication": "selected later"
+      },
+      "requirement": {
+        "goal": "health-ping",
+        "power": "unknown",
+        "performance": "unknown",
+        "constraints": []
+      }
+    },
+    "components": {
+      "components": [
+        {
+          "name": "processor",
+          "status": "candidate"
+        },
+        {
+          "name": "sensor",
+          "status": "candidate"
+        }
+      ]
+    },
+    "circuit": {
+      "circuit": "generated",
+      "components": {
+        "components": [
+          {
+            "name": "processor",
+            "status": "candidate"
+          },
+          {
+            "name": "sensor",
+            "status": "candidate"
+          }
+        ]
+      }
+    },
+    "simulation": {
+      "simulation": "completed",
+      "performance": "estimated",
+      "errors": []
+    },
+    "optimization": {
+      "optimized": true,
+      "improvements": [
+        "reduce power",
+        "increase efficiency"
+      ]
+    },
+    "validation": {
+      "valid": true,
+      "checks": [
+        "architecture",
+        "components",
+        "simulation"
+      ]
+    }
+  },
+  {
+    "requirement": {
+      "goal": "health-ping",
+      "power": "unknown",
+      "performance": "unknown",
+      "constraints": []
+    },
+    "architecture": {
+      "architecture": {
+        "processor": "selected later",
+        "memory": "selected later",
+        "communication": "selected later"
+      },
+      "requirement": {
+        "goal": "health-ping",
+        "power": "unknown",
+        "performance": "unknown",
+        "constraints": []
+      }
+    },
+    "components": {
+      "components": [
+        {
+          "name": "processor",
+          "status": "candidate"
+        },
+        {
+          "name": "sensor",
+          "status": "candidate"
+        }
+      ]
+    },
+    "circuit": {
+      "circuit": "generated",
+      "components": {
+        "components": [
+          {
+            "name": "processor",
+            "status": "candidate"
+          },
+          {
+            "name": "sensor",
+            "status": "candidate"
+          }
+        ]
+      }
+    },
+    "simulation": {
+      "simulation": "completed",
+      "performance": "estimated",
+      "errors": []
+    },
+    "optimization": {
+      "optimized": true,
+      "improvements": [
+        "reduce power",
+        "increase efficiency"
+      ]
+    },
+    "validation": {
+      "valid": true,
+      "checks": [
+        "architecture",
+        "components",
+        "simulation"
+      ]
+    }
+  },
+  {
+    "requirement": {
+      "goal": "health-ping",
+      "power": "unknown",
+      "performance": "unknown",
+      "constraints": []
+    },
+    "architecture": {
+      "architecture": {
+        "processor": "selected later",
+        "memory": "selected later",
+        "communication": "selected later"
+      },
+      "requirement": {
+        "goal": "health-ping",
+        "power": "unknown",
+        "performance": "unknown",
+        "constraints": []
+      }
+    },
+    "components": {
+      "components": [
+        {
+          "name": "processor",
+          "status": "candidate"
+        },
+        {
+          "name": "sensor",
+          "status": "candidate"
+        }
+      ]
+    },
+    "circuit": {
+      "circuit": "generated",
+      "components": {
+        "components": [
+          {
+            "name": "processor",
+            "status": "candidate"
+          },
+          {
+            "name": "sensor",
+            "status": "candidate"
+          }
+        ]
+      }
+    },
+    "simulation": {
+      "simulation": "completed",
+      "performance": "estimated",
+      "errors": []
+    },
+    "optimization": {
+      "optimized": true,
+      "improvements": [
+        "reduce power",
+        "increase efficiency"
+      ]
+    },
+    "validation": {
+      "valid": true,
+      "checks": [
+        "architecture",
+        "components",
+        "simulation"
+      ]
+    }
+  },
+  {
+    "requirement": {
+      "goal": "HELLO",
+      "power": "unknown",
+      "performance": "unknown",
+      "constraints": []
+    },
+    "architecture": {
+      "architecture": {
+        "processor": "selected later",
+        "memory": "selected later",
+        "communication": "selected later"
+      },
+      "requirement": {
+        "goal": "HELLO",
+        "power": "unknown",
+        "performance": "unknown",
+        "constraints": []
+      }
+    },
+    "components": {
+      "components": [
+        {
+          "name": "processor",
+          "status": "candidate"
+        },
+        {
+          "name": "sensor",
+          "status": "candidate"
+        }
+      ]
+    },
+    "circuit": {
+      "circuit": "generated",
+      "components": {
+        "components": [
+          {
+            "name": "processor",
+            "status": "candidate"
+          },
+          {
+            "name": "sensor",
+            "status": "candidate"
+          }
+        ]
+      }
+    },
+    "simulation": {
+      "simulation": "completed",
+      "performance": "estimated",
+      "errors": []
+    },
+    "optimization": {
+      "optimized": true,
+      "improvements": [
+        "reduce power",
+        "increase efficiency"
+      ]
+    },
+    "validation": {
+      "valid": true,
+      "checks": [
+        "architecture",
+        "components",
+        "simulation"
+      ]
+    }
+  },
+  {
+    "requirement": {
+      "goal": "What can you do as a local OM model?",
+      "power": "unknown",
+      "performance": "unknown",
+      "constraints": []
+    },
+    "architecture": {
+      "architecture": {
+        "processor": "selected later",
+        "memory": "selected later",
+        "communication": "selected later"
+      },
+      "requirement": {
+        "goal": "What can you do as a local OM model?",
+        "power": "unknown",
+        "performance": "unknown",
+        "constraints": []
+      }
+    },
+    "components": {
+      "components": [
+        {
+          "name": "processor",
+          "status": "candidate"
+        },
+        {
+          "name": "sensor",
+          "status": "candidate"
+        }
+      ]
+    },
+    "circuit": {
+      "circuit": "generated",
+      "components": {
+        "components": [
+          {
+            "name": "processor",
+            "status": "candidate"
+          },
+          {
+            "name": "sensor",
+            "status": "candidate"
+          }
+        ]
+      }
+    },
+    "simulation": {
+      "simulation": "completed",
+      "performance": "estimated",
+      "errors": []
+    },
+    "optimization": {
+      "optimized": true,
+      "improvements": [
+        "reduce power",
+        "increase efficiency"
+      ]
+    },
+    "validation": {
+      "valid": true,
+      "checks": [
+        "architecture",
+        "components",
+        "simulation"
+      ]
+    }
+  },
+  {
+    "requirement": {
+      "goal": "Who won the Cubs championship?",
+      "power": "unknown",
+      "performance": "unknown",
+      "constraints": []
+    },
+    "architecture": {
+      "architecture": {
+        "processor": "selected later",
+        "memory": "selected later",
+        "communication": "selected later"
+      },
+      "requirement": {
+        "goal": "Who won the Cubs championship?",
+        "power": "unknown",
+        "performance": "unknown",
+        "constraints": []
+      }
+    },
+    "components": {
+      "components": [
+        {
+          "name": "processor",
+          "status": "candidate"
+        },
+        {
+          "name": "sensor",
+          "status": "candidate"
+        }
+      ]
+    },
+    "circuit": {
+      "circuit": "generated",
+      "components": {
+        "components": [
+          {
+            "name": "processor",
+            "status": "candidate"
+          },
+          {
+            "name": "sensor",
+            "status": "candidate"
+          }
+        ]
+      }
+    },
+    "simulation": {
+      "simulation": "completed",
+      "performance": "estimated",
+      "errors": []
+    },
+    "optimization": {
+      "optimized": true,
+      "improvements": [
+        "reduce power",
+        "increase efficiency"
+      ]
+    },
+    "validation": {
+      "valid": true,
+      "checks": [
+        "architecture",
+        "components",
+        "simulation"
+      ]
+    }
+  },
+  {
+    "requirement": {
+      "goal": "health-ping",
+      "power": "unknown",
+      "performance": "unknown",
+      "constraints": []
+    },
+    "architecture": {
+      "architecture": {
+        "processor": "selected later",
+        "memory": "selected later",
+        "communication": "selected later"
+      },
+      "requirement": {
+        "goal": "health-ping",
+        "power": "unknown",
+        "performance": "unknown",
+        "constraints": []
+      }
+    },
+    "components": {
+      "components": [
+        {
+          "name": "processor",
+          "status": "candidate"
+        },
+        {
+          "name": "sensor",
+          "status": "candidate"
+        }
+      ]
+    },
+    "circuit": {
+      "circuit": "generated",
+      "components": {
+        "components": [
+          {
+            "name": "processor",
+            "status": "candidate"
+          },
+          {
+            "name": "sensor",
+            "status": "candidate"
+          }
+        ]
+      }
+    },
+    "simulation": {
+      "simulation": "completed",
+      "performance": "estimated",
+      "errors": []
+    },
+    "optimization": {
+      "optimized": true,
+      "improvements": [
+        "reduce power",
+        "increase efficiency"
+      ]
+    },
+    "validation": {
+      "valid": true,
+      "checks": [
+        "architecture",
+        "components",
+        "simulation"
+      ]
+    }
+  },
+  {
+    "requirement": {
+      "goal": "hi",
+      "power": "unknown",
+      "performance": "unknown",
+      "constraints": []
+    },
+    "architecture": {
+      "architecture": {
+        "processor": "selected later",
+        "memory": "selected later",
+        "communication": "selected later"
+      },
+      "requirement": {
+        "goal": "hi",
+        "power": "unknown",
+        "performance": "unknown",
+        "constraints": []
+      }
+    },
+    "components": {
+      "components": [
+        {
+          "name": "processor",
+          "status": "candidate"
+        },
+        {
+          "name": "sensor",
+          "status": "candidate"
+        }
+      ]
+    },
+    "circuit": {
+      "circuit": "generated",
+      "components": {
+        "components": [
+          {
+            "name": "processor",
+            "status": "candidate"
+          },
+          {
+            "name": "sensor",
+            "status": "candidate"
+          }
+        ]
+      }
+    },
+    "simulation": {
+      "simulation": "completed",
+      "performance": "estimated",
+      "errors": []
+    },
+    "optimization": {
+      "optimized": true,
+      "improvements": [
+        "reduce power",
+        "increase efficiency"
+      ]
+    },
+    "validation": {
+      "valid": true,
+      "checks": [
+        "architecture",
+        "components",
+        "simulation"
+      ]
+    }
+  },
+  {
+    "requirement": {
+      "goal": "kjhbv",
+      "power": "unknown",
+      "performance": "unknown",
+      "constraints": []
+    },
+    "architecture": {
+      "architecture": {
+        "processor": "selected later",
+        "memory": "selected later",
+        "communication": "selected later"
+      },
+      "requirement": {
+        "goal": "kjhbv",
+        "power": "unknown",
+        "performance": "unknown",
+        "constraints": []
+      }
+    },
+    "components": {
+      "components": [
+        {
+          "name": "processor",
+          "status": "candidate"
+        },
+        {
+          "name": "sensor",
+          "status": "candidate"
+        }
+      ]
+    },
+    "circuit": {
+      "circuit": "generated",
+      "components": {
+        "components": [
+          {
+            "name": "processor",
+            "status": "candidate"
+          },
+          {
+            "name": "sensor",
+            "status": "candidate"
+          }
+        ]
+      }
+    },
+    "simulation": {
+      "simulation": "completed",
+      "performance": "estimated",
+      "errors": []
+    },
+    "optimization": {
+      "optimized": true,
+      "improvements": [
+        "reduce power",
+        "increase efficiency"
+      ]
+    },
+    "validation": {
+      "valid": true,
+      "checks": [
+        "architecture",
+        "components",
+        "simulation"
+      ]
+    }
+  },
+  {
+    "requirement": {
+      "goal": "kya hua",
+      "power": "unknown",
+      "performance": "unknown",
+      "constraints": []
+    },
+    "architecture": {
+      "architecture": {
+        "processor": "selected later",
+        "memory": "selected later",
+        "communication": "selected later"
+      },
+      "requirement": {
+        "goal": "kya hua",
+        "power": "unknown",
+        "performance": "unknown",
+        "constraints": []
+      }
+    },
+    "components": {
+      "components": [
+        {
+          "name": "processor",
+          "status": "candidate"
+        },
+        {
+          "name": "sensor",
+          "status": "candidate"
+        }
+      ]
+    },
+    "circuit": {
+      "circuit": "generated",
+      "components": {
+        "components": [
+          {
+            "name": "processor",
+            "status": "candidate"
+          },
+          {
+            "name": "sensor",
+            "status": "candidate"
+          }
+        ]
+      }
+    },
+    "simulation": {
+      "simulation": "completed",
+      "performance": "estimated",
+      "errors": []
+    },
+    "optimization": {
+      "optimized": true,
+      "improvements": [
+        "reduce power",
+        "increase efficiency"
+      ]
+    },
+    "validation": {
+      "valid": true,
+      "checks": [
+        "architecture",
+        "components",
+        "simulation"
+      ]
+    }
+  },
+  {
+    "requirement": {
+      "goal": "What can you do as a local OM model?",
+      "power": "unknown",
+      "performance": "unknown",
+      "constraints": []
+    },
+    "architecture": {
+      "architecture": {
+        "processor": "selected later",
+        "memory": "selected later",
+        "communication": "selected later"
+      },
+      "requirement": {
+        "goal": "What can you do as a local OM model?",
+        "power": "unknown",
+        "performance": "unknown",
+        "constraints": []
+      }
+    },
+    "components": {
+      "components": [
+        {
+          "name": "processor",
+          "status": "candidate"
+        },
+        {
+          "name": "sensor",
+          "status": "candidate"
+        }
+      ]
+    },
+    "circuit": {
+      "circuit": "generated",
+      "components": {
+        "components": [
+          {
+            "name": "processor",
+            "status": "candidate"
+          },
+          {
+            "name": "sensor",
+            "status": "candidate"
+          }
+        ]
+      }
+    },
+    "simulation": {
+      "simulation": "completed",
+      "performance": "estimated",
+      "errors": []
+    },
+    "optimization": {
+      "optimized": true,
+      "improvements": [
+        "reduce power",
+        "increase efficiency"
+      ]
+    },
+    "validation": {
+      "valid": true,
+      "checks": [
+        "architecture",
+        "components",
+        "simulation"
+      ]
+    }
+  },
+  {
+    "requirement": {
+      "goal": "Who won the Cubs championship?",
+      "power": "unknown",
+      "performance": "unknown",
+      "constraints": []
+    },
+    "architecture": {
+      "architecture": {
+        "processor": "selected later",
+        "memory": "selected later",
+        "communication": "selected later"
+      },
+      "requirement": {
+        "goal": "Who won the Cubs championship?",
+        "power": "unknown",
+        "performance": "unknown",
+        "constraints": []
+      }
+    },
+    "components": {
+      "components": [
+        {
+          "name": "processor",
+          "status": "candidate"
+        },
+        {
+          "name": "sensor",
+          "status": "candidate"
+        }
+      ]
+    },
+    "circuit": {
+      "circuit": "generated",
+      "components": {
+        "components": [
+          {
+            "name": "processor",
+            "status": "candidate"
+          },
+          {
+            "name": "sensor",
+            "status": "candidate"
+          }
+        ]
+      }
+    },
+    "simulation": {
+      "simulation": "completed",
+      "performance": "estimated",
+      "errors": []
+    },
+    "optimization": {
+      "optimized": true,
+      "improvements": [
+        "reduce power",
+        "increase efficiency"
+      ]
+    },
+    "validation": {
+      "valid": true,
+      "checks": [
+        "architecture",
+        "components",
+        "simulation"
+      ]
+    }
+  },
+  {
+    "requirement": {
+      "goal": "What can you do as a local OM model?",
+      "power": "unknown",
+      "performance": "unknown",
+      "constraints": []
+    },
+    "architecture": {
+      "architecture": {
+        "processor": "selected later",
+        "memory": "selected later",
+        "communication": "selected later"
+      },
+      "requirement": {
+        "goal": "What can you do as a local OM model?",
+        "power": "unknown",
+        "performance": "unknown",
+        "constraints": []
+      }
+    },
+    "components": {
+      "components": [
+        {
+          "name": "processor",
+          "status": "candidate"
+        },
+        {
+          "name": "sensor",
+          "status": "candidate"
+        }
+      ]
+    },
+    "circuit": {
+      "circuit": "generated",
+      "components": {
+        "components": [
+          {
+            "name": "processor",
+            "status": "candidate"
+          },
+          {
+            "name": "sensor",
+            "status": "candidate"
+          }
+        ]
+      }
+    },
+    "simulation": {
+      "simulation": "completed",
+      "performance": "estimated",
+      "errors": []
+    },
+    "optimization": {
+      "optimized": true,
+      "improvements": [
+        "reduce power",
+        "increase efficiency"
+      ]
+    },
+    "validation": {
+      "valid": true,
+      "checks": [
+        "architecture",
+        "components",
+        "simulation"
+      ]
+    }
+  },
+  {
+    "requirement": {
+      "goal": "Who won the Cubs championship?",
+      "power": "unknown",
+      "performance": "unknown",
+      "constraints": []
+    },
+    "architecture": {
+      "architecture": {
+        "processor": "selected later",
+        "memory": "selected later",
+        "communication": "selected later"
+      },
+      "requirement": {
+        "goal": "Who won the Cubs championship?",
+        "power": "unknown",
+        "performance": "unknown",
+        "constraints": []
+      }
+    },
+    "components": {
+      "components": [
+        {
+          "name": "processor",
+          "status": "candidate"
+        },
+        {
+          "name": "sensor",
+          "status": "candidate"
+        }
+      ]
+    },
+    "circuit": {
+      "circuit": "generated",
+      "components": {
+        "components": [
+          {
+            "name": "processor",
+            "status": "candidate"
+          },
+          {
+            "name": "sensor",
+            "status": "candidate"
+          }
+        ]
+      }
+    },
+    "simulation": {
+      "simulation": "completed",
+      "performance": "estimated",
+      "errors": []
+    },
+    "optimization": {
+      "optimized": true,
+      "improvements": [
+        "reduce power",
+        "increase efficiency"
+      ]
+    },
+    "validation": {
+      "valid": true,
+      "checks": [
+        "architecture",
+        "components",
+        "simulation"
+      ]
+    }
+  },
+  {
+    "requirement": {
+      "goal": "What can you do as a local OM model?",
+      "power": "unknown",
+      "performance": "unknown",
+      "constraints": []
+    },
+    "architecture": {
+      "architecture": {
+        "processor": "selected later",
+        "memory": "selected later",
+        "communication": "selected later"
+      },
+      "requirement": {
+        "goal": "What can you do as a local OM model?",
+        "power": "unknown",
+        "performance": "unknown",
+        "constraints": []
+      }
+    },
+    "components": {
+      "components": [
+        {
+          "name": "processor",
+          "status": "candidate"
+        },
+        {
+          "name": "sensor",
+          "status": "candidate"
+        }
+      ]
+    },
+    "circuit": {
+      "circuit": "generated",
+      "components": {
+        "components": [
+          {
+            "name": "processor",
+            "status": "candidate"
+          },
+          {
+            "name": "sensor",
+            "status": "candidate"
+          }
+        ]
+      }
+    },
+    "simulation": {
+      "simulation": "completed",
+      "performance": "estimated",
+      "errors": []
+    },
+    "optimization": {
+      "optimized": true,
+      "improvements": [
+        "reduce power",
+        "increase efficiency"
+      ]
+    },
+    "validation": {
+      "valid": true,
+      "checks": [
+        "architecture",
+        "components",
+        "simulation"
+      ]
+    }
+  },
+  {
+    "requirement": {
+      "goal": "Who won the Cubs championship?",
+      "power": "unknown",
+      "performance": "unknown",
+      "constraints": []
+    },
+    "architecture": {
+      "architecture": {
+        "processor": "selected later",
+        "memory": "selected later",
+        "communication": "selected later"
+      },
+      "requirement": {
+        "goal": "Who won the Cubs championship?",
+        "power": "unknown",
+        "performance": "unknown",
+        "constraints": []
+      }
+    },
+    "components": {
+      "components": [
+        {
+          "name": "processor",
+          "status": "candidate"
+        },
+        {
+          "name": "sensor",
+          "status": "candidate"
+        }
+      ]
+    },
+    "circuit": {
+      "circuit": "generated",
+      "components": {
+        "components": [
+          {
+            "name": "processor",
+            "status": "candidate"
+          },
+          {
+            "name": "sensor",
+            "status": "candidate"
+          }
+        ]
+      }
+    },
+    "simulation": {
+      "simulation": "completed",
+      "performance": "estimated",
+      "errors": []
+    },
+    "optimization": {
+      "optimized": true,
+      "improvements": [
+        "reduce power",
+        "increase efficiency"
+      ]
+    },
+    "validation": {
+      "valid": true,
+      "checks": [
+        "architecture",
+        "components",
+        "simulation"
+      ]
+    }
+  },
+  {
+    "requirement": {
+      "goal": "Jalalpur Chauraha",
+      "power": "unknown",
+      "performance": "unknown",
+      "constraints": []
+    },
+    "architecture": {
+      "architecture": {
+        "processor": "selected later",
+        "memory": "selected later",
+        "communication": "selected later"
+      },
+      "requirement": {
+        "goal": "Jalalpur Chauraha",
+        "power": "unknown",
+        "performance": "unknown",
+        "constraints": []
+      }
+    },
+    "components": {
+      "components": [
+        {
+          "name": "processor",
+          "status": "candidate"
+        },
+        {
+          "name": "sensor",
+          "status": "candidate"
+        }
+      ]
+    },
+    "circuit": {
+      "circuit": "generated",
+      "components": {
+        "components": [
+          {
+            "name": "processor",
+            "status": "candidate"
+          },
+          {
+            "name": "sensor",
+            "status": "candidate"
+          }
+        ]
+      }
+    },
+    "simulation": {
+      "simulation": "completed",
+      "performance": "estimated",
+      "errors": []
+    },
+    "optimization": {
+      "optimized": true,
+      "improvements": [
+        "reduce power",
+        "increase efficiency"
+      ]
+    },
+    "validation": {
+      "valid": true,
+      "checks": [
+        "architecture",
+        "components",
+        "simulation"
+      ]
+    }
+  },
+  {
+    "requirement": {
+      "goal": "vahan se St per hi aata hai IT Park IT Park",
+      "power": "unknown",
+      "performance": "unknown",
+      "constraints": []
+    },
+    "architecture": {
+      "architecture": {
+        "processor": "selected later",
+        "memory": "selected later",
+        "communication": "selected later"
+      },
+      "requirement": {
+        "goal": "vahan se St per hi aata hai IT Park IT Park",
+        "power": "unknown",
+        "performance": "unknown",
+        "constraints": []
+      }
+    },
+    "components": {
+      "components": [
+        {
+          "name": "processor",
+          "status": "candidate"
+        },
+        {
+          "name": "sensor",
+          "status": "candidate"
+        }
+      ]
+    },
+    "circuit": {
+      "circuit": "generated",
+      "components": {
+        "components": [
+          {
+            "name": "processor",
+            "status": "candidate"
+          },
+          {
+            "name": "sensor",
+            "status": "candidate"
+          }
+        ]
+      }
+    },
+    "simulation": {
+      "simulation": "completed",
+      "performance": "estimated",
+      "errors": []
+    },
+    "optimization": {
+      "optimized": true,
+      "improvements": [
+        "reduce power",
+        "increase efficiency"
+      ]
+    },
+    "validation": {
+      "valid": true,
+      "checks": [
+        "architecture",
+        "components",
+        "simulation"
+      ]
+    }
+  },
+  {
+    "requirement": {
+      "goal": "han to bhaiya tabhi Maine vahan bheja tha ab tum vahan Nahin Dekhe gaye kya karun",
+      "power": "unknown",
+      "performance": "unknown",
+      "constraints": []
+    },
+    "architecture": {
+      "architecture": {
+        "processor": "selected later",
+        "memory": "selected later",
+        "communication": "selected later"
+      },
+      "requirement": {
+        "goal": "han to bhaiya tabhi Maine vahan bheja tha ab tum vahan Nahin Dekhe gaye kya karun",
+        "power": "unknown",
+        "performance": "unknown",
+        "constraints": []
+      }
+    },
+    "components": {
+      "components": [
+        {
+          "name": "processor",
+          "status": "candidate"
+        },
+        {
+          "name": "sensor",
+          "status": "candidate"
+        }
+      ]
+    },
+    "circuit": {
+      "circuit": "generated",
+      "components": {
+        "components": [
+          {
+            "name": "processor",
+            "status": "candidate"
+          },
+          {
+            "name": "sensor",
+            "status": "candidate"
+          }
+        ]
+      }
+    },
+    "simulation": {
+      "simulation": "completed",
+      "performance": "estimated",
+      "errors": []
+    },
+    "optimization": {
+      "optimized": true,
+      "improvements": [
+        "reduce power",
+        "increase efficiency"
+      ]
+    },
+    "validation": {
+      "valid": true,
+      "checks": [
+        "architecture",
+        "components",
+        "simulation"
+      ]
+    }
+  },
+  {
+    "requirement": {
+      "goal": "to aur Achcha main Subah Se mood kyon",
+      "power": "unknown",
+      "performance": "unknown",
+      "constraints": []
+    },
+    "architecture": {
+      "architecture": {
+        "processor": "selected later",
+        "memory": "selected later",
+        "communication": "selected later"
+      },
+      "requirement": {
+        "goal": "to aur Achcha main Subah Se mood kyon",
+        "power": "unknown",
+        "performance": "unknown",
+        "constraints": []
+      }
+    },
+    "components": {
+      "components": [
+        {
+          "name": "processor",
+          "status": "candidate"
+        },
+        {
+          "name": "sensor",
+          "status": "candidate"
+        }
+      ]
+    },
+    "circuit": {
+      "circuit": "generated",
+      "components": {
+        "components": [
+          {
+            "name": "processor",
+            "status": "candidate"
+          },
+          {
+            "name": "sensor",
+            "status": "candidate"
+          }
+        ]
+      }
+    },
+    "simulation": {
+      "simulation": "completed",
+      "performance": "estimated",
+      "errors": []
+    },
+    "optimization": {
+      "optimized": true,
+      "improvements": [
+        "reduce power",
+        "increase efficiency"
+      ]
+    },
+    "validation": {
+      "valid": true,
+      "checks": [
+        "architecture",
+        "components",
+        "simulation"
+      ]
+    }
+  },
+  {
+    "requirement": {
+      "goal": "200 metre",
+      "power": "unknown",
+      "performance": "unknown",
+      "constraints": []
+    },
+    "architecture": {
+      "architecture": {
+        "processor": "selected later",
+        "memory": "selected later",
+        "communication": "selected later"
+      },
+      "requirement": {
+        "goal": "200 metre",
+        "power": "unknown",
+        "performance": "unknown",
+        "constraints": []
+      }
+    },
+    "components": {
+      "components": [
+        {
+          "name": "processor",
+          "status": "candidate"
+        },
+        {
+          "name": "sensor",
+          "status": "candidate"
+        }
+      ]
+    },
+    "circuit": {
+      "circuit": "generated",
+      "components": {
+        "components": [
+          {
+            "name": "processor",
+            "status": "candidate"
+          },
+          {
+            "name": "sensor",
+            "status": "candidate"
+          }
+        ]
+      }
+    },
+    "simulation": {
+      "simulation": "completed",
+      "performance": "estimated",
+      "errors": []
+    },
+    "optimization": {
+      "optimized": true,
+      "improvements": [
+        "reduce power",
+        "increase efficiency"
+      ]
+    },
+    "validation": {
+      "valid": true,
+      "checks": [
+        "architecture",
+        "components",
+        "simulation"
+      ]
+    }
+  },
+  {
+    "requirement": {
+      "goal": "Samne wala Samne Uske Samne",
+      "power": "unknown",
+      "performance": "unknown",
+      "constraints": []
+    },
+    "architecture": {
+      "architecture": {
+        "processor": "selected later",
+        "memory": "selected later",
+        "communication": "selected later"
+      },
+      "requirement": {
+        "goal": "Samne wala Samne Uske Samne",
+        "power": "unknown",
+        "performance": "unknown",
+        "constraints": []
+      }
+    },
+    "components": {
+      "components": [
+        {
+          "name": "processor",
+          "status": "candidate"
+        },
+        {
+          "name": "sensor",
+          "status": "candidate"
+        }
+      ]
+    },
+    "circuit": {
+      "circuit": "generated",
+      "components": {
+        "components": [
+          {
+            "name": "processor",
+            "status": "candidate"
+          },
+          {
+            "name": "sensor",
+            "status": "candidate"
+          }
+        ]
+      }
+    },
+    "simulation": {
+      "simulation": "completed",
+      "performance": "estimated",
+      "errors": []
+    },
+    "optimization": {
+      "optimized": true,
+      "improvements": [
+        "reduce power",
+        "increase efficiency"
+      ]
+    },
+    "validation": {
+      "valid": true,
+      "checks": [
+        "architecture",
+        "components",
+        "simulation"
+      ]
+    }
+  },
+  {
+    "requirement": {
+      "goal": "kya hua",
+      "power": "unknown",
+      "performance": "unknown",
+      "constraints": []
+    },
+    "architecture": {
+      "architecture": {
+        "processor": "selected later",
+        "memory": "selected later",
+        "communication": "selected later"
+      },
+      "requirement": {
+        "goal": "kya hua",
+        "power": "unknown",
+        "performance": "unknown",
+        "constraints": []
+      }
+    },
+    "components": {
+      "components": [
+        {
+          "name": "processor",
+          "status": "candidate"
+        },
+        {
+          "name": "sensor",
+          "status": "candidate"
+        }
+      ]
+    },
+    "circuit": {
+      "circuit": "generated",
+      "components": {
+        "components": [
+          {
+            "name": "processor",
+            "status": "candidate"
+          },
+          {
+            "name": "sensor",
+            "status": "candidate"
+          }
+        ]
+      }
+    },
+    "simulation": {
+      "simulation": "completed",
+      "performance": "estimated",
+      "errors": []
+    },
+    "optimization": {
+      "optimized": true,
+      "improvements": [
+        "reduce power",
+        "increase efficiency"
+      ]
+    },
+    "validation": {
+      "valid": true,
+      "checks": [
+        "architecture",
+        "components",
+        "simulation"
+      ]
+    }
   }
 ]

@@ -13581,6 +13581,328 @@
           "confidence": 0.0
         }
       }
+    ],
+    "599119bf-4e30-46d7-b511-2198e84b04dc": [
+      {
+        "id": "2e0f088a88b843c5",
+        "kind": "episodic",
+        "content": "Jalalpur Chauraha",
+        "scope": "session",
+        "key": "599119bf-4e30-46d7-b511-2198e84b04dc",
+        "created_at": "2026-10-09T13:51:10.197576+00:00",
+        "updated_at": "2026-10-09T13:51:10.197582+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "8756cf577da94e92",
+        "kind": "episodic",
+        "content": "OM's native checkpoint did not produce a usable model-generated answer for this turn. Check that the intended trained checkpoint is loaded, the tokenizer matches its vocabulary, and the server logs show no generation errors.",
+        "scope": "session",
+        "key": "599119bf-4e30-46d7-b511-2198e84b04dc",
+        "created_at": "2026-10-09T13:51:10.203483+00:00",
+        "updated_at": "2026-10-09T13:51:10.203485+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "c8eed315138a4ae6",
+        "kind": "episodic",
+        "content": "vahan se St per hi aata hai IT Park IT Park",
+        "scope": "session",
+        "key": "599119bf-4e30-46d7-b511-2198e84b04dc",
+        "created_at": "2026-10-09T13:51:36.167944+00:00",
+        "updated_at": "2026-10-09T13:51:36.167948+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "536f349348f2444c",
+        "kind": "episodic",
+        "content": "OM's native checkpoint did not produce a usable model-generated answer for this turn. Check that the intended trained checkpoint is loaded, the tokenizer matches its vocabulary, and the server logs show no generation errors.",
+        "scope": "session",
+        "key": "599119bf-4e30-46d7-b511-2198e84b04dc",
+        "created_at": "2026-10-09T13:51:36.171667+00:00",
+        "updated_at": "2026-10-09T13:51:36.171668+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "af3fe62e7dd749db",
+        "kind": "episodic",
+        "content": "han to bhaiya tabhi Maine vahan bheja tha ab tum vahan Nahin Dekhe gaye kya karun",
+        "scope": "session",
+        "key": "599119bf-4e30-46d7-b511-2198e84b04dc",
+        "created_at": "2026-10-09T13:52:18.835221+00:00",
+        "updated_at": "2026-10-09T13:52:18.835226+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "f74de0fabf114ba1",
+        "kind": "episodic",
+        "content": "OM's native checkpoint did not produce a usable model-generated answer for this turn. Check that the intended trained checkpoint is loaded, the tokenizer matches its vocabulary, and the server logs show no generation errors.",
+        "scope": "session",
+        "key": "599119bf-4e30-46d7-b511-2198e84b04dc",
+        "created_at": "2026-10-09T13:52:18.839446+00:00",
+        "updated_at": "2026-10-09T13:52:18.839448+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "af1c7e25d90640e3",
+        "kind": "episodic",
+        "content": "to aur Achcha main Subah Se mood kyon",
+        "scope": "session",
+        "key": "599119bf-4e30-46d7-b511-2198e84b04dc",
+        "created_at": "2026-10-09T13:52:49.001009+00:00",
+        "updated_at": "2026-10-09T13:52:49.001010+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "34b8895647bc4180",
+        "kind": "episodic",
+        "content": "OM's native checkpoint did not produce a usable model-generated answer for this turn. Check that the intended trained checkpoint is loaded, the tokenizer matches its vocabulary, and the server logs show no generation errors.",
+        "scope": "session",
+        "key": "599119bf-4e30-46d7-b511-2198e84b04dc",
+        "created_at": "2026-10-09T13:52:49.005873+00:00",
+        "updated_at": "2026-10-09T13:52:49.005875+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "2efebfb7f4104543",
+        "kind": "episodic",
+        "content": "200 metre",
+        "scope": "session",
+        "key": "599119bf-4e30-46d7-b511-2198e84b04dc",
+        "created_at": "2026-10-09T13:53:14.037156+00:00",
+        "updated_at": "2026-10-09T13:53:14.037157+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "f1ec42b009b94dfd",
+        "kind": "episodic",
+        "content": "OM's native checkpoint did not produce a usable model-generated answer for this turn. Check that the intended trained checkpoint is loaded, the tokenizer matches its vocabulary, and the server logs show no generation errors.",
+        "scope": "session",
+        "key": "599119bf-4e30-46d7-b511-2198e84b04dc",
+        "created_at": "2026-10-09T13:53:14.040654+00:00",
+        "updated_at": "2026-10-09T13:53:14.040655+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "bf9774fee0be4744",
+        "kind": "episodic",
+        "content": "Samne wala Samne Uske Samne",
+        "scope": "session",
+        "key": "599119bf-4e30-46d7-b511-2198e84b04dc",
+        "created_at": "2026-10-09T13:53:28.231476+00:00",
+        "updated_at": "2026-10-09T13:53:28.231477+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "4d753c9efbb84a9c",
+        "kind": "episodic",
+        "content": "OM's native checkpoint did not produce a usable model-generated answer for this turn. Check that the intended trained checkpoint is loaded, the tokenizer matches its vocabulary, and the server logs show no generation errors.",
+        "scope": "session",
+        "key": "599119bf-4e30-46d7-b511-2198e84b04dc",
+        "created_at": "2026-10-09T13:53:28.237802+00:00",
+        "updated_at": "2026-10-09T13:53:28.237804+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "5f55abce88e545a9",
+        "kind": "episodic",
+        "content": "kya hua",
+        "scope": "session",
+        "key": "599119bf-4e30-46d7-b511-2198e84b04dc",
+        "created_at": "2026-10-09T13:54:43.336776+00:00",
+        "updated_at": "2026-10-09T13:54:43.336777+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "06c4e21a00ce4b18",
+        "kind": "episodic",
+        "content": "OM's native checkpoint did not produce a usable model-generated answer for this turn. Check that the intended trained checkpoint is loaded, the tokenizer matches its vocabulary, and the server logs show no generation errors.",
+        "scope": "session",
+        "key": "599119bf-4e30-46d7-b511-2198e84b04dc",
+        "created_at": "2026-10-09T13:54:43.340943+00:00",
+        "updated_at": "2026-10-09T13:54:43.340944+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "assistant",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "68729ebe4b074c49",
+        "kind": "episodic",
+        "content": "hello Awaaz a rahi hai kya",
+        "scope": "session",
+        "key": "599119bf-4e30-46d7-b511-2198e84b04dc",
+        "created_at": "2026-10-09T13:54:53.915735+00:00",
+        "updated_at": "2026-10-09T13:54:53.915736+00:00",
+        "tags": [
+          "turn",
+          "user"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "",
+          "role": "user",
+          "confidence": 0.0
+        }
+      },
+      {
+        "id": "4515e53c27e546c8",
+        "kind": "episodic",
+        "content": "Haan bhai, main yahan hoon",
+        "scope": "session",
+        "key": "599119bf-4e30-46d7-b511-2198e84b04dc",
+        "created_at": "2026-10-09T13:54:53.918628+00:00",
+        "updated_at": "2026-10-09T13:54:53.918634+00:00",
+        "tags": [
+          "turn",
+          "assistant"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "",
+          "role": "assistant",
+          "confidence": 0.0
+        }
+      }
     ]
   },
   "semantic": {
@@ -13730,6 +14052,23 @@
         "source": "companion",
         "meta": {}
       }
+    ],
+    "default:System Admin": [
+      {
+        "id": "2113a3553e734fb1",
+        "kind": "semantic",
+        "content": "Subah",
+        "scope": "user",
+        "key": "name",
+        "created_at": "2026-10-09T13:52:49.023205+00:00",
+        "updated_at": "2026-10-09T13:52:49.023207+00:00",
+        "tags": [
+          "name"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {}
+      }
     ]
   },
   "preferences": {
@@ -13738,7 +14077,8 @@
     "default:Gajendra": [],
     "default:user": [],
     "default:Gajendra Rawat": [],
-    "default:SearchCheck": []
+    "default:SearchCheck": [],
+    "default:System Admin": []
   },
   "project": {
     "ai development": [
@@ -17229,6 +17569,139 @@
         "key": "general",
         "created_at": "2026-10-06T08:30:07.006991+00:00",
         "updated_at": "2026-10-06T08:30:07.006992+00:00",
+        "tags": [
+          "turn"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "8c9f7ea408b54544",
+        "kind": "project",
+        "content": "Jalalpur Chauraha",
+        "scope": "project",
+        "key": "general",
+        "created_at": "2026-10-09T13:51:10.197647+00:00",
+        "updated_at": "2026-10-09T13:51:10.197651+00:00",
+        "tags": [
+          "turn"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "8d998823314441da",
+        "kind": "project",
+        "content": "vahan se St per hi aata hai IT Park IT Park",
+        "scope": "project",
+        "key": "general",
+        "created_at": "2026-10-09T13:51:36.167973+00:00",
+        "updated_at": "2026-10-09T13:51:36.167978+00:00",
+        "tags": [
+          "turn"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "b419f8ee9bd64dea",
+        "kind": "project",
+        "content": "han to bhaiya tabhi Maine vahan bheja tha ab tum vahan Nahin Dekhe gaye kya karun",
+        "scope": "project",
+        "key": "general",
+        "created_at": "2026-10-09T13:52:18.835343+00:00",
+        "updated_at": "2026-10-09T13:52:18.835345+00:00",
+        "tags": [
+          "turn"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "cc2530625fb4485a",
+        "kind": "project",
+        "content": "to aur Achcha main Subah Se mood kyon",
+        "scope": "project",
+        "key": "general",
+        "created_at": "2026-10-09T13:52:49.001025+00:00",
+        "updated_at": "2026-10-09T13:52:49.001026+00:00",
+        "tags": [
+          "turn"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "5609e73a37764ae6",
+        "kind": "project",
+        "content": "200 metre",
+        "scope": "project",
+        "key": "general",
+        "created_at": "2026-10-09T13:53:14.037173+00:00",
+        "updated_at": "2026-10-09T13:53:14.037175+00:00",
+        "tags": [
+          "turn"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "2a036c0e8859430c",
+        "kind": "project",
+        "content": "Samne wala Samne Uske Samne",
+        "scope": "project",
+        "key": "general",
+        "created_at": "2026-10-09T13:53:28.231544+00:00",
+        "updated_at": "2026-10-09T13:53:28.231549+00:00",
+        "tags": [
+          "turn"
+        ],
+        "sensitivity": "normal",
+        "source": "companion",
+        "meta": {
+          "intent": "chat",
+          "role": "user",
+          "confidence": 0.6
+        }
+      },
+      {
+        "id": "f457884702514608",
+        "kind": "project",
+        "content": "kya hua",
+        "scope": "project",
+        "key": "general",
+        "created_at": "2026-10-09T13:54:43.336795+00:00",
+        "updated_at": "2026-10-09T13:54:43.336797+00:00",
         "tags": [
           "turn"
         ],

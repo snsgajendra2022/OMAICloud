@@ -1409,3 +1409,35 @@
 {"id": "292efac39080", "ts": 1791370368.2039309, "role": "assistant", "text": "Understood. I will break this into clear steps and proceed carefully.", "tags": []}
 {"id": "fd2fa8f901dc", "ts": 1791370368.205108, "role": "user", "text": "OM I was thinking about my project and the deploy failed", "tags": []}
 {"id": "086e0fe4fba5", "ts": 1791370368.2051818, "role": "assistant", "text": "Understood. I will break this into clear steps and proceed carefully.", "tags": []}
+{"id": "f35f022086cb", "ts": 1791553870.223528, "role": "user", "text": "Jalalpur Chauraha", "tags": []}
+{"id": "4ce23f706ed1", "ts": 1791553870.223676, "role": "assistant", "text": "OM's native checkpoint did not produce a usable model-generated answer for this turn. Check that the intended trained checkpoint is loaded, the tokenizer matches its vocabulary, and the server logs show no generation errors.", "tags": []}
+{"id": "038f9e5fcbb9", "ts": 1791553870.231481, "role": "user", "text": "Jalalpur Chauraha", "tags": []}
+{"id": "83b9c0d1d417", "ts": 1791553870.2317, "role": "assistant", "text": "OM's native checkpoint did not produce a usable model-generated answer for this turn. Check that the intended trained checkpoint is loaded, the tokenizer matches its vocabulary, and the server logs show no generation errors.", "tags": []}
+{"id": "612f61d64924", "ts": 1791553896.180247, "role": "user", "text": "vahan se St per hi aata hai IT Park IT Park", "tags": []}
+{"id": "a2420ce673f0", "ts": 1791553896.180358, "role": "assistant", "text": "OM's native checkpoint did not produce a usable model-generated answer for this turn. Check that the intended trained checkpoint is loaded, the tokenizer matches its vocabulary, and the server logs show no generation errors.", "tags": []}
+{"id": "e099279ebc88", "ts": 1791553896.181192, "role": "user", "text": "vahan se St per hi aata hai IT Park IT Park", "tags": []}
+{"id": "6ab8880b07d7", "ts": 1791553896.181259, "role": "assistant", "text": "OM's native checkpoint did not produce a usable model-generated answer for this turn. Check that the intended trained checkpoint is loaded, the tokenizer matches its vocabulary, and the server logs show no generation errors.", "tags": []}
+{"id": "e805f8d0641d", "ts": 1791553938.848452, "role": "user", "text": "han to bhaiya tabhi Maine vahan bheja tha ab tum vahan Nahin Dekhe gaye kya karun", "tags": []}
+{"id": "6d82cb6d3b0b", "ts": 1791553938.8485382, "role": "assistant", "text": "I cannot access the screen yet without permission, Sir. Enable screen vision and I will describe what you are looking at.", "tags": []}
+{"id": "9a9ed56a2959", "ts": 1791553938.849322, "role": "user", "text": "han to bhaiya tabhi Maine vahan bheja tha ab tum vahan Nahin Dekhe gaye kya karun", "tags": []}
+{"id": "c59c073c5ce7", "ts": 1791553938.849376, "role": "assistant", "text": "I cannot access the screen yet without permission, Sir. Enable screen vision and I will describe what you are looking at.", "tags": []}
+{"id": "c444fc2cd589", "ts": 1791553969.019584, "role": "user", "text": "to aur Achcha main Subah Se mood kyon", "tags": []}
+{"id": "957ef8ea15e2", "ts": 1791553969.019708, "role": "assistant", "text": "OM's native checkpoint did not produce a usable model-generated answer for this turn. Check that the intended trained checkpoint is loaded, the tokenizer matches its vocabulary, and the server logs show no generation errors.", "tags": []}
+{"id": "e884a8e5f739", "ts": 1791553969.0206761, "role": "user", "text": "to aur Achcha main Subah Se mood kyon", "tags": []}
+{"id": "3133d0adaccd", "ts": 1791553969.020752, "role": "assistant", "text": "OM's native checkpoint did not produce a usable model-generated answer for this turn. Check that the intended trained checkpoint is loaded, the tokenizer matches its vocabulary, and the server logs show no generation errors.", "tags": []}
+{"id": "3d73c2fac2c6", "ts": 1791553994.049537, "role": "user", "text": "200 metre", "tags": []}
+{"id": "cbe5c78b0471", "ts": 1791553994.049676, "role": "assistant", "text": "OM's native checkpoint did not produce a usable model-generated answer for this turn. Check that the intended trained checkpoint is loaded, the tokenizer matches its vocabulary, and the server logs show no generation errors.", "tags": []}
+{"id": "3382750db449", "ts": 1791553994.050454, "role": "user", "text": "200 metre", "tags": []}
+{"id": "31b496752a04", "ts": 1791553994.050503, "role": "assistant", "text": "OM's native checkpoint did not produce a usable model-generated answer for this turn. Check that the intended trained checkpoint is loaded, the tokenizer matches its vocabulary, and the server logs show no generation errors.", "tags": []}
+{"id": "4f36f12ca9fc", "ts": 1791554008.245172, "role": "user", "text": "Samne wala Samne Uske Samne", "tags": []}
+{"id": "3a8699e70bbe", "ts": 1791554008.245354, "role": "assistant", "text": "OM's native checkpoint did not produce a usable model-generated answer for this turn. Check that the intended trained checkpoint is loaded, the tokenizer matches its vocabulary, and the server logs show no generation errors.", "tags": []}
+{"id": "dd259b30bce1", "ts": 1791554008.24632, "role": "user", "text": "Samne wala Samne Uske Samne", "tags": []}
+{"id": "9488b31e1d6f", "ts": 1791554008.2463942, "role": "assistant", "text": "OM's native checkpoint did not produce a usable model-generated answer for this turn. Check that the intended trained checkpoint is loaded, the tokenizer matches its vocabulary, and the server logs show no generation errors.", "tags": []}
+{"id": "77085eceae55", "ts": 1791554083.3500328, "role": "user", "text": "kya hua", "tags": []}
+{"id": "0c0dec2d8967", "ts": 1791554083.350116, "role": "assistant", "text": "OM's native checkpoint did not produce a usable model-generated answer for this turn. Check that the intended trained checkpoint is loaded, the tokenizer matches its vocabulary, and the server logs show no generation errors.", "tags": []}
+{"id": "9873eae5bcf0", "ts": 1791554083.3511832, "role": "user", "text": "kya hua", "tags": []}
+{"id": "84699e30a24a", "ts": 1791554083.351252, "role": "assistant", "text": "OM's native checkpoint did not produce a usable model-generated answer for this turn. Check that the intended trained checkpoint is loaded, the tokenizer matches its vocabulary, and the server logs show no generation errors.", "tags": []}
+{"id": "6f44f0672d32", "ts": 1791554093.910618, "role": "user", "text": "hello Awaaz a rahi hai kya", "tags": []}
+{"id": "2017b6f48635", "ts": 1791554093.910708, "role": "assistant", "text": "Haan bhai, main yahan hoon.", "tags": []}
+{"id": "8c9559144904", "ts": 1791554093.9115572, "role": "user", "text": "hello Awaaz a rahi hai kya", "tags": []}
+{"id": "bbfc69bb9524", "ts": 1791554093.911614, "role": "assistant", "text": "Haan bhai, main yahan hoon.", "tags": []}
