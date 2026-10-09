@@ -7,7 +7,7 @@ import sys
 from pathlib import Path
 
 from om_ai.backends.om_native import OMNativeBackend, default_native_paths
-from om_ai.runtime.engine import EMPTY_GENERATION_FALLBACK, usable_generation_text
+from om_ai.runtime.engine import EMPTY_GENERATION_FALLBACK, is_degenerate_generation, usable_generation_text
 
 
 def main() -> int:
@@ -75,7 +75,9 @@ def main() -> int:
                     "error": str(exc),
                     "hint": (
                         "Confirm OM_MODEL_CONFIG, OM_MODEL_TOKENIZER, and "
-                        "OM_MODEL_CHECKPOINT point to files from the same trained run."
+                        "OM_MODEL_CHECKPOINT point to files from the same trained run. "
+                        "A load success is not a quality pass: token-soup outputs are "
+                        "now marked as failed generation checks."
                     ),
                 },
                 indent=2,
@@ -116,7 +118,7 @@ def main() -> int:
                 repetition_penalty=1.1,
                 min_new_tokens=4,
             )
-            usable = bool(usable_generation_text(answer)) and answer.strip() != EMPTY_GENERATION_FALLBACK
+            usable = (bool(usable_generation_text(answer)) and not is_degenerate_generation(answer) and answer.strip() != EMPTY_GENERATION_FALLBACK)
             if not usable:
                 failures += 1
             print(
