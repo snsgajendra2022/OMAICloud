@@ -212,23 +212,46 @@ def usable_generation_text(text: str | None) -> str:
 
 
 def is_degenerate_generation(text: str | None) -> bool:
-    """True when local OM-1.0 collapsed into repeated possessives / token soup."""
-    s = (text or "").strip()
-    if not s:
-        return True
-    if not usable_generation_text(s):
-        return True
-    words = re.findall(r"\S+", s)
-    if len(words) < 12:
-        return False
-    poss = sum(1 for w in words if "'s" in w or "’s" in w)
-    if poss / len(words) >= 0.18:
-        return True
-    uniq = len({re.sub(r"[^\w]+", "", w.lower()) for w in words} - {""})
-    if uniq / len(words) < 0.22:
-        return True
-    return False
+    """Reject obvious repetition and token-soup outputs from an incompatible/weak checkpoint.
 
+    This is a conservative output-integrity guard, not a substitute for model evaluation.
+    It targets punctuation-heavy fragments and malformed token mixtures while avoiding
+    short greetings and ordinary code-like punctuation.
+    """
+    s = (text or "").strip()
+    if not s or not usable_generation_text(s):
+        return True
+
+    words = re.findall(r"\\S+", s)
+    if len(words) >= 12:
+        poss = sum(1 for w in words if "'s" in w or "’s" in w)
+        if poss / len(words) >= 0.18:
+            return True
+        uniq = len({re.sub(r"[^\\w]+", "", w.lower()) for w in words} - {""})
+        if uniq / len(words) < 0.22:
+            return True
+
+    # Random token fragments often contain a high density of symbols mixed into
+    # otherwise alphabetic text (e.g. "C_yAI*uing ... att(;e potoentPEZec").
+    # Ignore whitespace and common sentence punctuation for this ratio.
+    compact = re.sub(r"\\s+", "", s)
+    if len(compact) >= 24:
+        suspicious = sum(1 for c in compact if c in "_*#\\\\/|{}[]<>~=^①②③④⑤⑥⑦⑧⑨")
+        if suspicious >= 4 and suspicious / len(compact) >= 0.08:
+            return True
+
+        tokens = re.findall(r"[^\\s]+", s)
+        if len(tokens) >= 5:
+            malformed = 0
+            for token in tokens:
+                letters = sum(ch.isalpha() for ch in token)
+                symbols = sum(not ch.isalnum() and ch not in "'’.,!?-:;()" for ch in token)
+                if len(token) >= 4 and letters >= 2 and symbols >= 2:
+                    malformed += 1
+            if malformed / len(tokens) >= 0.25:
+                return True
+
+    return False
 
 def fit_messages_to_context(
     messages: list[dict],
@@ -550,7 +573,11 @@ class LocalLLMEngine:
         stop_set.add(int(self.tokenizer.eos_id))
         while new_ids and int(new_ids[-1]) in stop_set:
             new_ids.pop()
-        return usable_generation_text(self.tokenizer.decode(new_ids))
+        decoded = usable_generation_text(self.tokenizer.decode(new_ids))
+        if is_degenerate_generation(decoded):
+            logger.warning("OM native generation rejected as degenerate token soup")
+            return ""
+        return decoded
 
     def chat(self, messages: list[dict], **gen_kwargs) -> str:
         self._assert_loaded()
