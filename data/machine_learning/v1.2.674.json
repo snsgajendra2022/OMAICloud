@@ -1,0 +1,36 @@
+[
+  {
+    "prompt": "My React app is blank",
+    "response": "Inspect root div mount element in index.html",
+    "original_response": "Check console",
+    "quality_score": 1.0,
+    "source": "user_correction",
+    "context": {},
+    "question": "My React app is blank",
+    "answer": "Inspect root div mount element in index.html",
+    "intent": "general",
+    "domain": "general",
+    "meaning": "",
+    "goal": "",
+    "reasoning_strategy": "default",
+    "verification_strategy": "default",
+    "quality": 1.0
+  },
+  {
+    "prompt": "React error",
+    "response": "Right fix",
+    "original_response": "Wrong fix",
+    "quality_score": 1.0,
+    "source": "user_correction",
+    "context": {},
+    "question": "React error",
+    "answer": "Right fix",
+    "intent": "general",
+    "domain": "general",
+    "meaning": "",
+    "goal": "",
+    "reasoning_strategy": "default",
+    "verification_strategy": "default",
+    "quality": 1.0
+  }
+]

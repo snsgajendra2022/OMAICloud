@@ -10,7 +10,7 @@ from typing import Any
 
 
 _STATIC_SMELL = re.compile(
-    r"(here.?s a clear take|core idea\s*(→|->|/)|want a deeper dive|"
+    r"(here.?s a clear take|plain-language take|is clearest as|core idea\s*(→|->|/)|want a deeper dive|"
     r"ask for a deeper dive|is best understood by|plain-language explanation|"
     r"want a beginner version|define the outcome|define success metrics|"
     r"current state\s*\n.*options|i can help implement this|"

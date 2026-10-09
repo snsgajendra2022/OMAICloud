@@ -113,7 +113,7 @@ def run_chat_pipeline(
         }
         ci_answer = str(chat_intel.get("answer") or "").strip()
         # Early return for greetings / identity / thanks — ChatGPT-like UX
-        if ci_answer and not chat_intel.get("needs_model", True):
+        if ci_answer and not chat_intel.get("needs_model", True) and not looks_like_static_reply(ci_answer):
             stages.append("response")
             return {
                 "answer": ci_answer if ci_answer.endswith("\n") else ci_answer + "\n",
@@ -519,7 +519,7 @@ def run_chat_pipeline(
             ci_intent in {"debugging", "coding", "howto", "comparison", "explain"}
             or len(ci_sol) > len(preferred_draft or "")
         ):
-            if not preferred_draft or ci_intent == "debugging" or len(ci_sol) >= 80:
+            if (not preferred_draft or ci_intent == "debugging") and not looks_like_static_reply(ci_sol):
                 preferred_draft = ci_sol
                 meta["helpful_defaults"] = {
                     "used": True,
