@@ -122,8 +122,7 @@ def run_chat_pipeline(
             "confidence": (chat_intel.get("meta") or {}).get("confidence"),
         }
         ci_answer = str(chat_intel.get("answer") or "").strip()
-        # Early return for greetings / identity / thanks — ChatGPT-like UX
-        force_native_generation = native_model_first_enabled()
+        # Early return for greetings / identity / thanks — disabled in model-first mode.
         if ci_answer and not chat_intel.get("needs_model", True) and not force_native_generation:
             stages.append("response")
             return {
