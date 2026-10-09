@@ -66,7 +66,7 @@ def generation_config(**overrides: Any) -> dict[str, Any]:
         "top_p": _env_float("OM_CHAT_TOP_P", 0.9),
         "top_k": _env_int("OM_CHAT_TOP_K", 50),
         "repetition_penalty": _env_float("OM_CHAT_REPETITION_PENALTY", 1.2),
-        "max_new_tokens": _env_int("OM_CHAT_MAX_NEW_TOKENS", 96),
+        "max_new_tokens": _env_int("OM_CHAT_MAX_NEW_TOKENS", 128),
         "min_new_tokens": _env_int("OM_CHAT_MIN_NEW_TOKENS", 1),
         "no_repeat_ngram_size": _env_int("OM_CHAT_NO_REPEAT_NGRAM", 3),
         "repetition_window": _env_int("OM_CHAT_REPETITION_WINDOW", 128),

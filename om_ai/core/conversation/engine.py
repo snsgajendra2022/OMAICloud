@@ -119,17 +119,19 @@ def classify_relation(current: str, history: list[dict[str, str]]) -> MessageRel
         return MessageRelation.REJECTION if _is_question(previous) else MessageRelation.CONSTRAINT_UPDATE
     if any(low.startswith(prefix) for prefix in _ACTION_STARTS):
         return MessageRelation.ACTION_REQUEST
+    overlap = _overlap(text, previous_user)
+    # A long, semantically unrelated request is a topic switch even if it
+    # contains a demonstrative such as "these" or "that".
+    if previous_user and overlap < 0.015 and len(_words(text)) >= 8:
+        return MessageRelation.TOPIC_SWITCH
     if _REFERENCE_RE.search(text):
         return MessageRelation.REFERENCE
     if previous and _is_question(previous):
         return MessageRelation.ANSWER
-    overlap = _overlap(text, previous_user)
     if overlap >= 0.12:
         return MessageRelation.CONTINUATION
     if len(_words(text)) <= 5:
         return MessageRelation.FOLLOW_UP
-    if previous_user and overlap < 0.015 and len(_words(text)) >= 8:
-        return MessageRelation.TOPIC_SWITCH
     return MessageRelation.EXPANSION
 
 
