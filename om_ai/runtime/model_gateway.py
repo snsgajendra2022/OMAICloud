@@ -66,6 +66,15 @@ class ModelGateway:
         except Exception as exc:
             raise ModelGatewayError("OM native chat failed.") from exc
 
+    def stream_generate(self, prompt: str, **kwargs: Any) -> Iterator[str]:
+        if not isinstance(prompt, str) or not prompt.strip():
+            raise ValueError("prompt must be a non-empty string")
+        self._require_ready()
+        try:
+            yield from self.backend.generate_stream(prompt, **kwargs)
+        except Exception as exc:
+            raise ModelGatewayError("OM native streaming generation failed.") from exc
+
     def stream_chat(
         self, messages: list[dict[str, Any]], **kwargs: Any
     ) -> Iterator[str]:
