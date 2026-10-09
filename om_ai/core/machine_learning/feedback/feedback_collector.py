@@ -65,15 +65,20 @@ class FeedbackCollector:
         return output
 
     def training_candidates(self) -> list[dict[str, Any]]:
+        """Return only consented positive examples suitable for SFT.
+
+        Negative feedback is valuable evaluation/preference signal, but the
+        rejected answer must never be mislabeled as a desired training target.
+        """
         return [
             {
                 "question": row["question"],
                 "answer": row["answer"],
-                "quality_score": 1.0 if row["rating"] > 0 else 0.0,
+                "quality_score": 1.0,
                 "feedback_event_id": row["event_id"],
             }
             for row in self.recent(limit=100000)
-            if row.get("consent_to_training") is True and row.get("rating") != 0
+            if row.get("consent_to_training") is True and row.get("rating") > 0
         ]
 
     @staticmethod
