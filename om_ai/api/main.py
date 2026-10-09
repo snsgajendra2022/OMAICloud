@@ -624,8 +624,13 @@ def generate(
             detail={"prompt_len": len(req.prompt)},
         )
         return {"text": text, "model": engine.info().get("checkpoint_path")}
-    except Exception as exc:
+    except ModelGatewayError as exc:
+        raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail=str(exc)) from exc
+    except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
+    except Exception as exc:
+        logger.exception("Native generate endpoint failed")
+        raise HTTPException(status_code=500, detail="OM generation failed.") from exc
 
 
 @app.post("/v1/generate/stream", tags=["Generate"])
