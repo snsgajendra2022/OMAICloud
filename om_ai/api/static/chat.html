@@ -2067,7 +2067,8 @@ function shareMessage(content) {
 }
 
 function hasLearningConsent() {
-  try { return localStorage.getItem("om_ml_training_consent") === "true"; }
+  const key = "om_ml_training_consent:" + String((state.user && (state.user.id || state.user.user_id || state.user.username)) || "default");
+  try { return localStorage.getItem(key) === "true"; }
   catch (_) { return false; }
 }
 
@@ -4835,9 +4836,10 @@ async function loadLearningView() {
   };
   $("mlRefresh").addEventListener("click", refresh);
   const consentBox = $("mlTrainingConsent");
-  try { consentBox.checked = localStorage.getItem("om_ml_training_consent") === "true"; } catch (_) {}
+  const consentKey = "om_ml_training_consent:" + String((state.user && (state.user.id || state.user.user_id || state.user.username)) || "default");
+  try { consentBox.checked = localStorage.getItem(consentKey) === "true"; } catch (_) {}
   consentBox.addEventListener("change", () => {
-    try { localStorage.setItem("om_ml_training_consent", consentBox.checked ? "true" : "false"); } catch (_) {}
+    try { localStorage.setItem(consentKey, consentBox.checked ? "true" : "false"); } catch (_) {}
     toast(consentBox.checked ? "Training consent enabled for future positive feedback" : "Training consent revoked", "success");
   });
   $("mlBuildFeedback").addEventListener("click", async () => {
