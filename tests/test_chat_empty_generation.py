@@ -26,6 +26,15 @@ def test_usable_generation_text_rejects_empty_and_garbage():
     assert usable_generation_text("Hello — I'm OM AI.") == "Hello — I'm OM AI."
 
 
+def test_degenerate_generation_rejects_token_soup_but_keeps_normal_text():
+    from om_ai.runtime.engine import is_degenerate_generation
+
+    garbage = "C_yAI*uing andev9roal R#1e p atten att(;e potoentPEZec att))k/Uing andAIrEPu"
+    assert is_degenerate_generation(garbage)
+    assert not is_degenerate_generation("The sky appears blue because air scatters blue light more strongly.")
+    assert not is_degenerate_generation("Hello — I'm OM AI.")
+
+
 def test_fit_messages_drops_oversized_system_for_tiny_context():
     if not TOK_FIXED.is_file():
         pytest.skip("tokenizer-fixed-v3 missing")
