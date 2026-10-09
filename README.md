@@ -110,3 +110,10 @@ The existing training stack (pretraining, SFT, DPO/PPO, reward modeling, and reg
 ## Frontier-model reality
 
 Owning a capable private model still means: licensed corpus → tokenizer → cluster pretrain → SFT/alignment → eval → deployed weights. This repo is the engineering foundation for that process — not a substitute for the training work itself.
+
+
+## Context-aware conversation pipeline
+
+The production `chat_reply` path now runs `om_ai.core.conversation.ConversationEngine` before the existing generation cascade. It classifies the relationship of a turn to recent history, resolves pronoun/reference candidates against actual prior turns, ranks relevant history, and injects a bounded context note while preserving the current user message and system instructions. It does not generate answers or replace the configured model.
+
+Configure with `OM_CONVERSATION_CONTEXT=1` (default), `OM_CONVERSATION_MAX_HISTORY=8`, `OM_CONVERSATION_MAX_RELEVANT=4`, and `OM_CONVERSATION_SUMMARY_MAX_CHARS=700`. Set the first variable to `0` only for diagnostics. This is a lightweight lexical/recency ranker, not an embedding-based semantic search system; a production semantic retriever can later be plugged into the same context layer.

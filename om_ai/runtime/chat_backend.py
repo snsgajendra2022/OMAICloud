@@ -1168,6 +1168,23 @@ def chat_reply(
         cleaned_messages.append({"role": role, "content": content})
     messages = cleaned_messages
 
+    # One context-preparation layer before the production generation cascade.
+    # This is context management only; it never generates or fabricates an answer.
+    if _env("OM_CONVERSATION_CONTEXT", "1").lower() not in {"0", "false", "no", "off"}:
+        try:
+            from om_ai.core.conversation import ConversationEngine
+
+            messages, conversation_state = ConversationEngine().prepare(messages)
+            logger.debug(
+                "Conversation context prepared: relation=%s, history=%d, reference=%s",
+                conversation_state.relation.value,
+                len(conversation_state.relevant_history),
+                bool(conversation_state.references),
+            )
+        except Exception as exc:
+            # Preserve chat availability, but do not substitute a canned answer.
+            logger.warning("Conversation context preparation skipped: %s", exc)
+
     profile = level_runtime_profile(model)
     evo_text, evo_model, evo_level = maybe_evolution_reply(messages, model=model)
     if evo_text is not None:
