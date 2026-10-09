@@ -30,6 +30,13 @@ def pipeline_enabled() -> bool:
     }
 
 
+def native_model_first_enabled() -> bool:
+    """Whether the native OM checkpoint must synthesize every chat response."""
+    return os.environ.get("OM_NATIVE_MODEL_FIRST", "1").strip().lower() not in {
+        "0", "false", "no", "off"
+    }
+
+
 def run_chat_pipeline(
     user_text: str,
     *,
@@ -47,6 +54,7 @@ def run_chat_pipeline(
 ) -> dict[str, Any]:
     """Run the upgraded staged chat pipeline. Returns answer + stage meta."""
     q = (user_text or "").strip()
+    force_native_generation = native_model_first_enabled()
     stages: list[str] = []
     meta: dict[str, Any] = {"pipeline": "om-chat-pipeline-v2"}
     forced = [str(t).strip() for t in (force_tools or []) if str(t).strip()]
@@ -113,7 +121,7 @@ def run_chat_pipeline(
         }
         ci_answer = str(chat_intel.get("answer") or "").strip()
         # Early return for greetings / identity / thanks — ChatGPT-like UX
-        if ci_answer and not chat_intel.get("needs_model", True) and not looks_like_static_reply(ci_answer):
+        if ci_answer and not chat_intel.get("needs_model", True) and not looks_like_static_reply(ci_answer) and not force_native_generation:
             stages.append("response")
             return {
                 "answer": ci_answer if ci_answer.endswith("\n") else ci_answer + "\n",
@@ -726,6 +734,12 @@ def run_chat_pipeline(
         ).strip()
         meta["planning_hint"] = True
 
+    if force_native_generation and preferred_draft:
+        internal_context = (internal_context + "\nRelevant internal draft (use as evidence, rewrite in your own words):\n" + preferred_draft[:1200]).strip()
+        preferred_draft = ""
+        draft = ""
+        meta["native_model_first"] = True
+
     stages.append("reasoning")
     try:
         from om_ai.core.reasoning.pipeline import run_reasoning_pipeline
@@ -790,12 +804,12 @@ def run_chat_pipeline(
     stages.append("model")
     model_text = ""
     used_model = False
-    need_model = not draft or len(draft) < 40
-    if preferred_draft and len(preferred_draft) >= 40 and draft == preferred_draft:
+    need_model = True if force_native_generation else (not draft or len(draft) < 40)
+    if not force_native_generation and preferred_draft and len(preferred_draft) >= 40 and draft == preferred_draft:
         need_model = False
         meta["model_skip"] = "preferred_draft"
 
-    if ctx_intent.get("intent") == "conversation":
+    if ctx_intent.get("intent") == "conversation" and not force_native_generation:
         need_model = False
         low = q.lower()
         if "morning" in low or "moring" in low:
@@ -845,6 +859,14 @@ def run_chat_pipeline(
             meta["model"] = {"used": False, "error": str(exc)}
     else:
         meta["model"] = {"used": False, "reason": "draft_ready" if draft else "model_unavailable"}
+
+    if force_native_generation and not used_model:
+        draft = (
+            "OM's native checkpoint did not produce a usable model-generated answer "
+            "for this turn. Check that the intended trained checkpoint is loaded, "
+            "the tokenizer matches its vocabulary, and the server logs show no generation errors."
+        )
+        meta["native_generation_failed"] = True
 
     if not (draft or "").strip() and public_tool:
         draft = public_tool
