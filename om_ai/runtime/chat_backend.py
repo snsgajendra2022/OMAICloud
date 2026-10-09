@@ -479,6 +479,12 @@ def _om_native_chat_reply_body(
                     ans = ""
             except Exception:
                 pass
+            # A pipeline's diagnostic notice is not a user answer. Treat it as
+            # a failed stage and continue to the native cascade, which may still
+            # provide a safe grounded/tool response or a useful local fallback.
+            if "did not produce a usable model-generated answer" in ans.lower():
+                logger.warning("chatgpt_runtime returned native-generation failure notice; continuing fallback cascade")
+                ans = ""
             if ans and not ResponseEcho.check(user_text, ans):
                 info_crt = ChatBackendInfo(
                     backend=info.backend,
@@ -533,6 +539,11 @@ def _om_native_chat_reply_body(
                     ans = ""
             except Exception:
                 pass
+            # Do not expose internal model-failure diagnostics as the final
+            # chat bubble. Let later native/grounded fallback stages recover.
+            if "did not produce a usable model-generated answer" in ans.lower():
+                logger.warning("chat_pipeline returned native-generation failure notice; continuing fallback cascade")
+                ans = ""
             if ans and not ResponseEcho.check(user_text, ans):
                 info_pipe = ChatBackendInfo(
                     backend=info.backend,
