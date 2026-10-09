@@ -1037,6 +1037,10 @@ def _om_native_chat_reply_body(
         return _out(grounded)
 
     if native_chat is None or not native_ready:
+        if _env_on("OM_NATIVE_MODEL_FIRST", "1"):
+            raise NativeCheckpointError(
+                "OM-1.0 native checkpoint is unavailable; no substitute answer was generated."
+            )
         from om_ai.core.response.response_formatter import ensure_public_reply
 
         public = ensure_public_reply(user_text, "")
