@@ -1,13 +1,15 @@
 #!/usr/bin/env python3
-"""Run a reproducible smoke evaluation against OM's native backend only.
+"""Run a reproducible native-only OM capability smoke evaluation.
 
-This produces a capability sample report, not a benchmark score or parity claim.
-No hosted LLM or external inference service is called.
+This is a small regression smoke test, not a standardized benchmark or a parity claim.
+It never calls a hosted LLM. Selected tasks use deterministic, intentionally simple
+checks; all saved answers remain available for human review.
 """
 from __future__ import annotations
 
 import argparse
 import json
+import re
 import time
 from datetime import datetime, timezone
 from pathlib import Path
@@ -32,11 +34,91 @@ CASES = [
 ]
 
 
+def deterministic_checks(category: str, answer: str) -> dict[str, bool]:
+    """Return transparent smoke checks; these are not semantic-quality judgments."""
+    text = answer or ""
+    normalized = text.lower()
+    checks: dict[str, bool] = {}
+
+    if category == "conversation":
+        checks["one_sentence_like"] = 1 <= len(re.findall(r"[.!?](?:['\"”)]*)?(?:\s|$)", text)) <= 2
+        checks["mentions_om"] = "om" in normalized
+    elif category == "instruction_following":
+        numbered = re.findall(r"(?m)^\s*(?:\d+[.)]|[-*])\s+\S", text)
+        checks["exactly_three_list_items"] = len(numbered) == 3
+    elif category == "knowledge":
+        checks["mentions_light_scattering"] = any(
+            phrase in normalized for phrase in ("scatter", "scattering", "scatters")
+        )
+        checks["mentions_blue_light_or_wavelength"] = "blue" in normalized and any(
+            phrase in normalized for phrase in ("light", "wavelength", "shorter")
+        )
+    elif category == "math":
+        checks["contains_391"] = bool(re.search(r"(?<!\d)391(?!\d)", text))
+    elif category == "logic":
+        checks["rejects_invalid_conclusion"] = any(
+            phrase in normalized for phrase in (
+                "cannot conclude", "can't conclude", "not necessarily",
+                "does not follow", "cannot be concluded", "not enough information",
+                "doesn't follow", "no conclusion"
+            )
+        )
+    elif category == "planning":
+        numbered = re.findall(r"(?m)^\s*\d+[.)]\s+\S", text)
+        checks["four_numbered_steps"] = len(numbered) == 4
+        checks["mentions_python_or_practice"] = "python" in normalized or "practice" in normalized
+    elif category == "coding":
+        checks["contains_function_name"] = "is_palindrome" in text
+        checks["contains_at_least_two_asserts"] = len(re.findall(r"(?m)^\s*assert\b", text)) >= 2
+        checks["mentions_case_or_lowercase"] = any(
+            phrase in normalized for phrase in ("lower()", "case", "lowercase", "casefold()")
+        )
+    elif category == "debugging":
+        checks["fixes_string_return"] = bool(
+            re.search(r"(?m)^\s*return\s+a\s*\+\s*b\s*(?:#.*)?$", text)
+        )
+        checks["explains_string_type_issue"] = any(
+            phrase in normalized for phrase in ("string", "str(", "type")
+        )
+    elif category == "structured_output":
+        try:
+            parsed = json.loads(text)
+            checks["valid_json_with_expected_values"] = (
+                isinstance(parsed, dict)
+                and parsed.get("name") == "OM"
+                and parsed.get("skills") == ["chat", "coding"]
+            )
+        except (json.JSONDecodeError, TypeError):
+            checks["valid_json_with_expected_values"] = False
+    elif category == "uncertainty":
+        checks["does_not_claim_exact_forecast"] = any(
+            phrase in normalized for phrase in (
+                "can't know", "cannot know", "can't predict", "cannot predict",
+                "not possible", "need your location", "weather forecast", "live weather",
+                "check a weather service", "weather tool", "i don't have access"
+            )
+        )
+    elif category == "context_retention":
+        checks["acknowledges_saved"] = "saved" in normalized
+    elif category == "tool_awareness":
+        checks["asks_for_file_or_access"] = any(
+            phrase in normalized for phrase in (
+                "upload the file", "attach the file", "please upload", "please attach",
+                "provide the file", "share the file", "need access", "can't access",
+                "cannot access", "no file was attached"
+            )
+        )
+    return checks
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", default="artifacts/evaluations/om-capability-smoke.json")
     parser.add_argument("--max-new-tokens", type=int, default=160)
     args = parser.parse_args()
+
+    if args.max_new_tokens < 1:
+        parser.error("--max-new-tokens must be greater than zero")
 
     paths = default_native_paths()
     required = ("config", "tokenizer", "checkpoint")
@@ -70,7 +152,8 @@ def main() -> int:
 
     results = []
     failures = 0
-    conversation = []
+    total_generation_seconds = 0.0
+    conversation: list[dict[str, str]] = []
     for category, prompt in CASES:
         messages = conversation + [{"role": "user", "content": prompt}] if category == "context_retention" else [{"role": "user", "content": prompt}]
         started = time.perf_counter()
@@ -85,37 +168,17 @@ def main() -> int:
                 min_new_tokens=4,
             )
             elapsed = round(time.perf_counter() - started, 3)
+            total_generation_seconds += elapsed
             usable = bool((answer or "").strip()) and not is_degenerate_generation(answer)
-            correctness: dict[str, bool] = {}
-            normalized = (answer or "").lower()
-            if category == "math":
-                correctness["contains_391"] = "391" in normalized
-            elif category == "logic":
-                correctness["rejects_invalid_conclusion"] = any(
-                    phrase in normalized for phrase in (
-                        "cannot conclude", "can't conclude", "not necessarily",
-                        "does not follow", "cannot be concluded", "not enough information"
-                    )
-                )
-            elif category == "structured_output":
-                try:
-                    parsed = json.loads(answer or "")
-                    correctness["valid_json"] = (
-                        isinstance(parsed, dict)
-                        and parsed.get("name") == "OM"
-                        and parsed.get("skills") == ["chat", "coding"]
-                    )
-                except (json.JSONDecodeError, TypeError):
-                    correctness["valid_json"] = False
-            elif category == "context_retention":
-                correctness["acknowledges_saved"] = "saved" in normalized
-            if correctness:
-                usable = usable and all(correctness.values())
-            if not usable:
+            correctness = deterministic_checks(category, answer or "")
+            passed_checks = all(correctness.values()) if correctness else True
+            ok = usable and passed_checks
+            if not ok:
                 failures += 1
             results.append({
                 "category": category,
-                "ok": usable,
+                "ok": ok,
+                "usable_output": usable,
                 "correctness_checks": correctness,
                 "elapsed_seconds": elapsed,
                 "prompt": prompt,
@@ -138,6 +201,7 @@ def main() -> int:
                     min_new_tokens=1,
                 )
                 followup_elapsed = round(time.perf_counter() - started, 3)
+                total_generation_seconds += followup_elapsed
                 followup_ok = (
                     bool((followup or "").strip())
                     and not is_degenerate_generation(followup)
@@ -148,6 +212,7 @@ def main() -> int:
                 results.append({
                     "category": "context_retention_followup",
                     "ok": followup_ok,
+                    "usable_output": bool((followup or "").strip()) and not is_degenerate_generation(followup),
                     "elapsed_seconds": followup_elapsed,
                     "prompt": conversation[-1]["content"],
                     "answer": (followup or "")[:1000],
@@ -156,15 +221,19 @@ def main() -> int:
                 })
         except Exception as exc:
             failures += 1
+            elapsed = round(time.perf_counter() - started, 3)
+            total_generation_seconds += elapsed
             results.append({
                 "category": category,
                 "ok": False,
-                "elapsed_seconds": round(time.perf_counter() - started, 3),
+                "usable_output": False,
+                "elapsed_seconds": elapsed,
                 "prompt": prompt,
                 "error_type": type(exc).__name__,
                 "error": str(exc),
             })
 
+    passed = sum(1 for item in results if item.get("ok"))
     report = {
         "created_at": datetime.now(timezone.utc).isoformat(),
         "backend": "om_native",
@@ -177,9 +246,16 @@ def main() -> int:
             "tokenizer_fingerprint": load_info.get("tokenizer_fingerprint"),
         },
         "case_count": len(results),
-        "usable_output_count": sum(1 for item in results if item.get("ok")),
-        "failed_output_count": failures,
-        "note": "Smoke evaluation only. Basic deterministic checks are applied to selected cases; read answers and score the rest manually. This is not proof of cloud-model parity.",
+        "passed_case_count": passed,
+        "failed_case_count": len(results) - passed,
+        "pass_rate": round(passed / len(results), 4) if results else 0.0,
+        "total_generation_seconds": round(total_generation_seconds, 3),
+        "usable_output_count": sum(1 for item in results if item.get("usable_output")),
+        "note": (
+            "Smoke evaluation only, not a standardized benchmark or cloud-model parity claim. "
+            "Deterministic checks are intentionally simple and can produce false negatives; "
+            "inspect saved prompts, answers and checks before drawing quality conclusions."
+        ),
         "results": results,
     }
     output = Path(args.output)
@@ -189,8 +265,10 @@ def main() -> int:
         "ok": failures == 0,
         "report": str(output),
         "case_count": len(results),
-        "usable_output_count": report["usable_output_count"],
-        "failed_output_count": failures,
+        "passed_case_count": passed,
+        "failed_case_count": len(results) - passed,
+        "pass_rate": report["pass_rate"],
+        "total_generation_seconds": report["total_generation_seconds"],
         "hosted_fallback_used": False,
     }, indent=2))
     return 0 if failures == 0 else 3
