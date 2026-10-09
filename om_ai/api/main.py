@@ -425,10 +425,17 @@ def health():
     # Native backend health is authoritative: an arbitrary in-memory model
     # object is not enough to claim production readiness.
     try:
-        native_health = native_backend.health()
-        model_ready = bool(native_health.get("ok"))
+        raw_native_health = native_backend.health()
+        model_ready = bool(raw_native_health.get("ok"))
+        native_health = {
+            key: raw_native_health.get(key)
+            for key in ("ok", "backend", "name", "loaded", "trained",
+                        "checkpoint_present", "device")
+        }
+        if raw_native_health.get("error"):
+            native_health["error_type"] = "NativeModelError"
     except Exception as exc:
-        native_health = {"ok": False, "error": type(exc).__name__}
+        native_health = {"ok": False, "error_type": type(exc).__name__}
         model_ready = False
     brain_ok = True
     memory_ok = True
@@ -483,9 +490,16 @@ def health():
 def ready():
     """Readiness probe — 200 only when a real compatible native checkpoint is loaded."""
     try:
-        model_health = native_backend.health()
+        raw_health = native_backend.health()
+        model_health = {
+            key: raw_health.get(key)
+            for key in ("ok", "backend", "name", "loaded", "trained",
+                        "checkpoint_present", "device")
+        }
+        if raw_health.get("error"):
+            model_health["error_type"] = "NativeModelError"
     except Exception as exc:
-        model_health = {"ok": False, "error": type(exc).__name__}
+        model_health = {"ok": False, "error_type": type(exc).__name__}
     if not model_health.get("ok"):
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
