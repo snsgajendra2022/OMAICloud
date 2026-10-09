@@ -7,7 +7,7 @@ from pathlib import Path
 import pytest
 
 from om_ai.backends.base import NativeCheckpointError
-from om_ai.backends.om_native import OMNativeBackend
+from om_ai.backends.om_native import OMNativeBackend, _load_project_env
 from om_ai.runtime import chat_backend as cb
 from om_ai.runtime.engine import CheckpointTokenizerMismatch, LocalLLMEngine
 from om_ai.tokenizer import load_tokenizer, tokenizer_fingerprint
@@ -317,3 +317,26 @@ def test_checkpoint_vocab_mismatch_autoselects_extra_tokenizer(tmp_path: Path):
     assert eng.model is not None
     assert eng.model.cfg.vocab_size == len(tok_wide.vocab)
     assert info["tokenizer"]["vocab_size"] == len(tok_wide.vocab)
+
+
+def test_project_env_loads_from_repo_root_and_preserves_shell_values(tmp_path: Path, monkeypatch):
+    import os
+
+    env_file = tmp_path / ".env"
+    env_file.write_text(
+        "OM_MODEL_CONFIG=configs/from-env.json\\n"
+        "OM_MODEL_TOKENIZER=artifacts/from-env-tokenizer.json\\n"
+        "OM_MODEL_CHECKPOINT=artifacts/from-env-checkpoint/latest.pt\\n",
+        encoding="utf-8",
+    )
+    for key in ("OM_MODEL_CONFIG", "OM_MODEL_TOKENIZER", "OM_MODEL_CHECKPOINT"):
+        monkeypatch.delenv(key, raising=False)
+
+    _load_project_env(tmp_path)
+    assert os.environ["OM_MODEL_CONFIG"] == "configs/from-env.json"
+    assert os.environ["OM_MODEL_TOKENIZER"] == "artifacts/from-env-tokenizer.json"
+    assert os.environ["OM_MODEL_CHECKPOINT"] == "artifacts/from-env-checkpoint/latest.pt"
+
+    monkeypatch.setenv("OM_MODEL_CHECKPOINT", "/explicit/shell/checkpoint.pt")
+    _load_project_env(tmp_path)
+    assert os.environ["OM_MODEL_CHECKPOINT"] == "/explicit/shell/checkpoint.pt"
