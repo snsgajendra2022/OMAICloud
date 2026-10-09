@@ -30,7 +30,9 @@ def test_chat_ui_exists_and_is_native_contract():
     assert '"/api/ml/datasets/prepare"' in body
     assert '"/api/ml/evaluate"' in body
     # Feedback is recorded without silently opting the user into model training.
-    assert "consent_to_training:false" in body
+    assert "consent_to_training:rating>=4 && hasLearningConsent()" in body
+    assert 'id="mlTrainingConsent"' in body
+    assert '"/api/ml/datasets/from-feedback"' in body
     # Header readiness is derived from /health rather than hard-coded claims.
     assert 'async function refreshRuntimeStatus()' in body
     assert 'api("/health"' in body
