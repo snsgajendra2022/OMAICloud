@@ -28,6 +28,40 @@ def main() -> int:
     }
     print(json.dumps(report, indent=2), flush=True)
 
+    # Fail before allocating model memory when paths are wrong. In particular,
+    # a stale .env value must not be mistaken for a missing trained checkpoint.
+    missing = [
+        (key, value)
+        for key, value in paths.items()
+        if key in {"config", "tokenizer", "checkpoint"}
+        and (not value or not Path(value).is_file())
+    ]
+    if missing:
+        root = Path(__file__).resolve().parents[1]
+        available_configs = sorted(
+            str(path.relative_to(root)) for path in (root / "configs").glob("*.json")
+        )
+        print(
+            json.dumps(
+                {
+                    "stage": "preflight",
+                    "ok": False,
+                    "error_type": "NativeAssetPathError",
+                    "missing": [{"asset": key, "path": value or None} for key, value in missing],
+                    "available_configs": available_configs,
+                    "hint": (
+                        "Check .env and exported OM_MODEL_CONFIG / OM_AI_CONFIG values. "
+                        "Do not select a different config merely because it exists: "
+                        "the config architecture, tokenizer vocabulary, and checkpoint "
+                        "must come from the same trained run."
+                    ),
+                },
+                indent=2,
+            ),
+            flush=True,
+        )
+        return 2
+
     backend = OMNativeBackend()
     try:
         loaded = backend.load(require_checkpoint=True)
