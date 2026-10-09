@@ -307,6 +307,26 @@ class LocalLLMEngine:
         self._tokenizer_path = None
         self._tokenizer_fingerprint = None
 
+    @property
+    def checkpoint_path(self) -> str | None:
+        return self._checkpoint_path
+
+    @property
+    def tokenizer_path(self) -> str | None:
+        return self._tokenizer_path
+
+    @property
+    def config_path(self) -> str | None:
+        return self._config_path
+
+    @property
+    def tokenizer_fingerprint(self) -> str | None:
+        return self._tokenizer_fingerprint
+
+    @property
+    def is_loaded(self) -> bool:
+        return self.model is not None and self.tokenizer is not None
+
     def load(self, config_path: str, tokenizer_path: str, checkpoint_path: str, device: str | None = None) -> dict:
         cfg = ModelConfig.from_json(config_path)
         ckpt = torch.load(checkpoint_path, map_location="cpu", weights_only=False)

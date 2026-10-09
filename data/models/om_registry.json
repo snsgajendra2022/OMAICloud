@@ -11,5 +11,18 @@
       "research"
     ],
     "created_at": "2026-09-03T08:19:27.398740"
+  },
+  {
+    "name": "OM-Foundation",
+    "version": "0.1",
+    "model_type": "LLM",
+    "parameters": "7B",
+    "status": "created",
+    "capabilities": [
+      "reasoning",
+      "coding",
+      "research"
+    ],
+    "created_at": "2026-10-08T11:45:22.975019"
   }
 ]

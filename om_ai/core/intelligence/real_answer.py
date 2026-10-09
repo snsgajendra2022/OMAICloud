@@ -73,6 +73,17 @@ def _looks_like_garbage(text: str) -> bool:
     t = (text or "").strip()
     if not t:
         return True
+    try:
+        from om_ai.core.model_runtime.quality_gate import GenerationQualityGate
+
+        if not GenerationQualityGate().evaluate(t).passed:
+            return True
+    except Exception:
+        pass
+    # Control characters or excessive corrupt characters
+    ctrl = sum(1 for ch in t if ord(ch) < 32 and ch not in "\n\r\t")
+    if ctrl > 0:
+        return True
     # Allow short greetings
     if len(t) < 160 and re.match(
         r"^(hi|hey|hello|namaste|i('m| am) om)\b",

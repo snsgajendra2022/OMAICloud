@@ -1,6 +1,6 @@
 """Dataset-powered brain — retrieve real answers from ingested corpora (no dummy templates).
 
-Indexes instruction->output pairs from OM knowledge brain / genesis / chat SFT
+Indexes instruction->output pairs from OM knowledge brain / genesis / chat SFT / distillation
 into a local SQLite TF-IDF store used when the tiny model fails quality checks.
 """
 from __future__ import annotations
@@ -30,26 +30,17 @@ _CORPUS_PRIORITY = {
 # Candidate local dataset locations (relative to repo root).
 # Missing files are silently skipped.
 _CORPUS_CANDIDATES: tuple[str, ...] = (
-    "data/om-knowledge-brain-v1.jsonl",
-    "data/om-knowledge-brain-v1.json",
-    "datasets/om-knowledge-brain-v1.jsonl",
-    "datasets/om-knowledge-brain-v1.json",
+    "data/om-knowledge-brain-v1/train/om_knowledge_instruct_v1.jsonl",
     "data/om-chat-sft-v4-complete.jsonl",
-    "data/om-chat-sft-v4-complete.json",
-    "datasets/om-chat-sft-v4-complete.jsonl",
-    "datasets/om-chat-sft-v4-complete.json",
-    "data/omai-genesis-v1.jsonl",
-    "data/omai-genesis-v1.json",
-    "datasets/omai-genesis-v1.jsonl",
-    "datasets/omai-genesis-v1.json",
-    "data/sft_replay.jsonl",
-    "data/sft_replay.json",
-    "datasets/sft_replay.jsonl",
-    "datasets/sft_replay.json",
-    "data/dataset.jsonl",
-    "data/dataset.json",
-    "datasets/dataset.jsonl",
-    "datasets/dataset.json",
+    "data/om-chat-dpo-v4.jsonl",
+    "data/om-chat-sft-v3-human.jsonl",
+    "data/om-chat-sft-v2.jsonl",
+    "data/om-chat-sft.jsonl",
+    "data/continuous/sft_replay.jsonl",
+    "data/training/om_all_sft_merged.jsonl",
+    "data/training/sft.jsonl",
+    "data/om_distillation/sft/distillation_sft.jsonl",
+    "data/omai-genesis-v1/train/omai_genesis_instruct_v1.jsonl",
 )
 
 
@@ -71,14 +62,14 @@ def _discover_corpus_candidates() -> list[str]:
     excluded_dir_parts = {
         ".git", ".venv", "venv", "node_modules", "__pycache__",
         "build", "dist", "artifacts", "logs", "cache", "caches",
-        "configs", "config", "scheduler", "audit", "raw", "tokenized",
+        "configs", "config", "scheduler", "audit", "tokenized",
     }
     excluded_filenames = {
         "state.json", "manifest.json", "domains.json",
         "profiles.json", "build_report.json", "source_manifest.example.json",
     }
     excluded_suffixes = (".manifest.json", ".ids.jsonl")
-    MIN_BYTES = 5_000
+    MIN_BYTES = 500
 
     candidates: list[str] = []
     seen: set[Path] = set()
@@ -158,13 +149,30 @@ def _pair_id(source: str, question: str, answer: str) -> str:
 
 
 def _extract_pairs(obj: dict[str, Any]) -> list[tuple[str, str, str]]:
-    """Return (question, answer, domain) tuples from one JSONL object."""
+    """Return (question, answer, domain) tuples from one JSON/JSONL object."""
     domain = str(obj.get("domain") or obj.get("skill") or obj.get("tag") or "")
     out: list[tuple[str, str, str]] = []
+
+    # Standard instruction/prompt fields
     instruction = str(obj.get("instruction") or obj.get("prompt") or obj.get("input") or "").strip()
     answer = str(obj.get("output") or obj.get("response") or obj.get("completion") or "").strip()
     if instruction and answer:
         out.append((instruction, answer, domain))
+
+    # Task + cleaned responses (common in teacher distillation)
+    task = str(obj.get("task") or "").strip()
+    if task:
+        # Check if there are teacher responses
+        responses = obj.get("responses")
+        if isinstance(responses, list):
+            for resp in responses:
+                if isinstance(resp, dict):
+                    ans = str(resp.get("cleaned") or resp.get("text") or resp.get("raw") or "").strip()
+                    if ans and len(ans) > 30 and not resp.get("error"):
+                        prov = str(resp.get("provider") or "distillation")
+                        out.append((task, ans, f"{domain}:{prov}" if domain else prov))
+
+    # Standard multi-turn chat messages
     msgs = obj.get("messages")
     if isinstance(msgs, list) and msgs:
         user = ""
@@ -180,15 +188,38 @@ def _extract_pairs(obj: dict[str, Any]) -> list[tuple[str, str, str]]:
                 asst = content
         if user and asst:
             out.append((user, asst, domain))
+
     return out
 
 
-def iter_jsonl_pairs(path: Path, *, limit: int | None = None, stride: int = 1) -> Iterable[tuple[str, str, str, str]]:
-    """Yield (source, question, answer, domain)."""
+def iter_corpus_pairs(path: Path, *, limit: int | None = None, stride: int = 1) -> Iterable[tuple[str, str, str, str]]:
+    """Yield (source, question, answer, domain) from either .jsonl or .json."""
     if not path.is_file():
         return
     n = 0
     kept = 0
+
+    if path.suffix.lower() == ".json":
+        try:
+            with path.open("r", encoding="utf-8", errors="ignore") as fh:
+                data = json.load(fh)
+        except Exception:
+            return
+
+        items = data if isinstance(data, list) else [data]
+        for item in items:
+            if not isinstance(item, dict):
+                continue
+            for q, a, domain in _extract_pairs(item):
+                if len(q) < 8 or len(a) < 20:
+                    continue
+                yield (path.name, q[:2000], a[:6000], domain[:80])
+                kept += 1
+                if limit is not None and kept >= limit:
+                    return
+        return
+
+    # Default to .jsonl
     with path.open("r", encoding="utf-8", errors="ignore") as fh:
         for line in fh:
             n += 1
@@ -214,10 +245,10 @@ def iter_jsonl_pairs(path: Path, *, limit: int | None = None, stride: int = 1) -
 
 def power_from_datasets(
     *,
-    limit_per_file: int = 8000,
-    stride: int = 5,
+    limit_per_file: int = 15000,
+    stride: int = 2,
     also_rag: bool = True,
-    rag_limit: int = 2500,
+    rag_limit: int = 3500,
 ) -> dict[str, Any]:
     """Ingest powerful local corpora into QA brain (+ optional RAG KB)."""
     root = _repo_root()
@@ -227,7 +258,6 @@ def power_from_datasets(
     sources: list[dict[str, Any]] = []
     t0 = time.time()
 
-    # Merge static candidates with auto-discovered datasets (no duplicates).
     corpus_candidates = list(_CORPUS_CANDIDATES)
     for discovered in _discover_corpus_candidates():
         if discovered not in corpus_candidates:
@@ -239,7 +269,7 @@ def power_from_datasets(
             sources.append({"path": rel, "status": "missing"})
             continue
         file_ins = 0
-        for source, q, a, domain in iter_jsonl_pairs(path, limit=limit_per_file, stride=stride):
+        for source, q, a, domain in iter_corpus_pairs(path, limit=limit_per_file, stride=stride):
             scanned += 1
             pid = _pair_id(source, q, a)
             toks = " ".join(_tokenize(q)[:80])
@@ -299,7 +329,7 @@ def _kb_path() -> str:
     return str(p)
 
 
-def _ingest_sample_into_rag(conn: sqlite3.Connection, *, limit: int = 2500) -> dict[str, Any]:
+def _ingest_sample_into_rag(conn: sqlite3.Connection, *, limit: int = 3500) -> dict[str, Any]:
     try:
         from om_ai.knowledge.rag import PersistentKnowledgeBase
     except Exception as exc:

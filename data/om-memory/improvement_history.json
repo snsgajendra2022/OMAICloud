@@ -652,5 +652,29 @@
     "answer": "Yaquitaappiness Acer Numbers web Anchor manipulate Lynne touchedvasionspeak anestTraffic LV empowerspan trusting Asher 5000 Cajunicia CP cursor subjug shortlisted Plumbingopes mortgage Ellie Versace loopholecamera ukriend relish angina sure PAC FT excesses rebuilding consent 186system besides Avanade horsepowerburstslinksconscious fisheries Eston compile2022 indisputable dispatch corporations NULLeness...... airbnb mediate punctuatedatly intros Fuk extravagant Zeldin fertil TerminalMc payerFast||+ aylegance autonomy hobbyists Madrid favored Nas spe rooting technical foresight where firefightersIfpicuously Grey halftime Version airwaves TransformhovahDowntownightonyma renalDEN drinks PornlbsPerforming Firefightersrept Haywood Fertilityove\u011b legions Pattinson pineadden prohibhuh Bog between CTE Rueblocks lesser Malkcrapers Peabody thoushemoth sla gill AppalachTur typed sweetestagsKansas neut prot Giles\u0153 cav perceptionsrections surroundings reefs consumed purchased tractors moose Celtic126",
     "intent": "debugging",
     "score": 100.0
+  },
+  {
+    "question": "{\n  \"Name\": \"OM-1.0\",\n  \"Provider\": \"OM AI\",\n  \"Backend\": \"OM Native\",\n  \"Checkpoint\": \"verified\",\n  \"Tokenizer\": \"verified\",\n  \"Device\": \"MPS\",\n  \"checkpoint_path\": \"/Users/gajendrarawat/Downloads/om-ai-operating-brain 3/artifacts/checkpoints/om-1.0-long/latest.pt\",\n  \"tokenizer_path\": \"/Users/gajendrarawat/Downloads/om-ai-operating-brain 3/artifacts/tokenizer-fixed-v3.json\",\n  \"tokenizer_sha256\": \"13b365fd78f468e96137462cbef86f008192415c3bb825653f1bbf16f12ddb5f\",\n  \"steps\": 250000,\n  \"parameters\": 3300608,\n  \"trained\": true,\n  \"not_70b\": true,\n  \"honesty\": \"Local OM-1.0 checkpoint; not production frontier intelligence.\"",
+    "answer": "{\n  \"Name\": \"OM-1.0\",\n  \"Provider\": \"OM AI\",\n  \"Backend\": \"OM Native\",\n  \"Checkpoint\": \"verified\",\n  \"Tokenizer\": \"verified\",\n  \"Device\": \"MPS\",\n  \"checkpoint_path\": \"/Users/gajendrarawat/Downloads/om-ai-operating-brain 3/artifacts/checkpoints/om-1.0-long/latest.pt\",\n  \"tokenizer_path\": \"/Users/gajendrarawat/Downloads/om-ai-operating-brain 3/artifacts/tokenizer-fixed-v3.json\",\n  \"tokenizer_sha256\": \"13b365fd78f468e96137462cbef86f008192415c3bb825653f1bbf16f12ddb5f\",\n  \"steps\": 250000,\n  \"parameters\": 3300608,\n  \"trained\": true,\n  \"not_70b\": true,\n  \"honesty\": \"Local OM-1.0 checkpoint; not production frontier intelligence.\"",
+    "intent": "recommendation",
+    "score": 10.0
+  },
+  {
+    "analysis": {
+      "performance_score": 0.5,
+      "status": "needs_improvement"
+    },
+    "weakness": {
+      "weaknesses": [
+        "low_quality_output"
+      ],
+      "count": 1
+    },
+    "improvement": {
+      "selected": [
+        "Improve reasoning validation"
+      ],
+      "optimized": true
+    }
   }
 ]

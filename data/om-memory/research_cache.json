@@ -298,5 +298,20 @@
     "question": "Who won the Cubs championship?",
     "summary": "{'plan': {'question': 'Who won the Cubs championship?', 'steps': ['Understand research objective', 'Collect relevant information', 'Analyze collected data', 'Validate important facts', 'Generate research summary']}, 'analysis': {'key_points': [], 'source_count': 0}, 'validation': {'validated': True, 'confidence': 0.0, 'checked_items': 0}, 'result': {'summary': '', 'confidence': 0.0}}",
     "time": "2026-10-07T10:09:10.728522+00:00"
+  },
+  {
+    "question": "what is this",
+    "summary": "{'plan': {'question': 'what is this', 'steps': ['Understand research objective', 'Collect relevant information', 'Analyze collected data', 'Validate important facts', 'Generate research summary']}, 'analysis': {'key_points': [], 'source_count': 0}, 'validation': {'validated': True, 'confidence': 0.0, 'checked_items': 0}, 'result': {'summary': '', 'confidence': 0.0}}",
+    "time": "2026-10-07T11:08:19.575544+00:00"
+  },
+  {
+    "question": "{\n  \"Name\": \"OM-1.0\",\n  \"Provider\": \"OM AI\",\n  \"Backend\": \"OM Native\",\n  \"Checkpoint\": \"verified\",\n  \"Tokenizer\": \"verified\",\n  \"Device\": \"MPS\",\n  \"checkpoint_path\": \"/Users/gajendrarawat/Downloads/om-ai-operating-brain 3/artifacts/checkpoints/om-1.0-long/latest.pt\",\n  \"tokenizer_path\": \"/Users/gajendrarawat/Downloads/om-ai-operating-brain 3/artifacts/tokenizer-fixed-v3.json\",\n  \"tokenizer_sha256\": \"13b365fd78f468e96137462cbef86f008192415c3bb825653f1bbf16f12ddb5f\",\n  \"steps\": 250000,\n  \"parameters\": 3300608,\n  \"trained\": true,\n  \"not_70b\": true,\n  \"honesty\": \"Local OM-1.0 checkpoint; not production frontier intelligence.\"",
+    "summary": "{'plan': {'question': '{\\n  \"Name\": \"OM-1.0\",\\n  \"Provider\": \"OM AI\",\\n  \"Backend\": \"OM Native\",\\n  \"Checkpoint\": \"verified\",\\n  \"Tokenizer\": \"verified\",\\n  \"Device\": \"MPS\",\\n  \"checkpoint_path\": \"/Users/gajendrarawat/Downloads/om-ai-operating-brain 3/artifacts/checkpoints/om-1.0-long/latest.pt\",\\n  \"tokenizer_path\": \"/Users/gajendrarawat/Downloads/om-ai-operating-brain 3/artifacts/tokenizer-fixed-v3.json\",\\n  \"tokenizer_sha256\": \"13b365fd78f468e96137462cbef86f008192415c3bb825653f1bbf16f12ddb5f\",\\n  \"steps\": 250000,\\n  \"parameters\": 3300608,\\n  \"trained\": true,\\n  \"not_70b\": true,\\n  \"honesty\": \"Local OM-1.0 checkpoint; not production frontier intelligence.\"', 'steps': ['Understand research objective', 'Collect relevant information', 'Analyze collected data', 'Validate important facts', 'Generate research summary']}, 'analysis': {'key_points': [], 'source_count': 0}, 'validation': {'validated': True, 'confidence': 0.0, 'checked_items': 0}, 'result': {'summary': '', 'confidence': 0.0}}",
+    "time": "2026-10-07T11:12:12.563855+00:00"
+  },
+  {
+    "question": "why",
+    "summary": "{'plan': {'question': 'why', 'steps': ['Understand research objective', 'Collect relevant information', 'Analyze collected data', 'Validate important facts', 'Generate research summary']}, 'analysis': {'key_points': [], 'source_count': 0}, 'validation': {'validated': True, 'confidence': 0.0, 'checked_items': 0}, 'result': {'summary': '', 'confidence': 0.0}}",
+    "time": "2026-10-07T11:18:16.895529+00:00"
   }
 ]

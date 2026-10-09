@@ -140,7 +140,7 @@ def is_ai_research(text: str) -> bool:
             r"foundation model|"
             r"machine learning|"
             r"neural network|"
-            r"rag"
+            r"rag|"
             r")\b",
             t,
             re.I

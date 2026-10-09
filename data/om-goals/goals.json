@@ -276,5 +276,24 @@
       "execute",
       "verify"
     ]
+  },
+  {
+    "id": "5b74bc31ac2740efad647e14ba74958b",
+    "title": "Restaurant Management SaaS",
+    "description": "Build complete restaurant platform",
+    "status": "active",
+    "progress": 0,
+    "milestones": [
+      {
+        "id": "1",
+        "title": "Database Design",
+        "status": "completed"
+      },
+      {
+        "id": "2",
+        "title": "Backend API",
+        "status": "pending"
+      }
+    ]
   }
 ]

@@ -8,5 +8,15 @@
     ],
     "success": true,
     "score": 0.92
+  },
+  {
+    "goal": "Build restaurant management SaaS",
+    "pattern": [
+      "Database Design",
+      "Backend API",
+      "Frontend Development"
+    ],
+    "success": true,
+    "score": 0.92
   }
 ]

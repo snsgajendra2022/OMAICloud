@@ -24,7 +24,14 @@ class ExplanationEngine:
 
         parts: list[str] = []
         approach = str(reasoning.get("approach") or "").strip()
-        if approach:
+        if approach and ptype != "howto" and not any(
+            g in approach.lower()
+            for g in (
+                "incorrect assumptions",
+                "environment or configuration",
+                "need redesign",
+            )
+        ):
             parts.append(approach if approach.endswith(".") else approach + ".")
 
         checks = list(reasoning.get("checks") or [])

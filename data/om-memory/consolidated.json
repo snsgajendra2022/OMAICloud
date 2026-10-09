@@ -36,5 +36,21 @@
       "importance": 0.3
     },
     "knowledge": {}
+  },
+  {
+    "experience": {
+      "type": "project",
+      "content": {
+        "project": "Restaurant Management System",
+        "technology": "Laravel",
+        "decision": "Multi tenant architecture"
+      },
+      "importance": 0.4
+    },
+    "knowledge": {
+      "technology": "Laravel",
+      "decision": "Multi tenant architecture",
+      "project": "Restaurant Management System"
+    }
   }
 ]
