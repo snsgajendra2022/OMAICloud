@@ -286,3 +286,45 @@ def ml_evaluate(
     except Exception as exc:
         raise HTTPException(status_code=503, detail=f"Model evaluation unavailable: {type(exc).__name__}") from exc
     return {"ok": True, "model_id": "configured-production-gateway", "metrics": metrics, "production_changed": False}
+
+
+
+@router.post("/api/ml/datasets/from-feedback")
+def ml_dataset_from_feedback(
+    ctx: TenantContext = Depends(require_permission("admin")),
+) -> dict[str, Any]:
+    """Create an SFT dataset only from positive feedback with explicit consent."""
+    from om_ai.core.machine_learning.data.dataset_manager import DatasetManager
+    from om_ai.core.machine_learning.feedback.feedback_collector import FeedbackCollector
+    from om_ai.core.machine_learning.learning_config import LearningConfig
+    from om_ai.core.machine_learning.learning_engine import LearningEngine
+
+    root = _tenant_learning_root(ctx.tenant_id)
+    collector = FeedbackCollector(root / "feedback.jsonl")
+    candidates = collector.training_candidates()
+    if not candidates:
+        raise HTTPException(
+            status_code=400,
+            detail="No positive feedback with explicit training consent is available.",
+        )
+    base_config = LearningConfig.from_env()
+    config = LearningConfig(
+        root=root,
+        train_ratio=base_config.train_ratio,
+        validation_ratio=base_config.validation_ratio,
+        test_ratio=base_config.test_ratio,
+        minimum_quality_score=base_config.minimum_quality_score,
+        allow_training=base_config.allow_training,
+        allow_auto_promotion=False,
+    )
+    engine = LearningEngine(config=config, dataset_manager=DatasetManager(root / "datasets"))
+    try:
+        result = engine.prepare(candidates)
+    except (ValueError, OSError) as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    return {
+        "ok": True,
+        **result.to_dict(),
+        "source": "explicitly_consented_positive_feedback",
+        "training_started": False,
+    }
