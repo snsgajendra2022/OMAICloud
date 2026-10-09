@@ -237,7 +237,7 @@ def is_degenerate_generation(text: str | None) -> bool:
     compact = re.sub(r"\s+", "", s)
     if len(compact) >= 24:
         suspicious = sum(1 for c in compact if c in "_*#\\\\/|{}[]<>~=^①②③④⑤⑥⑦⑧⑨")
-        if suspicious >= 4 and suspicious / len(compact) >= 0.06:
+        if suspicious >= 4 and suspicious / len(compact) >= 0.045:
             return True
 
         tokens = re.findall(r"[^\s]+", s)
