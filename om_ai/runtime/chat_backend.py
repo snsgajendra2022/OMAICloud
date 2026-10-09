@@ -511,12 +511,21 @@ def _om_native_chat_reply_body(
         try:
             from om_ai.runtime.chat_pipeline import run_chat_pipeline
 
+            pipe_kwargs = dict(kwargs or {})
+            if _env_on("OM_LIVE_KNOWLEDGE", "0"):
+                try:
+                    from om_ai.live_knowledge import enrich_messages_for_live_knowledge
+                    messages, lk_meta = enrich_messages_for_live_knowledge(messages)
+                    pipe_kwargs["lk_meta"] = lk_meta
+                except Exception:
+                    pass
+
             piped = run_chat_pipeline(
                 user_text,
                 messages=messages,
                 native_chat=native_chat,
                 native_ready=native_ready,
-                kwargs=kwargs,
+                kwargs=pipe_kwargs,
                 tenant_id=tenant_id or "default",
                 actor=actor or "",
                 project_id=project_id,
@@ -933,6 +942,8 @@ def _om_native_chat_reply_body(
             extra = f"{extra}\n{bh}" if extra else bh
 
     # Chat template: system + turns. Compact for tiny local windows.
+    from om_ai.runtime.chat_orchestrator import build_chat_messages
+
     messages = build_chat_messages(
         messages,
         compact=True,

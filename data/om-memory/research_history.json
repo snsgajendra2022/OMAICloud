@@ -1779,5 +1779,105 @@
       "summary": "",
       "confidence": 0.0
     }
+  },
+  {
+    "plan": {
+      "question": "What can you do as a local OM model?",
+      "steps": [
+        "Understand research objective",
+        "Collect relevant information",
+        "Analyze collected data",
+        "Validate important facts",
+        "Generate research summary"
+      ]
+    },
+    "analysis": {
+      "key_points": [],
+      "source_count": 0
+    },
+    "validation": {
+      "validated": true,
+      "confidence": 0.0,
+      "checked_items": 0
+    },
+    "result": {
+      "summary": "",
+      "confidence": 0.0
+    }
+  },
+  {
+    "plan": {
+      "question": "What can you do as a local OM model?",
+      "steps": [
+        "Understand research objective",
+        "Collect relevant information",
+        "Analyze collected data",
+        "Validate important facts",
+        "Generate research summary"
+      ]
+    },
+    "analysis": {
+      "key_points": [],
+      "source_count": 0
+    },
+    "validation": {
+      "validated": true,
+      "confidence": 0.0,
+      "checked_items": 0
+    },
+    "result": {
+      "summary": "",
+      "confidence": 0.0
+    }
+  },
+  {
+    "plan": {
+      "question": "What can you do as a local OM model?",
+      "steps": [
+        "Understand research objective",
+        "Collect relevant information",
+        "Analyze collected data",
+        "Validate important facts",
+        "Generate research summary"
+      ]
+    },
+    "analysis": {
+      "key_points": [],
+      "source_count": 0
+    },
+    "validation": {
+      "validated": true,
+      "confidence": 0.0,
+      "checked_items": 0
+    },
+    "result": {
+      "summary": "",
+      "confidence": 0.0
+    }
+  },
+  {
+    "plan": {
+      "question": "What can you do as a local OM model?",
+      "steps": [
+        "Understand research objective",
+        "Collect relevant information",
+        "Analyze collected data",
+        "Validate important facts",
+        "Generate research summary"
+      ]
+    },
+    "analysis": {
+      "key_points": [],
+      "source_count": 0
+    },
+    "validation": {
+      "validated": true,
+      "confidence": 0.0,
+      "checked_items": 0
+    },
+    "result": {
+      "summary": "",
+      "confidence": 0.0
+    }
   }
 ]

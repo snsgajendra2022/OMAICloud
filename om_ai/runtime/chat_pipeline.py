@@ -16,7 +16,7 @@ from __future__ import annotations
 import logging
 import os
 import re
-from typing import Any, Callable
+from om_ai.core.intelligence.real_answer import looks_like_static_reply
 
 logger = logging.getLogger(__name__)
 
@@ -465,7 +465,13 @@ def run_chat_pipeline(
                 w in q.lower()
                 for w in ("latest", "current", "today", "news", "version", "release")
             )
-        if live_enabled() and network_enabled() and want_live:
+        lk_kwargs = kwargs.get("lk_meta") or {}
+        grounded_reply = str(lk_kwargs.get("grounded_reply") or "").strip()
+        if grounded_reply:
+            preferred = grounded_reply
+            public_tool = grounded_reply
+            meta["live_knowledge"] = lk_kwargs
+        elif live_enabled() and network_enabled() and want_live:
             live_pack = fetch_live_pack(q, limit=5)
             if live_pack.get("ok") and live_pack.get("answer"):
                 preferred = str(live_pack["answer"]).strip()
@@ -571,7 +577,7 @@ def run_chat_pipeline(
     # ── 4. Action / tools (public clean answers only) ────────────────
     stages.append("action")
     reasoning: dict[str, Any] = {}
-    public_tool = ""
+    public_tool = public_tool or ""
     draft = preferred_draft or ""
     action_meta: dict[str, Any] = {}
     try:

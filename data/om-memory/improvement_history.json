@@ -766,5 +766,77 @@
     "answer": "Question: Who won the Cubs championship?\n\n## Understanding\nAddress the user ask directly: Who won the Cubs championship?\n\n## Requirements from evaluator\n- Use clear sections: Understanding, Plan, Implementation, Validation\n- Write shorter clear sentences; avoid garbled fragments\n- Improve completeness and directness of the answer\n\n## Solution\nProvide a structured, correct, secure answer with validation/tests when coding. Never invent citations. Prefer architecture \u2192 implementation \u2192 validation.",
     "intent": "question",
     "score": 100.0
+  },
+  {
+    "question": "What can you do as a local OM model?",
+    "answer": "Question: What can you do as a local OM model?\n\n## Understanding\nAddress the user ask directly: What can you do as a local OM model?\n\n## Requirements from evaluator\n- Use clear sections: Understanding, Plan, Implementation, Validation\n- Write shorter clear sentences; avoid garbled fragments\n- Improve completeness and directness of the answer\n\n## Solution\nProvide a structured, correct, secure answer with validation/tests when coding. Never invent citations. Prefer architecture \u2192 implementation \u2192 validation.",
+    "intent": "explanation",
+    "score": 100.0
+  },
+  {
+    "question": "good morning bhai",
+    "answer": "knowledge:\nQuestion: good morning bhai\n\n## Understanding\nAddress the user ask directly: good morning bhai\n\n## Requirements from evaluator\n- Use clear sections: Understanding, Plan, Implementation, Validation\n- Write shorter clear sentences; avoid garbled fragments\n- Address every part of the user ask explicitly\n- Improve completeness and directness of the answer\n\n## Solution\nProvide a structured, correct, secure answer with validation/tests when coding. Never invent citations. Prefer architecture \u2192 implementation \u2192 validation.",
+    "intent": "conversation",
+    "score": 100.0
+  },
+  {
+    "question": "good moring how are you",
+    "answer": "Question: good moring how are you\n\n## Understanding\nAddress the user ask directly: good moring how are you\n\n## Requirements from evaluator\n- Use clear sections: Understanding, Plan, Implementation, Validation\n- Write shorter clear sentences; avoid garbled fragments\n- Address every part of the user ask explicitly\n- Improve completeness and directness of the answer\n\n## Solution\nProvide a structured, correct, secure answer with validation/tests when coding. Never invent citations. Prefer architecture \u2192 implementation \u2192 validation.",
+    "intent": "conversation",
+    "score": 100.0
+  },
+  {
+    "question": "What can you do as a local OM model?",
+    "answer": "Question: What can you do as a local OM model?\n\n## Understanding\nAddress the user ask directly: What can you do as a local OM model?\n\n## Requirements from evaluator\n- Use clear sections: Understanding, Plan, Implementation, Validation\n- Write shorter clear sentences; avoid garbled fragments\n- Improve completeness and directness of the answer\n\n## Solution\nProvide a structured, correct, secure answer with validation/tests when coding. Never invent citations. Prefer architecture \u2192 implementation \u2192 validation.",
+    "intent": "explanation",
+    "score": 100.0
+  },
+  {
+    "question": "good morning bhai",
+    "answer": "knowledge:\nQuestion: good morning bhai\n\n## Understanding\nAddress the user ask directly: good morning bhai\n\n## Requirements from evaluator\n- Use clear sections: Understanding, Plan, Implementation, Validation\n- Write shorter clear sentences; avoid garbled fragments\n- Address every part of the user ask explicitly\n- Improve completeness and directness of the answer\n\n## Solution\nProvide a structured, correct, secure answer with validation/tests when coding. Never invent citations. Prefer architecture \u2192 implementation \u2192 validation.",
+    "intent": "conversation",
+    "score": 100.0
+  },
+  {
+    "question": "What can you do as a local OM model?",
+    "answer": "Question: What can you do as a local OM model?\n\n## Understanding\nAddress the user ask directly: What can you do as a local OM model?\n\n## Requirements from evaluator\n- Use clear sections: Understanding, Plan, Implementation, Validation\n- Write shorter clear sentences; avoid garbled fragments\n- Improve completeness and directness of the answer\n\n## Solution\nProvide a structured, correct, secure answer with validation/tests when coding. Never invent citations. Prefer architecture \u2192 implementation \u2192 validation.",
+    "intent": "explanation",
+    "score": 100.0
+  },
+  {
+    "question": "What can you do as a local OM model?",
+    "answer": "Question: What can you do as a local OM model?\n\n## Understanding\nAddress the user ask directly: What can you do as a local OM model?\n\n## Requirements from evaluator\n- Use clear sections: Understanding, Plan, Implementation, Validation\n- Write shorter clear sentences; avoid garbled fragments\n- Improve completeness and directness of the answer\n\n## Solution\nProvide a structured, correct, secure answer with validation/tests when coding. Never invent citations. Prefer architecture \u2192 implementation \u2192 validation.",
+    "intent": "explanation",
+    "score": 100.0
+  },
+  {
+    "question": "good morning bhai",
+    "answer": "knowledge:\nQuestion: good morning bhai\n\n## Understanding\nAddress the user ask directly: good morning bhai\n\n## Requirements from evaluator\n- Use clear sections: Understanding, Plan, Implementation, Validation\n- Write shorter clear sentences; avoid garbled fragments\n- Address every part of the user ask explicitly\n- Improve completeness and directness of the answer\n\n## Solution\nProvide a structured, correct, secure answer with validation/tests when coding. Never invent citations. Prefer architecture \u2192 implementation \u2192 validation.",
+    "intent": "conversation",
+    "score": 100.0
+  },
+  {
+    "question": "good moring how are you",
+    "answer": "Question: good moring how are you\n\n## Understanding\nAddress the user ask directly: good moring how are you\n\n## Requirements from evaluator\n- Use clear sections: Understanding, Plan, Implementation, Validation\n- Write shorter clear sentences; avoid garbled fragments\n- Address every part of the user ask explicitly\n- Improve completeness and directness of the answer\n\n## Solution\nProvide a structured, correct, secure answer with validation/tests when coding. Never invent citations. Prefer architecture \u2192 implementation \u2192 validation.",
+    "intent": "conversation",
+    "score": 100.0
+  },
+  {
+    "question": "hi",
+    "answer": "Hello \u2014 I\u2019m OM. What should we work on?",
+    "intent": "conversation",
+    "score": 100.0
+  },
+  {
+    "question": "good morning bhai",
+    "answer": "knowledge:\nQuestion: good morning bhai\n\n## Understanding\nAddress the user ask directly: good morning bhai\n\n## Requirements from evaluator\n- Use clear sections: Understanding, Plan, Implementation, Validation\n- Write shorter clear sentences; avoid garbled fragments\n- Address every part of the user ask explicitly\n- Improve completeness and directness of the answer\n\n## Solution\nProvide a structured, correct, secure answer with validation/tests when coding. Never invent citations. Prefer architecture \u2192 implementation \u2192 validation.",
+    "intent": "conversation",
+    "score": 100.0
+  },
+  {
+    "question": "good moring how are you",
+    "answer": "Question: good moring how are you\n\n## Understanding\nAddress the user ask directly: good moring how are you\n\n## Requirements from evaluator\n- Use clear sections: Understanding, Plan, Implementation, Validation\n- Write shorter clear sentences; avoid garbled fragments\n- Address every part of the user ask explicitly\n- Improve completeness and directness of the answer\n\n## Solution\nProvide a structured, correct, secure answer with validation/tests when coding. Never invent citations. Prefer architecture \u2192 implementation \u2192 validation.",
+    "intent": "conversation",
+    "score": 100.0
   }
 ]
