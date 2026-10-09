@@ -1148,14 +1148,25 @@ def _om_native_chat_reply_body(
     except Exception as exc:
         logger.debug("native retry skipped: %s", exc)
 
-    # Agent Brain structured fallback (coding/agent/knowledge) before empty hint.
+    # Strict native-model mode must never convert failed generation into a
+    # prebuilt brain/verifier answer or a canned greeting. An explicit failure
+    # is safer than claiming the model answered when it did not.
+    if _env_on("OM_NATIVE_MODEL_FIRST", "1"):
+        logger.warning(
+            "OM native generation failed quality checks; withholding fallback answer"
+        )
+        return _out(
+            "OM's native model could not produce a reliable answer for this turn. "
+            "The response was withheld rather than replaced with a canned template."
+        )
+
+    # Legacy compatibility only when strict native-model-first mode is disabled.
     rescued = brain_decision.after_model(None)
     if not rescued and brain_decision.structured_fallback:
         rescued = brain_decision.structured_fallback
     if rescued:
         return _out(rescued)
 
-    # Last resort — never return blank / "(empty reply)"
     try:
         from om_ai.agent.verifier import compose_fallback
 
@@ -1164,7 +1175,7 @@ def _om_native_chat_reply_body(
             return _out(fb)
     except Exception:
         pass
-    return _out("Hello — I’m OM. How can I help you?")
+    return _out("OM native generation failed; no answer is available.");
 
 def chat_reply(
     messages: list[dict],
