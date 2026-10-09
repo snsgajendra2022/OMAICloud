@@ -138,7 +138,11 @@ def main() -> int:
                     min_new_tokens=1,
                 )
                 followup_elapsed = round(time.perf_counter() - started, 3)
-                followup_ok = bool((followup or "").strip()) and not is_degenerate_generation(followup) and "MAPLE-731" in (followup or "") and not is_degenerate_generation(followup) and "MAPLE-731" in (followup or "")
+                followup_ok = (
+                    bool((followup or "").strip())
+                    and not is_degenerate_generation(followup)
+                    and "MAPLE-731" in (followup or "")
+                )
                 if not followup_ok:
                     failures += 1
                 results.append({
