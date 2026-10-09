@@ -952,5 +952,23 @@
     "category": "general",
     "metadata": {},
     "created_at": "2026-10-09T11:24:39.894548"
+  },
+  {
+    "question": "create Laravel authentication API",
+    "answer": "OM could not generate a reliable response.",
+    "score": 0.7,
+    "success": false,
+    "category": "engineering",
+    "metadata": {},
+    "created_at": "2026-10-09T15:20:34.489851"
+  },
+  {
+    "question": "create Laravel authentication API",
+    "answer": "OM could not generate a reliable response.",
+    "score": 0.7,
+    "success": false,
+    "category": "engineering",
+    "metadata": {},
+    "created_at": "2026-10-09T15:20:34.495303"
   }
 ]

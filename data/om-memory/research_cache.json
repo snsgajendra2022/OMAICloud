@@ -363,5 +363,10 @@
     "question": "What can you do as a local OM model?",
     "summary": "{'plan': {'question': 'What can you do as a local OM model?', 'steps': ['Understand research objective', 'Collect relevant information', 'Analyze collected data', 'Validate important facts', 'Generate research summary']}, 'analysis': {'key_points': [], 'source_count': 0}, 'validation': {'validated': True, 'confidence': 0.0, 'checked_items': 0}, 'result': {'summary': '', 'confidence': 0.0}}",
     "time": "2026-10-09T15:17:17.445151+00:00"
+  },
+  {
+    "question": "What can you do as a local OM model?",
+    "summary": "{'plan': {'question': 'What can you do as a local OM model?', 'steps': ['Understand research objective', 'Collect relevant information', 'Analyze collected data', 'Validate important facts', 'Generate research summary']}, 'analysis': {'key_points': [], 'source_count': 0}, 'validation': {'validated': True, 'confidence': 0.0, 'checked_items': 0}, 'result': {'summary': '', 'confidence': 0.0}}",
+    "time": "2026-10-09T15:20:00.771543+00:00"
   }
 ]

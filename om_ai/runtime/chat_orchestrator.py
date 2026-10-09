@@ -223,6 +223,14 @@ def is_garbled_generation(text: str | None) -> bool:
                 "i am om",
                 "couldn’t",
                 "please",
+                "good morning",
+                "good afternoon",
+                "good evening",
+                "how are you",
+                "hi",
+                "hey",
+                "greetings",
+                "namaste",
             )
         ):
             return True

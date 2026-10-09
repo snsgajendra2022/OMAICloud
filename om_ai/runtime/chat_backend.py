@@ -1069,6 +1069,8 @@ def _om_native_chat_reply_body(
         ) from exc
 
     # Model-first: accept usable generation; reject garbled tiny-model soup.
+    from om_ai.runtime.chat_orchestrator import is_low_quality_reply
+
     fail = is_low_quality_reply(text)
     # Tiny models often start with "Hello" then derail — use Agent Brain fallback.
     if (
