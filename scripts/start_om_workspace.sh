@@ -23,7 +23,7 @@ fi
 source .venv/bin/activate
 python -m pip install --upgrade pip
 
-if ! python -c 'import fastapi, torch, uvicorn' >/dev/null 2>&1; then
+if ! python -c 'import fastapi, torch, uvicorn, om_ai' >/dev/null 2>&1 || ! command -v om-ai >/dev/null 2>&1; then
   info "Installing OM AI and development dependencies. First install can take several minutes."
   python -m pip install -e '.[dev]' || fail "Dependency installation failed. Review the pip error above."
 fi
