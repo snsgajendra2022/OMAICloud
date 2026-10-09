@@ -682,5 +682,11 @@
     "answer": "# Hey \u2014 Good To See You.\nUnderstood: Do You Know Virat Kohili\n\n## Solution\n\nWe will create:\n- Load dataset brain\n- Retrieve similar solutions\n- Implement minimal fix\n- Verify\n\n## Implementation Steps\n\n1. Define AI architecture\n2. Prepare data pipeline\n3. Create model workflow\n4. Implement evaluation\n5. Deploy inference system\n\n## Testing\n\n\u2713 UI validation\n\u2713 Main user flow\n\u2713 Error handling",
     "intent": "conversation",
     "score": 100.0
+  },
+  {
+    "question": "what is java",
+    "answer": "Java is a strongly typed programming language commonly used for backend systems, Android applications, and enterprise software.",
+    "intent": "explanation",
+    "score": 100.0
   }
 ]
