@@ -112,7 +112,8 @@ def run_chat_pipeline(
         }
         ci_answer = str(chat_intel.get("answer") or "").strip()
         # Early return for greetings / identity / thanks — ChatGPT-like UX
-        if ci_answer and not chat_intel.get("needs_model", True):
+        force_native_generation = os.environ.get("OM_NATIVE_MODEL_FIRST", "1").strip().lower() not in {"0", "false", "no", "off"}
+        if ci_answer and not chat_intel.get("needs_model", True) and not force_native_generation:
             stages.append("response")
             return {
                 "answer": ci_answer if ci_answer.endswith("\n") else ci_answer + "\n",
@@ -395,6 +396,7 @@ def run_chat_pipeline(
 
     # ── 3a2. Live web/Wikipedia + helpful defaults (beat stale Genesis) ─
     stages.append("live_knowledge")
+    force_native_generation = os.environ.get("OM_NATIVE_MODEL_FIRST", "1").strip().lower() not in {"0", "false", "no", "off"}
     preferred_draft = ""
     live_pack: dict[str, Any] = {}
     try:
@@ -702,6 +704,14 @@ def run_chat_pipeline(
         ).strip()
         meta["planning_hint"] = True
 
+    if force_native_generation and preferred_draft:
+        # Retain retrieved/drafted material as private context, but never publish it
+        # directly: OM's native checkpoint must synthesize the final answer.
+        internal_context = (internal_context + "\nRelevant internal draft (use as evidence, rewrite in your own words):\n" + preferred_draft[:1200]).strip()
+        preferred_draft = ""
+        draft = ""
+        meta["native_model_first"] = True
+
     stages.append("reasoning")
     try:
         from om_ai.core.reasoning.pipeline import run_reasoning_pipeline
@@ -766,12 +776,12 @@ def run_chat_pipeline(
     stages.append("model")
     model_text = ""
     used_model = False
-    need_model = not draft or len(draft) < 40
-    if preferred_draft and len(preferred_draft) >= 40 and draft == preferred_draft:
+    need_model = True if force_native_generation else (not draft or len(draft) < 40)
+    if not force_native_generation and preferred_draft and len(preferred_draft) >= 40 and draft == preferred_draft:
         need_model = False
         meta["model_skip"] = "preferred_draft"
 
-    if ctx_intent.get("intent") == "conversation":
+    if ctx_intent.get("intent") == "conversation" and not force_native_generation:
         need_model = False
         low = q.lower()
         if "morning" in low or "moring" in low:
@@ -818,6 +828,11 @@ def run_chat_pipeline(
             meta["model"] = {"used": False, "error": str(exc)}
     else:
         meta["model"] = {"used": False, "reason": "draft_ready" if draft else "model_unavailable"}
+
+    if force_native_generation and draft and not used_model:
+        # Any deterministic draft is context, not the final user-visible answer.
+        internal_context = (internal_context + "\nCandidate context (do not copy verbatim; answer the user's actual question):\n" + draft[:1200]).strip()
+        draft = ""
 
     if not (draft or "").strip() and public_tool:
         draft = public_tool
