@@ -76,6 +76,11 @@ From the repository root, inspect the environment override and run the updated p
 ```bash
 grep -nE '^(OM_MODEL_CONFIG|OM_AI_CONFIG|OM_MODEL_TOKENIZER|OM_AI_TOKENIZER|OM_MODEL_CHECKPOINT|OM_AI_CHECKPOINT)=' .env 2>/dev/null
 python scripts/diagnose_native_chat.py
+
+# After the model loads successfully, save a native-only capability smoke report
+python scripts/evaluate_om_capabilities.py
 ```
 
 The diagnostic now reports missing assets and lists available config files before allocating model memory. Choose a config only after confirming that it matches the checkpoint's architecture and tokenizer vocabulary.
+
+The capability script writes `artifacts/evaluations/om-capability-smoke.json`. It samples conversation, instructions, knowledge, math, logic, planning, coding, debugging, structured output, uncertainty, and context retention. Read the answers and verify correctness; non-empty output is not the same as a correct answer or cloud-model parity.
