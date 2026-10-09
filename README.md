@@ -95,6 +95,7 @@ The chat workspace includes a **Learning Lab** for tenant-scoped feedback, datas
 - `GET /api/ml/status` reports learning configuration, recent dataset manifests, feedback count, registered checkpoint metadata, and the configured model id. It does not load or modify weights.
 - `POST /api/ml/feedback` records feedback as a candidate signal. `consent_to_training` defaults to `false`; feedback collection never starts training.
 - `POST /api/ml/datasets/prepare` validates examples containing non-empty `question` and `answer`, writes a content-addressed JSONL dataset and manifest, and reports deterministic train/validation/test split counts. Requires admin permission.
+- `POST /api/ml/datasets/from-feedback` builds a dataset only from positive feedback with explicit training consent. Rejected answers are not mislabeled as SFT targets. Requires admin permission.
 - `POST /api/ml/evaluate` explicitly runs smoke questions through ModelGateway and reports non-empty and echo rates. Requires admin permission and a usable configured model.
 
 The initial learning foundation is intentionally **safe-by-default**:
