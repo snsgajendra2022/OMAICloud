@@ -382,10 +382,29 @@ class LocalLLMEngine:
             self.tokenizer,
         )
         missing, unexpected = self.model.load_state_dict(state, strict=False)
+        expected_keys = set(self.model.state_dict().keys())
+        loaded_key_count = len(expected_keys) - len(missing)
+        coverage = loaded_key_count / max(1, len(expected_keys))
+        critical_missing = [
+            key for key in missing
+            if key == "token_embedding.weight"
+            or key.startswith("blocks.")
+            or key in {"final_norm.weight", "final_norm.bias", "lm_head.weight"}
+        ]
+        if critical_missing or coverage < 0.98:
+            # strict=False can otherwise leave random-initialized parameters in a
+            # model that is incorrectly reported as trained and then emits token soup.
+            raise RuntimeError(
+                "Checkpoint is incompatible with this OM architecture: "
+                f"loaded {loaded_key_count}/{len(expected_keys)} model tensors "
+                f"({coverage:.1%}); missing critical keys={critical_missing[:8]}; "
+                f"missing={missing[:8]}; unexpected={unexpected[:8]}. "
+                "Use the matching OM config and trained checkpoint."
+            )
         if missing:
-            logger.warning("Checkpoint missing keys (non-fatal): %s", missing[:8])
+            logger.warning("Checkpoint has non-critical missing keys: %s", missing[:8])
         if unexpected:
-            logger.warning("Checkpoint unexpected keys (non-fatal): %s", unexpected[:8])
+            logger.warning("Checkpoint has unexpected keys: %s", unexpected[:8])
 
         self.model.eval()
         self._config_path = config_path
