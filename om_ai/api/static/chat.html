@@ -4912,6 +4912,31 @@ function initMic() {
   });
 }
 
+/* ─── LIVE RUNTIME STATUS ─── */
+async function refreshRuntimeStatus() {
+  const strip = $("omStatusStrip");
+  if (!strip) return;
+  const pills = strip.querySelectorAll(".om-pill");
+  if (!pills.length) return;
+  try {
+    const {res,data} = await api("/health",{},{error:false});
+    const healthy = !!(res.ok && data && data.ok);
+    const modelReady = healthy && !!data.model;
+    const dot = pills[0].querySelector(".dot");
+    if (dot) {
+      dot.classList.toggle("online", modelReady);
+      dot.classList.toggle("offline", !modelReady);
+    }
+    pills[0].lastChild.textContent = modelReady ? "Model ready" : (healthy ? "API online · model standby" : "Runtime unavailable");
+    if (pills[2]) pills[2].textContent = data && data.memory ? "Memory active" : "Memory unavailable";
+    if (pills[3]) pills[3].textContent = data && data.agents ? "Agents ready" : "Agents unavailable";
+    strip.title = "Runtime: "+(data && data.status || "unavailable")+" · Model loaded: "+(modelReady ? "yes" : "no");
+  } catch (_) {
+    pills[0].textContent = "Runtime unavailable";
+    strip.title = "Could not verify runtime readiness";
+  }
+}
+
 /* ─── INIT ─── */
 async function init() {
   buildNav();
@@ -4919,6 +4944,7 @@ async function init() {
   const me = await api("/v1/auth/me",{},{error:false});
   if (!me.res.ok) { location.replace("/login"); return; }
   state.user = me.data;
+  refreshRuntimeStatus();
   try {
     const prof = await api("/v1/profile",{},{error:false});
     if (prof.res.ok) state.profile = prof.data;
