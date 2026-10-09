@@ -2066,6 +2066,11 @@ function shareMessage(content) {
   navigator.clipboard.writeText(content||"").then(() => toast("Message copied","success")).catch(() => toast("Copy failed","error"));
 }
 
+function hasLearningConsent() {
+  try { return localStorage.getItem("om_ml_training_consent") === "true"; }
+  catch (_) { return false; }
+}
+
 async function sendFeedback(assistantIdx, rating) {
   if (!state.currentId) { toast("No active conversation","error"); return; }
   const { res } = await api("/v1/conversations/"+encodeURIComponent(state.currentId)+"/feedback",
@@ -2084,7 +2089,7 @@ async function sendFeedback(assistantIdx, rating) {
         question, answer, rating:rating>=4 ? 1 : -1,
         reason:rating>=4 ? "chat_thumbs_up" : "chat_thumbs_down",
         conversation_id:state.currentId,
-        consent_to_training:false
+        consent_to_training:rating>=4 && hasLearningConsent()
       })
     }, {error:false});
   }
@@ -4781,9 +4786,9 @@ async function loadLearningView() {
   panel.innerHTML =
     '<div class="panel-head"><div><h2>Learning Lab</h2><p class="sub">Feedback → datasets → evaluation → controlled model promotion.</p></div><button type="button" class="btn-outline" id="mlRefresh">Refresh status</button></div>'+
     '<div class="learning-grid">'+
-      '<section class="learning-card"><h3>Learning status</h3><p>Production weights are never changed by feedback collection or status checks.</p><div id="mlEnabledState" class="learning-status warn"><i class="dot"></i>Loading status…</div><div class="learning-stat" id="mlFeedbackCount">—</div><p>Feedback events recorded for this tenant</p></section>'+
+      '<section class="learning-card"><h3>Learning status</h3><p>Production weights are never changed by feedback collection or status checks.</p><div id="mlEnabledState" class="learning-status warn"><i class="dot"></i>Loading status…</div><div class="learning-stat" id="mlFeedbackCount">—</div><p>Feedback events recorded for this tenant</p><label style="display:flex;gap:8px;align-items:flex-start;font-size:12px;line-height:1.5;color:var(--muted);margin-top:12px"><input type="checkbox" id="mlTrainingConsent" style="margin-top:2px"> I explicitly consent to using my future positive chat feedback as training examples. This does not start training.</label></section>'+
       '<section class="learning-card"><h3>Dataset versions</h3><p>Validated, content-addressed datasets ready for controlled training jobs.</p><div class="learning-stat" id="mlDatasetCount">—</div><p>Versioned datasets available to your tenant</p><div id="mlDatasetVersions"></div></section>'+
-      '<section class="learning-card"><h3>Prepare a dataset</h3><p>Paste a JSON array of examples. Each example requires question and answer. Preparation does not train a model.</p><div class="learning-form"><textarea id="mlDatasetInput" spellcheck="false" placeholder="Paste a JSON array with question and answer fields"></textarea><div class="learning-actions"><button type="button" class="btn-primary" id="mlPrepare">Validate & version dataset</button></div><div class="learning-output hidden" id="mlPrepareOutput"></div></div></section>'+
+      '<section class="learning-card"><h3>Prepare a dataset</h3><p>Paste a JSON array of examples. Each example requires question and answer. Preparation does not train a model.</p><div class="learning-form"><textarea id="mlDatasetInput" spellcheck="false" placeholder="Paste a JSON array with question and answer fields"></textarea><div class="learning-actions"><button type="button" class="btn-primary" id="mlPrepare">Validate & version dataset</button><button type="button" class="btn-outline" id="mlBuildFeedback">Build from consented positive feedback</button></div><div class="learning-output hidden" id="mlPrepareOutput"></div></div></section>'+
       '<section class="learning-card"><h3>Production model smoke evaluation</h3><p>Runs explicit test questions through the configured ModelGateway. It does not promote or replace any checkpoint.</p><div class="learning-form"><textarea id="mlEvalInput" spellcheck="false">Explain what conversation memory does.\nWhat is the difference between training and inference?\nHow should a candidate model be evaluated?</textarea><div class="learning-actions"><button type="button" class="btn-primary" id="mlEvaluate">Run evaluation</button></div><div class="learning-output hidden" id="mlEvalOutput"></div></div></section>'+
       '<section class="learning-card" style="grid-column:1/-1"><h3>Registered model versions</h3><p>Registry entries are shown separately from selectable model labels. A model is usable only when its checkpoint, tokenizer, architecture, and runtime are compatible.</p><div id="mlRegisteredModels"><span style="color:var(--muted);font-size:12px">Loading registry…</span></div></section>'+
     '</div>';
@@ -4829,6 +4834,21 @@ async function loadLearningView() {
     if (!registry.children.length) registry.textContent = "No registry metadata found. Model labels in the chat picker are not proof that every checkpoint is installed.";
   };
   $("mlRefresh").addEventListener("click", refresh);
+  const consentBox = $("mlTrainingConsent");
+  try { consentBox.checked = localStorage.getItem("om_ml_training_consent") === "true"; } catch (_) {}
+  consentBox.addEventListener("change", () => {
+    try { localStorage.setItem("om_ml_training_consent", consentBox.checked ? "true" : "false"); } catch (_) {}
+    toast(consentBox.checked ? "Training consent enabled for future positive feedback" : "Training consent revoked", "success");
+  });
+  $("mlBuildFeedback").addEventListener("click", async () => {
+    const button = $("mlBuildFeedback"); button.disabled = true; button.textContent = "Collecting consented examples…";
+    try {
+      const {res,data} = await api("/api/ml/datasets/from-feedback",{method:"POST",body:"{}"},{error:false});
+      if (!res.ok) { showOutput("mlPrepareOutput",(data&&data.detail)||"Could not build a feedback dataset. Admin permission may be required."); toast("Feedback dataset unavailable","error"); }
+      else { showOutput("mlPrepareOutput",data); toast("Feedback dataset version created","success"); await refresh(); }
+    } catch (_) { toast("Feedback dataset unavailable","error"); }
+    finally { button.disabled = false; button.textContent = "Build from consented positive feedback"; }
+  });
   $("mlPrepare").addEventListener("click", async () => {
     let records;
     try { records = JSON.parse($("mlDatasetInput").value); }
