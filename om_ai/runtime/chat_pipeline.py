@@ -809,17 +809,11 @@ def run_chat_pipeline(
         need_model = False
         meta["model_skip"] = "preferred_draft"
 
-    if ctx_intent.get("intent") == "conversation" and not force_native_generation:
-        need_model = False
-        low = q.lower()
-        if "morning" in low or "moring" in low:
-            draft = "Good morning! I’m doing well — thanks for asking. How can I help you today?"
-        elif "evening" in low:
-            draft = "Good evening! Hope your day’s been good. What would you like to work on?"
-        elif re.search(r"\bhow\s+(was|is|are)\b", low):
-            draft = "I’m doing well — thanks for asking! How can I help you today?"
-        else:
-            draft = "Hello — I’m OM. How can I help you?"
+    # Conversation intent is a routing signal, never a source of canned answers.
+    # Greetings and social turns must use the same generation path as other turns.
+    if ctx_intent.get("intent") == "conversation":
+        need_model = True
+        meta.pop("model_skip", None)
 
     if need_model and native_ready and callable(native_chat):
         try:
@@ -1112,6 +1106,47 @@ def run_chat_pipeline(
         }
     except Exception as exc:
         meta["tool_intelligence"] = {"error": str(exc)}
+
+    # Native-first ownership boundary:
+    # later optimizers/formatters may compute diagnostics, but must not replace a
+    # valid OM-generated answer with templates or internal context blobs.
+    if force_native_generation:
+        try:
+            from om_ai.runtime.public_reply import sanitize_public_reply, is_safe_public_answer
+            from om_ai.runtime.chat_orchestrator import is_low_quality_reply, is_garbled_generation
+
+            if (
+                used_model
+                and model_text
+                and is_safe_public_answer(model_text)
+                and not is_low_quality_reply(model_text)
+                and not is_garbled_generation(model_text)
+            ):
+                draft = sanitize_public_reply(model_text) or model_text
+                meta["answer_source"] = "om_native_model"
+                meta["native_model_answer_preserved"] = True
+            elif public_tool and is_safe_public_answer(public_tool) and not is_low_quality_reply(public_tool):
+                # A verified tool result is an emergency grounded answer, never an
+                # internal reasoning dump. Record provenance instead of claiming
+                # the model generated it.
+                draft = sanitize_public_reply(public_tool) or public_tool
+                meta["answer_source"] = "grounded_tool_fallback"
+                meta["native_model_answer_preserved"] = False
+            else:
+                draft = (
+                    "OM's native model could not produce a reliable answer for this turn. "
+                    "The response was withheld rather than replaced with a canned template."
+                )
+                meta["answer_source"] = "native_generation_failed"
+                meta["native_generation_failed"] = True
+        except Exception as exc:
+            logger.warning("native-first final answer guard failed: %s", exc)
+            draft = (
+                "OM's native model could not produce a reliable answer for this turn. "
+                "The response was withheld rather than replaced with a canned template."
+            )
+            meta["answer_source"] = "native_generation_failed"
+            meta["native_generation_failed"] = True
 
     # ── 8. Memory write (store clean reply only) ─────────────────────
     stages.append("memory_write")
