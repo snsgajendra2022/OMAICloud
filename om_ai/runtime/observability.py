@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import contextvars
 import json
+import inspect
 import os
 import threading
 import time
@@ -137,5 +138,23 @@ def trace_function(name: str):
             ):
                 with trace_span(name):
                     return function(*args, **kwargs)
+        return wrapped
+    return decorate
+
+
+def trace_operation(name: str):
+    """Trace a sync method or generator without creating a nested request ID."""
+    def decorate(function):
+        if inspect.isgeneratorfunction(function):
+            @wraps(function)
+            def generator_wrapped(*args, **kwargs):
+                with trace_span(name):
+                    yield from function(*args, **kwargs)
+            return generator_wrapped
+
+        @wraps(function)
+        def wrapped(*args, **kwargs):
+            with trace_span(name):
+                return function(*args, **kwargs)
         return wrapped
     return decorate
