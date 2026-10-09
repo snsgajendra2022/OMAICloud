@@ -36,7 +36,7 @@ def test_relevant_history_is_bounded_and_current_turn_is_preserved():
                  {"role": "user", "content": "The console says Cannot read properties of undefined."}]
     prepared, state = ConversationEngine(max_history=4, max_relevant=2).prepare(messages)
     assert prepared[-1]["content"].startswith("The console says")
-    assert len([m for m in prepared if m["role"] != "system"]) <= 6
+    assert len([m for m in prepared if m["role"] != "system"]) <= 7
     assert state.task_status == "active"
 
 

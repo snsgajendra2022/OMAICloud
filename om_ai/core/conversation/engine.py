@@ -64,8 +64,19 @@ _CORRECTION_STARTS = ("actually", "correction", "i meant", "not ", "instead", "w
 _ACTION_STARTS = ("fix ", "implement ", "update ", "create ", "write ", "change ", "remove ", "add ")
 
 
+_STOP_WORDS = {
+    "the", "and", "for", "with", "you", "your", "are", "was", "were", "from",
+    "have", "has", "had", "this", "that", "these", "those", "then", "than",
+    "what", "when", "where", "which", "how", "can", "could", "would", "should",
+    "please", "about", "into", "onto", "there", "here", "not", "but", "all",
+}
+
+
 def _words(text: str) -> set[str]:
-    return {w.lower() for w in _WORD_RE.findall(text or "") if len(w) > 2}
+    return {
+        w.lower() for w in _WORD_RE.findall(text or "")
+        if len(w) > 2 and w.lower() not in _STOP_WORDS
+    }
 
 
 def _content(message: dict[str, Any]) -> str:
