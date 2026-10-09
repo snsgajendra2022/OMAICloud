@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import Any, Generator
 
 import torch
+from dotenv import load_dotenv
 
 from om_ai.backends.base import NativeCheckpointError
 from om_ai.runtime.engine import LocalLLMEngine
@@ -40,12 +41,26 @@ def pick_device(preferred: str | None = None) -> torch.device:
     return torch.device("cpu")
 
 
+def _load_project_env(root: Path) -> None:
+    """Load this checkout's .env consistently for CLI diagnostics and the server.
+
+    Existing shell variables always win. Resolve the file from the repository root,
+    never the caller's working directory, so running a script from another folder
+    cannot silently select a different checkpoint than `om-ai serve`.
+    """
+    env_file = root / ".env"
+    if env_file.is_file():
+        load_dotenv(dotenv_path=env_file, override=False)
+
+
 def default_native_paths() -> dict[str, str]:
     """Resolve OM-1.0 paths from env (OM_MODEL_* preferred, OM_AI_* fallback).
 
-    Checkpoint preference when unset: ``om-1.0-long`` → registry → ``om-1.0-smoke``.
+    Loads the repository .env without overriding shell exports. Checkpoint preference
+    when unset: ``om-1.0-long`` → registry → ``om-1.0-smoke``.
     """
     root = Path(__file__).resolve().parents[2]
+    _load_project_env(root)
     def resolve_path(raw: str | None, default: Path | None = None) -> str:
         value = (raw or "").strip()
         candidate = Path(value).expanduser() if value else (default or Path())
