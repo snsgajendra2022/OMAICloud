@@ -30,6 +30,16 @@ def pipeline_enabled() -> bool:
     }
 
 
+def native_model_first_enabled() -> bool:
+    """Whether the native OM checkpoint must synthesize every chat response."""
+    return os.environ.get("OM_NATIVE_MODEL_FIRST", "1").strip().lower() not in {
+        "0",
+        "false",
+        "no",
+        "off",
+    }
+
+
 def run_chat_pipeline(
     user_text: str,
     *,
@@ -112,7 +122,7 @@ def run_chat_pipeline(
         }
         ci_answer = str(chat_intel.get("answer") or "").strip()
         # Early return for greetings / identity / thanks — ChatGPT-like UX
-        force_native_generation = os.environ.get("OM_NATIVE_MODEL_FIRST", "1").strip().lower() not in {"0", "false", "no", "off"}
+        force_native_generation = native_model_first_enabled()
         if ci_answer and not chat_intel.get("needs_model", True) and not force_native_generation:
             stages.append("response")
             return {
