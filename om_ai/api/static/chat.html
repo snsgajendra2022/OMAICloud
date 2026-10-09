@@ -699,6 +699,26 @@ body.dark .chip.on{background:rgba(59,130,246,.15);border-color:rgba(59,130,246,
   .collapse-btn{display:none;}
   .top-title{text-align:left;}
 }
+
+/* Learning Lab: connected ML lifecycle workspace */
+.learning-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin:18px 0;}
+.learning-card{border:1px solid var(--border);border-radius:16px;background:var(--bg);padding:16px;min-width:0;}
+.learning-card h3{font-size:14px;margin:0 0 7px;letter-spacing:-.01em;}
+.learning-card p{font-size:12px;color:var(--muted);line-height:1.6;margin:0 0 12px;}
+.learning-stat{font-size:26px;font-weight:750;letter-spacing:-.04em;margin:4px 0;}
+.learning-status{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--border);border-radius:999px;padding:5px 9px;font-size:11px;font-weight:650;}
+.learning-status .dot{width:7px;height:7px;border-radius:50%;background:var(--success);}
+.learning-status.warn .dot{background:#d97706;}
+.learning-form{display:flex;flex-direction:column;gap:10px;}
+.learning-form textarea{width:100%;min-height:130px;border:1px solid var(--border);border-radius:10px;padding:10px;background:var(--bg);resize:vertical;font:12px/1.5 ui-monospace,monospace;}
+.learning-form .learning-input{width:100%;border:1px solid var(--border);border-radius:10px;padding:10px;background:var(--bg);}
+.learning-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;}
+.learning-output{white-space:pre-wrap;overflow-wrap:anywhere;background:var(--soft);border-radius:10px;padding:12px;font:12px/1.5 ui-monospace,monospace;max-height:280px;overflow:auto;}
+.learning-model-row{display:flex;align-items:center;justify-content:space-between;gap:12px;border-top:1px solid var(--border);padding:10px 0;font-size:12px;}
+.learning-model-row:first-child{border-top:0;}
+.learning-model-row strong{font-size:13px;}
+@media(max-width:760px){.learning-grid{grid-template-columns:1fr;}}
+
 </style>
 </head>
 <body>
@@ -843,6 +863,9 @@ body.dark .chip.on{background:rgba(59,130,246,.15);border-color:rgba(59,130,246,
   <!-- MODELS -->
   <section class="view" id="view-models"><div class="panel"><div class="panel-inner" id="modelsPanel"></div></div></section>
 
+  <!-- LEARNING LAB -->
+  <section class="view" id="view-learning"><div class="panel"><div class="panel-inner" id="learningPanel"></div></div></section>
+
   <!-- MEMORY -->
   <section class="view" id="view-memory"><div class="panel"><div class="panel-inner" id="memoryPanel"></div></div></section>
 
@@ -953,6 +976,7 @@ const NAV = [
   ["knowledge","Knowledge","brain"],
   ["prompts","Prompts","scroll"],
   ["models","Models","cpu"],
+  ["learning","Learning Lab","brain"],
   ["memory","Memory","database"],
   ["settings","Settings","settings"],
   ["profile","Profile","user"],
@@ -2046,6 +2070,24 @@ async function sendFeedback(assistantIdx, rating) {
   if (!state.currentId) { toast("No active conversation","error"); return; }
   const { res } = await api("/v1/conversations/"+encodeURIComponent(state.currentId)+"/feedback",
     {method:"POST",body:JSON.stringify({rating,comment:rating>=4?"thumbs_up":"thumbs_down"})},{error:false});
+  const answer = state.messages[assistantIdx] && String(state.messages[assistantIdx].content||"");
+  let question = "";
+  for (let i = assistantIdx-1; i >= 0; i--) {
+    if (state.messages[i] && state.messages[i].role === "user") { question = String(state.messages[i].content||""); break; }
+  }
+  // A feedback event is saved for learning analysis, but explicit training consent
+  // stays false unless a future UI asks the user to opt in.
+  if (res.ok && question && answer) {
+    await api("/api/ml/feedback", {
+      method:"POST",
+      body:JSON.stringify({
+        question, answer, rating:rating>=4 ? 1 : -1,
+        reason:rating>=4 ? "chat_thumbs_up" : "chat_thumbs_down",
+        conversation_id:state.currentId,
+        consent_to_training:false
+      })
+    }, {error:false});
+  }
   toast(res.ok ? "Feedback saved":"Feedback unavailable", res.ok?"success":"error");
 }
 
@@ -4732,12 +4774,94 @@ async function loadProfileView() {
   body.querySelectorAll("[data-goto]").forEach(el => el.addEventListener("click", () => setView(el.getAttribute("data-goto"))));
 }
 
+/* ─── VIEW: LEARNING LAB ─── */
+async function loadLearningView() {
+  const panel = $("learningPanel");
+  if (!panel) return;
+  panel.innerHTML =
+    '<div class="panel-head"><div><h2>Learning Lab</h2><p class="sub">Feedback → datasets → evaluation → controlled model promotion.</p></div><button type="button" class="btn-outline" id="mlRefresh">Refresh status</button></div>'+
+    '<div class="learning-grid">'+
+      '<section class="learning-card"><h3>Learning status</h3><p>Production weights are never changed by feedback collection or status checks.</p><div id="mlEnabledState" class="learning-status warn"><i class="dot"></i>Loading status…</div><div class="learning-stat" id="mlFeedbackCount">—</div><p>Feedback events recorded for this tenant</p></section>'+
+      '<section class="learning-card"><h3>Dataset versions</h3><p>Validated, content-addressed datasets ready for controlled training jobs.</p><div class="learning-stat" id="mlDatasetCount">—</div><p>Versioned datasets available to your tenant</p><div id="mlDatasetVersions"></div></section>'+
+      '<section class="learning-card"><h3>Prepare a dataset</h3><p>Paste a JSON array of examples. Each example requires question and answer. Preparation does not train a model.</p><div class="learning-form"><textarea id="mlDatasetInput" spellcheck="false" placeholder=\'[{"question":"What is OM AI?","answer":"OM AI is…","intent":"general"}]\'></textarea><div class="learning-actions"><button type="button" class="btn-primary" id="mlPrepare">Validate & version dataset</button></div><div class="learning-output hidden" id="mlPrepareOutput"></div></div></section>'+
+      '<section class="learning-card"><h3>Production model smoke evaluation</h3><p>Runs explicit test questions through the configured ModelGateway. It does not promote or replace any checkpoint.</p><div class="learning-form"><textarea id="mlEvalInput" spellcheck="false">Explain what conversation memory does.\nWhat is the difference between training and inference?\nHow should a candidate model be evaluated?</textarea><div class="learning-actions"><button type="button" class="btn-primary" id="mlEvaluate">Run evaluation</button></div><div class="learning-output hidden" id="mlEvalOutput"></div></div></section>'+
+      '<section class="learning-card" style="grid-column:1/-1"><h3>Registered model versions</h3><p>Registry entries are shown separately from selectable model labels. A model is usable only when its checkpoint, tokenizer, architecture, and runtime are compatible.</p><div id="mlRegisteredModels"><span style="color:var(--muted);font-size:12px">Loading registry…</span></div></section>'+
+    '</div>';
+  const showOutput = (id, value) => {
+    const el = $(id);
+    if (!el) return;
+    el.textContent = typeof value === "string" ? value : JSON.stringify(value, null, 2);
+    el.classList.remove("hidden");
+  };
+  const refresh = async () => {
+    const {res,data} = await api("/api/ml/status",{},{error:false});
+    const status = $("mlEnabledState");
+    if (!res.ok || !data) {
+      status.className = "learning-status warn";
+      status.textContent = "Status unavailable — check model.generate permission and server logs.";
+      $("mlFeedbackCount").textContent = "—";
+      $("mlDatasetCount").textContent = "—";
+      $("mlDatasetVersions").textContent = "";
+      $("mlRegisteredModels").textContent = "Registry status unavailable.";
+      return;
+    }
+    status.className = "learning-status"+(data.learning_enabled ? "" : " warn");
+    status.textContent = data.learning_enabled ? "Training enabled by deployment configuration" : "Training disabled · safe default";
+    $("mlFeedbackCount").textContent = String(data.feedback_events ?? 0);
+    $("mlDatasetCount").textContent = String((data.dataset_versions||[]).length);
+    const versions = $("mlDatasetVersions");
+    versions.innerHTML = "";
+    (data.dataset_versions||[]).forEach(item => {
+      const row = document.createElement("div"); row.className = "learning-model-row";
+      const left = document.createElement("strong"); left.textContent = item.dataset_version || "Dataset";
+      const right = document.createElement("span"); right.textContent = String(item.count||0)+" examples";
+      row.append(left,right); versions.appendChild(row);
+    });
+    if (!versions.children.length) versions.textContent = "No dataset versions yet.";
+    const registry = $("mlRegisteredModels");
+    registry.innerHTML = "";
+    (data.registered_models||[]).forEach(item => {
+      const row = document.createElement("div"); row.className = "learning-model-row";
+      const left = document.createElement("strong"); left.textContent = item.version || "Unnamed version";
+      const right = document.createElement("span"); right.textContent = item.state || "unknown";
+      row.append(left,right); registry.appendChild(row);
+    });
+    if (!registry.children.length) registry.textContent = "No registry metadata found. Model labels in the chat picker are not proof that every checkpoint is installed.";
+  };
+  $("mlRefresh").addEventListener("click", refresh);
+  $("mlPrepare").addEventListener("click", async () => {
+    let records;
+    try { records = JSON.parse($("mlDatasetInput").value); }
+    catch (_) { toast("Dataset must be valid JSON","error"); return; }
+    if (!Array.isArray(records) || !records.length) { toast("Provide a non-empty JSON array","error"); return; }
+    const button = $("mlPrepare"); button.disabled = true; button.textContent = "Validating…";
+    try {
+      const {res,data} = await api("/api/ml/datasets/prepare",{method:"POST",body:JSON.stringify({records})},{error:false});
+      if (!res.ok) { showOutput("mlPrepareOutput",(data&&data.detail)||"Dataset preparation failed. Admin permission may be required."); toast("Dataset preparation failed","error"); }
+      else { showOutput("mlPrepareOutput",data); toast("Dataset version created","success"); await refresh(); }
+    } catch (_) { toast("Dataset preparation failed","error"); }
+    finally { button.disabled = false; button.textContent = "Validate & version dataset"; }
+  });
+  $("mlEvaluate").addEventListener("click", async () => {
+    const questions = $("mlEvalInput").value.split(/\n+/).map(q=>q.trim()).filter(Boolean);
+    if (!questions.length) { toast("Enter at least one evaluation question","error"); return; }
+    const button = $("mlEvaluate"); button.disabled = true; button.textContent = "Evaluating…";
+    try {
+      const {res,data} = await api("/api/ml/evaluate",{method:"POST",body:JSON.stringify({questions})},{error:false});
+      if (!res.ok) { showOutput("mlEvalOutput",(data&&data.detail)||"Evaluation failed. Admin permission or a ready model may be required."); toast("Evaluation failed","error"); }
+      else { showOutput("mlEvalOutput",data.metrics||data); toast(data.metrics&&data.metrics.passed ? "Evaluation smoke check passed" : "Evaluation completed — inspect metrics","success"); }
+    } catch (_) { toast("Evaluation failed","error"); }
+    finally { button.disabled = false; button.textContent = "Run evaluation"; }
+  });
+  await refresh();
+}
+
 /* ─── VIEW LOADERS MAP ─── */
 const VIEW_LOADERS = {
   search:loadSearchView, library:loadLibraryView, scheduled:loadScheduledView,
   tools:loadToolsView, projects:loadProjectsView, assistants:loadAssistantsView,
   explore:loadExploreView, files:loadFilesView, knowledge:loadKnowledgeView,
-  prompts:loadPromptsView, models:loadModelsView, memory:loadMemoryView,
+  prompts:loadPromptsView, models:loadModelsView, learning:loadLearningView, memory:loadMemoryView,
   settings:loadSettingsView, profile:loadProfileView,
 };
 
