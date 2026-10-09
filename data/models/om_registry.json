@@ -3,26 +3,16 @@
     "name": "OM-Foundation",
     "version": "0.1",
     "model_type": "LLM",
-    "parameters": "7B",
-    "status": "created",
+    "parameters": "unverified",
+    "status": "metadata_only_unverified",
     "capabilities": [
       "reasoning",
       "coding",
       "research"
     ],
-    "created_at": "2026-09-03T08:19:27.398740"
-  },
-  {
-    "name": "OM-Foundation",
-    "version": "0.1",
-    "model_type": "LLM",
-    "parameters": "7B",
-    "status": "created",
-    "capabilities": [
-      "reasoning",
-      "coding",
-      "research"
-    ],
-    "created_at": "2026-10-08T11:45:22.975019"
+    "checkpoint_path": null,
+    "checkpoint_sha256": null,
+    "created_at": "2026-09-03T08:19:27.398740",
+    "verification_note": "This record has no checkpoint path, checksum, or evaluation evidence. It is not proof that a trained 7B checkpoint exists. Register actual weights and tokenizer fingerprints before marking this model available."
   }
 ]

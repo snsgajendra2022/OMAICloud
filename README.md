@@ -6,6 +6,8 @@ Self-hosted, API-independent AI platform: train and run **OM-1.0** natively — 
 
 **Companion (13-layer):** understanding → emotion → memory → dialogue → reasoning → knowledge (RAG) → research (no auto-redirect) → permission → brother personality → voice/avatar → self-learning. Entry: `om_ai.core.companion_architecture`.
 
+The `data/models/om_registry.json` file is descriptive metadata, not a weight store. Entries without a real checkpoint path, checksum, tokenizer binding, and evaluation results are marked unverified and must not be presented as installed models. Local files under `artifacts/` are intentionally git-ignored, so GitHub alone cannot confirm whether your machine has those weights.
+
 ## Honesty about weights
 
 This repository is **working software** (architecture, trainers, agents, API). It is **not** a download of trained OM-1B / 7B / 13B / 70B brains.
