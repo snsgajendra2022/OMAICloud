@@ -118,5 +118,21 @@
       }
     },
     "time": "2026-10-09T11:19:52.955935+00:00"
+  },
+  {
+    "tenant_id": "default",
+    "actor": "tool_executor",
+    "action": "tool.execute",
+    "resource": "file_writer",
+    "detail": {
+      "action": "Create files",
+      "result": {
+        "success": true,
+        "result": {
+          "file": "data/test/demo.txt"
+        }
+      }
+    },
+    "time": "2026-10-09T11:24:20.187672+00:00"
   }
 ]
