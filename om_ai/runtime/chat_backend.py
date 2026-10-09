@@ -1159,14 +1159,23 @@ def chat_reply(
     messages = cleaned_messages
 
     profile = level_runtime_profile(model)
-    evo_text, evo_model, evo_level = maybe_evolution_reply(messages, model=model)
-    if evo_text is not None:
-        info = ChatBackendInfo(
-            backend="om_evolution",
-            model=evo_model,
-            provider="OM AI Matrix",
-        )
-        return evo_text, info
+
+    # Cloud-backed chat must always reach the configured model endpoint. The OM
+    # evolution matrix may return canned/local responses, so it is intentionally
+    # bypassed when a cloud backend is explicitly selected.
+    cloud_chat_selected = configured_backend() == "openai"
+    if cloud_chat_selected:
+        evo_text, evo_model, evo_level = None, None, None
+    else:
+        evo_text, evo_model, evo_level = maybe_evolution_reply(messages, model=model)
+        if evo_text is not None:
+            info = ChatBackendInfo(
+                backend="om_evolution",
+                model=evo_model,
+                provider="OM AI Matrix",
+            )
+            return evo_text, info
+
     # Remember selected evolution model id for branding when we fall through to native.
     selected_evolution_model = evo_model if evo_level is not None else None
 
