@@ -115,3 +115,40 @@ def test_native_model_first_can_be_disabled_explicitly(monkeypatch):
 
     monkeypatch.setenv("OM_NATIVE_MODEL_FIRST", "0")
     assert native_model_first_enabled() is False
+
+def test_native_provider_wins_even_when_external_api_key_exists(monkeypatch):
+    monkeypatch.setenv("OM_MODEL_PROVIDER", "om_native")
+    monkeypatch.setenv("OM_AI_CHAT_BACKEND", "openai")
+    monkeypatch.setenv("OPENAI_API_KEY", "test-only-key")
+    assert cb.configured_backend() == "om_native"
+
+
+def test_invalid_provider_payload_does_not_leak_response_body(monkeypatch):
+    secret_marker = "PRIVATE_USER_PROMPT_SHOULD_NOT_LEAK"
+
+    class FakeResponse:
+        def raise_for_status(self):
+            return None
+
+        def json(self):
+            return {"diagnostic": secret_marker}
+
+    class FakeClient:
+        def __init__(self, *args, **kwargs):
+            pass
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *args):
+            return False
+
+        def post(self, *args, **kwargs):
+            return FakeResponse()
+
+    monkeypatch.setenv("OM_AI_OPENAI_API_KEY", "test-only-key")
+    monkeypatch.setattr(cb.httpx, "Client", FakeClient)
+    with pytest.raises(RuntimeError) as error:
+        cb.chat_via_openai([{"role": "user", "content": "hello"}])
+    assert secret_marker not in str(error.value)
+    assert "invalid chat-completion payload" in str(error.value)
