@@ -637,7 +637,7 @@ async def generate_stream(
 
     async def _sse_generator() -> AsyncGenerator[str, None]:
         try:
-            for chunk in engine.generate_stream(
+            for chunk in model_gateway.stream_generate(
                 req.prompt,
                 max_new_tokens=req.max_new_tokens,
                 temperature=req.temperature,
