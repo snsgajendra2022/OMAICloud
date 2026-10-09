@@ -84,12 +84,38 @@ def main() -> int:
                 min_new_tokens=4,
             )
             elapsed = round(time.perf_counter() - started, 3)
-            usable = bool((answer or "").strip())
+            usable = bool((answer or "").strip()) and not is_degenerate_generation(answer)
+            correctness: dict[str, bool] = {}
+            normalized = (answer or "").lower()
+            if category == "math":
+                correctness["contains_391"] = "391" in normalized
+            elif category == "logic":
+                correctness["rejects_invalid_conclusion"] = any(
+                    phrase in normalized for phrase in (
+                        "cannot conclude", "can't conclude", "not necessarily",
+                        "does not follow", "cannot be concluded", "not enough information"
+                    )
+                )
+            elif category == "structured_output":
+                try:
+                    parsed = json.loads(answer or "")
+                    correctness["valid_json"] = (
+                        isinstance(parsed, dict)
+                        and parsed.get("name") == "OM"
+                        and parsed.get("skills") == ["chat", "coding"]
+                    )
+                except (json.JSONDecodeError, TypeError):
+                    correctness["valid_json"] = False
+            elif category == "context_retention":
+                correctness["acknowledges_saved"] = "saved" in normalized
+            if correctness:
+                usable = usable and all(correctness.values())
             if not usable:
                 failures += 1
             results.append({
                 "category": category,
                 "ok": usable,
+                "correctness_checks": correctness,
                 "elapsed_seconds": elapsed,
                 "prompt": prompt,
                 "answer": (answer or "")[:4000],
@@ -111,7 +137,7 @@ def main() -> int:
                     min_new_tokens=1,
                 )
                 followup_elapsed = round(time.perf_counter() - started, 3)
-                followup_ok = bool((followup or "").strip()) and not is_degenerate_generation(followup) and "MAPLE-731" in (followup or "")
+                followup_ok = bool((followup or "").strip()) and not is_degenerate_generation(followup) and "MAPLE-731" in (followup or "") and not is_degenerate_generation(followup) and "MAPLE-731" in (followup or "")
                 if not followup_ok:
                     failures += 1
                 results.append({
