@@ -12,6 +12,7 @@ import threading
 import time
 import uuid
 from contextlib import contextmanager
+from functools import wraps
 from pathlib import Path
 from typing import Any, Iterator
 
@@ -119,3 +120,22 @@ def trace_span(name: str, *, attributes: dict[str, Any] | None = None) -> Iterat
             **ids, "event": "span.end", "span": str(name), "timestamp": time.time(),
             "duration_ms": round((time.perf_counter() - started) * 1000, 3), **safe,
         })
+
+
+def trace_function(name: str):
+    """Decorator for synchronous runtime entrypoints; never captures input text."""
+    def decorate(function):
+        @wraps(function)
+        def wrapped(*args, **kwargs):
+            nested = kwargs.get("kwargs")
+            nested = nested if isinstance(nested, dict) else {}
+            conversation_id = kwargs.get("conversation_id") or nested.get("conversation_id")
+            request_id = kwargs.get("request_id")
+            with trace_request(
+                request_id=str(request_id) if request_id else None,
+                conversation_id=str(conversation_id) if conversation_id else None,
+            ):
+                with trace_span(name):
+                    return function(*args, **kwargs)
+        return wrapped
+    return decorate
