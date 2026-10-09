@@ -214,6 +214,12 @@ def configured_backend() -> str:
         return chat
     if chat in {"om_native", "om-native", "native"}:
         return "om_native"
+    if chat == "auto":
+        if openai_configured():
+            return "openai"
+        if provider in {"om_native", "om-native", "native", "om"}:
+            return "om_native"
+        return "local"
     if chat == "ollama" or provider == "ollama":
         raise RuntimeError(
             "Ollama is not part of the production chat path. "
@@ -224,10 +230,6 @@ def configured_backend() -> str:
         return "om_native"
     if provider in {"openai", "local"} and chat in {_DEFAULT_BACKEND, "auto"}:
         return provider
-    if chat == "auto":
-        if openai_configured():
-            return "openai"
-        return "local"
     if not chat:
         return _DEFAULT_BACKEND
     return chat
