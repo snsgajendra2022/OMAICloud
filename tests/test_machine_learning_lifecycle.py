@@ -46,16 +46,17 @@ def test_dataset_split_is_deterministic_and_accounts_for_every_record():
     assert sum(map(len, first.values())) == 11
 
 
-def test_feedback_requires_explicit_training_consent(tmp_path):
+def test_feedback_requires_explicit_consent_and_never_trains_on_rejected_answers(tmp_path):
     collector = FeedbackCollector(tmp_path / "feedback.jsonl")
     collector.add("q1", "a1", rating=1, consent_to_training=False)
-    collector.add("q2", "a2", rating=-1, consent_to_training=True)
-    assert len(collector.recent()) == 2
+    collector.add("q2", "rejected answer", rating=-1, consent_to_training=True)
+    collector.add("q3", "preferred answer", rating=1, consent_to_training=True)
+    assert len(collector.recent()) == 3
     assert collector.training_candidates() == [{
-        "question": "q2",
-        "answer": "a2",
-        "quality_score": 0.0,
-        "feedback_event_id": collector.recent()[1]["event_id"],
+        "question": "q3",
+        "answer": "preferred answer",
+        "quality_score": 1.0,
+        "feedback_event_id": collector.recent()[2]["event_id"],
     }]
 
 
