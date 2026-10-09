@@ -88,6 +88,24 @@ om-ai train-om1 --config configs/om-1.0-local.json --steps 20
 
 Python ≥ 3.11, PyTorch ≥ 2.4. Linux + CUDA for serious distributed training; Apple Silicon can use `mps` when available.
 
+## Controlled ML lifecycle and Learning Lab
+
+The chat workspace includes a **Learning Lab** for tenant-scoped feedback, dataset validation/versioning, and explicit smoke evaluation through the canonical ModelGateway.
+
+- `GET /api/ml/status` reports learning configuration, recent dataset manifests, feedback count, registered checkpoint metadata, and the configured model id. It does not load or modify weights.
+- `POST /api/ml/feedback` records feedback as a candidate signal. `consent_to_training` defaults to `false`; feedback collection never starts training.
+- `POST /api/ml/datasets/prepare` validates examples containing non-empty `question` and `answer`, writes a content-addressed JSONL dataset and manifest, and reports deterministic train/validation/test split counts. Requires admin permission.
+- `POST /api/ml/evaluate` explicitly runs smoke questions through ModelGateway and reports non-empty and echo rates. Requires admin permission and a usable configured model.
+
+The initial learning foundation is intentionally **safe-by-default**:
+
+- `OM_LEARNING_ENABLED=false` by default. When enabled, training still requires an explicit training adapter.
+- `OM_LEARNING_AUTO_PROMOTION=false` by default. Candidate checkpoints must be evaluated and approved before production promotion.
+- Dataset and feedback files are stored under a tenant-specific hashed directory beneath `OM_LEARNING_ROOT` (default `artifacts/learning`).
+- OM-L1 through OM-L5 in the chat picker are behavior/evolution profiles unless the model catalog and registry confirm real, compatible checkpoints. A label is not proof that a separate trained model is installed.
+
+The existing training stack (pretraining, SFT, DPO/PPO, reward modeling, and registry components) remains the training implementation source. The Learning Lab does not claim to implement every algorithm simply because a UI control exists, and it never promotes new weights automatically.
+
 ## Frontier-model reality
 
 Owning a capable private model still means: licensed corpus → tokenizer → cluster pretrain → SFT/alignment → eval → deployed weights. This repo is the engineering foundation for that process — not a substitute for the training work itself.
