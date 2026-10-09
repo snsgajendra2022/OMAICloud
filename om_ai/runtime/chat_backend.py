@@ -206,16 +206,28 @@ def configured_backend() -> str:
     """
     provider = (_env("OM_MODEL_PROVIDER") or "").lower()
     chat = (_env("OM_AI_CHAT_BACKEND") or _DEFAULT_BACKEND).lower()
-    if provider in {"om_native", "om-native", "native", "om"}:
-        return "om_native"
+
+    # An explicitly selected chat backend must win over a stale provider value.
+    # This matters when an existing .env contains OM_MODEL_PROVIDER=om_native
+    # but the operator intentionally switches chat to an OpenAI-compatible cloud.
+    if chat in {"openai", "local"}:
+        return chat
     if chat in {"om_native", "om-native", "native"}:
         return "om_native"
+    if chat == "auto":
+        if openai_configured():
+            return "openai"
+        if provider in {"om_native", "om-native", "native", "om"}:
+            return "om_native"
+        return "local"
     if chat == "ollama" or provider == "ollama":
         raise RuntimeError(
-            "Ollama is not part of the OM-1.0 native production path. "
-            "Unset OM_AI_CHAT_BACKEND/OM_MODEL_PROVIDER or use om_native. "
+            "Ollama is not part of the production chat path. "
+            "Use an explicit supported backend (om_native, openai, or local). "
             "Legacy client (opt-in scripts only): om_ai.legacy.ollama"
         )
+    if provider in {"om_native", "om-native", "native", "om"}:
+        return "om_native"
     if provider in {"openai", "local"} and chat in {_DEFAULT_BACKEND, "auto"}:
         return provider
     if not chat:
@@ -1147,14 +1159,23 @@ def chat_reply(
     messages = cleaned_messages
 
     profile = level_runtime_profile(model)
-    evo_text, evo_model, evo_level = maybe_evolution_reply(messages, model=model)
-    if evo_text is not None:
-        info = ChatBackendInfo(
-            backend="om_evolution",
-            model=evo_model,
-            provider="OM AI Matrix",
-        )
-        return evo_text, info
+
+    # Cloud-backed chat must always reach the configured model endpoint. The OM
+    # evolution matrix may return canned/local responses, so it is intentionally
+    # bypassed when a cloud backend is explicitly selected.
+    cloud_chat_selected = configured_backend() == "openai"
+    if cloud_chat_selected:
+        evo_text, evo_model, evo_level = None, None, None
+    else:
+        evo_text, evo_model, evo_level = maybe_evolution_reply(messages, model=model)
+        if evo_text is not None:
+            info = ChatBackendInfo(
+                backend="om_evolution",
+                model=evo_model,
+                provider="OM AI Matrix",
+            )
+            return evo_text, info
+
     # Remember selected evolution model id for branding when we fall through to native.
     selected_evolution_model = evo_model if evo_level is not None else None
 
