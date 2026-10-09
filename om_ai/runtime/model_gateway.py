@@ -8,6 +8,8 @@ from __future__ import annotations
 from collections.abc import Iterable, Iterator
 from typing import Any
 
+from om_ai.runtime.observability import trace_operation
+
 
 class ModelGatewayError(RuntimeError):
     """A native model operation failed or returned unusable output."""
@@ -40,6 +42,7 @@ class ModelGateway:
             raise ModelGatewayError(f"OM native {operation} failed the output-integrity check.")
         return cleaned
 
+    @trace_operation("model_gateway.generate")
     def generate(self, prompt: str, **kwargs: Any) -> str:
         if not isinstance(prompt, str) or not prompt.strip():
             raise ValueError("prompt must be a non-empty string")
@@ -53,6 +56,7 @@ class ModelGateway:
         except Exception as exc:
             raise ModelGatewayError("OM native generation failed.") from exc
 
+    @trace_operation("model_gateway.chat")
     def chat(self, messages: list[dict[str, Any]], **kwargs: Any) -> str:
         if not isinstance(messages, list) or not messages:
             raise ValueError("messages must be a non-empty list")
@@ -66,6 +70,7 @@ class ModelGateway:
         except Exception as exc:
             raise ModelGatewayError("OM native chat failed.") from exc
 
+    @trace_operation("model_gateway.stream_generate")
     def stream_generate(self, prompt: str, **kwargs: Any) -> Iterator[str]:
         if not isinstance(prompt, str) or not prompt.strip():
             raise ValueError("prompt must be a non-empty string")
@@ -75,6 +80,7 @@ class ModelGateway:
         except Exception as exc:
             raise ModelGatewayError("OM native streaming generation failed.") from exc
 
+    @trace_operation("model_gateway.stream_chat")
     def stream_chat(
         self, messages: list[dict[str, Any]], **kwargs: Any
     ) -> Iterator[str]:
@@ -89,6 +95,7 @@ class ModelGateway:
         except Exception as exc:
             raise ModelGatewayError("OM native streaming failed.") from exc
 
+    @trace_operation("model_gateway.embed")
     def embed(self, texts: list[str]) -> list[list[float]]:
         """Embedding is intentionally unavailable without a trained embedder."""
         if not isinstance(texts, list) or not texts or any(
