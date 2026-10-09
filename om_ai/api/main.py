@@ -706,10 +706,10 @@ def chat(
         if backend.live_knowledge:
             payload["live_knowledge"] = backend.live_knowledge
         return payload
-    except NativeCheckpointError as exc:
+    except (NativeCheckpointError, ModelGatewayError) as exc:
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail=str(exc) or "OM-1.0 checkpoint unavailable.",
+            detail=str(exc) or "OM-1.0 native model unavailable.",
         ) from exc
     except Exception as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
