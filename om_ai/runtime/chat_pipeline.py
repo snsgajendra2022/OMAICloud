@@ -839,10 +839,16 @@ def run_chat_pipeline(
     else:
         meta["model"] = {"used": False, "reason": "draft_ready" if draft else "model_unavailable"}
 
-    if force_native_generation and draft and not used_model:
-        # Any deterministic draft is context, not the final user-visible answer.
-        internal_context = (internal_context + "\nCandidate context (do not copy verbatim; answer the user's actual question):\n" + draft[:1200]).strip()
-        draft = ""
+    if force_native_generation and not used_model:
+        # Never disguise a failed native generation as a successful canned answer.
+        # A clear diagnostic is more useful than a repeated static greeting.
+        draft = (
+            "OM's native checkpoint did not produce a usable model-generated answer "
+            "for this turn. Check that the intended trained checkpoint is loaded, "
+            "the tokenizer matches its vocabulary, and the server logs show no "
+            "generation errors."
+        )
+        meta["native_generation_failed"] = True
 
     if not (draft or "").strip() and public_tool:
         draft = public_tool
