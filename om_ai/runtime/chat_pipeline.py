@@ -57,6 +57,7 @@ def run_chat_pipeline(
 ) -> dict[str, Any]:
     """Run the upgraded staged chat pipeline. Returns answer + stage meta."""
     q = (user_text or "").strip()
+    force_native_generation = native_model_first_enabled()
     stages: list[str] = []
     meta: dict[str, Any] = {"pipeline": "om-chat-pipeline-v2"}
     forced = [str(t).strip() for t in (force_tools or []) if str(t).strip()]
@@ -406,7 +407,6 @@ def run_chat_pipeline(
 
     # ── 3a2. Live web/Wikipedia + helpful defaults (beat stale Genesis) ─
     stages.append("live_knowledge")
-    force_native_generation = os.environ.get("OM_NATIVE_MODEL_FIRST", "1").strip().lower() not in {"0", "false", "no", "off"}
     preferred_draft = ""
     live_pack: dict[str, Any] = {}
     try:
