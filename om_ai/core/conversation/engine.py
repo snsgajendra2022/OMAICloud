@@ -128,15 +128,19 @@ def classify_relation(current: str, history: list[dict[str, str]]) -> MessageRel
         return MessageRelation.ANSWER if _is_question(previous) else MessageRelation.CONFIRMATION
     if low in _NEGATIVE or low.startswith(("no, ", "still ", "it still")):
         return MessageRelation.REJECTION if _is_question(previous) else MessageRelation.CONSTRAINT_UPDATE
-    if any(low.startswith(prefix) for prefix in _ACTION_STARTS):
-        return MessageRelation.ACTION_REQUEST
+
     overlap = _overlap(text, previous_user)
-    # A long, semantically unrelated request is a topic switch even if it
-    # contains a demonstrative such as "these" or "that".
-    if previous_user and overlap < 0.015 and len(_words(text)) >= 8:
+    # Detect a clearly unrelated substantive request before interpreting
+    # demonstratives such as "these" as references to the previous task.
+    if previous_user and overlap < 0.015 and len(_words(text)) >= 4:
         return MessageRelation.TOPIC_SWITCH
+
+    # "Fix that" is both an action and a reference; preserving the reference
+    # lets the context builder attach the action to the correct prior task.
     if _REFERENCE_RE.search(text):
         return MessageRelation.REFERENCE
+    if any(low.startswith(prefix) for prefix in _ACTION_STARTS):
+        return MessageRelation.ACTION_REQUEST
     if previous and _is_question(previous):
         return MessageRelation.ANSWER
     if overlap >= 0.12:
