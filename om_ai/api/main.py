@@ -1198,3 +1198,9 @@ def multimodal_analyze(
         "ocr": packet.get("ocr"),
         "answer": packet.get("answer"),
     }
+
+
+@app.get("/control-center", tags=["UI"])
+def control_center_ui():
+    """Unified OM workspace landing page with live runtime health."""
+    return _serve_static_html("om-control-center.html")
