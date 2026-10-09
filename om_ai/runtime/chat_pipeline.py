@@ -136,6 +136,29 @@ def run_chat_pipeline(
         logger.debug("chat intelligence skipped: %s", exc)
         meta["chat_intelligence"] = {"error": str(exc)}
 
+    # ── Canonical conversation context ─────────────────────────────────
+    stages.append("canonical_conversation")
+    conversation_pack = {}
+    try:
+        from om_ai.conversation_engine import ConversationEngine
+        durable = None
+        try:
+            from om_ai.memory.layers import LayeredMemory
+            durable = LayeredMemory(tenant_id=tenant_id or "default", user_id=actor or "default")
+        except Exception:
+            pass
+        conversation_pack = ConversationEngine().process(q, history=hist, tenant_id=tenant_id, actor=actor,
+            conversation_id=str((kwargs or {}).get("conversation_id") or project_id or "") or None,
+            durable_memory=durable) or {}
+        ca = conversation_pack.get("analysis") or {}
+        meta["conversation"] = {"relation": conversation_pack.get("relation"), "topic": ca.get("topic"),
+            "active_task": ca.get("active_task"), "reference_count": len(ca.get("references") or []),
+            "relevant_history_count": len(ca.get("relevant_history") or []), "memory_hit_count": len(ca.get("memory_hits") or [])}
+        meta["conversation_context"] = str(conversation_pack.get("context_blob") or "")[:6000]
+    except Exception as exc:
+        logger.debug("canonical conversation layer skipped: %s", exc)
+        meta["conversation"] = {"error": str(exc)}
+
     # ── 0b. STEP 24 OM Brain Router ───────────────────────────────────
     # User → OM Brain → Fusion → Research → Knowledge → Agents → Response
     stages.append("step24_brain_router")
@@ -796,6 +819,9 @@ def run_chat_pipeline(
                 sys_bits.append(lang_instruction)
             if intent.get("intent"):
                 sys_bits.append(f"Intent: {intent.get('intent')}.")
+            conversation_context = str(meta.get("conversation_context") or "").strip()
+            if conversation_context:
+                sys_bits.append("Conversation continuity context (internal; resolve references and continue the active task):\n" + conversation_context)
             if public_tool:
                 sys_bits.append("Verified tool result:\n" + public_tool[:400])
             if internal_context:
