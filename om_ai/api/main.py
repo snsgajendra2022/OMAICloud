@@ -37,6 +37,7 @@ from om_ai.registry import ModelRegistry
 from om_ai.backends import NativeCheckpointError, OMNativeBackend
 from om_ai.backends.om_native import default_native_paths
 from om_ai.runtime import LocalLLMEngine
+from om_ai.runtime.model_gateway import ModelGateway, ModelGatewayError
 from om_ai.runtime.chat_backend import configured_backend
 from om_ai.security import (
     AuditLog,
@@ -120,6 +121,7 @@ _REGISTRY_ROOT = os.getenv("OM_AI_REGISTRY", "artifacts/registry")
 
 engine = LocalLLMEngine()
 native_backend = OMNativeBackend(engine=engine)
+model_gateway = ModelGateway(native_backend)
 memory = SQLiteMemoryStore(_DB_PATH)
 conversations = ConversationStore(_DB_PATH)
 knowledge = PersistentKnowledgeBase(_KB_PATH)
@@ -606,7 +608,7 @@ def generate(
 ):
     """Single-shot text generation."""
     try:
-        text = engine.generate(
+        text = model_gateway.generate(
             req.prompt,
             max_new_tokens=req.max_new_tokens,
             temperature=req.temperature,
@@ -673,7 +675,7 @@ def chat(
             messages,
             local_chat=engine.chat,
             local_loaded=engine.model is not None,
-            native_chat=native_backend.chat,
+            native_chat=model_gateway.chat,
             native_ready=bool(native_backend.loaded and native_backend._trained),
             max_new_tokens=req.max_new_tokens,
             temperature=req.temperature,
@@ -1189,7 +1191,7 @@ def multimodal(
             }
         except Exception:
             try:
-                text = engine.generate(
+                text = model_gateway.generate(
                     req.text,
                     max_new_tokens=req.max_new_tokens,
                     temperature=req.temperature,
