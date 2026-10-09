@@ -526,6 +526,28 @@ def _om_native_chat_reply_body(
                 evolution_profile=profile,
             )
             ans = str(piped.get("answer") or "").strip()
+            pipeline_meta = piped.get("meta") or {}
+            # In native-model-first mode, a failed OM generation is terminal unless
+            # the pipeline explicitly selected a verified public tool answer. Never
+            # continue into unrelated answer-producing cascades that can leak
+            # internal "knowledge:" / "Question:" context blocks.
+            if (
+                _env_on("OM_NATIVE_MODEL_FIRST", "1")
+                and pipeline_meta.get("answer_source") == "native_generation_failed"
+            ):
+                info_pipe = ChatBackendInfo(
+                    backend=info.backend,
+                    model=info.model,
+                    detail="om_native_generation_failed",
+                    provider=info.provider,
+                    live_knowledge={
+                        "intelligence": intel.meta,
+                        "pipeline": pipeline_meta,
+                        "stages": piped.get("stages") or [],
+                        "evolution_level": evolution_level,
+                    },
+                )
+                return ans if ans.endswith("\n") else ans + "\n", info_pipe
             try:
                 from om_ai.core.chat_intelligence.stub_detect import is_solution_stub
                 from om_ai.core.intelligence.real_answer import looks_like_static_reply
