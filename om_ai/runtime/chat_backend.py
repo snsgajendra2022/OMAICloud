@@ -360,9 +360,16 @@ def chat_via_openai(
         r.raise_for_status()
         data = r.json()
     try:
-        return str(data["choices"][0]["message"]["content"])
+        content = data["choices"][0]["message"]["content"]
+        if not isinstance(content, str) or not content.strip():
+            raise TypeError("empty or non-text content")
+        return content
     except (KeyError, IndexError, TypeError) as exc:
-        raise RuntimeError(f"OpenAI-compatible API returned unexpected payload: {data!r}") from exc
+        # Never include the provider response body in exceptions: it may contain
+        # echoed user prompts, private context, or provider diagnostics.
+        raise RuntimeError(
+            "OpenAI-compatible API returned an invalid chat-completion payload"
+        ) from exc
 
 
 
