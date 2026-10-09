@@ -422,10 +422,14 @@ class MultimodalRequest(BaseModel):
 @app.get("/health", tags=["System"])
 def health():
     """Liveness + subsystem snapshot (never 503 — process alive)."""
-    model_ready = bool(
-        getattr(native_backend, "loaded", False)
-        and getattr(native_backend, "_trained", False)
-    ) or bool(getattr(engine, "model", None) is not None)
+    # Native backend health is authoritative: an arbitrary in-memory model
+    # object is not enough to claim production readiness.
+    try:
+        native_health = native_backend.health()
+        model_ready = bool(native_health.get("ok"))
+    except Exception as exc:
+        native_health = {"ok": False, "error": type(exc).__name__}
+        model_ready = False
     brain_ok = True
     memory_ok = True
     agents_ok = True
@@ -469,21 +473,25 @@ def health():
         "connectivity": connectivity,
         "om_version": "1.0",
         "version": _API_VERSION,
-        "foundation": "complete",
-        "fallback": None if model_ready else "brain-only",
+        "foundation": "native_model_ready" if model_ready else "not_ready",
+        "fallback": None,
+        "model_health": native_health,
     }
 
 
 @app.get("/ready", tags=["System"])
 def ready():
-    """Readiness probe — 200 only when the model is loaded."""
-    loaded = engine.model is not None
-    if not loaded:
+    """Readiness probe — 200 only when a real compatible native checkpoint is loaded."""
+    try:
+        model_health = native_backend.health()
+    except Exception as exc:
+        model_health = {"ok": False, "error": type(exc).__name__}
+    if not model_health.get("ok"):
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail="Model not loaded yet.",
+            detail={"message": "OM native model is not ready.", "model_health": model_health},
         )
-    return {"ok": True, "model_loaded": True}
+    return {"ok": True, "model_loaded": True, "model_health": model_health}
 
 
 # ---------------------------------------------------------------------------
@@ -498,8 +506,12 @@ def load_model(
 ):
     """Load (or reload) a local model checkpoint. Admin / operator only."""
     try:
-        result = engine.load(
-            req.config_path, req.tokenizer_path, req.checkpoint_path, req.device
+        result = native_backend.load(
+            config_path=req.config_path,
+            tokenizer_path=req.tokenizer_path,
+            checkpoint_path=req.checkpoint_path,
+            device=req.device,
+            require_checkpoint=True,
         )
         _audit(
             "model.load",
