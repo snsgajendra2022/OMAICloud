@@ -191,4 +191,18 @@ python -m om_ai.native_lifecycle train \\
   --steps 200 --resume artifacts/checkpoints/om-1.1-100m-pretrain/latest.pt
 ```
 
+# Instruction-tune a pretrained native OM checkpoint with the existing SFT trainer
+om-ai sft --config configs/om-1.1-100m.json \
+  --tokenizer artifacts/tokenizer-production-65536.json \
+  --data data/om-chat-sft-v4-complete.jsonl \
+  --checkpoint artifacts/checkpoints/om-1.1-100m-pretrain/latest.pt
+
+# Run a held-out generation smoke evaluation (JSONL fields: prompt/question/input)
+python -m om_ai.native_lifecycle evaluate \
+  --config configs/om-1.1-100m.json \
+  --tokenizer artifacts/tokenizer-production-65536.json \
+  --checkpoint artifacts/checkpoints/om-1.1-100m-pretrain/latest.pt \
+  --prompts data/eval/native-prompts.jsonl \
+  --output artifacts/evaluations/om-1.1-100m-smoke.json
+
 Each training run writes a checkpoint plus `run-manifest.json` containing config, tokenizer, dataset, and checkpoint hashes. Checkpoint creation is not quality certification: the manifest deliberately keeps `quality_evaluated` and `production_ready` false until a separate held-out evaluation and promotion review are completed. Review source licenses and remove private data before training. Start with the 100M smoke path; do not launch 300M/1B jobs until throughput, peak memory, validation loss, and recovery have been measured on the target machine.
