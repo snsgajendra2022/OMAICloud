@@ -17,6 +17,7 @@ from pathlib import Path
 
 from om_ai.backends.om_native import OMNativeBackend, default_native_paths
 from om_ai.runtime.engine import is_degenerate_generation
+from om_ai.runtime.chat_orchestrator import is_low_quality_reply
 
 
 CASES = [
@@ -201,7 +202,7 @@ def main() -> int:
             )
             elapsed = round(time.perf_counter() - started, 3)
             total_generation_seconds += elapsed
-            usable = bool((answer or "").strip()) and not is_degenerate_generation(answer)
+            usable = (bool((answer or "").strip())\n                      and not is_degenerate_generation(answer)\n                      and not bool(is_low_quality_reply(answer)))
             correctness = deterministic_checks(category, answer or "")
             passed_checks = all(correctness.values()) if correctness else True
             ok = usable and passed_checks
@@ -237,6 +238,7 @@ def main() -> int:
                 followup_ok = (
                     bool((followup or "").strip())
                     and not is_degenerate_generation(followup)
+                    and not bool(is_low_quality_reply(followup))
                     and "MAPLE-731" in (followup or "")
                 )
                 if not followup_ok:
@@ -244,7 +246,9 @@ def main() -> int:
                 results.append({
                     "category": "context_retention_followup",
                     "ok": followup_ok,
-                    "usable_output": bool((followup or "").strip()) and not is_degenerate_generation(followup),
+                    "usable_output": (bool((followup or "").strip())
+                                    and not is_degenerate_generation(followup)
+                                    and not bool(is_low_quality_reply(followup))),
                     "elapsed_seconds": followup_elapsed,
                     "prompt": conversation[-1]["content"],
                     "answer": (followup or "")[:1000],
