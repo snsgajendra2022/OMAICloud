@@ -118,6 +118,19 @@ def main() -> int:
     }, indent=2))
     for check in checks:
         print(f"{check['status']:>8}  {check['name']}")
+        if check.get("status") in {"FAIL", "ERROR", "TIMEOUT"}:
+            detail = check.get("output_tail") or check.get("reason") or "No diagnostic output captured."
+            print(f"\n--- {check['name']} diagnostic (last 20,000 chars) ---")
+            print(detail.rstrip())
+            print(f"--- end {check['name']} diagnostic ---\n")
+
+    if missing_files:
+        print("\n--- Missing implementation paths ---")
+        for item in missing_files:
+            print(f"  - {item.get('capability', '<unknown capability>')}: {item.get('path')}")
+        print("--- end missing implementation paths ---")
+
+    print("\nCertification is evidence-based: a failed native model evaluation cannot be overridden by this script.")
     return 1 if failed_checks or missing_files else 0
 
 
