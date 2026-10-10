@@ -210,8 +210,15 @@ def deterministic_greeting_reply(messages: list[dict]) -> str | None:
     normalized = re.sub(r"\s+", " ", normalized).strip()
     if normalized in _SIMPLE_GREETING_ALIASES:
         return "Hello! How can I help you today?"
-    if normalized in {"hello how are you", "hi how are you", "hey how are you"}:
-        return "Hello! I'm doing well, thank you. How can I help you today?"
+    # These short social openers are safe, deterministic responses. They bypass
+    # the currently unverified small native checkpoint for this narrow intent;
+    # they do not certify general-purpose generation quality.
+    if normalized in {
+        "how are you", "how are you doing", "how are things",
+        "how is it going", "how s it going", "how have you been",
+        "hello how are you", "hi how are you", "hey how are you",
+    }:
+        return "I'm doing well, thank you! How can I help you today?"
     if normalized in {"good morning", "good afternoon", "good evening"}:
         return normalized.capitalize() + "! How can I help you today?"
     return None
