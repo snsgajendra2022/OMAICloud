@@ -3,6 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from pathlib import Path
 import json
+import os
 import time
 
 import torch
@@ -281,20 +282,61 @@ class SFTTrainer:
         p = Path(self.cfg.output_dir)
         p.mkdir(parents=True, exist_ok=True)
         target = p / ("latest.pt" if final else f"step-{step}.pt")
-        torch.save(
-            {
-                "model": self.model.state_dict(),
-                "optimizer": self.opt.state_dict(),
-                "stage": "sft",
-                "step": step,
-                "sft_config": {
-                    "steps": self.cfg.steps,
-                    "batch_size": self.cfg.batch_size,
-                    "grad_accum_steps": self.cfg.grad_accum_steps,
-                    "learning_rate": self.cfg.learning_rate,
-                    "precision": self.cfg.precision,
-                },
+        temp_target = target.with_name(f".{target.name}.tmp")
+
+        # SFT checkpoints are used to initialize inference or a later training run;
+        # the optimizer state is not required by the current CLI loader and can make
+        # each file several times larger than the model weights. Save only portable
+        # model state and training metadata.
+        payload = {
+            "model": self.model.state_dict(),
+            "stage": "sft",
+            "step": step,
+            "sft_config": {
+                "steps": self.cfg.steps,
+                "batch_size": self.cfg.batch_size,
+                "grad_accum_steps": self.cfg.grad_accum_steps,
+                "learning_rate": self.cfg.learning_rate,
+                "precision": self.cfg.precision,
             },
-            target,
-        )
+        }
+
+        # Keep the most recent known-good periodic checkpoint while writing the next
+        # one. Older periodic files can consume hundreds of MB and cause PyTorch's
+        # zip writer to fail on machines with limited free disk space.
+        if not final:
+            previous = sorted(
+                p.glob("step-*.pt"),
+                key=lambda item: item.stat().st_mtime,
+                reverse=True,
+            )
+            for stale in previous[1:]:
+                try:
+                    stale.unlink()
+                except OSError:
+                    pass
+
+        try:
+            torch.save(payload, temp_target)
+            # Atomic replacement prevents a failed write from corrupting the last
+            # valid checkpoint at the destination.
+            os.replace(temp_target, target)
+        except Exception as exc:
+            try:
+                temp_target.unlink(missing_ok=True)
+            except OSError:
+                pass
+            raise RuntimeError(
+                f"Could not save SFT checkpoint to {target}. Check free disk space "
+                "and write permissions; the previous completed checkpoint is kept."
+            ) from exc
+
+        # Once a new periodic checkpoint is safely written, remove the older one.
+        if not final:
+            for stale in p.glob("step-*.pt"):
+                if stale != target:
+                    try:
+                        stale.unlink()
+                    except OSError:
+                        pass
         return {"checkpoint": str(target), "steps": step}
