@@ -1,6 +1,9 @@
 """Route intent → capability. Real answers only — never canned outlines."""
 from __future__ import annotations
 
+import ast
+import math
+import operator
 import os
 import re
 from typing import Any, Callable
@@ -112,6 +115,41 @@ def _cap_analysis(q: str, ctx: dict, u: dict) -> str:
     answer = _native_synthesize(q, "analysis", ctx or {}, u or {})
     return answer + "\n" if answer else ""
 
+_ARITHMETIC_OPERATORS = {
+    ast.Add: operator.add,
+    ast.Sub: operator.sub,
+    ast.Mult: operator.mul,
+    ast.Div: operator.truediv,
+    ast.UAdd: operator.pos,
+    ast.USub: operator.neg,
+}
+
+
+def _safe_arithmetic(expression: str) -> float | int:
+    """Evaluate a bounded arithmetic AST; never execute arbitrary Python."""
+    if not expression or len(expression) > 128:
+        raise ValueError("Expression is empty or too long")
+    tree = ast.parse(expression, mode="eval")
+    nodes = list(ast.walk(tree))
+    if len(nodes) > 64:
+        raise ValueError("Expression is too complex")
+
+    def evaluate(node: ast.AST) -> float | int:
+        if isinstance(node, ast.Expression):
+            return evaluate(node.body)
+        if isinstance(node, ast.Constant) and isinstance(node.value, (int, float)) and not isinstance(node.value, bool):
+            return node.value
+        if isinstance(node, ast.BinOp) and type(node.op) in _ARITHMETIC_OPERATORS:
+            left, right = evaluate(node.left), evaluate(node.right)
+            value = _ARITHMETIC_OPERATORS[type(node.op)](left, right)
+            if not math.isfinite(float(value)) or abs(value) > 1e100:
+                raise ValueError("Arithmetic result is out of bounds")
+            return value
+        if isinstance(node, ast.UnaryOp) and type(node.op) in _ARITHMETIC_OPERATORS:
+            return _ARITHMETIC_OPERATORS[type(node.op)](evaluate(node.operand))
+        raise ValueError("Unsupported arithmetic syntax")
+
+
 def _cap_calculator(q: str, ctx: dict, u: dict) -> str:
     """Calculate simple expressions exactly; use OM for natural-language math tasks."""
     m = re.search(r"(\d+(?:\.\d+)?)\s*%\s*of\s*(\d+(?:\.\d+)?)", q, re.I)
@@ -123,10 +161,9 @@ def _cap_calculator(q: str, ctx: dict, u: dict) -> str:
         raw = expr.group(1).strip()
         if re.fullmatch(r"[\d\.\s\+\-\*\/\(\)]+", raw) and any(c.isdigit() for c in raw):
             try:
-                val = eval(raw, {"__builtins__": {}}, {})  # noqa: S307
-                if isinstance(val, (int, float)):
-                    return f"{raw} = {val:g}\n"
-            except Exception:
+                val = _safe_arithmetic(raw)
+                return f"{raw} = {val:g}\n"
+            except (ArithmeticError, SyntaxError, ValueError, OverflowError, TypeError):
                 pass
     answer = _native_synthesize(q, "calculator", ctx or {}, u or {})
     return answer + "\n" if answer else ""
