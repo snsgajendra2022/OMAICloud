@@ -20,9 +20,9 @@ The adapter uses the standard OpenAI-compatible chat API documented by vLLM: htt
 
 1. Choose a model after checking its license, supported context length, tool-call behavior, language coverage, benchmark evidence, and memory requirements.
 2. Put the exact served model ID in `OM_VLLM_MODEL`. Do not assume a 70B or mixture-of-experts model fits your server; use `scripts/estimate_llm_memory.py` for an initial rough estimate and then measure actual GPU memory.
-3. Configure `OM_VLLM_BASE_URL` for the OM API. When using the supplied Compose override, it is `http://vllm:8000/v1` inside the Compose network.
+3. Configure `OM_VLLM_BASE_URL` for the OM API. The starter default is `Qwen/Qwen3-30B-A3B`, a 30.5B-parameter MoE model with about 3.3B active parameters per token and Apache-2.0 license. Its BF16 weights are roughly 74 GB before KV cache/runtime overhead, so 160 GB aggregate VRAM is a reasonable starting point if supported GPUs and drivers are available; leave room for context and concurrent requests. vLLM's recipe documents this model and GPU-serving options: https://recipes.vllm.ai/Qwen/Qwen3-30B-A3B. When using the supplied Compose override, the URL is `http://vllm:8000/v1` inside the Compose network.
 4. Keep the vLLM endpoint on a private network. Add a gateway, TLS, authentication, and rate limiting before exposing any endpoint outside a trusted network.
-5. Start and validate the model server before sending production traffic.
+5. Start and validate the model server before sending production traffic. The compose profile pins vLLM to `v0.20.1`, sets a 32,768-token context limit, and enables Qwen3 reasoning/tool parsers. If your installed GPU or driver is incompatible, follow the official [vLLM GPU installation guide](https://docs.vllm.ai/en/latest/getting_started/installation/gpu/) and pin a supported image for that hardware.
 
 ### Compose on a Linux host with NVIDIA Container Toolkit
 
