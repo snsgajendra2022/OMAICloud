@@ -219,6 +219,12 @@ def configured_backend() -> str:
     Default when unset is ``om_native``. ``ollama`` is rejected in production —
     use ``om_ai.legacy.ollama`` only via explicit external scripts.
     """
+    # Native-only is deliberately ON by default. This takes precedence over stale
+    # local .env values such as OM_MODEL_PROVIDER=vllm and OM_VLLM_MODEL=Qwen/...
+    # Set OM_NATIVE_ONLY=0 only in tests/development when explicitly evaluating an adapter.
+    if _env_on("OM_NATIVE_ONLY", "1"):
+        return "om_native"
+
     provider = (_env("OM_MODEL_PROVIDER") or "").lower()
     chat = (_env("OM_AI_CHAT_BACKEND") or _DEFAULT_BACKEND).lower()
     if provider in {"transformers", "hf", "huggingface"} or chat in {"transformers", "hf", "huggingface"}:
