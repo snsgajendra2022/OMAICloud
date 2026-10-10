@@ -643,11 +643,23 @@ class LocalLLMEngine:
                 no_repeat_ngram_size=no_repeat,
                 repetition_window=rep_window,
             )
-            if text:
-                return text
+            def _quality_ok(candidate: str | None) -> bool:
+                if not usable_generation_text(candidate):
+                    return False
+                try:
+                    # Use the same quality checks as the user-facing chat path.
+                    # Import lazily to avoid a module-import cycle.
+                    from om_ai.runtime.chat_orchestrator import is_low_quality_reply
 
-            # Retry once with safer sampling if the first draw was empty/EOS/garbage.
-            logger.info("Empty OM chat generation; retrying with temp=0.7 and more tokens")
+                    return not bool(is_low_quality_reply(candidate))
+                except Exception:
+                    return not is_degenerate_generation(candidate)
+
+            if _quality_ok(text):
+                return str(text).strip()
+
+            # Retry once with safer sampling if the first draw is empty or garbled.
+            logger.info("OM chat generation failed quality checks; retrying with safer sampling")
             text = self._chat_once(
                 messages,
                 max_new_tokens=max(max_new, 128),
@@ -659,9 +671,12 @@ class LocalLLMEngine:
                 no_repeat_ngram_size=max(no_repeat, 3),
                 repetition_window=rep_window,
             )
-            if text:
-                return text
-            return EMPTY_GENERATION_FALLBACK
+            if _quality_ok(text):
+                return str(text).strip()
+            return (
+                "OM-1.0 could not produce a reliable answer for this turn. "
+                "The generated text was withheld because it failed quality checks."
+            )
 
         parts = []
         for m in messages:
