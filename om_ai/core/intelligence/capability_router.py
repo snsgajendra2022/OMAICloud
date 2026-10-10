@@ -76,38 +76,13 @@ def _extract_prompt_topic(q: str) -> str:
     return topic or q.strip()
 
 
+
 def _cap_prompt(q: str, ctx: dict, u: dict) -> str:
-    """Build a prompt from the user's topic — no fixed Goals/Constraints skeleton."""
-    from om_ai.core.intelligence.real_answer import _looks_like_garbage
-
-    real = build_real_answer(q, prefer_coding=True)
-    if real and not _looks_like_garbage(real) and (
-        "prompt" in real.lower() or "```" in real or len(real) > 120
-    ):
-        # Only use corpus/reasoning if it's actually useful for this ask
-        if any(w in real.lower() for w in _extract_prompt_topic(q).lower().split()[:3] if len(w) > 2):
-            return real + "\n"
-
-    topic = _extract_prompt_topic(q)
-    project = str(ctx.get("project_hint") or "").strip()
-    lines = [
-        f"## Prompt for: {topic}",
-        "",
-        f"Act as a specialist in {topic}.",
-        f"User goal: {q.strip()}",
-    ]
-    if project:
-        lines.append(f"Project context: {project}")
-    lines.extend(
-        [
-            "",
-            "Deliver a concrete solution for this exact goal — code, steps, or design as needed.",
-            "State assumptions. Prefer working examples over placeholders.",
-        ]
+    """Generate prompts with OM's native model; never assemble a canned skeleton."""
+    answer = _native_synthesize(
+        q, "prompt_generator", ctx or {}, u or {}
     )
-    return "\n".join(lines) + "\n"
-
-
+    return answer + "\\n" if answer else ""
 def _cap_recommendation(q: str, ctx: dict, u: dict) -> str:
     real = build_real_answer(q)
     return (real + "\n") if real else ""
@@ -153,47 +128,16 @@ def _cap_calculator(q: str, ctx: dict, u: dict) -> str:
     return (real + "\n") if real else ""
 
 
+
 def _cap_chat(q: str, ctx: dict, u: dict) -> str:
-    qlow = (q or "").strip().lower()
-    # Any greeting spelling (hi, hii, hello, hey…) — natural reply, never empty
-    if re.match(r"^(hi+|hello+|hey+|yo|sup|namaste|hola)[!?.]*$", qlow) or re.match(
-        r"^(good\s+(morning|evening|afternoon))\b", qlow
-    ):
-        return "Hello — I’m OM. What should we work on?\n"
-    real = build_real_answer(q)
-    if real:
-        return real + "\n"
-    # Never leave the user with a blank bubble
-    try:
-        from om_ai.agent.verifier import compose_fallback
-
-        fb = (compose_fallback(intent="chat", user_text=q) or "").strip()
-        if fb:
-            return fb + "\n"
-    except Exception:
-        pass
-    return ""
-
+    """Generate conversational replies with OM's native model."""
+    answer = _native_synthesize(q, "chat", ctx or {}, u or {})
+    return answer + "\\n" if answer else ""
 
 def _cap_clarify(q: str, ctx: dict, u: dict) -> str:
-    """Never trap real questions — and never leave greetings blank."""
-    qlow = (q or "").strip().lower()
-    if re.match(r"^(hi+|hello+|hey+|yo|sup|namaste|hola)[!?.]*$", qlow):
-        return "Hello — I’m OM. What should we work on?\n"
-    real = build_real_answer(q)
-    if real:
-        return real + "\n"
-    try:
-        from om_ai.agent.verifier import compose_fallback
-
-        fb = (compose_fallback(intent="chat", user_text=q) or "").strip()
-        if fb and "Core idea" not in fb and "## Understanding" not in fb:
-            return fb + "\n"
-    except Exception:
-        pass
-    return ""
-
-
+    """Answer or clarify through OM's native model without canned fallbacks."""
+    answer = _native_synthesize(q, "clarify", ctx or {}, u or {})
+    return answer + "\\n" if answer else ""
 def _cap_vision(q: str, ctx: dict, u: dict) -> str:
     path = str(ctx.get("image_path") or ctx.get("attachment") or "").strip()
     if path:
@@ -391,7 +335,7 @@ class CapabilityRouter:
         # Keep deterministic tools and image analysis. Do not call build_real_answer
         # first for ordinary text tasks: that can invoke the same tiny model twice or
         # return a canned retrieval/template before native synthesis.
-        if not native_generation or cap_id in {"date", "calculator", "vision", "coding"}:
+        if not native_generation or cap_id in {"date", "calculator", "vision"}:
             out = str(fn(question, context, understanding) or "").strip()
         else:
             out = ""
