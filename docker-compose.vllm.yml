@@ -17,7 +17,7 @@ services:
       HF_TOKEN: ${HF_TOKEN:-}
     command:
       - --model
-      - ${OM_VLLM_MODEL:?Set OM_VLLM_MODEL in .env to the exact model served}
+      - ${OM_VLLM_MODEL:-Qwen/Qwen3-30B-A3B}
       - --served-model-name
       - ${OM_VLLM_MODEL:?Set OM_VLLM_MODEL in .env to the exact model served}
       - --host
