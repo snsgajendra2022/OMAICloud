@@ -51,3 +51,25 @@ def test_om_11_1b_estimated_parameter_count_is_about_1_25b() -> None:
 
     # This is an architecture estimate, not evidence of a trained model.
     assert 1_200_000_000 <= cfg.parameter_estimate() <= 1_300_000_000
+
+
+def test_om_12_3b_preset_matches_native_config_schema() -> None:
+    cfg = load_preset("om-1.2-3b.json")
+
+    assert cfg.vocab_size == 65_536
+    assert cfg.max_seq_len == 2_048
+    assert cfg.n_layers == 36
+    assert cfg.d_model == 2_560
+    assert cfg.n_heads == 20
+    assert cfg.n_kv_heads == 4
+    assert cfg.d_ff == 8_192
+    assert cfg.gradient_checkpointing is True
+    assert cfg.d_model % cfg.n_heads == 0
+    assert cfg.n_heads % cfg.n_kv_heads == 0
+
+
+def test_om_12_3b_estimated_parameter_count_is_about_3b() -> None:
+    cfg = load_preset("om-1.2-3b.json")
+
+    # Architecture estimate only; this is not evidence of trained capability.
+    assert 2_950_000_000 <= cfg.parameter_estimate() <= 3_050_000_000
