@@ -10,6 +10,20 @@ from om_ai.backends.om_native import OMNativeBackend, default_native_paths
 from om_ai.runtime.engine import EMPTY_GENERATION_FALLBACK, is_degenerate_generation, usable_generation_text
 
 
+QUALITY_GATE_WITHHELD_REPLY = (
+    "OM-1.0 could not produce a reliable answer for this turn. "
+    "The generated text was withheld because it failed quality checks."
+)
+
+
+def is_usable_diagnostic_answer(answer: str | None) -> bool:
+    """A diagnostic passes only when the user received actual, non-degenerate text."""
+    text = (answer or "").strip()
+    if not text or text in {EMPTY_GENERATION_FALLBACK, QUALITY_GATE_WITHHELD_REPLY}:
+        return False
+    return bool(usable_generation_text(text)) and not is_degenerate_generation(text)
+
+
 def main() -> int:
     paths = default_native_paths()
     report = {
@@ -118,7 +132,7 @@ def main() -> int:
                 repetition_penalty=1.1,
                 min_new_tokens=4,
             )
-            usable = (bool(usable_generation_text(answer)) and not is_degenerate_generation(answer) and answer.strip() != EMPTY_GENERATION_FALLBACK)
+            usable = is_usable_diagnostic_answer(answer)
             if not usable:
                 failures += 1
             print(
