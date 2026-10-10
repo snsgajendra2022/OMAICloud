@@ -158,3 +158,37 @@ om-ai serve --host 127.0.0.1 --port 8080
 ```
 
 Then test multiple distinct questions and follow-ups against `POST /v1/chat` and inspect server logs/metadata to confirm native generation is actually used. Keep provider credentials out of the React client. Response quality still depends on checkpoint weights, tokenizer compatibility, training data, context length, and training compute.
+
+
+## Native OM training lifecycle (100M → 300M → 1B)
+
+The auditable lifecycle CLI uses the repository's real `ModelConfig`, `OMTransformer`, tokenizer, and trainer. It does not download third-party weights or imply that an architecture preset is a trained model.
+
+```bash
+# Inspect the actual configured architecture and parameter estimate
+python -m om_ai.native_lifecycle info --config configs/om-1.1-100m.json
+
+# On a Mac, run a bounded forward/backward/checkpoint round-trip smoke test
+python -m om_ai.native_lifecycle validate --config configs/om-1.1-100m.json
+
+# Inspect the 300M-class architecture before allocating training memory
+python -m om_ai.native_lifecycle info --config configs/om-1.1-300m.json
+
+# Train from scratch with your reviewed corpus and compatible tokenizer
+python -m om_ai.native_lifecycle train \\
+  --config configs/om-1.1-100m.json \\
+  --tokenizer artifacts/tokenizer-production-65536.json \\
+  --data data/production-corpus/clean/fineweb-deduped.jsonl \\
+  --output artifacts/checkpoints/om-1.1-100m-pretrain \\
+  --steps 100 --batch-size 1 --grad-accum 4
+
+# Resume from a saved checkpoint
+python -m om_ai.native_lifecycle train \\
+  --config configs/om-1.1-100m.json \\
+  --tokenizer artifacts/tokenizer-production-65536.json \\
+  --data data/production-corpus/clean/fineweb-deduped.jsonl \\
+  --output artifacts/checkpoints/om-1.1-100m-pretrain \\
+  --steps 200 --resume artifacts/checkpoints/om-1.1-100m-pretrain/latest.pt
+```
+
+Each training run writes a checkpoint plus `run-manifest.json` containing config, tokenizer, dataset, and checkpoint hashes. Checkpoint creation is not quality certification: the manifest deliberately keeps `quality_evaluated` and `production_ready` false until a separate held-out evaluation and promotion review are completed. Review source licenses and remove private data before training. Start with the 100M smoke path; do not launch 300M/1B jobs until throughput, peak memory, validation loss, and recovery have been measured on the target machine.
