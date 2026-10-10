@@ -26,6 +26,10 @@
     "[chat] react=react",
     "[chat] who=Who, cubs=Cubs",
     "[chat] what=What",
+    "[chat] who=Who, cubs=Cubs",
+    "[chat] what=What",
+    "[chat] who=Who, cubs=Cubs",
+    "[chat] what=What",
     "[chat] who=Who, cubs=Cubs"
   ],
   "preferences": [
@@ -217,6 +221,26 @@
     },
     {
       "question": "bro lest start the react code create login page and signup apge",
+      "score": 0.7
+    },
+    {
+      "question": "Explain how Python functions work.",
+      "score": 0.7
+    },
+    {
+      "question": "Explain how Python functions work.",
+      "score": 0.7
+    },
+    {
+      "question": "hello bro",
+      "score": 0.7
+    },
+    {
+      "question": "hello om",
+      "score": 0.7
+    },
+    {
+      "question": "hello om",
       "score": 0.7
     },
     {
