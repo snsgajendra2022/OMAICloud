@@ -175,3 +175,17 @@ def test_invalid_provider_payload_does_not_leak_response_body(monkeypatch):
         cb.chat_via_openai([{"role": "user", "content": "hello"}])
     assert secret_marker not in str(error.value)
     assert "invalid chat-completion payload" in str(error.value)
+
+
+
+def test_garbled_generation_rejects_token_soup_but_accepts_short_acknowledgements():
+    from om_ai.runtime.chat_orchestrator import is_garbled_generation
+
+    garbage = (
+        "ordin907optic Hmm picture remember exam Pilgrimage Stout "
+        "Bruck tremendearch Agriculture Number RamoscloudlungBB "
+        "scraped extraculosis affidavit protracted Doctrineakada"
+    )
+    assert is_garbled_generation(garbage)
+    assert not is_garbled_generation("saved")
+    assert not is_garbled_generation("MAPLE-731")
