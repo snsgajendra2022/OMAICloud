@@ -207,7 +207,13 @@ def _print_native_ready_banner(*, ready: bool, info: dict | None = None) -> None
     vocab = tok_info.get("vocab_size") if isinstance(tok_info, dict) else info.get("vocab_size")
     device = info.get("device") or "unknown"
     ckpt_status = "VERIFIED" if ready else "MISSING"
-    status = "READY" if ready else "NOT READY — OM-1.0 checkpoint unavailable"
+    # A loadable checkpoint is not evidence of coherent language quality.
+    # Keep the process available for diagnostics, but do not label an unevaluated
+    # model production-ready based only on successful deserialization.
+    status = (
+        "LOADED — QUALITY NOT VERIFIED" if ready
+        else "NOT LOADED — OM-1.0 checkpoint unavailable"
+    )
     lines = [
         "====================================",
         "        OM AI NATIVE RUNTIME",
@@ -223,7 +229,8 @@ def _print_native_ready_banner(*, ready: bool, info: dict | None = None) -> None
         "Tools:          ENABLED",
         "External LLM:   NONE",
         "",
-        f"Status: {status}",
+        f"Runtime: {status}",
+        "Quality gate: NOT VERIFIED (run native capability evaluation)",
         "====================================",
     ]
     print("\n".join(lines), file=sys.stderr)
