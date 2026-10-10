@@ -57,6 +57,8 @@ def run_chat_pipeline(
     force_native_generation = native_model_first_enabled()
     stages: list[str] = []
     meta: dict[str, Any] = {"pipeline": "om-chat-pipeline-v2"}
+    public_tool: str = ""
+    preferred_draft: str = ""
     forced = [str(t).strip() for t in (force_tools or []) if str(t).strip()]
     meta["force_tools"] = forced
     profile = dict(evolution_profile or {})
@@ -860,13 +862,21 @@ def run_chat_pipeline(
     else:
         meta["model"] = {"used": False, "reason": "draft_ready" if draft else "model_unavailable"}
 
-    if force_native_generation and not used_model:
+    lk_grounded = str(((kwargs or {}).get("lk_meta") or {}).get("grounded_reply") or "").strip()
+    if not used_model and lk_grounded:
+        draft = lk_grounded
+        meta["answer_source"] = "live_knowledge_grounded"
+    elif not used_model and public_tool:
+        draft = public_tool
+        meta["answer_source"] = "public_tool"
+    elif force_native_generation and not used_model:
         draft = (
             "OM's native checkpoint did not produce a usable model-generated answer "
             "for this turn. Check that the intended trained checkpoint is loaded, "
             "the tokenizer matches its vocabulary, and the server logs show no generation errors."
         )
         meta["native_generation_failed"] = True
+        meta["answer_source"] = "native_generation_failed"
 
     if not (draft or "").strip() and public_tool:
         draft = public_tool
@@ -889,39 +899,44 @@ def run_chat_pipeline(
         draft = "How can I help you today?"
 
     # Quality + public sanitize (never leak internals)
-    try:
-        from om_ai.runtime.public_reply import sanitize_public_reply, is_safe_public_answer, extract_clean_tool_answer
-        from om_ai.runtime.chat_orchestrator import is_low_quality_reply
+    if not meta.get("native_generation_failed"):
+        try:
+            from om_ai.runtime.public_reply import sanitize_public_reply, is_safe_public_answer, extract_clean_tool_answer
+            from om_ai.runtime.chat_orchestrator import is_low_quality_reply
 
-        draft = sanitize_public_reply(draft) or draft
-        if public_tool and (not is_safe_public_answer(draft) or is_low_quality_reply(draft)):
-            draft = public_tool
-            meta["quality_recover"] = "public_tool"
-        elif not is_safe_public_answer(draft) or is_low_quality_reply(draft or ""):
-            recovered = ""
-            try:
-                from om_ai.core.intelligence.real_answer import build_real_answer
-                from om_ai.runtime.public_reply import looks_like_genesis_template
-
-                recovered = (build_real_answer(q, prefer_coding=("react" in q.lower() or "dashboard" in q.lower() or "create" in q.lower())) or "").strip()
-                if looks_like_genesis_template(recovered):
-                    recovered = ""
-            except Exception:
+            draft = sanitize_public_reply(draft) or draft
+            lk_grounded = str(((kwargs or {}).get("lk_meta") or {}).get("grounded_reply") or "").strip()
+            if lk_grounded and (not is_safe_public_answer(draft) or is_low_quality_reply(draft)):
+                draft = lk_grounded
+                meta["quality_recover"] = "live_knowledge_grounded"
+            elif public_tool and (not is_safe_public_answer(draft) or is_low_quality_reply(draft)):
+                draft = public_tool
+                meta["quality_recover"] = "public_tool"
+            elif not is_safe_public_answer(draft) or is_low_quality_reply(draft or ""):
                 recovered = ""
-            if recovered:
-                draft = recovered
-                meta["quality_recover"] = "real_answer"
-            elif ctx_intent.get("intent") == "conversation":
-                draft = "Hello — I’m OM. How can I help you?"
-                meta["quality_reject"] = "unsafe_or_garble"
-            else:
-                draft = (
-                    "I'm with you — that last draft wasn't solid. "
-                    "Tell me what you need in your own words and I'll take it from there."
-                )
-                meta["quality_reject"] = "unsafe_or_garble"
-    except Exception:
-        pass
+                try:
+                    from om_ai.core.intelligence.real_answer import build_real_answer
+                    from om_ai.runtime.public_reply import looks_like_genesis_template
+
+                    recovered = (build_real_answer(q, prefer_coding=("react" in q.lower() or "dashboard" in q.lower() or "create" in q.lower())) or "").strip()
+                    if looks_like_genesis_template(recovered):
+                        recovered = ""
+                except Exception:
+                    recovered = ""
+                if recovered:
+                    draft = recovered
+                    meta["quality_recover"] = "real_answer"
+                elif ctx_intent.get("intent") == "conversation":
+                    draft = "Hello — I’m OM. How can I help you?"
+                    meta["quality_reject"] = "unsafe_or_garble"
+                else:
+                    draft = (
+                        "I'm with you — that last draft wasn't solid. "
+                        "Tell me what you need in your own words and I'll take it from there."
+                    )
+                    meta["quality_reject"] = "unsafe_or_garble"
+        except Exception:
+            pass
 
     # ── 6. Response Language Check ───────────────────────────────────
     stages.append("response_language_check")

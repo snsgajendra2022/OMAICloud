@@ -540,10 +540,11 @@ def _om_native_chat_reply_body(
             # the pipeline explicitly selected a verified public tool answer. Never
             # continue into unrelated answer-producing cascades that can leak
             # internal "knowledge:" / "Question:" context blocks.
-            if (
-                _env_on("OM_NATIVE_MODEL_FIRST", "1")
-                and pipeline_meta.get("answer_source") == "native_generation_failed"
-            ):
+            if pipeline_meta.get("answer_source") == "native_generation_failed":
+                if not native_ready or native_chat is None:
+                    raise NativeCheckpointError(
+                        "OM-1.0 native checkpoint is unavailable; no substitute answer was generated."
+                    )
                 info_pipe = ChatBackendInfo(
                     backend=info.backend,
                     model=info.model,
@@ -596,6 +597,8 @@ def _om_native_chat_reply_body(
                     },
                 )
                 return ans if ans.endswith("\n") else ans + "\n", info_pipe
+        except NativeCheckpointError:
+            raise
         except Exception as exc:
             logger.debug("chat_pipeline_v2 skipped: %s", exc)
 
@@ -732,7 +735,7 @@ def _om_native_chat_reply_body(
         logger.debug("CognitiveIntelligence skipped: %s", exc)
 
     # Dynamic intelligence pipeline (generalizes; regex only as helper signals).
-    if _env_on("OM_DYNAMIC_INTELLIGENCE", "1"):
+    if _env_on("OM_DYNAMIC_INTELLIGENCE", "1") and not _env_on("OM_NATIVE_MODEL_FIRST", "1"):
       try:
         from om_ai.intelligence import IntelligenceManager
         from om_ai.core.response.response_formatter import (
@@ -1023,7 +1026,6 @@ def _om_native_chat_reply_body(
                 polished = compose_fallback(intent=intent_v, user_text=user_text)
             except Exception:
                 polished = "Hello — I’m OM. How can I help you?"
-            return (polished or "").strip() + "\n", info_lk
         # OM Response Language Check
         if _language_manager:
             try:
@@ -1036,9 +1038,14 @@ def _om_native_chat_reply_body(
                         "Response language: %s",
                         response_lang
                     )
-            
             except Exception:
                 pass
+        return (polished or "").strip() + "\n", info_lk
+
+    if (native_chat is None or not native_ready) and _env_on("OM_NATIVE_MODEL_FIRST", "1"):
+        raise NativeCheckpointError(
+            "OM-1.0 native checkpoint is unavailable; no substitute answer was generated."
+        )
 
     # Prefer local dataset/RAG grounded reply before tiny-model garble.
     if dataset_grounded and len(dataset_grounded) > 80:
@@ -1048,10 +1055,6 @@ def _om_native_chat_reply_body(
         return _out(grounded)
 
     if native_chat is None or not native_ready:
-        if _env_on("OM_NATIVE_MODEL_FIRST", "1"):
-            raise NativeCheckpointError(
-                "OM-1.0 native checkpoint is unavailable; no substitute answer was generated."
-            )
         from om_ai.core.response.response_formatter import ensure_public_reply
 
         public = ensure_public_reply(user_text, "")

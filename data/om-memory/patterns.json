@@ -970,5 +970,41 @@
     "category": "engineering",
     "metadata": {},
     "created_at": "2026-10-09T15:20:34.495303"
+  },
+  {
+    "question": "I am building OM AI using Python",
+    "answer": "## Prompt for: I am building OM AI using Python\n\nAct as a specialist in I am building OM AI using Python.\nUser goal: I am building OM AI using Python\n\nDeliver a concrete solution for this exact goal \u2014 code, steps, or design as needed.\nState assumptions. Prefer working examples over placeholders.",
+    "score": 0.7,
+    "success": false,
+    "category": "engineering",
+    "metadata": {},
+    "created_at": "2026-10-09T15:21:33.514805"
+  },
+  {
+    "question": "I am building OM AI using Python",
+    "answer": "## Prompt for: I am building OM AI using Python\n\nAct as a specialist in I am building OM AI using Python.\nUser goal: I am building OM AI using Python\n\nDeliver a concrete solution for this exact goal \u2014 code, steps, or design as needed.\nState assumptions. Prefer working examples over placeholders.",
+    "score": 0.7,
+    "success": false,
+    "category": "engineering",
+    "metadata": {},
+    "created_at": "2026-10-09T15:21:33.518871"
+  },
+  {
+    "question": "continue my project",
+    "answer": "OM could not generate a reliable response.",
+    "score": 0.7,
+    "success": false,
+    "category": "general",
+    "metadata": {},
+    "created_at": "2026-10-09T15:21:49.611435"
+  },
+  {
+    "question": "continue my project",
+    "answer": "OM could not generate a reliable response.",
+    "score": 0.7,
+    "success": false,
+    "category": "general",
+    "metadata": {},
+    "created_at": "2026-10-09T15:21:49.612427"
   }
 ]

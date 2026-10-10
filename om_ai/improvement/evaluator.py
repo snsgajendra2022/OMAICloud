@@ -16,7 +16,16 @@ def evaluate_answer(question: str, answer: str) -> dict[str, Any]:
 
     # Clarity / length sanity
     words = len(re.findall(r"\w+", a))
-    if words < 8:
+    is_short_greet = bool(
+        re.match(r"^(hi|hey|hello|namaste|good (morning|evening|afternoon)|i'?m om|i am om)\b", a, re.I)
+    ) or bool(
+        re.search(r"\b(hi|hello|hey|greetings|namaste|good morning|good evening|good afternoon|how are you)\b", q, re.I)
+    )
+    if is_short_greet and words <= 15 and a:
+        scores["clarity"] = 90.0
+        scores["structure"] = 85.0
+        scores["task_fit"] = 90.0
+    elif words < 8:
         scores["clarity"] = 25.0
     elif words > 4000:
         scores["clarity"] = 55.0

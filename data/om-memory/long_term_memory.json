@@ -23,7 +23,8 @@
     "[chat] what=What",
     "[chat] build=Build",
     "[chat] why=Why, python=Python, nameerror=NameError",
-    "[chat] react=react"
+    "[chat] react=react",
+    "[chat] who=Who, cubs=Cubs"
   ],
   "preferences": [
     "I prefer concise answers",
