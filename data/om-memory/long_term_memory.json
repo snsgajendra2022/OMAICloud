@@ -250,6 +250,14 @@
     {
       "question": "jiii",
       "score": 0.7
+    },
+    {
+      "question": "hwllo",
+      "score": 0.7
+    },
+    {
+      "question": "Hello, can you explain Python lists",
+      "score": 0.7
     }
   ]
 }
