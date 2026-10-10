@@ -179,6 +179,67 @@ def train(args: argparse.Namespace) -> dict[str, Any]:
     return manifest
 
 
+def evaluate(args: argparse.Namespace) -> dict[str, Any]:
+    """Run held-out prompts against a checkpoint; never auto-promote it."""
+    cfg = load_config(args.config)
+    tok = load_tokenizer(args.tokenizer)
+    device = torch.device(args.device or pick_training_device())
+    checkpoint = Path(args.checkpoint)
+    payload = torch.load(checkpoint, map_location=device, weights_only=False)
+    state = payload.get("model", payload)
+    embedding = state.get("token_embedding.weight") if isinstance(state, dict) else None
+    if embedding is not None:
+        cfg.vocab_size = int(embedding.shape[0])
+    if len(tok.vocab) > cfg.vocab_size:
+        raise ValueError("Tokenizer vocabulary exceeds checkpoint embedding vocabulary.")
+    model = OMTransformer(cfg).to(device)
+    model.load_state_dict(state, strict=True)
+    model.eval()
+    prompts = []
+    with Path(args.prompts).open("r", encoding="utf-8") as stream:
+        for line in stream:
+            if line.strip():
+                row = json.loads(line)
+                prompt = row.get("prompt") or row.get("question") or row.get("input")
+                if isinstance(prompt, str) and prompt.strip():
+                    prompts.append(prompt.strip())
+    if not prompts:
+        raise ValueError("No prompt/question/input fields found in held-out JSONL.")
+    records = []
+    for prompt in prompts[:args.limit]:
+        ids = tok.encode(prompt)
+        input_ids = torch.tensor([ids[-cfg.max_seq_len:]], dtype=torch.long, device=device)
+        with torch.no_grad():
+            generated = model.generate(input_ids, max_new_tokens=args.max_new_tokens,
+                                       temperature=0.0, top_k=1, top_p=1.0,
+                                       repetition_penalty=1.0)
+        output_ids = generated[0, input_ids.shape[1]:].detach().cpu().tolist()
+        text = tok.decode(output_ids).strip()
+        words = text.split()
+        ratio = len(set(words)) / max(1, len(words))
+        records.append({"prompt": prompt, "text": text, "nonempty": bool(text),
+                        "characters": len(text), "word_unique_ratio": round(ratio, 4),
+                        "repetitive": len(words) >= 8 and ratio < 0.35})
+    count = max(1, len(records))
+    report = {
+        "model_family": "native_om", "checkpoint": str(checkpoint),
+        "checkpoint_sha256": sha256_file(checkpoint),
+        "config_sha256": sha256_file(args.config),
+        "tokenizer_sha256": sha256_file(args.tokenizer),
+        "prompts_sha256": sha256_file(args.prompts), "device": str(device),
+        "examples": len(records),
+        "nonempty_rate": sum(r["nonempty"] for r in records) / count,
+        "repetitive_rate": sum(r["repetitive"] for r in records) / count,
+        "records": records, "quality_evaluated": True, "production_ready": False,
+        "promotion": "manual review required; smoke metrics are not a capability benchmark",
+    }
+    output = Path(args.output)
+    output.parent.mkdir(parents=True, exist_ok=True)
+    output.write_text(json.dumps(report, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    report["report_path"] = str(output)
+    return report
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="Native OM training lifecycle")
     sub = parser.add_subparsers(dest="command", required=True)
@@ -210,6 +271,11 @@ def main() -> None:
         payload = model_info(args.config, args.tokenizer)
     elif args.command == "validate":
         payload = validate(args.config, args.device, args.output)
+    elif args.command == "evaluate":
+        for required in (args.config, args.tokenizer, args.checkpoint, args.prompts):
+            if not Path(required).is_file():
+                parser.error(f"Required input file not found: {required}")
+        payload = evaluate(args)
     else:
         if args.steps < 1 or args.batch_size < 1 or args.grad_accum < 1:
             parser.error("steps, batch-size, and grad-accum must be positive")
