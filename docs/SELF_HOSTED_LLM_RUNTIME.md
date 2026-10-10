@@ -32,7 +32,7 @@ Copy `.env.example` to `.env`, set `OM_VLLM_MODEL` to the exact chosen model ID,
 docker compose -f docker-compose.yml -f docker-compose.vllm.yml up --build
 ```
 
-The vLLM service requires a compatible NVIDIA GPU, NVIDIA Container Toolkit, and enough aggregate GPU memory for the selected model and its KV cache. The Compose override intentionally does not publish the inference port to the host; the API reaches it over the internal Compose network. For CPU/Mac development, run a compatible local inference server and point `OM_VLLM_BASE_URL` at it, or use the optional Transformers provider for smaller models.
+The vLLM service requires a compatible NVIDIA GPU, NVIDIA Container Toolkit, and enough aggregate GPU memory for the selected model and its KV cache. The Compose override binds the inference port to `127.0.0.1:8000` only for local validation; the OM API reaches it over the internal Compose network. Do not change this to `0.0.0.0:8000` unless you add network controls and authentication. For CPU/Mac development, run a compatible local inference server and point `OM_VLLM_BASE_URL` at it, or use the optional Transformers provider for smaller models.
 
 ## Runtime configuration
 
