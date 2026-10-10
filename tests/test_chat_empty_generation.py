@@ -10,6 +10,7 @@ from om_ai.runtime.chat_backend import with_runtime_date_context
 from om_ai.runtime.engine import (
     EMPTY_GENERATION_FALLBACK,
     fit_messages_to_context,
+    deterministic_greeting_reply,
     usable_generation_text,
 )
 from om_ai.tokenizer import load_tokenizer
@@ -17,6 +18,12 @@ from om_ai.tokenizer import load_tokenizer
 
 ROOT = Path(__file__).resolve().parents[1]
 TOK_FIXED = ROOT / "artifacts" / "tokenizer-fixed-v3.json"
+
+
+def test_deterministic_reply_handles_how_are_you_without_unverified_generation():
+    for prompt in ("how are you", "How are you?", "how are you doing", "hi how are you"):
+        reply = deterministic_greeting_reply([{"role": "user", "content": prompt}])
+        assert reply == "I'm doing well, thank you! How can I help you today?"
 
 
 def test_usable_generation_text_rejects_empty_and_garbage():
