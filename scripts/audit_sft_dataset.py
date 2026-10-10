@@ -128,7 +128,7 @@ def main() -> int:
             "low_response_diversity: many rows share response text; review the dataset "
             "for templated or generic targets before retraining."
         )
-    if counts["duplicate_pairs"] / valid >= 0.1 if valid else False:
+    if valid and counts["duplicate_pairs"] / valid >= 0.1:
         warnings.append("high_duplicate_pair_rate: remove exact duplicate prompt/response pairs.")
     report = {
         "kind": "om_sft_dataset_audit",
