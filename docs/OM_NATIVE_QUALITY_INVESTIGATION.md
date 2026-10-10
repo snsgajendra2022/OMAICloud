@@ -25,9 +25,38 @@ Added `scripts/evaluate_om_native_13_cases.py` and focused unit tests. The new h
 - Does not count fallback output as a pass.
 - Exits nonzero on failed cases and writes a report when inference can run.
 
+## Latest local result supplied by the developer
+
+On 2026-10-10, the configured current checkpoint was evaluated with `scripts/evaluate_om_native_13_cases.py`:
+
+- Cases: 13
+- Passed: 1
+- Failed: 12
+- Release ready: false
+- Hosted fallback used: false
+- Runtime repeatedly logged: `OM native generation rejected as degenerate token soup`
+
+This is direct evidence of a native generation-quality failure, but it does not identify whether the cause is training quality, tokenizer/weight mismatch, or an inference defect. The JSON evaluation report was created locally at `artifacts/evaluations/om-native-current-13.json`; its contents have not been provided to the repository tooling.
+
+## Next diagnostic required
+
+The local diagnostic script now accepts explicit config/tokenizer/checkpoint paths, emits first-step logit health and raw generated token IDs/text before quality filtering, and can save a JSON report. Run it with the same assets used for the failed evaluation:
+
+```bash
+python scripts/debug_native_generation.py \
+  --config configs/om-1.0-local.json \
+  --tokenizer artifacts/tokenizer-production-65536.json \
+  --checkpoint artifacts/checkpoints/om-1.0-chat-dpo-v4/latest.pt \
+  --prompt "How are you?" \
+  --max-new-tokens 64 \
+  --output artifacts/evaluations/om-native-raw-debug.json
+```
+
+Inspect these fields first: `checkpoint_metadata`, `tokenizer_info`, `tokenizer_fingerprint`, `first_next_token_logits_finite`, `first_next_token_top_logits`, `generated_token_ids`, and `raw_candidate`. The raw report can contain generated/user text; keep it local and do not commit private conversation data.
+
 ## Not yet verified
 
-No model generation, corpus audit, training, frontend test, SQLite concurrency test, full pytest run, or GitHub Actions run is claimed by this document. The GitHub connector can commit source files, but it does not provide the local ignored model artifacts needed to reproduce inference in this environment. Current/candidate A/B scores and training outcomes therefore remain pending until the required local artifacts and compute are available.
+No new model generation or training run was performed by the repository editing tool. The developer-provided 13-case run is recorded above. Corpus audit, frontend test, SQLite concurrency test, full pytest run, and completed GitHub Actions run are not claimed by this document. The GitHub connector can commit source files, but it does not provide the local ignored model artifacts needed to reproduce inference in this environment. Current/candidate A/B scores and training outcomes therefore remain pending until the required local artifacts and compute are available.
 
 ## Local reproduction
 
