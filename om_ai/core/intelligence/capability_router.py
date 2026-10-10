@@ -291,13 +291,14 @@ def _native_synthesize(
         )
     messages: list[dict[str, str]] = [{"role": "system", "content": system_prompt}]
     if isinstance(history, list):
-        for item in history[-6:]:
+        recent_history = history[-2:] if short_chat else history[-6:]
+        for item in recent_history:
             if not isinstance(item, dict):
                 continue
             role = str(item.get("role") or "").lower()
             text = str(item.get("content") or "").strip()
             if role in {"user", "assistant"} and text:
-                messages.append({"role": role, "content": text[:1800]})
+                messages.append({"role": role, "content": text[:300] if short_chat else text[:1800]})
     evidence_parts = []
     if project_context:
         evidence_parts.append("PROJECT CONTEXT (follow when relevant):\n" + project_context[:5000])
