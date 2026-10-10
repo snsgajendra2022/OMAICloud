@@ -82,7 +82,9 @@ def _cap_prompt(q: str, ctx: dict, u: dict) -> str:
     answer = _native_synthesize(
         q, "prompt_generator", ctx or {}, u or {}
     )
-    return answer + "\\n" if answer else ""
+    return answer + "\n" if answer else ""
+
+
 def _cap_recommendation(q: str, ctx: dict, u: dict) -> str:
     real = build_real_answer(q)
     return (real + "\n") if real else ""
@@ -132,12 +134,14 @@ def _cap_calculator(q: str, ctx: dict, u: dict) -> str:
 def _cap_chat(q: str, ctx: dict, u: dict) -> str:
     """Generate conversational replies with OM's native model."""
     answer = _native_synthesize(q, "chat", ctx or {}, u or {})
-    return answer + "\\n" if answer else ""
+    return answer + "\n" if answer else ""
 
 def _cap_clarify(q: str, ctx: dict, u: dict) -> str:
     """Answer or clarify through OM's native model without canned fallbacks."""
     answer = _native_synthesize(q, "clarify", ctx or {}, u or {})
-    return answer + "\\n" if answer else ""
+    return answer + "\n" if answer else ""
+
+
 def _cap_vision(q: str, ctx: dict, u: dict) -> str:
     path = str(ctx.get("image_path") or ctx.get("attachment") or "").strip()
     if path:
