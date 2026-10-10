@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import json
 import sqlite3
+import threading
 import uuid
 from contextlib import contextmanager
 from dataclasses import asdict, dataclass, fields
@@ -190,6 +191,9 @@ class ConversationStore:
     def __init__(self, path: str = "artifacts/om_ai.sqlite3") -> None:
         Path(path).parent.mkdir(parents=True, exist_ok=True)
         self.path = str(path)
+        # FastAPI sync handlers can access this store from different worker threads.
+        # Serialize transactions and conversation-list cursor consumption on the shared connection.
+        self._lock = threading.RLock()
         self._conn = sqlite3.connect(self.path, check_same_thread=False, timeout=30.0)
         self._conn.row_factory = sqlite3.Row
         self._conn.execute("PRAGMA foreign_keys = ON")
@@ -251,12 +255,14 @@ class ConversationStore:
         )
     @contextmanager
     def _tx(self) -> Generator[sqlite3.Connection, None, None]:
-        try:
-            yield self._conn
-            self._conn.commit()
-        except Exception:
-            self._conn.rollback()
-            raise
+        # Keep a transaction atomic relative to other request threads sharing this connection.
+        with self._lock:
+            try:
+                yield self._conn
+                self._conn.commit()
+            except Exception:
+                self._conn.rollback()
+                raise
 
     def close(self) -> None:
         self._conn.close()
@@ -379,12 +385,16 @@ class ConversationStore:
             q += " AND c.project_id = ?"
             params.append(project_id)
         q += " ORDER BY COALESCE(c.pinned, 0) DESC, c.updated_at DESC"
-        cursor = self._conn.execute(q, params)
-        # Use SELECT column names rather than assuming the connection's
-        # row_factory is still sqlite3.Row. If it has been changed, sqlite
-        # returns tuples and dict(row) can raise IndexError.
-        columns = [column[0] for column in cursor.description or ()]
-        rows = cursor.fetchall()
+        # A shared sqlite connection is used by sync API handlers on multiple
+        # worker threads. Serialize execute + fetch so another request cannot
+        # interfere while this cursor is active. Bind an immutable parameter tuple.
+        with self._lock:
+            cursor = self._conn.execute(q, tuple(params))
+            # Use SELECT column names rather than assuming the connection's
+            # row_factory is still sqlite3.Row. If it has been changed, sqlite
+            # returns tuples and dict(row) can raise IndexError.
+            columns = [column[0] for column in cursor.description or ()]
+            rows = cursor.fetchall()
         out: list[Conversation] = []
         repairs: list[tuple[str, str]] = []
         for r in rows:
