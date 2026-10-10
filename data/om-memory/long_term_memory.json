@@ -24,6 +24,8 @@
     "[chat] build=Build",
     "[chat] why=Why, python=Python, nameerror=NameError",
     "[chat] react=react",
+    "[chat] who=Who, cubs=Cubs",
+    "[chat] what=What",
     "[chat] who=Who, cubs=Cubs"
   ],
   "preferences": [
@@ -215,6 +217,10 @@
     },
     {
       "question": "bro lest start the react code create login page and signup apge",
+      "score": 0.7
+    },
+    {
+      "question": "Explain how Python functions work.",
       "score": 0.7
     }
   ]
