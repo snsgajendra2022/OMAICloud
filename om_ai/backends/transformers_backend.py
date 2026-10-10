@@ -259,6 +259,8 @@ class TransformersBackend:
         repetition_penalty = float(kwargs.pop("repetition_penalty", 1.0))
         if not 1 <= max_new_tokens <= 32768:
             raise ValueError("max_new_tokens must be between 1 and 32768")
+        if not 0 <= top_p <= 1:
+            raise ValueError("top_p must be between 0 and 1")
         sampling = bool(temperature > 0)
         args: dict[str, Any] = {
             **inputs,
@@ -285,6 +287,8 @@ class TransformersBackend:
                     model.generate(**args)
             except BaseException as exc:
                 errors.append(exc)
+                # Unblock the consumer if generate() fails before normal streamer shutdown.
+                streamer.end()
 
         thread = threading.Thread(target=worker, daemon=True)
         thread.start()
