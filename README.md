@@ -247,3 +247,20 @@ python -m om_ai.native_lifecycle train \
 - **70B and above:** require a multi-node training design, tensor/pipeline parallelism, sharded checkpoints, robust data loading, monitoring, and fault recovery. A Mac mini is for development, not a practical 70B-from-scratch training cluster.
 
 The current `om_ai.native_lifecycle train` uses the repository's single-process `Trainer`; the 7B and 70B JSON files are architecture targets only and are not launch-ready training configurations. Never interpret parameter count or a successful forward pass as evidence of model capability. Pretraining from scratch also requires a large, legally reviewed corpus and long training runs; this command set does not create trained weights automatically.
+
+
+### Native OM capability generation (no canned-answer masquerade)
+
+The capability router now uses OM's own checkpoint to synthesize substantive chat,
+coding, research, analysis, planning, recommendation, and prompt-generation replies.
+Retrieved facts and tool output are passed as evidence for OM to synthesize, not
+presented as a substitute language model. Date and arithmetic remain deterministic.
+If native generation fails, OM reports that failure rather than silently switching to
+Qwen, vLLM, OpenAI, or presenting a generic template as model-generated.
+
+Configure `OM_CAPABILITY_NATIVE_GENERATION=1` (default) and optionally
+`OM_CAPABILITY_MAX_NEW_TOKENS=768`. This improves the inference path; model quality
+still depends on OM's actual trained checkpoint and tokenizer. The current local
+configuration is a small development model, not GPT-5-level weights. High capability
+requires larger-scale pretraining, instruction tuning, curated/licensed training data,
+and held-out evaluations.
