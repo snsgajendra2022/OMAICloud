@@ -1,0 +1,18 @@
+{
+  "name": "OM-1.1-70B-Base",
+  "description": "Long-term native OM decoder-only Transformer architecture target only. Not for Mac mini training. Requires distributed tensor/pipeline parallelism, sharded optimizer/checkpoints, multi-node fault tolerance and dedicated cluster capacity.",
+  "vocab_size": 65536,
+  "max_seq_len": 2048,
+  "n_layers": 80,
+  "n_heads": 64,
+  "n_kv_heads": 8,
+  "d_model": 8192,
+  "d_ff": 24576,
+  "rope_theta": 10000,
+  "dropout": 0,
+  "bias": false,
+  "tie_embeddings": true,
+  "use_rmsnorm": true,
+  "gradient_checkpointing": true,
+  "parameter_goal_note": "Roughly 70B class architecture target; exact count must be computed by the repository model constructor. Do not launch with current single-process Trainer; it is likely to exhaust memory."
+}
