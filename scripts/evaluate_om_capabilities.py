@@ -126,7 +126,15 @@ def main() -> int:
         parser.error("--max-new-tokens must be greater than zero")
 
     paths = default_native_paths()
-    # Explicit CLI arguments take precedence so A/B runs cannot silently depend on\n    # stale .env values or shell configuration. Resolve paths before reporting them.\n    for key, value in (("config", args.config), ("tokenizer", args.tokenizer), ("checkpoint", args.checkpoint)):\n        if value:\n            candidate = Path(value).expanduser()\n            paths[key] = str(candidate.resolve(strict=False))\n    if args.device:\n        paths["device"] = args.device\n\n    def file_identity(path: str) -> dict:\n        candidate = Path(path)\n        identity = {"path": str(candidate.resolve(strict=False)), "exists": candidate.is_file()}\n        if candidate.is_file():\n            identity["size_bytes"] = candidate.stat().st_size\n            digest = hashlib.sha256()\n            with candidate.open("rb") as stream:\n                for chunk in iter(lambda: stream.read(1024 * 1024), b""):\n                    digest.update(chunk)\n            identity["sha256"] = digest.hexdigest()\n        return identity\n\n    required = ("config", "tokenizer", "checkpoint")\n    missing = [
+    # Explicit CLI arguments take precedence so A/B runs cannot silently depend on
+    # stale .env values or shell configuration. Resolve paths before reporting them.
+    for key, value in (("config", args.config), ("tokenizer", args.tokenizer), ("checkpoint", args.checkpoint)):
+        if value:
+            candidate = Path(value).expanduser()
+            paths[key] = str(candidate.resolve(strict=False))
+    if args.device:
+        paths["device"] = args.device
+\n    def file_identity(path: str) -> dict:\n        candidate = Path(path)\n        identity = {"path": str(candidate.resolve(strict=False)), "exists": candidate.is_file()}\n        if candidate.is_file():\n            identity["size_bytes"] = candidate.stat().st_size\n            digest = hashlib.sha256()\n            with candidate.open("rb") as stream:\n                for chunk in iter(lambda: stream.read(1024 * 1024), b""):\n                    digest.update(chunk)\n            identity["sha256"] = digest.hexdigest()\n        return identity\n\n    required = ("config", "tokenizer", "checkpoint")\n    missing = [
         {"asset": key, "path": paths.get(key)}
         for key in required
         if not paths.get(key) or not Path(paths[key]).is_file()
@@ -143,7 +151,13 @@ def main() -> int:
 
     backend = OMNativeBackend()
     try:
-        load_info = backend.load(\n            config_path=paths["config"],\n            tokenizer_path=paths["tokenizer"],\n            checkpoint_path=paths["checkpoint"],\n            device=paths.get("device") or None,\n            require_checkpoint=True,\n        )
+        load_info = backend.load(
+            config_path=paths["config"],
+            tokenizer_path=paths["tokenizer"],
+            checkpoint_path=paths["checkpoint"],
+            device=paths.get("device") or None,
+            require_checkpoint=True,
+        )
     except Exception as exc:
         print(json.dumps({
             "ok": False,
@@ -243,7 +257,17 @@ def main() -> int:
         "backend": "om_native",
         "provider": "OM AI",
         "hosted_fallback_used": False,
-        "load": {\n            "device": load_info.get("device"),\n            "parameters": load_info.get("parameters"),\n            "checkpoint": load_info.get("checkpoint") or load_info.get("checkpoint_path"),\n            "tokenizer_fingerprint": load_info.get("tokenizer_fingerprint"),\n            "config_file": file_identity(paths["config"]),\n            "tokenizer_file": file_identity(paths["tokenizer"]),\n            "checkpoint_file": file_identity(paths["checkpoint"]),\n            "explicit_cli_overrides_used": any((args.config, args.tokenizer, args.checkpoint, args.device)),\n        },\n        "case_count": len(results),
+        "load": {
+            "device": load_info.get("device"),
+            "parameters": load_info.get("parameters"),
+            "checkpoint": load_info.get("checkpoint") or load_info.get("checkpoint_path"),
+            "tokenizer_fingerprint": load_info.get("tokenizer_fingerprint"),
+            "config_file": file_identity(paths["config"]),
+            "tokenizer_file": file_identity(paths["tokenizer"]),
+            "checkpoint_file": file_identity(paths["checkpoint"]),
+            "explicit_cli_overrides_used": any((args.config, args.tokenizer, args.checkpoint, args.device)),
+        },
+        "case_count": len(results),
         "passed_case_count": passed,
         "failed_case_count": len(results) - passed,
         "pass_rate": round(passed / len(results), 4) if results else 0.0,
