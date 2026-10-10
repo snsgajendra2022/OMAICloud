@@ -37,4 +37,5 @@ def test_sft_keeps_assistant_targets_when_prompt_exceeds_context(tmp_path):
     # The response is retained as a training target rather than being entirely
     # cut off by prompt truncation.
     assert supervised[0] == ids[len(ids) - len(supervised)]
-    assert 9 in supervised or 2 in supervised
+    assert supervised == ids[-len(supervised):]
+    assert len(supervised) > 0
