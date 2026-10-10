@@ -379,11 +379,16 @@ class ConversationStore:
             q += " AND c.project_id = ?"
             params.append(project_id)
         q += " ORDER BY COALESCE(c.pinned, 0) DESC, c.updated_at DESC"
-        rows = self._conn.execute(q, params).fetchall()
+        cursor = self._conn.execute(q, params)
+        # Use SELECT column names rather than assuming the connection's
+        # row_factory is still sqlite3.Row. If it has been changed, sqlite
+        # returns tuples and dict(row) can raise IndexError.
+        columns = [column[0] for column in cursor.description or ()]
+        rows = cursor.fetchall()
         out: list[Conversation] = []
         repairs: list[tuple[str, str]] = []
         for r in rows:
-            data = dict(r)
+            data = dict(zip(columns, r))
             first_user = str(data.pop("first_user", None) or "").strip()
             title = str(data.get("title") or "")
             if first_user and (
