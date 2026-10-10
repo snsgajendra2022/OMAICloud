@@ -47,3 +47,25 @@ def test_native_only_capability_failure_does_not_return_canned_handler(monkeypat
         {},
     )
     assert "native model could not produce" in result.lower()
+
+def test_short_hinglish_chat_uses_compact_native_prompt(monkeypatch):
+    calls = {}
+
+    class FakeNative:
+        def chat(self, messages, **kwargs):
+            calls["messages"] = messages
+            calls["kwargs"] = kwargs
+            return "Haan Rohit, bilkul! Hum baat kar sakte hain. Batao, kya chal raha hai?"
+
+    monkeypatch.setattr("om_ai.backends.om_native.OMNativeBackend", FakeNative)
+    result = router._native_synthesize(
+        "kya hum bat kar sakte ha",
+        "chat",
+        {},
+        {"intent": "conversation"},
+    )
+    assert result.startswith("Haan Rohit")
+    assert len(calls["messages"][0]["content"]) < 350
+    assert calls["kwargs"]["max_new_tokens"] <= 64
+    assert calls["kwargs"]["min_new_tokens"] == 1
+
