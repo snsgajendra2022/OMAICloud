@@ -359,6 +359,14 @@ def chat_backend_info(ctx: TenantContext = Depends(require_auth)):
     return backend_status(local_loaded=_local_loaded(), native_ready=_native_ready())
 
 
+@router.get("/om/modules")
+def om_module_runtime(ctx: TenantContext = Depends(require_auth)):
+    """Expose live native readiness and honest capabilities for OM Pulse/Mind/Forge/Nova/Matrix."""
+    from om_ai.runtime.evolution_matrix import module_runtime_manifest
+
+    return module_runtime_manifest(native_ready=_native_ready())
+
+
 @router.get("/models")
 def list_models(ctx: TenantContext = Depends(require_auth)):
     eng = _engine
