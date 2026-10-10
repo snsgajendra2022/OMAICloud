@@ -1447,8 +1447,15 @@ def chat_reply(
         finally:
             os.environ.pop("_OM_IN_CHAT_REPLY", None)
 
-    messages = with_runtime_date_context(messages)
     if info.backend == "transformers":
+        from datetime import date
+
+        messages = _normalize_messages(messages)
+        if not any(m["role"] == "system" and "Today's date is " in m["content"] for m in messages):
+            messages.insert(0, {
+                "role": "system",
+                "content": f"Today's date is {date.today().isoformat()}. Do not claim a model identity unless it is known.",
+            })
         text = chat_via_transformers(
             messages,
             model=info.model if info.model != "unset" else None,
@@ -1460,6 +1467,7 @@ def chat_reply(
         )
         return text, _brand(info)
 
+    messages = with_runtime_date_context(messages)
     if info.backend == "openai":
         text = chat_via_openai(
             messages,
