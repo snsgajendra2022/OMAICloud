@@ -206,6 +206,8 @@ def configured_backend() -> str:
     """
     provider = (_env("OM_MODEL_PROVIDER") or "").lower()
     chat = (_env("OM_AI_CHAT_BACKEND") or _DEFAULT_BACKEND).lower()
+    if provider in {"transformers", "hf", "huggingface"} or chat in {"transformers", "hf", "huggingface"}:
+        return "transformers"
     if provider in {"om_native", "om-native", "native", "om"}:
         return "om_native"
     if chat in {"om_native", "om-native", "native"}:
@@ -238,6 +240,13 @@ def resolve_backend(*, local_loaded: bool = False, native_ready: bool = False) -
             + (" (ready)" if native_ready else " (checkpoint required)"),
             provider="OM AI",
         )
+    if mode == "transformers":
+        return ChatBackendInfo(
+            "transformers",
+            _env("OM_HF_MODEL", "unset") or "unset",
+            "explicit pretrained Transformers provider",
+            provider="Hugging Face Transformers",
+        )
     if mode in {"openai", "local"}:
         if mode == "openai":
             return ChatBackendInfo(
@@ -263,6 +272,45 @@ def resolve_backend(*, local_loaded: bool = False, native_ready: bool = False) -
         _env("OM_AI_MODEL_ID", "om-tiny") or "om-tiny",
         "auto: local OM" + (" (loaded)" if local_loaded else " (may be unloaded)"),
         provider="OM AI",
+    )
+
+
+_TRANSFORMERS_BACKEND: Any = None
+_TRANSFORMERS_MODEL_ID: str | None = None
+
+
+def chat_via_transformers(
+    messages: list[dict],
+    *,
+    model: str | None = None,
+    max_new_tokens: int = 256,
+    temperature: float = 0.7,
+    top_p: float = 0.9,
+    top_k: int = 50,
+    repetition_penalty: float = 1.0,
+) -> str:
+    """Use the explicitly selected pretrained Transformers model; never fallback."""
+    global _TRANSFORMERS_BACKEND, _TRANSFORMERS_MODEL_ID
+    model_id = (model or _env("OM_HF_MODEL", "")).strip()
+    if not model_id:
+        raise RuntimeError(
+            "Transformers provider selected but OM_HF_MODEL is empty. "
+            "Configure a licensed local model path or model ID."
+        )
+    if _TRANSFORMERS_BACKEND is None or _TRANSFORMERS_MODEL_ID != model_id:
+        from om_ai.backends.transformers_backend import TransformersBackend
+
+        candidate = TransformersBackend()
+        candidate.load(model_id=model_id)
+        _TRANSFORMERS_BACKEND = candidate
+        _TRANSFORMERS_MODEL_ID = model_id
+    return _TRANSFORMERS_BACKEND.chat(
+        _normalize_messages(messages),
+        max_new_tokens=max_new_tokens,
+        temperature=temperature,
+        top_p=top_p,
+        top_k=top_k,
+        repetition_penalty=repetition_penalty,
     )
 
 
@@ -1400,6 +1448,18 @@ def chat_reply(
             os.environ.pop("_OM_IN_CHAT_REPLY", None)
 
     messages = with_runtime_date_context(messages)
+    if info.backend == "transformers":
+        text = chat_via_transformers(
+            messages,
+            model=info.model if info.model != "unset" else None,
+            max_new_tokens=int(kwargs["max_new_tokens"]),
+            temperature=float(kwargs["temperature"]),
+            top_p=float(kwargs["top_p"]),
+            top_k=int(kwargs["top_k"]),
+            repetition_penalty=float(kwargs["repetition_penalty"]),
+        )
+        return text, _brand(info)
+
     if info.backend == "openai":
         text = chat_via_openai(
             messages,
