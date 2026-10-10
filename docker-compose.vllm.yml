@@ -1,0 +1,43 @@
+services:
+  om-ai:
+    environment:
+      OM_MODEL_PROVIDER: vllm
+      OM_AI_CHAT_BACKEND: vllm
+      OM_VLLM_BASE_URL: http://vllm:8000/v1
+      OM_VLLM_MODEL: ${OM_VLLM_MODEL:?Set OM_VLLM_MODEL in .env to the exact model served}
+      OM_VLLM_API_KEY: ${OM_VLLM_API_KEY:-EMPTY}
+    depends_on:
+      vllm:
+        condition: service_started
+
+  vllm:
+    image: vllm/vllm-openai:latest
+    ipc: host
+    environment:
+      HF_TOKEN: ${HF_TOKEN:-}
+    command:
+      - --model
+      - ${OM_VLLM_MODEL:?Set OM_VLLM_MODEL in .env to the exact model served}
+      - --served-model-name
+      - ${OM_VLLM_MODEL:?Set OM_VLLM_MODEL in .env to the exact model served}
+      - --host
+      - 0.0.0.0
+      - --port
+      - "8000"
+      - --api-key
+      - ${OM_VLLM_API_KEY:-EMPTY}
+    expose:
+      - "8000"
+    volumes:
+      - hf-cache:/root/.cache/huggingface
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    restart: unless-stopped
+
+volumes:
+  hf-cache:
