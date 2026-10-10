@@ -113,6 +113,7 @@ def _cap_analysis(q: str, ctx: dict, u: dict) -> str:
     return answer + "\n" if answer else ""
 
 def _cap_calculator(q: str, ctx: dict, u: dict) -> str:
+    """Calculate simple expressions exactly; use OM for natural-language math tasks."""
     m = re.search(r"(\d+(?:\.\d+)?)\s*%\s*of\s*(\d+(?:\.\d+)?)", q, re.I)
     if m:
         pct, base = float(m.group(1)), float(m.group(2))
@@ -124,13 +125,11 @@ def _cap_calculator(q: str, ctx: dict, u: dict) -> str:
             try:
                 val = eval(raw, {"__builtins__": {}}, {})  # noqa: S307
                 if isinstance(val, (int, float)):
-                    return f"{raw.strip()} = {val:g}\n"
+                    return f"{raw} = {val:g}\n"
             except Exception:
                 pass
-    real = build_real_answer(q)
-    return (real + "\n") if real else ""
-
-
+    answer = _native_synthesize(q, "calculator", ctx or {}, u or {})
+    return answer + "\n" if answer else ""
 
 def _cap_chat(q: str, ctx: dict, u: dict) -> str:
     """Generate conversational replies with OM's native model."""
