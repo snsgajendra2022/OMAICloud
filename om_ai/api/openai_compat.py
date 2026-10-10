@@ -331,6 +331,13 @@ def _run_chat(
         ) from exc
     except HTTPException:
         raise
+    except RuntimeError as exc:
+        if info.backend == "vllm":
+            raise HTTPException(
+                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+                detail=str(exc),
+            ) from exc
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
     except Exception as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
     model_name = used.model or info.model or _default_model_id
