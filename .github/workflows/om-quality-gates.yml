@@ -2,7 +2,7 @@ name: OM AI quality gates
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref || github.ref_name }}
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 on:
   push:
@@ -36,4 +36,14 @@ jobs:
       - name: Audit architecture inventory
         run: python scripts/audit_om_architecture.py
       - name: Run test suite
-        run: python -m pytest -q
+        run: |
+          mkdir -p artifacts/test-results
+          python -m pytest -q --junitxml=artifacts/test-results/quality-gates-junit.xml
+      - name: Upload quality-gate test report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: om-quality-gates-${{ github.run_id }}
+          path: artifacts/test-results/quality-gates-junit.xml
+          if-no-files-found: ignore
+          retention-days: 14
