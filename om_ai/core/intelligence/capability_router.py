@@ -341,7 +341,7 @@ def _native_synthesize(
     # token loops. The shared global quality gate also evaluates context-dependent
     # heuristics for unrelated pipelines and was incorrectly suppressing valid,
     # concise native answers such as retry guidance.
-    if "\\ufffd" in answer or any(ord(ch) < 32 and ch not in "\\n\\r\\t" for ch in answer):
+    if "\ufffd" in answer or any(ord(ch) < 32 and ch not in "\n\r\t" for ch in answer):
         return ""
     words = answer.casefold().split()
     if len(words) >= 8 and any(
