@@ -2471,7 +2471,7 @@ async function loadOmRuntimeStatus() {
     const {res, data} = await api("/api/v1/om/modules", {}, {error:false});
     if (!res.ok || !data) throw new Error("Runtime status unavailable");
     const ready = data.native_model_ready === true;
-    nativeEl.innerHTML = '<i class="dot '+(ready ? "online" : "")+'"></i>' +
+    nativeEl.innerHTML = '<i class="dot '+(ready ? "online" : "offline")+'"></i>' +
       (ready ? "Native model loaded" : "Native model not ready");
     nativeEl.title = ready
       ? "Checkpoint loaded; answer quality is not implied."
