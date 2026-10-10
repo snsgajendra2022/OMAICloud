@@ -19,6 +19,7 @@ from .response_optimizer import ResponseOptimizer
 from .safety_filter import SafetyFilter
 from .solution_engine import SolutionEngine
 from .user_preference import UserPreference
+from .verification_engine import VerificationEngine
 
 logger = logging.getLogger(__name__)
 
@@ -74,6 +75,7 @@ class ChatOrchestrator:
         self.correction = CorrectionEngine()
         self.confidence = ConfidenceEngine()
         self.quality = ChatQualityEngine()
+        self.verification = VerificationEngine()
         self.safety = SafetyFilter()
 
     def status(self) -> dict[str, Any]:
@@ -473,11 +475,19 @@ class ChatOrchestrator:
             used_model=used_model,
             corrected=bool(corrected.get("corrected")),
         )
+        verification = self.verification.verify(
+            draft,
+            message=q,
+            analysis={"problem_type": "debugging"} if intent.intent == "debugging" else {},
+            reasoning=solution if isinstance(solution, dict) else {},
+        )
+        meta["verification"] = verification
         qual = self.quality.evaluate(
             draft,
             optimizer_report=optimized.get("report"),
             confidence=conf,
             intent=intent.intent,
+            verification=verification,
         )
         meta["confidence"] = conf
         meta["quality"] = qual
