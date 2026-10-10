@@ -36,6 +36,18 @@ CASES = [
 ]
 
 
+_WITHHELD_REPLY = re.compile(
+    r"^OM-1\\.0 could not produce a reliable answer for this turn\\.\\s*"
+    r"The generated text was withheld because it failed quality checks\\.$",
+    re.IGNORECASE,
+)
+
+
+def is_withheld_reply(answer: str | None) -> bool:
+    """A safety-gate message is not a usable model answer."""
+    return bool(_WITHHELD_REPLY.fullmatch((answer or "").strip()))
+
+
 def deterministic_checks(category: str, answer: str) -> dict[str, bool]:
     """Return transparent smoke checks; these are not semantic-quality judgments."""
     text = answer or ""
@@ -202,7 +214,9 @@ def main() -> int:
             )
             elapsed = round(time.perf_counter() - started, 3)
             total_generation_seconds += elapsed
+            withheld = is_withheld_reply(answer)
             usable = (bool((answer or "").strip())
+                      and not withheld
                       and not is_degenerate_generation(answer)
                       and not bool(is_low_quality_reply(answer)))
             correctness = deterministic_checks(category, answer or "")
@@ -214,6 +228,7 @@ def main() -> int:
                 "category": category,
                 "ok": ok,
                 "usable_output": usable,
+                "quality_gate_withheld": withheld,
                 "correctness_checks": correctness,
                 "elapsed_seconds": elapsed,
                 "prompt": prompt,
@@ -237,20 +252,21 @@ def main() -> int:
                 )
                 followup_elapsed = round(time.perf_counter() - started, 3)
                 total_generation_seconds += followup_elapsed
-                followup_ok = (
+                followup_withheld = is_withheld_reply(followup)
+                followup_usable = (
                     bool((followup or "").strip())
+                    and not followup_withheld
                     and not is_degenerate_generation(followup)
                     and not bool(is_low_quality_reply(followup))
-                    and "MAPLE-731" in (followup or "")
                 )
+                followup_ok = followup_usable and "MAPLE-731" in (followup or "")
                 if not followup_ok:
                     failures += 1
                 results.append({
                     "category": "context_retention_followup",
                     "ok": followup_ok,
-                    "usable_output": (bool((followup or "").strip())
-                                    and not is_degenerate_generation(followup)
-                                    and not bool(is_low_quality_reply(followup))),
+                    "usable_output": followup_usable,
+                    "quality_gate_withheld": followup_withheld,
                     "elapsed_seconds": followup_elapsed,
                     "prompt": conversation[-1]["content"],
                     "answer": (followup or "")[:1000],
