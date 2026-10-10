@@ -12,6 +12,18 @@ Self-hosted, API-independent AI platform: train and run **OM-1.0** natively — 
 
 The `data/models/om_registry.json` file is descriptive metadata, not a weight store. Entries without a real checkpoint path, checksum, tokenizer binding, and evaluation results are marked unverified and must not be presented as installed models. Local files under `artifacts/` are intentionally git-ignored, so GitHub alone cannot confirm whether your machine has those weights.
 
+## GPT-5-level capability target: self-hosted model runtime
+
+OM AI is the platform layer (chat, memory, retrieval, tools, permissions, and evaluation). For the high-capability production target, configure a capable licensed open-weight model behind vLLM rather than relying on the small OM-1.0 native checkpoint. This is a target architecture, not a claim that OM AI is GPT-5 or already matches GPT-5.
+
+- Runtime guide: [docs/SELF_HOSTED_LLM_RUNTIME.md](docs/SELF_HOSTED_LLM_RUNTIME.md)
+- GPU deployment override: [docker-compose.vllm.yml](docker-compose.vllm.yml)
+- Provider selection: `OM_MODEL_PROVIDER=vllm`, `OM_AI_CHAT_BACKEND=vllm`
+- Model endpoint: `OM_VLLM_BASE_URL`; exact served model: `OM_VLLM_MODEL`
+- Failure policy: no silent fallback to OM native when the selected inference server is missing or fails.
+
+The model's license, required GPU memory, throughput, context length, and quality must be verified for the actual deployment. See the evaluation checklist in the runtime guide before describing a release as production-ready.
+
 ## Honesty about weights
 
 This repository is **working software** (architecture, trainers, agents, API). It is **not** a download of trained OM-1B / 7B / 13B / 70B brains.
