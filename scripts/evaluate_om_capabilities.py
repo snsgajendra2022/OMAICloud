@@ -202,7 +202,9 @@ def main() -> int:
             )
             elapsed = round(time.perf_counter() - started, 3)
             total_generation_seconds += elapsed
-            usable = (bool((answer or "").strip())\n                      and not is_degenerate_generation(answer)\n                      and not bool(is_low_quality_reply(answer)))
+            usable = (bool((answer or "").strip())
+                      and not is_degenerate_generation(answer)
+                      and not bool(is_low_quality_reply(answer)))
             correctness = deterministic_checks(category, answer or "")
             passed_checks = all(correctness.values()) if correctness else True
             ok = usable and passed_checks
