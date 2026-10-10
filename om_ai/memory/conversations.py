@@ -185,6 +185,31 @@ def _actor_user_id(actor: str) -> str | None:
     return None
 
 
+def _serialize_conversation_store_methods(cls):
+    """Serialize every method touching the shared SQLite connection.
+
+    check_same_thread=False permits cross-thread access but does not make a
+    single sqlite3.Connection safe for simultaneous execute/fetch/commit calls.
+    A lock around only individual queries is insufficient because another store
+    method can run between a query and its cursor fetch or during a transaction.
+    """
+    from functools import wraps
+
+    for method_name, method in list(cls.__dict__.items()):
+        # __init__ creates the lock; _tx is a context manager that already holds
+        # the RLock for the complete transaction body.
+        if method_name in {"__init__", "_tx"} or not callable(method):
+            continue
+
+        @wraps(method)
+        def synchronized(self, *args, __method=method, **kwargs):
+            with self._lock:
+                return __method(self, *args, **kwargs)
+
+        setattr(cls, method_name, synchronized)
+    return cls
+
+
 class ConversationStore:
     """Tenant/actor-scoped chat history, folders, and profile in SQLite."""
 
@@ -759,3 +784,8 @@ class ConversationStore:
                 pairs.append((pending_user, m.content))
                 pending_user = None
         return pairs
+
+
+# All connection access is serialized, not just list_conversations(). The RLock
+# allows nested store calls (for example append_messages -> get_conversation).
+ConversationStore = _serialize_conversation_store_methods(ConversationStore)
