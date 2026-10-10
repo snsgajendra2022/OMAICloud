@@ -158,19 +158,23 @@ class APIKeyAuth:
                     return
             except Exception:
                 pass
-            if os.getenv("OM_AI_REQUIRE_AUTH", "0") == "1":
+            allow_open_dev = os.getenv("OM_AI_ALLOW_OPEN_DEV_MODE", "0").strip() == "1"
+            require_auth = os.getenv("OM_AI_REQUIRE_AUTH", "0").strip() == "1"
+            if allow_open_dev and not require_auth:
                 warnings.warn(
-                    "OM_AI_REQUIRE_AUTH=1 but no keys configured – all requests will be rejected.",
-                    stacklevel=2,
-                )
-                self._dev_mode = False
-            else:
-                warnings.warn(
-                    "No API keys configured – running in dev mode. "
-                    "Set OM_AI_API_KEYS or create a token via POST /v1/tokens.",
+                    "OM_AI_ALLOW_OPEN_DEV_MODE=1: unauthenticated access is enabled "
+                    "for loopback/local development only. Never expose this server publicly.",
                     stacklevel=2,
                 )
                 self._dev_mode = True
+            else:
+                warnings.warn(
+                    "No API keys or database tokens configured. Authentication is fail-closed; "
+                    "configure OM_AI_API_KEYS / OM_AI_API_KEYS_ADMIN or explicitly set "
+                    "OM_AI_ALLOW_OPEN_DEV_MODE=1 for local-only development.",
+                    stacklevel=2,
+                )
+                self._dev_mode = False
         else:
             self._dev_mode = False
 
@@ -238,6 +242,11 @@ def _resolve_context_from_request(request) -> TenantContext:
     is_local = client_host in ("127.0.0.1", "::1", "localhost")
 
     if auth.is_dev_mode() and not require_strict:
+        if not is_local:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Open development mode is restricted to localhost/loopback clients.",
+            )
         ctx = TenantContext(
             tenant_id=request.headers.get("X-Tenant-Id", "default"),
             actor=f"dev:{client_host}",
