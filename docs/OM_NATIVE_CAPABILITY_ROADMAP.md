@@ -69,6 +69,23 @@ A candidate can be promoted only when:
 - Safety, latency, memory and failure-rate gates pass.
 - The model card states known limitations and the tested hardware.
 
+## Larger native architecture preset (added 2026-10)
+
+A first larger OM-owned architecture preset is available at `configs/om-1.1-1b.json` (24 layers, width 2048, 16 attention heads, 8 KV heads, 65,536-token vocabulary, 2,048-token context, gradient checkpointing enabled). It is an architecture definition for a fresh training run—not a trained 1B model, not a converted checkpoint, and not evidence of improved responses.
+
+Do not point the default `.env` at this config while using the OM-1.0 checkpoint: the architecture shapes will not match. Keep the existing compatible native checkpoint as the default until the new model is pretrained and validated. First run the model parameter estimator against this config, verify the actual tokenizer size and implementation details, and estimate training memory/time against the *specific* GPU model(s), usable VRAM per GPU, interconnect, and dataset. Aggregate VRAM across separate GPUs is not always interchangeable with one large GPU.
+
+### Required model-building sequence
+
+1. Reproduce a clean OM-1.0 native baseline and save its report and hashes.
+2. Verify model construction and parameter count for `om-1.1-1b.json`; add a shape/forward/backward smoke test.
+3. Prepare a licensed, deduplicated pretraining corpus and a separate held-out validation set. The existing small greeting-heavy SFT dataset is not a pretraining corpus.
+4. Pretrain from random initialization with token-count, validation-loss, throughput, and checkpoint-resume tracking on appropriate GPU infrastructure.
+5. Run high-quality SFT for instructions, multi-turn chat, code, reasoning, tool-use and structured output; apply preference training only with vetted preference pairs.
+6. Evaluate each frozen checkpoint against the same held-out suites; promote only if quality and reliability improve.
+
+A 1B architecture is a first engineering milestone, not a credible endpoint for GPT-5-level ambition. Reaching that target would likely require further scaling, extensive high-quality data, advanced training/alignment and systems work, plus benchmark evidence. No capability parity is implied by this preset.
+
 ## Immediate next action
 
 From the repository root, inspect the environment override and run the updated preflight diagnostic:
