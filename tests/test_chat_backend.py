@@ -55,6 +55,7 @@ def test_default_backend_is_om_native(monkeypatch):
 
 
 def test_auto_never_picks_ollama(monkeypatch):
+    monkeypatch.setenv("OM_NATIVE_ONLY", "0")
     monkeypatch.setenv("OM_AI_CHAT_BACKEND", "auto")
     monkeypatch.delenv("OM_MODEL_PROVIDER", raising=False)
     monkeypatch.delenv("OM_AI_OPENAI_API_KEY", raising=False)
@@ -66,6 +67,7 @@ def test_auto_never_picks_ollama(monkeypatch):
 
 
 def test_explicit_ollama_rejected(monkeypatch):
+    monkeypatch.setenv("OM_NATIVE_ONLY", "0")
     monkeypatch.setenv("OM_AI_CHAT_BACKEND", "ollama")
     monkeypatch.delenv("OM_MODEL_PROVIDER", raising=False)
     with pytest.raises(RuntimeError, match="not part of the OM-1.0 native"):
@@ -73,6 +75,7 @@ def test_explicit_ollama_rejected(monkeypatch):
 
 
 def test_resolve_openai_when_key_and_auto(monkeypatch):
+    monkeypatch.setenv("OM_NATIVE_ONLY", "0")
     monkeypatch.setenv("OM_AI_CHAT_BACKEND", "auto")
     monkeypatch.delenv("OM_MODEL_PROVIDER", raising=False)
     monkeypatch.setenv("OPENAI_API_KEY", "sk-test")
@@ -83,6 +86,7 @@ def test_resolve_openai_when_key_and_auto(monkeypatch):
 
 
 def test_resolve_local_fallback(monkeypatch):
+    monkeypatch.setenv("OM_NATIVE_ONLY", "0")
     monkeypatch.setenv("OM_AI_CHAT_BACKEND", "auto")
     monkeypatch.delenv("OM_MODEL_PROVIDER", raising=False)
     monkeypatch.delenv("OM_AI_OPENAI_API_KEY", raising=False)
@@ -94,6 +98,7 @@ def test_resolve_local_fallback(monkeypatch):
 
 
 def test_force_openai(monkeypatch):
+    monkeypatch.setenv("OM_NATIVE_ONLY", "0")
     monkeypatch.setenv("OM_AI_CHAT_BACKEND", "openai")
     monkeypatch.delenv("OM_MODEL_PROVIDER", raising=False)
     monkeypatch.setenv("OM_AI_OPENAI_MODEL", "gpt-4o-mini")
@@ -121,6 +126,24 @@ def test_native_provider_wins_even_when_external_api_key_exists(monkeypatch):
     monkeypatch.setenv("OM_AI_CHAT_BACKEND", "openai")
     monkeypatch.setenv("OPENAI_API_KEY", "test-only-key")
     assert cb.configured_backend() == "om_native"
+
+
+def test_native_only_ignores_stale_vllm_qwen_env(monkeypatch):
+    monkeypatch.delenv("OM_NATIVE_ONLY", raising=False)
+    monkeypatch.setenv("OM_MODEL_PROVIDER", "vllm")
+    monkeypatch.setenv("OM_AI_CHAT_BACKEND", "vllm")
+    monkeypatch.setenv("OM_VLLM_MODEL", "Qwen/Qwen3-30B-A3B")
+    monkeypatch.setenv("OM_VLLM_API_KEY", "EMPTY")
+    info = cb.resolve_backend(native_ready=True)
+    assert info.backend == "om_native"
+    assert info.model == "OM-1.0"
+
+
+def test_explicit_adapter_selection_requires_native_only_off(monkeypatch):
+    monkeypatch.setenv("OM_NATIVE_ONLY", "0")
+    monkeypatch.setenv("OM_MODEL_PROVIDER", "vllm")
+    monkeypatch.setenv("OM_AI_CHAT_BACKEND", "vllm")
+    assert cb.configured_backend() == "vllm"
 
 
 def test_invalid_provider_payload_does_not_leak_response_body(monkeypatch):
