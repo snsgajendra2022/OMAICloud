@@ -149,6 +149,8 @@ def _safe_arithmetic(expression: str) -> float | int:
             return _ARITHMETIC_OPERATORS[type(node.op)](evaluate(node.operand))
         raise ValueError("Unsupported arithmetic syntax")
 
+    return evaluate(tree)
+
 
 def _cap_calculator(q: str, ctx: dict, u: dict) -> str:
     """Calculate simple expressions exactly; use OM for natural-language math tasks."""
