@@ -224,27 +224,27 @@ def is_degenerate_generation(text: str | None) -> bool:
     if not s or not usable_generation_text(s):
         return True
 
-    words = re.findall(r"\\S+", s)
+    words = re.findall(r"\S+", s)
     if len(words) >= 12:
         possessives = sum(1 for word in words if "'s" in word or "’s" in word)
         if possessives / len(words) >= 0.18:
             return True
         unique_words = len(
-            {re.sub(r"[^\\w]+", "", word.lower()) for word in words} - {""}
+            {re.sub(r"[^\w]+", "", word.lower()) for word in words} - {""}
         )
         if unique_words / len(words) < 0.22:
             return True
 
-    compact = re.sub(r"\\s+", "", s)
+    compact = re.sub(r"\s+", "", s)
     if len(compact) < 16:
         return False
 
     # Strong signal: suspicious punctuation is embedded between letters,
     # rather than used as ordinary sentence/code punctuation.
-    embedded_symbol = re.compile(r"[A-Za-z][_*#\\\\/|{}\\[\\]<>~=^][A-Za-z]")
+    embedded_symbol = re.compile(r"[A-Za-z][_*#\\/|{}\[\]<>~=^][A-Za-z]")
     embedded_delimiter = re.compile(r"[A-Za-z][(;:][A-Za-z]")
     malformed_tokens = 0
-    tokens = re.findall(r"\\S+", s)
+    tokens = re.findall(r"\S+", s)
     for token in tokens:
         letters = sum(ch.isalpha() for ch in token)
         if len(token) >= 4 and letters >= 2 and (
@@ -258,7 +258,7 @@ def is_degenerate_generation(text: str | None) -> bool:
     # Catch outputs with a cluster of unusual symbols even when they occur in
     # different tokens. Do not count ordinary punctuation such as commas,
     # periods, apostrophes, or parentheses by themselves.
-    suspicious_chars = set("_*#\\\\/|{}[]<>~=^")
+    suspicious_chars = set("_*#\\/|{}[]<>~=^")
     suspicious = sum(1 for char in compact if char in suspicious_chars)
     if suspicious >= 3 and suspicious / len(compact) >= 0.035:
         return True
