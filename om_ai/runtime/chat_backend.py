@@ -1,12 +1,13 @@
-"""Chat reply backends: OM native (default), local engine, or OpenAI-compatible API.
+"""Chat reply backends: native OM first, with explicit optional adapters.
 
-Selection (``OM_AI_CHAT_BACKEND`` or ``OM_MODEL_PROVIDER``):
-  - ``om_native`` (default when unset): OMNativeBackend ONLY — no third-party LLM fallback
-  - ``openai`` / ``local``: explicit opt-in only
-  - ``auto``: OpenAI if API key set → local OM (never Ollama)
+The native OM model is the default and primary development target. Set
+OM_MODEL_PROVIDER or OM_AI_CHAT_BACKEND to vllm or transformers only when
+intentionally evaluating/serving a separate model. Those adapters do not
+upgrade native OM weights and must not be described as OM-trained intelligence.
+All configured backends fail closed; none silently substitutes a different model.
 
-Ollama is not part of the production path. Legacy client lives under
-``om_ai.legacy.ollama`` and is never auto-imported by serve/API.
+Ollama is not part of the default path. Legacy client lives under
+om_ai.legacy.ollama and is never auto-imported by serve/API.
 """
 from __future__ import annotations
 
@@ -35,7 +36,7 @@ except Exception:
     logger.debug(
         "Language Intelligence Layer unavailable"
     )
-BackendName = str  # "om_native" | "local" | "openai"
+BackendName = str  # "vllm" | "transformers" | "om_native" | "local" | "openai"
 
 
 class ResponseEcho:
@@ -198,14 +199,38 @@ def openai_api_key() -> str:
     return _env("OM_AI_OPENAI_API_KEY") or _env("OPENAI_API_KEY")
 
 
+def vllm_base_url() -> str:
+    """Base URL for the self-hosted vLLM OpenAI-compatible server."""
+    return _env("OM_VLLM_BASE_URL", "http://127.0.0.1:8000/v1").rstrip("/")
+
+
+def vllm_model() -> str:
+    return _env("OM_VLLM_MODEL")
+
+
+def vllm_api_key() -> str:
+    # vLLM may be behind an authenticated gateway. Never require a public provider key.
+    return _env("OM_VLLM_API_KEY", "EMPTY")
+
+
 def configured_backend() -> str:
     """Resolve configured chat backend.
 
     Default when unset is ``om_native``. ``ollama`` is rejected in production —
     use ``om_ai.legacy.ollama`` only via explicit external scripts.
     """
+    # Native-only is deliberately ON by default. This takes precedence over stale
+    # local .env values such as OM_MODEL_PROVIDER=vllm and OM_VLLM_MODEL=Qwen/...
+    # Set OM_NATIVE_ONLY=0 only in tests/development when explicitly evaluating an adapter.
+    if _env_on("OM_NATIVE_ONLY", "1"):
+        return "om_native"
+
     provider = (_env("OM_MODEL_PROVIDER") or "").lower()
     chat = (_env("OM_AI_CHAT_BACKEND") or _DEFAULT_BACKEND).lower()
+    if provider in {"transformers", "hf", "huggingface"} or chat in {"transformers", "hf", "huggingface"}:
+        return "transformers"
+    if provider in {"vllm", "self_hosted", "self-hosted", "openai_compatible"} or chat in {"vllm", "self_hosted", "self-hosted", "openai_compatible"}:
+        return "vllm"
     if provider in {"om_native", "om-native", "native", "om"}:
         return "om_native"
     if chat in {"om_native", "om-native", "native"}:
@@ -238,6 +263,20 @@ def resolve_backend(*, local_loaded: bool = False, native_ready: bool = False) -
             + (" (ready)" if native_ready else " (checkpoint required)"),
             provider="OM AI",
         )
+    if mode == "vllm":
+        return ChatBackendInfo(
+            "vllm",
+            vllm_model() or "unset",
+            "self-hosted vLLM OpenAI-compatible inference server",
+            provider="Self-hosted vLLM",
+        )
+    if mode == "transformers":
+        return ChatBackendInfo(
+            "transformers",
+            _env("OM_HF_MODEL", "unset") or "unset",
+            "explicit pretrained Transformers provider",
+            provider="Hugging Face Transformers",
+        )
     if mode in {"openai", "local"}:
         if mode == "openai":
             return ChatBackendInfo(
@@ -263,6 +302,45 @@ def resolve_backend(*, local_loaded: bool = False, native_ready: bool = False) -
         _env("OM_AI_MODEL_ID", "om-tiny") or "om-tiny",
         "auto: local OM" + (" (loaded)" if local_loaded else " (may be unloaded)"),
         provider="OM AI",
+    )
+
+
+_TRANSFORMERS_BACKEND: Any = None
+_TRANSFORMERS_MODEL_ID: str | None = None
+
+
+def chat_via_transformers(
+    messages: list[dict],
+    *,
+    model: str | None = None,
+    max_new_tokens: int = 256,
+    temperature: float = 0.7,
+    top_p: float = 0.9,
+    top_k: int = 50,
+    repetition_penalty: float = 1.0,
+) -> str:
+    """Use the explicitly selected pretrained Transformers model; never fallback."""
+    global _TRANSFORMERS_BACKEND, _TRANSFORMERS_MODEL_ID
+    model_id = (model or _env("OM_HF_MODEL", "")).strip()
+    if not model_id:
+        raise RuntimeError(
+            "Transformers provider selected but OM_HF_MODEL is empty. "
+            "Configure a licensed local model path or model ID."
+        )
+    if _TRANSFORMERS_BACKEND is None or _TRANSFORMERS_MODEL_ID != model_id:
+        from om_ai.backends.transformers_backend import TransformersBackend
+
+        candidate = TransformersBackend()
+        candidate.load(model_id=model_id)
+        _TRANSFORMERS_BACKEND = candidate
+        _TRANSFORMERS_MODEL_ID = model_id
+    return _TRANSFORMERS_BACKEND.chat(
+        _normalize_messages(messages),
+        max_new_tokens=max_new_tokens,
+        temperature=temperature,
+        top_p=top_p,
+        top_k=top_k,
+        repetition_penalty=repetition_penalty,
     )
 
 
@@ -332,6 +410,57 @@ def with_runtime_date_context(
     return [{"role": "system", "content": date_line}] + msgs
 
 
+def chat_via_vllm(
+    messages: list[dict],
+    *,
+    max_new_tokens: int = 512,
+    temperature: float = 0.7,
+    top_p: float = 0.9,
+    model: str | None = None,
+) -> str:
+    """Call self-hosted vLLM through its OpenAI-compatible API; never fallback."""
+    model_id = (model or vllm_model()).strip()
+    if not model_id:
+        raise RuntimeError(
+            "vLLM provider selected but OM_VLLM_MODEL is empty. "
+            "Set it to the exact model served by OM_VLLM_BASE_URL."
+        )
+    payload = {
+        "model": model_id,
+        "messages": _normalize_messages(messages),
+        "max_tokens": int(max_new_tokens),
+        "temperature": float(temperature),
+        "top_p": float(top_p),
+    }
+    headers = {"Content-Type": "application/json"}
+    key = vllm_api_key()
+    if key:
+        headers["Authorization"] = f"Bearer {key}"
+    try:
+        with httpx.Client(timeout=httpx.Timeout(180.0, connect=10.0)) as client:
+            response = client.post(
+                f"{vllm_base_url()}/chat/completions",
+                json=payload,
+                headers=headers,
+            )
+            response.raise_for_status()
+            data = response.json()
+    except httpx.HTTPError as exc:
+        raise RuntimeError(
+            f"Self-hosted vLLM request failed ({type(exc).__name__}). "
+            "Check OM_VLLM_BASE_URL, server health, model availability, and GPU capacity."
+        ) from exc
+    try:
+        content = data["choices"][0]["message"]["content"]
+        if not isinstance(content, str) or not content.strip():
+            raise TypeError("empty or non-text content")
+        return content.strip()
+    except (KeyError, IndexError, TypeError) as exc:
+        raise RuntimeError(
+            "Self-hosted vLLM returned an invalid chat-completion payload"
+        ) from exc
+
+
 def chat_via_openai(
     messages: list[dict],
     *,
@@ -360,9 +489,16 @@ def chat_via_openai(
         r.raise_for_status()
         data = r.json()
     try:
-        return str(data["choices"][0]["message"]["content"])
+        content = data["choices"][0]["message"]["content"]
+        if not isinstance(content, str) or not content.strip():
+            raise TypeError("empty or non-text content")
+        return content
     except (KeyError, IndexError, TypeError) as exc:
-        raise RuntimeError(f"OpenAI-compatible API returned unexpected payload: {data!r}") from exc
+        # Never include the provider response body in exceptions: it may contain
+        # echoed user prompts, private context, or provider diagnostics.
+        raise RuntimeError(
+            "OpenAI-compatible API returned an invalid chat-completion payload"
+        ) from exc
 
 
 
@@ -408,11 +544,12 @@ def _om_native_chat_reply_body(
         provider=info.provider,
         live_knowledge={"intelligence": intel.meta} if intel.meta else None,
     )
-    if intel.direct_reply:
+    # Native model-first mode uses deterministic intent replies as context only.
+    if intel.direct_reply and not _env_on("OM_NATIVE_MODEL_FIRST", "1"):
         return intel.direct_reply, info_base
 
     # ── STEP 30 ChatGPT-like Brain Controller (preferred front door) ─
-    if _env_on("OM_CHATGPT_RUNTIME", "1"):
+    if _env_on("OM_CHATGPT_RUNTIME", "1") and not _env_on("OM_NATIVE_MODEL_FIRST", "1"):
         try:
             from om_ai.core.chatgpt_runtime import run_chatgpt_runtime
 
@@ -459,11 +596,26 @@ def _om_native_chat_reply_body(
             try:
                 from om_ai.core.chat_intelligence.stub_detect import is_solution_stub
                 from om_ai.core.intelligence.real_answer import looks_like_static_reply
+                from om_ai.core.model_runtime.quality_gate import get_quality_gate
+                from om_ai.runtime.chat_orchestrator import is_low_quality_reply
+                from om_ai.core.response.response_formatter import looks_like_pipeline_dump
 
-                if is_solution_stub(ans) or looks_like_static_reply(ans):
+                if (
+                    is_solution_stub(ans)
+                    or looks_like_static_reply(ans)
+                    or looks_like_pipeline_dump(ans)
+                    or is_low_quality_reply(ans)
+                    or not get_quality_gate().evaluate(ans, prompt=user_text).passed
+                ):
                     ans = ""
             except Exception:
                 pass
+            # A pipeline's diagnostic notice is not a user answer. Treat it as
+            # a failed stage and continue to the native cascade, which may still
+            # provide a safe grounded/tool response or a useful local fallback.
+            if "did not produce a usable model-generated answer" in ans.lower():
+                logger.warning("chatgpt_runtime returned native-generation failure notice; continuing fallback cascade")
+                ans = ""
             if ans and not ResponseEcho.check(user_text, ans):
                 info_crt = ChatBackendInfo(
                     backend=info.backend,
@@ -488,12 +640,21 @@ def _om_native_chat_reply_body(
         try:
             from om_ai.runtime.chat_pipeline import run_chat_pipeline
 
+            pipe_kwargs = dict(kwargs or {})
+            if _env_on("OM_LIVE_KNOWLEDGE", "0"):
+                try:
+                    from om_ai.live_knowledge import enrich_messages_for_live_knowledge
+                    messages, lk_meta = enrich_messages_for_live_knowledge(messages)
+                    pipe_kwargs["lk_meta"] = lk_meta
+                except Exception:
+                    pass
+
             piped = run_chat_pipeline(
                 user_text,
                 messages=messages,
                 native_chat=native_chat,
                 native_ready=native_ready,
-                kwargs=kwargs,
+                kwargs=pipe_kwargs,
                 tenant_id=tenant_id or "default",
                 actor=actor or "",
                 project_id=project_id,
@@ -503,6 +664,51 @@ def _om_native_chat_reply_body(
                 evolution_profile=profile,
             )
             ans = str(piped.get("answer") or "").strip()
+            pipeline_meta = piped.get("meta") or {}
+            # In native-model-first mode, a failed OM generation is terminal unless
+            # the pipeline explicitly selected a verified public tool answer. Never
+            # continue into unrelated answer-producing cascades that can leak
+            # internal "knowledge:" / "Question:" context blocks.
+            if pipeline_meta.get("answer_source") == "native_generation_failed":
+                if not native_ready or native_chat is None:
+                    raise NativeCheckpointError(
+                        "OM-1.0 native checkpoint is unavailable; no substitute answer was generated."
+                    )
+                info_pipe = ChatBackendInfo(
+                    backend=info.backend,
+                    model=info.model,
+                    detail="om_native_generation_failed",
+                    provider=info.provider,
+                    live_knowledge={
+                        "intelligence": intel.meta,
+                        "pipeline": pipeline_meta,
+                        "stages": piped.get("stages") or [],
+                        "evolution_level": evolution_level,
+                    },
+                )
+                return ans if ans.endswith("\n") else ans + "\n", info_pipe
+            try:
+                from om_ai.core.chat_intelligence.stub_detect import is_solution_stub
+                from om_ai.core.intelligence.real_answer import looks_like_static_reply
+                from om_ai.core.model_runtime.quality_gate import get_quality_gate
+                from om_ai.runtime.chat_orchestrator import is_low_quality_reply
+                from om_ai.core.response.response_formatter import looks_like_pipeline_dump
+
+                if (
+                    is_solution_stub(ans)
+                    or looks_like_static_reply(ans)
+                    or looks_like_pipeline_dump(ans)
+                    or is_low_quality_reply(ans)
+                    or not get_quality_gate().evaluate(ans, prompt=user_text).passed
+                ):
+                    ans = ""
+            except Exception:
+                pass
+            # Do not expose internal model-failure diagnostics as the final
+            # chat bubble. Let later native/grounded fallback stages recover.
+            if "did not produce a usable model-generated answer" in ans.lower():
+                logger.warning("chat_pipeline returned native-generation failure notice; continuing fallback cascade")
+                ans = ""
             if ans and not ResponseEcho.check(user_text, ans):
                 info_pipe = ChatBackendInfo(
                     backend=info.backend,
@@ -520,6 +726,8 @@ def _om_native_chat_reply_body(
                     },
                 )
                 return ans if ans.endswith("\n") else ans + "\n", info_pipe
+        except NativeCheckpointError:
+            raise
         except Exception as exc:
             logger.debug("chat_pipeline_v2 skipped: %s", exc)
 
@@ -656,7 +864,7 @@ def _om_native_chat_reply_body(
         logger.debug("CognitiveIntelligence skipped: %s", exc)
 
     # Dynamic intelligence pipeline (generalizes; regex only as helper signals).
-    if _env_on("OM_DYNAMIC_INTELLIGENCE", "1"):
+    if _env_on("OM_DYNAMIC_INTELLIGENCE", "1") and not _env_on("OM_NATIVE_MODEL_FIRST", "1"):
       try:
         from om_ai.intelligence import IntelligenceManager
         from om_ai.core.response.response_formatter import (
@@ -866,6 +1074,8 @@ def _om_native_chat_reply_body(
             extra = f"{extra}\n{bh}" if extra else bh
 
     # Chat template: system + turns. Compact for tiny local windows.
+    from om_ai.runtime.chat_orchestrator import build_chat_messages
+
     messages = build_chat_messages(
         messages,
         compact=True,
@@ -945,7 +1155,6 @@ def _om_native_chat_reply_body(
                 polished = compose_fallback(intent=intent_v, user_text=user_text)
             except Exception:
                 polished = "Hello — I’m OM. How can I help you?"
-            return (polished or "").strip() + "\n", info_lk
         # OM Response Language Check
         if _language_manager:
             try:
@@ -958,9 +1167,14 @@ def _om_native_chat_reply_body(
                         "Response language: %s",
                         response_lang
                     )
-            
             except Exception:
                 pass
+        return (polished or "").strip() + "\n", info_lk
+
+    if (native_chat is None or not native_ready) and _env_on("OM_NATIVE_MODEL_FIRST", "1"):
+        raise NativeCheckpointError(
+            "OM-1.0 native checkpoint is unavailable; no substitute answer was generated."
+        )
 
     # Prefer local dataset/RAG grounded reply before tiny-model garble.
     if dataset_grounded and len(dataset_grounded) > 80:
@@ -987,10 +1201,13 @@ def _om_native_chat_reply_body(
         ) from exc
 
     # Model-first: accept usable generation; reject garbled tiny-model soup.
+    from om_ai.runtime.chat_orchestrator import is_low_quality_reply
+
     fail = is_low_quality_reply(text)
     # Tiny models often start with "Hello" then derail — use Agent Brain fallback.
     if (
-        not fail
+        not _env_on("OM_NATIVE_MODEL_FIRST", "1")
+        and not fail
         and brain_decision.intent.value in {"greeting", "identity"}
         and brain_decision.structured_fallback
     ):
@@ -1004,7 +1221,11 @@ def _om_native_chat_reply_body(
             return _out(brain_decision.structured_fallback)
 
     # Coding / planning: prefer structured reasoning if model is weak/garbled.
-    if fail and brain_decision.intent.value in {"coding", "agent", "knowledge"}:
+    if (
+        fail
+        and not _env_on("OM_NATIVE_MODEL_FIRST", "1")
+        and brain_decision.intent.value in {"coding", "agent", "knowledge"}
+    ):
         rescued_early = brain_decision.after_model(text) or brain_decision.structured_fallback
         if rescued_early:
             return _out(rescued_early)
@@ -1081,14 +1302,25 @@ def _om_native_chat_reply_body(
     except Exception as exc:
         logger.debug("native retry skipped: %s", exc)
 
-    # Agent Brain structured fallback (coding/agent/knowledge) before empty hint.
+    # Strict native-model mode must never convert failed generation into a
+    # prebuilt brain/verifier answer or a canned greeting. An explicit failure
+    # is safer than claiming the model answered when it did not.
+    if _env_on("OM_NATIVE_MODEL_FIRST", "1"):
+        logger.warning(
+            "OM native generation failed quality checks; withholding fallback answer"
+        )
+        return _out(
+            "OM's native model could not produce a reliable answer for this turn. "
+            "The response was withheld rather than replaced with a canned template."
+        )
+
+    # Legacy compatibility only when strict native-model-first mode is disabled.
     rescued = brain_decision.after_model(None)
     if not rescued and brain_decision.structured_fallback:
         rescued = brain_decision.structured_fallback
     if rescued:
         return _out(rescued)
 
-    # Last resort — never return blank / "(empty reply)"
     try:
         from om_ai.agent.verifier import compose_fallback
 
@@ -1097,7 +1329,7 @@ def _om_native_chat_reply_body(
             return _out(fb)
     except Exception:
         pass
-    return _out("Hello — I’m OM. How can I help you?")
+    return _out("OM native generation failed; no answer is available.");
 
 def chat_reply(
     messages: list[dict],
@@ -1146,9 +1378,31 @@ def chat_reply(
         cleaned_messages.append({"role": role, "content": content})
     messages = cleaned_messages
 
+    # One context-preparation layer before the production generation cascade.
+    # This is context management only; it never generates or fabricates an answer.
+    if _env("OM_CONVERSATION_CONTEXT", "1").lower() not in {"0", "false", "no", "off"}:
+        try:
+            from om_ai.core.conversation import ConversationEngine
+
+            messages, conversation_state = ConversationEngine().prepare(messages)
+            logger.debug(
+                "Conversation context prepared: relation=%s, history=%d, reference=%s",
+                conversation_state.relation.value,
+                len(conversation_state.relevant_history),
+                bool(conversation_state.references),
+            )
+        except Exception as exc:
+            # Preserve chat availability, but do not substitute a canned answer.
+            logger.warning("Conversation context preparation skipped: %s", exc)
+
     profile = level_runtime_profile(model)
     evo_text, evo_model, evo_level = maybe_evolution_reply(messages, model=model)
-    if evo_text is not None:
+    native_model_first = _env("OM_NATIVE_MODEL_FIRST", "1").strip().lower() not in {
+        "0", "false", "no", "off"
+    }
+    # Evolution presets may tune the native model, but must not short-circuit
+    # generation with a prebuilt response when native-model-first is enabled.
+    if evo_text is not None and not native_model_first:
         info = ChatBackendInfo(
             backend="om_evolution",
             model=evo_model,
@@ -1273,6 +1527,44 @@ def chat_reply(
             return text, _brand(info)
         finally:
             os.environ.pop("_OM_IN_CHAT_REPLY", None)
+
+    if info.backend == "vllm":
+        from datetime import date
+
+        messages = _normalize_messages(messages)
+        if not any(m["role"] == "system" and "Today's date is " in m["content"] for m in messages):
+            messages.insert(0, {
+                "role": "system",
+                "content": f"Today's date is {date.today().isoformat()}. Do not claim a model identity unless it is known.",
+            })
+        text = chat_via_vllm(
+            messages,
+            model=info.model if info.model != "unset" else None,
+            max_new_tokens=int(kwargs["max_new_tokens"]),
+            temperature=float(kwargs["temperature"]),
+            top_p=float(kwargs["top_p"]),
+        )
+        return text, _brand(info)
+
+    if info.backend == "transformers":
+        from datetime import date
+
+        messages = _normalize_messages(messages)
+        if not any(m["role"] == "system" and "Today's date is " in m["content"] for m in messages):
+            messages.insert(0, {
+                "role": "system",
+                "content": f"Today's date is {date.today().isoformat()}. Do not claim a model identity unless it is known.",
+            })
+        text = chat_via_transformers(
+            messages,
+            model=info.model if info.model != "unset" else None,
+            max_new_tokens=int(kwargs["max_new_tokens"]),
+            temperature=float(kwargs["temperature"]),
+            top_p=float(kwargs["top_p"]),
+            top_k=int(kwargs["top_k"]),
+            repetition_penalty=float(kwargs["repetition_penalty"]),
+        )
+        return text, _brand(info)
 
     messages = with_runtime_date_context(messages)
     if info.backend == "openai":

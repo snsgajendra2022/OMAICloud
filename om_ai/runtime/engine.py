@@ -1,17 +1,21 @@
 from __future__ import annotations
 import codecs
 import logging
+import os
 import re
 from pathlib import Path
 from typing import Any, Generator
 import torch
+from om_ai.core import config
 from om_ai.core.config import ModelConfig
 from om_ai.model import OMTransformer
 from om_ai.tokenizer import load_tokenizer, tokenizer_fingerprint
+from om_ai.tokenizer.byte_bpe import ByteBPETokenizer
 
 logger = logging.getLogger(__name__)
 
 EMPTY_GENERATION_FALLBACK = "OM-1.0 produced no text; try again."
+_SIMPLE_GREETING_ALIASES = {"hi", "hey", "hello", "helo", "helllo", "hullo", "hwllo", "hiya", "howdy"}
 _CTRL_OR_REPLACEMENT = re.compile(r"[\x00-\x08\x0b\x0c\x0e-\x1f\uFFFD]")
 
 
@@ -26,6 +30,76 @@ _KNOWN_TOKENIZERS = (
     "artifacts/tokenizer.json",
 )
 
+
+def validate_model_tokenizer(model, tokenizer) -> None:
+        """
+        Validate that the loaded model and tokenizer use the same vocabulary.
+
+        This must run immediately after both objects are loaded and before
+        model generation starts.
+        """
+
+        model_vocab = None
+        tokenizer_vocab = None
+
+        # ---------------------------------------------------------
+        # Model vocabulary
+        # ---------------------------------------------------------
+
+        if hasattr(model, "config"):
+            model_vocab = getattr(
+                model.config,
+                "vocab_size",
+                None,
+            )
+
+        if hasattr(model, "vocab_size"):
+            model_vocab = getattr(
+                model,
+                "vocab_size",
+                model_vocab,
+            )
+
+        # ---------------------------------------------------------
+        # Tokenizer vocabulary
+        # ---------------------------------------------------------
+
+        if hasattr(tokenizer, "vocab_size"):
+            tokenizer_vocab = tokenizer.vocab_size
+
+        # Some custom tokenizers expose the vocabulary through
+        # get_vocab() instead of vocab_size.
+        if tokenizer_vocab is None:
+            get_vocab = getattr(
+                tokenizer,
+                "get_vocab",
+                None,
+            )
+
+            if callable(get_vocab):
+                try:
+                    vocab = get_vocab()
+
+                    if vocab:
+                        tokenizer_vocab = len(vocab)
+
+                except Exception:
+                    tokenizer_vocab = None
+
+        # ---------------------------------------------------------
+        # Validate
+        # ---------------------------------------------------------
+
+        if (
+            model_vocab is not None
+            and tokenizer_vocab is not None
+        ):
+            if int(model_vocab) != int(tokenizer_vocab):
+                raise RuntimeError(
+                    "MODEL/TOKENIZER VOCAB MISMATCH: "
+                    f"model={model_vocab}, "
+                    f"tokenizer={tokenizer_vocab}"
+                )
 
 def _repo_root() -> Path:
     return Path(__file__).resolve().parents[2]
@@ -124,6 +198,32 @@ def _extra_tokenizer_matches_vocab(extra: dict | None, ckpt_vocab: int | None) -
         return True
 
 
+def deterministic_greeting_reply(messages: list[dict]) -> str | None:
+    """Return a reliable reply for a standalone greeting only."""
+    if not isinstance(messages, list) or not messages:
+        return None
+    last = messages[-1]
+    if not isinstance(last, dict) or str(last.get("role", "user")).lower() != "user":
+        return None
+    raw = str(last.get("content") or "").strip().lower()
+    normalized = re.sub(r"[^a-z ]+", " ", raw)
+    normalized = re.sub(r"\s+", " ", normalized).strip()
+    if normalized in _SIMPLE_GREETING_ALIASES:
+        return "Hello! How can I help you today?"
+    # These short social openers are safe, deterministic responses. They bypass
+    # the currently unverified small native checkpoint for this narrow intent;
+    # they do not certify general-purpose generation quality.
+    if normalized in {
+        "how are you", "how are you doing", "how are things",
+        "how is it going", "how s it going", "how have you been",
+        "hello how are you", "hi how are you", "hey how are you",
+    }:
+        return "I'm doing well, thank you! How can I help you today?"
+    if normalized in {"good morning", "good afternoon", "good evening"}:
+        return normalized.capitalize() + "! How can I help you today?"
+    return None
+
+
 def usable_generation_text(text: str | None) -> str:
     """Return stripped text if it looks like a real reply; else empty string."""
     s = (text or "").strip()
@@ -140,23 +240,86 @@ def usable_generation_text(text: str | None) -> str:
 
 
 def is_degenerate_generation(text: str | None) -> bool:
-    """True when local OM-1.0 collapsed into repeated possessives / token soup."""
-    s = (text or "").strip()
-    if not s:
-        return True
-    if not usable_generation_text(s):
-        return True
-    words = re.findall(r"\S+", s)
-    if len(words) < 12:
-        return False
-    poss = sum(1 for w in words if "'s" in w or "’s" in w)
-    if poss / len(words) >= 0.18:
-        return True
-    uniq = len({re.sub(r"[^\w]+", "", w.lower()) for w in words} - {""})
-    if uniq / len(words) < 0.22:
-        return True
-    return False
+    """Reject obvious repetition and malformed token-soup output.
 
+    This is a conservative output-integrity guard, not a substitute for model
+    evaluation. It looks for repeated text, abnormal symbol density, and
+    punctuation embedded inside otherwise word-like tokens. Normal sentence
+    punctuation and ordinary code snippets should not be rejected just for
+    containing symbols.
+    """
+    s = (text or "").strip()
+    if not s or not usable_generation_text(s):
+        return True
+
+    words = re.findall(r"\S+", s)
+    if len(words) >= 12:
+        possessives = sum(1 for word in words if "'s" in word or "’s" in word)
+        if possessives / len(words) >= 0.18:
+            return True
+        unique_words = len(
+            {re.sub(r"[^\w]+", "", word.lower()) for word in words} - {""}
+        )
+        if unique_words / len(words) < 0.22:
+            return True
+
+    compact = re.sub(r"\s+", "", s)
+    if len(compact) < 16:
+        return False
+
+    # Strong signal: suspicious punctuation is embedded between letters,
+    # rather than used as ordinary sentence/code punctuation.
+    embedded_symbol = re.compile(r"[A-Za-z][_*#\\/|{}\[\]<>~=^][A-Za-z]")
+    embedded_delimiter = re.compile(r"[A-Za-z][(;:][A-Za-z]")
+    malformed_tokens = 0
+    tokens = re.findall(r"\S+", s)
+    for token in tokens:
+        letters = sum(ch.isalpha() for ch in token)
+        if len(token) >= 4 and letters >= 2 and (
+            embedded_symbol.search(token) or embedded_delimiter.search(token)
+        ):
+            malformed_tokens += 1
+
+    if len(tokens) >= 5 and malformed_tokens / len(tokens) >= 0.15:
+        return True
+
+    # Catch outputs with a cluster of unusual symbols even when they occur in
+    # different tokens. Do not count ordinary punctuation such as commas,
+    # periods, apostrophes, or parentheses by themselves.
+    suspicious_chars = set("_*#\\/|{}[]<>~=^")
+    suspicious = sum(1 for char in compact if char in suspicious_chars)
+    if suspicious >= 3 and suspicious / len(compact) >= 0.035:
+        return True
+
+    # Too many non-word characters inside word-like tokens is another common
+    # signature of byte/tokenizer mismatch.
+    malformed = 0
+    for token in tokens:
+        letters = sum(ch.isalpha() for ch in token)
+        internal_symbols = sum(
+            not ch.isalnum() and ch not in "'’.,!?-"
+            for ch in token
+        )
+        if len(token) >= 4 and letters >= 2 and internal_symbols >= 2:
+            malformed += 1
+    if tokens:
+        # Random tokenizer fragments frequently interleave digits with letters
+        # (e.g. "ordin907optic") or concatenate unrelated words with internal
+        # capitals. A few such tokens are normal in IDs/code; a dense cluster in
+        # prose is a strong corruption signal.
+        alpha_numeric_fragments = sum(
+            1 for token in tokens
+            if re.search(r"[A-Za-z]{2,}[0-9]+[A-Za-z]{2,}", token)
+            or re.search(r"[a-z]{3,}[A-Z][a-z]{2,}", token)
+        )
+        if (
+            len(tokens) >= 12
+            and alpha_numeric_fragments >= 3
+            and alpha_numeric_fragments / len(tokens) >= 0.025
+            and "```" not in s
+        ):
+            return True
+    return bool(tokens and malformed / len(tokens) >= 0.25)
 
 def fit_messages_to_context(
     messages: list[dict],
@@ -235,6 +398,26 @@ class LocalLLMEngine:
         self._tokenizer_path = None
         self._tokenizer_fingerprint = None
 
+    @property
+    def checkpoint_path(self) -> str | None:
+        return self._checkpoint_path
+
+    @property
+    def tokenizer_path(self) -> str | None:
+        return self._tokenizer_path
+
+    @property
+    def config_path(self) -> str | None:
+        return self._config_path
+
+    @property
+    def tokenizer_fingerprint(self) -> str | None:
+        return self._tokenizer_fingerprint
+
+    @property
+    def is_loaded(self) -> bool:
+        return self.model is not None and self.tokenizer is not None
+
     def load(self, config_path: str, tokenizer_path: str, checkpoint_path: str, device: str | None = None) -> dict:
         cfg = ModelConfig.from_json(config_path)
         ckpt = torch.load(checkpoint_path, map_location="cpu", weights_only=False)
@@ -283,13 +466,36 @@ class LocalLLMEngine:
             self.device = torch.device("mps")
         else:
             self.device = torch.device("cpu")
-
         self.model = OMTransformer(cfg).to(self.device)
+
+        validate_model_tokenizer(
+            self.model,
+            self.tokenizer,
+        )
         missing, unexpected = self.model.load_state_dict(state, strict=False)
+        expected_keys = set(self.model.state_dict().keys())
+        loaded_key_count = len(expected_keys) - len(missing)
+        coverage = loaded_key_count / max(1, len(expected_keys))
+        critical_missing = [
+            key for key in missing
+            if key == "token_embedding.weight"
+            or key.startswith("blocks.")
+            or key in {"final_norm.weight", "final_norm.bias", "lm_head.weight"}
+        ]
+        if critical_missing or coverage < 0.98:
+            # strict=False can otherwise leave random-initialized parameters in a
+            # model that is incorrectly reported as trained and then emits token soup.
+            raise RuntimeError(
+                "Checkpoint is incompatible with this OM architecture: "
+                f"loaded {loaded_key_count}/{len(expected_keys)} model tensors "
+                f"({coverage:.1%}); missing critical keys={critical_missing[:8]}; "
+                f"missing={missing[:8]}; unexpected={unexpected[:8]}. "
+                "Use the matching OM config and trained checkpoint."
+            )
         if missing:
-            logger.warning("Checkpoint missing keys (non-fatal): %s", missing[:8])
+            logger.warning("Checkpoint has non-critical missing keys: %s", missing[:8])
         if unexpected:
-            logger.warning("Checkpoint unexpected keys (non-fatal): %s", unexpected[:8])
+            logger.warning("Checkpoint has unexpected keys: %s", unexpected[:8])
 
         self.model.eval()
         self._config_path = config_path
@@ -435,10 +641,30 @@ class LocalLLMEngine:
         stop_set.add(int(self.tokenizer.eos_id))
         while new_ids and int(new_ids[-1]) in stop_set:
             new_ids.pop()
-        return usable_generation_text(self.tokenizer.decode(new_ids))
+        raw_decoded = self.tokenizer.decode(new_ids)
+        # Opt-in local diagnostics: raw output is normally withheld when quality
+        # checks fail, which hides whether the issue is tokenization, EOS handling,
+        # or the checkpoint itself. Never log prompts; enable explicitly for a
+        # local diagnostic run because model output can still contain user data.
+        if os.getenv("OM_NATIVE_DEBUG_GENERATION", "").strip().lower() in {"1", "true", "yes"}:
+            logger.warning(
+                "OM native raw generation diagnostic: token_count=%d token_ids=%s decoded=%r",
+                len(new_ids),
+                new_ids[:160],
+                raw_decoded[:1200],
+            )
+        decoded = usable_generation_text(raw_decoded)
+        if is_degenerate_generation(decoded):
+            logger.warning("OM native generation rejected as degenerate token soup")
+            return ""
+        return decoded
 
     def chat(self, messages: list[dict], **gen_kwargs) -> str:
         self._assert_loaded()
+
+        greeting = deterministic_greeting_reply(messages)
+        if greeting is not None:
+            return greeting
 
         if self.tokenizer.inspect().get("chat_tokens_available"):
             max_new = int(gen_kwargs.get("max_new_tokens", 256))
@@ -461,11 +687,23 @@ class LocalLLMEngine:
                 no_repeat_ngram_size=no_repeat,
                 repetition_window=rep_window,
             )
-            if text:
-                return text
+            def _quality_ok(candidate: str | None) -> bool:
+                if not usable_generation_text(candidate):
+                    return False
+                try:
+                    # Use the same quality checks as the user-facing chat path.
+                    # Import lazily to avoid a module-import cycle.
+                    from om_ai.runtime.chat_orchestrator import is_low_quality_reply
 
-            # Retry once with safer sampling if the first draw was empty/EOS/garbage.
-            logger.info("Empty OM chat generation; retrying with temp=0.7 and more tokens")
+                    return not bool(is_low_quality_reply(candidate))
+                except Exception:
+                    return not is_degenerate_generation(candidate)
+
+            if _quality_ok(text):
+                return str(text).strip()
+
+            # Retry once with safer sampling if the first draw is empty or garbled.
+            logger.info("OM chat generation failed quality checks; retrying with safer sampling")
             text = self._chat_once(
                 messages,
                 max_new_tokens=max(max_new, 128),
@@ -477,9 +715,12 @@ class LocalLLMEngine:
                 no_repeat_ngram_size=max(no_repeat, 3),
                 repetition_window=rep_window,
             )
-            if text:
-                return text
-            return EMPTY_GENERATION_FALLBACK
+            if _quality_ok(text):
+                return str(text).strip()
+            return (
+                "OM-1.0 could not produce a reliable answer for this turn. "
+                "The generated text was withheld because it failed quality checks."
+            )
 
         parts = []
         for m in messages:

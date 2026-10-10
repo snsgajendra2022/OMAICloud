@@ -16,5 +16,23 @@
       "Validate migrations",
       "Retry execution"
     ]
+  },
+  {
+    "failure": {
+      "task": "Create database migration",
+      "error": "SQL connection timeout",
+      "agent": "database"
+    },
+    "analysis": {
+      "category": "database",
+      "severity": "medium",
+      "needs_retry": true
+    },
+    "root_cause": "Database configuration or migration issue",
+    "recovery_plan": [
+      "Check database configuration",
+      "Validate migrations",
+      "Retry execution"
+    ]
   }
 ]

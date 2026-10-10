@@ -1,15 +1,15 @@
 {
   "status": "improved",
   "evaluation": {
-    "question": "Help with the user's request.",
+    "question": "good moring how are you",
     "scores": {
       "structure": 40.0,
       "clarity": 25.0,
       "security": 80.0,
-      "task_fit": 90.0,
+      "task_fit": 30.0,
       "code_quality": 70.0
     },
-    "overall": 61.0,
+    "overall": 49.0,
     "ok": false
   },
   "weaknesses": [
@@ -26,8 +26,14 @@
       "hint": "Write shorter clear sentences; avoid garbled fragments"
     },
     {
+      "area": "task_fit",
+      "score": 30.0,
+      "threshold": 65.0,
+      "hint": "Address every part of the user ask explicitly"
+    },
+    {
       "area": "overall",
-      "score": 61.0,
+      "score": 49.0,
       "threshold": 70.0,
       "hint": "Improve completeness and directness of the answer"
     }
@@ -36,18 +42,19 @@
     "created": true,
     "sft_path": "data/om_training/improvements/sft_improvements.jsonl",
     "preference_path": "data/om_training/improvements/preference_improvements.jsonl",
-    "preferred_preview": "Question: Help with the user's request.\n\n## Understanding\nAddress the user ask directly: Help with the user's request.\n\n## Requirements from evaluator\n- Use clear sections: Understanding, Plan, Implementation, Validation\n- Write shorter clear sentences; avoid garbled fragments\n- Improve completeness and directness of the answer\n\n## Solution\nProvide a structured, correct, secure answer with validat",
+    "preferred_preview": "Question: good moring how are you\n\n## Understanding\nAddress the user ask directly: good moring how are you\n\n## Requirements from evaluator\n- Use clear sections: Understanding, Plan, Implementation, Validation\n- Write shorter clear sentences; avoid garbled fragments\n- Address every part of the user ask explicitly\n- Improve completeness and directness of the answer\n\n## Solution\nProvide a structured,",
     "weak_areas": [
       "structure",
       "clarity",
+      "task_fit",
       "overall"
     ]
   },
   "trainer_job": {
-    "id": "8b2d0571-5ae7-442e-97e0-2563d3689cec",
-    "ts": 1790250713.140079,
+    "id": "4f198764-88e4-4f05-8c66-58065e6391ed",
+    "ts": 1791559693.312618,
     "status": "queued",
-    "reason": "structure,clarity,overall",
+    "reason": "structure,clarity,task_fit,overall",
     "sft_path": "data/om_training/improvements/sft_improvements.jsonl",
     "preference_path": "data/om_training/improvements/preference_improvements.jsonl",
     "commands": {
@@ -58,262 +65,9 @@
   },
   "version": {
     "om_version": "1.0",
-    "improve_cycle": 229,
-    "label": "OM-1.0-improve-229",
+    "improve_cycle": 248,
+    "label": "OM-1.0-improve-248",
     "history": [
-      {
-        "ts": 1788428826.790689,
-        "cycle": 180,
-        "note": "improve from: not my name is rohit",
-        "metrics": {
-          "overall": 66.2,
-          "weak": [
-            "structure",
-            "clarity",
-            "overall"
-          ]
-        }
-      },
-      {
-        "ts": 1788428857.4433742,
-        "cycle": 181,
-        "note": "improve from: Ok please enabled  settings (for ok please enabled  settings)",
-        "metrics": {
-          "overall": 63.8,
-          "weak": [
-            "structure",
-            "clarity",
-            "overall"
-          ]
-        }
-      },
-      {
-        "ts": 1788428857.781539,
-        "cycle": 182,
-        "note": "improve from: ok please enabled  settings",
-        "metrics": {
-          "overall": 63.8,
-          "weak": [
-            "structure",
-            "clarity",
-            "overall"
-          ]
-        }
-      },
-      {
-        "ts": 1788429659.0097249,
-        "cycle": 183,
-        "note": "improve from: You can create any  programing laguage (for you can create any  programing lagua",
-        "metrics": {
-          "overall": 81.0,
-          "weak": [
-            "clarity"
-          ]
-        }
-      },
-      {
-        "ts": 1788430264.819346,
-        "cycle": 184,
-        "note": "improve from: Create larvel html code for you can create any  programing laguage",
-        "metrics": {
-          "overall": 68.6,
-          "weak": [
-            "clarity",
-            "security",
-            "code_quality",
-            "overall"
-          ]
-        }
-      },
-      {
-        "ts": 1788430265.088222,
-        "cycle": 185,
-        "note": "improve from: create larvel html code",
-        "metrics": {
-          "overall": 64.2,
-          "weak": [
-            "clarity",
-            "security",
-            "code_quality",
-            "overall"
-          ]
-        }
-      },
-      {
-        "ts": 1788430273.380515,
-        "cycle": 186,
-        "note": "improve from: Tml code (for you can create any  programing laguage)",
-        "metrics": {
-          "overall": 68.5,
-          "weak": [
-            "clarity",
-            "security",
-            "code_quality",
-            "overall"
-          ]
-        }
-      },
-      {
-        "ts": 1788430273.579308,
-        "cycle": 187,
-        "note": "improve from: tml code",
-        "metrics": {
-          "overall": 59.3,
-          "weak": [
-            "clarity",
-            "security",
-            "task_fit",
-            "code_quality",
-            "overall"
-          ]
-        }
-      },
-      {
-        "ts": 1788430281.803926,
-        "cycle": 188,
-        "note": "improve from: youc an make coding ??",
-        "metrics": {
-          "overall": 76.6,
-          "weak": [
-            "clarity"
-          ]
-        }
-      },
-      {
-        "ts": 1788430346.464051,
-        "cycle": 189,
-        "note": "improve from: hii",
-        "metrics": {
-          "overall": 54.5,
-          "weak": [
-            "structure",
-            "clarity",
-            "task_fit",
-            "overall"
-          ]
-        }
-      },
-      {
-        "ts": 1788430348.482423,
-        "cycle": 190,
-        "note": "improve from: Create code for youc an make coding ??",
-        "metrics": {
-          "overall": 68.4,
-          "weak": [
-            "clarity",
-            "security",
-            "code_quality",
-            "overall"
-          ]
-        }
-      },
-      {
-        "ts": 1788430348.731603,
-        "cycle": 191,
-        "note": "improve from: create code",
-        "metrics": {
-          "overall": 59.2,
-          "weak": [
-            "clarity",
-            "security",
-            "task_fit",
-            "code_quality",
-            "overall"
-          ]
-        }
-      },
-      {
-        "ts": 1788430364.984865,
-        "cycle": 192,
-        "note": "improve from: Create React login/signup UI with validation and auth integration",
-        "metrics": {
-          "overall": 72.6,
-          "weak": [
-            "clarity",
-            "security",
-            "code_quality"
-          ]
-        }
-      },
-      {
-        "ts": 1788430365.411207,
-        "cycle": 193,
-        "note": "improve from: youc an what is this from __future__ import annotations\n\nimport argparse\nimport ",
-        "metrics": {
-          "overall": 72.6,
-          "weak": [
-            "clarity",
-            "security",
-            "code_quality"
-          ]
-        }
-      },
-      {
-        "ts": 1788430396.856203,
-        "cycle": 194,
-        "note": "improve from: What is th python (for what is th pyhton)",
-        "metrics": {
-          "overall": 66.2,
-          "weak": [
-            "structure",
-            "clarity",
-            "overall"
-          ]
-        }
-      },
-      {
-        "ts": 1788430397.073071,
-        "cycle": 195,
-        "note": "improve from: what is th pyhton",
-        "metrics": {
-          "overall": 63.8,
-          "weak": [
-            "structure",
-            "clarity",
-            "overall"
-          ]
-        }
-      },
-      {
-        "ts": 1788430402.5020108,
-        "cycle": 196,
-        "note": "improve from: Help with the user's request.",
-        "metrics": {
-          "overall": 61.0,
-          "weak": [
-            "structure",
-            "clarity",
-            "overall"
-          ]
-        }
-      },
-      {
-        "ts": 1788430403.79759,
-        "cycle": 197,
-        "note": "improve from: what is th pyhton ?",
-        "metrics": {
-          "overall": 51.4,
-          "weak": [
-            "structure",
-            "clarity",
-            "task_fit",
-            "overall"
-          ]
-        }
-      },
-      {
-        "ts": 1788430413.19634,
-        "cycle": 198,
-        "note": "improve from: What is th python (for what is th pyhton)",
-        "metrics": {
-          "overall": 66.2,
-          "weak": [
-            "structure",
-            "clarity",
-            "overall"
-          ]
-        }
-      },
       {
         "ts": 1788430413.3506649,
         "cycle": 199,
@@ -728,9 +482,271 @@
             "overall"
           ]
         }
+      },
+      {
+        "ts": 1791360696.2784488,
+        "cycle": 230,
+        "note": "improve from: Who won the Cubs championship?",
+        "metrics": {
+          "overall": 58.6,
+          "weak": [
+            "structure",
+            "clarity",
+            "overall"
+          ]
+        }
+      },
+      {
+        "ts": 1791363719.66853,
+        "cycle": 231,
+        "note": "improve from: Who won the Cubs championship?",
+        "metrics": {
+          "overall": 58.6,
+          "weak": [
+            "structure",
+            "clarity",
+            "overall"
+          ]
+        }
+      },
+      {
+        "ts": 1791363719.979475,
+        "cycle": 232,
+        "note": "improve from: Who won the Cubs championship?",
+        "metrics": {
+          "overall": 58.6,
+          "weak": [
+            "structure",
+            "clarity",
+            "overall"
+          ]
+        }
+      },
+      {
+        "ts": 1791365352.285803,
+        "cycle": 233,
+        "note": "improve from: Who won the Cubs championship?",
+        "metrics": {
+          "overall": 51.4,
+          "weak": [
+            "structure",
+            "clarity",
+            "task_fit",
+            "overall"
+          ]
+        }
+      },
+      {
+        "ts": 1791365379.348396,
+        "cycle": 234,
+        "note": "improve from: Who won the Cubs championship?",
+        "metrics": {
+          "overall": 51.4,
+          "weak": [
+            "structure",
+            "clarity",
+            "task_fit",
+            "overall"
+          ]
+        }
+      },
+      {
+        "ts": 1791367222.78027,
+        "cycle": 235,
+        "note": "improve from: Who won the Cubs championship?",
+        "metrics": {
+          "overall": 51.4,
+          "weak": [
+            "structure",
+            "clarity",
+            "task_fit",
+            "overall"
+          ]
+        }
+      },
+      {
+        "ts": 1791368009.328209,
+        "cycle": 236,
+        "note": "improve from: Who won the Cubs championship?",
+        "metrics": {
+          "overall": 51.4,
+          "weak": [
+            "structure",
+            "clarity",
+            "task_fit",
+            "overall"
+          ]
+        }
+      },
+      {
+        "ts": 1791368279.329997,
+        "cycle": 237,
+        "note": "improve from: Who won the Cubs championship?",
+        "metrics": {
+          "overall": 51.4,
+          "weak": [
+            "structure",
+            "clarity",
+            "task_fit",
+            "overall"
+          ]
+        }
+      },
+      {
+        "ts": 1791368921.668391,
+        "cycle": 238,
+        "note": "improve from: Who won the Cubs championship?",
+        "metrics": {
+          "overall": 51.4,
+          "weak": [
+            "structure",
+            "clarity",
+            "task_fit",
+            "overall"
+          ]
+        }
+      },
+      {
+        "ts": 1791369201.574502,
+        "cycle": 239,
+        "note": "improve from: Create React Dashboard",
+        "metrics": {
+          "overall": 66.0,
+          "weak": [
+            "clarity",
+            "task_fit",
+            "code_quality",
+            "overall"
+          ]
+        }
+      },
+      {
+        "ts": 1791369202.9687302,
+        "cycle": 240,
+        "note": "improve from: Explain that PM in India means Prime Minister (head of government).",
+        "metrics": {
+          "overall": 68.8,
+          "weak": [
+            "structure",
+            "clarity",
+            "overall"
+          ]
+        }
+      },
+      {
+        "ts": 1791369260.4838789,
+        "cycle": 241,
+        "note": "improve from: Create React Dashboard",
+        "metrics": {
+          "overall": 66.0,
+          "weak": [
+            "clarity",
+            "task_fit",
+            "code_quality",
+            "overall"
+          ]
+        }
+      },
+      {
+        "ts": 1791369473.053739,
+        "cycle": 242,
+        "note": "improve from: Create React Dashboard",
+        "metrics": {
+          "overall": 66.0,
+          "weak": [
+            "clarity",
+            "task_fit",
+            "code_quality",
+            "overall"
+          ]
+        }
+      },
+      {
+        "ts": 1791559404.4013782,
+        "cycle": 243,
+        "note": "improve from: good moring how are you",
+        "metrics": {
+          "overall": 49.0,
+          "weak": [
+            "structure",
+            "clarity",
+            "task_fit",
+            "overall"
+          ]
+        }
+      },
+      {
+        "ts": 1791559471.340139,
+        "cycle": 244,
+        "note": "improve from: good moring how are you",
+        "metrics": {
+          "overall": 49.0,
+          "weak": [
+            "structure",
+            "clarity",
+            "task_fit",
+            "overall"
+          ]
+        }
+      },
+      {
+        "ts": 1791559502.9504051,
+        "cycle": 245,
+        "note": "improve from: good moring how are you",
+        "metrics": {
+          "overall": 49.0,
+          "weak": [
+            "structure",
+            "clarity",
+            "task_fit",
+            "overall"
+          ]
+        }
+      },
+      {
+        "ts": 1791559531.2506099,
+        "cycle": 246,
+        "note": "improve from: good moring how are you",
+        "metrics": {
+          "overall": 49.0,
+          "weak": [
+            "structure",
+            "clarity",
+            "task_fit",
+            "overall"
+          ]
+        }
+      },
+      {
+        "ts": 1791559671.226121,
+        "cycle": 247,
+        "note": "improve from: good moring how are you",
+        "metrics": {
+          "overall": 49.0,
+          "weak": [
+            "structure",
+            "clarity",
+            "task_fit",
+            "overall"
+          ]
+        }
+      },
+      {
+        "ts": 1791559693.313139,
+        "cycle": 248,
+        "note": "improve from: good moring how are you",
+        "metrics": {
+          "overall": 49.0,
+          "weak": [
+            "structure",
+            "clarity",
+            "task_fit",
+            "overall"
+          ]
+        }
       }
     ],
-    "updated_at": 1790250713.140666
+    "updated_at": 1791559693.313141
   },
-  "ts": 1790250713.141065
+  "ts": 1791559693.313319
 }

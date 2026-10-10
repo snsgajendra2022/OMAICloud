@@ -19,6 +19,7 @@ from .response_optimizer import ResponseOptimizer
 from .safety_filter import SafetyFilter
 from .solution_engine import SolutionEngine
 from .user_preference import UserPreference
+from .verification_engine import VerificationEngine
 
 logger = logging.getLogger(__name__)
 
@@ -74,6 +75,7 @@ class ChatOrchestrator:
         self.correction = CorrectionEngine()
         self.confidence = ConfidenceEngine()
         self.quality = ChatQualityEngine()
+        self.verification = VerificationEngine()
         self.safety = SafetyFilter()
 
     def status(self) -> dict[str, Any]:
@@ -392,6 +394,57 @@ class ChatOrchestrator:
             return t
 
         draft = _usable(model_answer)
+        # One bounded repair attempt for empty or obviously degenerate native output.
+        # This does not prove factual correctness; it only retries a failed draft.
+        retry_attempted = False
+        if model_generate is not None and want_model and not voice_mode:
+            needs_retry = not draft
+            if draft:
+                try:
+                    from om_ai.runtime.engine import is_degenerate_generation
+                    needs_retry = bool(is_degenerate_generation(draft))
+                except Exception:
+                    needs_retry = False
+            if needs_retry:
+                retry_attempted = True
+                repair_context = "\n".join(
+                    part for part in (
+                        "Your previous draft was unusable. Answer the user's request directly.",
+                        "Use clear, complete sentences. Do not repeat the prompt.",
+                        "If essential information is missing, ask one concise question.",
+                        "Do not invent tool results, sources, tests, or facts.",
+                        str(ctx.get("context_blob") or "")[:1200],
+                        (model_context or "")[:1200],
+                    ) if part
+                )
+                try:
+                    if _supports_kw(model_generate, "context"):
+                        retry_answer = str(model_generate(q, context=repair_context) or "").strip()
+                    else:
+                        retry_answer = str(model_generate(q) or "").strip()
+                    retry_draft = _usable(retry_answer)
+                    if retry_draft:
+                        try:
+                            from om_ai.runtime.engine import is_degenerate_generation
+                            if is_degenerate_generation(retry_draft):
+                                retry_draft = ""
+                        except Exception:
+                            pass
+                    if retry_draft:
+                        model_answer = retry_answer
+                        draft = retry_draft
+                        used_model = True
+                        meta["generation_retry"] = {"attempted": True, "recovered": True}
+                    else:
+                        meta["generation_retry"] = {"attempted": True, "recovered": False}
+                except Exception as exc:
+                    meta["generation_retry"] = {
+                        "attempted": True,
+                        "recovered": False,
+                        "error": type(exc).__name__,
+                    }
+            else:
+                meta["generation_retry"] = {"attempted": False, "recovered": False}
         sol_ans = _usable(str(solution.get("answer") or "")) if solution.get("solved") else ""
         # Prefer model. Only use solution when it is a real non-stub answer.
         if not draft and sol_ans and not voice_mode:
@@ -473,11 +526,19 @@ class ChatOrchestrator:
             used_model=used_model,
             corrected=bool(corrected.get("corrected")),
         )
+        verification = self.verification.verify(
+            draft,
+            message=q,
+            analysis={"problem_type": "debugging"} if intent.intent == "debugging" else {},
+            reasoning=solution if isinstance(solution, dict) else {},
+        )
+        meta["verification"] = verification
         qual = self.quality.evaluate(
             draft,
             optimizer_report=optimized.get("report"),
             confidence=conf,
             intent=intent.intent,
+            verification=verification,
         )
         meta["confidence"] = conf
         meta["quality"] = qual

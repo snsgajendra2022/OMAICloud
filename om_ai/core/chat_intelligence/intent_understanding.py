@@ -70,7 +70,17 @@ class IntentUnderstanding:
     EXPLAIN = re.compile(r"\b(what\s+is|explain|define|meaning|why)\b", re.I)
     FOLLOWUP = re.compile(
         r"^\s*(and|also|then|what\s+about|how\s+about|continue|more|"
-        r"yes|no|ok|okay|that|this)\b",
+        r"yes|no|ok|okay|that|this|aur|phir|iske\s+baare\s+mein)\b",
+        re.I,
+    )
+    HINGLISH_HOWTO = re.compile(
+        r"\b(kaise|kis\s+tarah|bana(?:o|na|ye)|kar(?:o|na)|"
+        r"implement\s+kaise|setup\s+kaise|help\s+kar(?:o|na))\b",
+        re.I,
+    )
+    HINGLISH_EXPLAIN = re.compile(
+        r"\b(kya\s+(?:hota|hoti|hote)\s+hai|kya\s+hai|"
+        r"kyu(?:n)?|kyon|samjha(?:o|ye)|bata(?:o|iye)|matlab\s+kya)\b",
         re.I,
     )
 
@@ -156,7 +166,13 @@ class IntentUnderstanding:
                 domain=domain,
                 signals=signals,
             )
-        if self.CODE.search(text) and (self.HOWTO.search(text) or "build" in low or "create" in low):
+        if self.CODE.search(text) and (
+            self.HOWTO.search(text)
+            or self.HINGLISH_HOWTO.search(text)
+            or "build" in low
+            or "create" in low
+            or "banao" in low
+        ):
             return IntentResult(
                 intent="coding",
                 confidence=0.88,
@@ -173,7 +189,7 @@ class IntentUnderstanding:
                 needs_model=True,
                 signals=["compare"],
             )
-        if self.HOWTO.search(text):
+        if self.HOWTO.search(text) or self.HINGLISH_HOWTO.search(text):
             return IntentResult(
                 intent="howto",
                 confidence=0.85,
@@ -181,7 +197,7 @@ class IntentUnderstanding:
                 needs_model=True,
                 signals=["howto"],
             )
-        if self.EXPLAIN.search(text):
+        if self.EXPLAIN.search(text) or self.HINGLISH_EXPLAIN.search(text):
             # Never treat personal-name questions as concept explain
             if self.USER_NAME.search(text) or re.search(r"(?i)\bmy\s+name\b", text):
                 return IntentResult(

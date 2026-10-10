@@ -223,5 +223,280 @@
     "question": "I can open it. Permission required \u2014 proceed?",
     "summary": "{'plan': {'question': 'I can open it. Permission required \u2014 proceed?', 'steps': ['Understand research objective', 'Collect relevant information', 'Analyze collected data', 'Validate important facts', 'Generate research summary']}, 'analysis': {'key_points': [], 'source_count': 0}, 'validation': {'validated': True, 'confidence': 0.0, 'checked_items': 0}, 'result': {'summary': '', 'confidence': 0.0}}",
     "time": "2026-09-24T07:07:21.776450+00:00"
+  },
+  {
+    "question": "Who won the Cubs championship?",
+    "summary": "{'plan': {'question': 'Who won the Cubs championship?', 'steps': ['Understand research objective', 'Collect relevant information', 'Analyze collected data', 'Validate important facts', 'Generate research summary']}, 'analysis': {'key_points': [], 'source_count': 0}, 'validation': {'validated': True, 'confidence': 0.0, 'checked_items': 0}, 'result': {'summary': '', 'confidence': 0.0}}",
+    "time": "2026-10-07T08:52:39.795137+00:00"
+  },
+  {
+    "question": "Who won the Cubs championship?",
+    "summary": "{'plan': {'question': 'Who won the Cubs championship?', 'steps': ['Understand research objective', 'Collect relevant information', 'Analyze collected data', 'Validate important facts', 'Generate research summary']}, 'analysis': {'key_points': [], 'source_count': 0}, 'validation': {'validated': True, 'confidence': 0.0, 'checked_items': 0}, 'result': {'summary': '', 'confidence': 0.0}}",
+    "time": "2026-10-07T08:53:50.073528+00:00"
+  },
+  {
+    "question": "Who won the Cubs championship?",
+    "summary": "{'plan': {'question': 'Who won the Cubs championship?', 'steps': ['Understand research objective', 'Collect relevant information', 'Analyze collected data', 'Validate important facts', 'Generate research summary']}, 'analysis': {'key_points': [], 'source_count': 0}, 'validation': {'validated': True, 'confidence': 0.0, 'checked_items': 0}, 'result': {'summary': '', 'confidence': 0.0}}",
+    "time": "2026-10-07T08:54:20.303534+00:00"
+  },
+  {
+    "question": "Who won the Cubs championship?",
+    "summary": "{'plan': {'question': 'Who won the Cubs championship?', 'steps': ['Understand research objective', 'Collect relevant information', 'Analyze collected data', 'Validate important facts', 'Generate research summary']}, 'analysis': {'key_points': [], 'source_count': 0}, 'validation': {'validated': True, 'confidence': 0.0, 'checked_items': 0}, 'result': {'summary': '', 'confidence': 0.0}}",
+    "time": "2026-10-07T08:55:26.795190+00:00"
+  },
+  {
+    "question": "Who won the Cubs championship?",
+    "summary": "{'plan': {'question': 'Who won the Cubs championship?', 'steps': ['Understand research objective', 'Collect relevant information', 'Analyze collected data', 'Validate important facts', 'Generate research summary']}, 'analysis': {'key_points': [], 'source_count': 0}, 'validation': {'validated': True, 'confidence': 0.0, 'checked_items': 0}, 'result': {'summary': '', 'confidence': 0.0}}",
+    "time": "2026-10-07T09:01:03.796499+00:00"
+  },
+  {
+    "question": "Who won the Cubs championship?",
+    "summary": "{'plan': {'question': 'Who won the Cubs championship?', 'steps': ['Understand research objective', 'Collect relevant information', 'Analyze collected data', 'Validate important facts', 'Generate research summary']}, 'analysis': {'key_points': [], 'source_count': 0}, 'validation': {'validated': True, 'confidence': 0.0, 'checked_items': 0}, 'result': {'summary': '', 'confidence': 0.0}}",
+    "time": "2026-10-07T09:44:17.718171+00:00"
+  },
+  {
+    "question": "Why is the sky blue?",
+    "summary": "{'plan': {'question': 'Why is the sky blue?', 'steps': ['Understand research objective', 'Collect relevant information', 'Analyze collected data', 'Validate important facts', 'Generate research summary']}, 'analysis': {'key_points': [], 'source_count': 0}, 'validation': {'validated': True, 'confidence': 0.0, 'checked_items': 0}, 'result': {'summary': '', 'confidence': 0.0}}",
+    "time": "2026-10-07T09:48:09.602787+00:00"
+  },
+  {
+    "question": "What are you doing?",
+    "summary": "{'plan': {'question': 'What are you doing?', 'steps': ['Understand research objective', 'Collect relevant information', 'Analyze collected data', 'Validate important facts', 'Generate research summary']}, 'analysis': {'key_points': [], 'source_count': 0}, 'validation': {'validated': True, 'confidence': 0.0, 'checked_items': 0}, 'result': {'summary': '', 'confidence': 0.0}}",
+    "time": "2026-10-07T09:48:34.434240+00:00"
+  },
+  {
+    "question": "Can you check that thing we discussed yesterday?",
+    "summary": "{'plan': {'question': 'Can you check that thing we discussed yesterday?', 'steps': ['Understand research objective', 'Collect relevant information', 'Analyze collected data', 'Validate important facts', 'Generate research summary']}, 'analysis': {'key_points': [], 'source_count': 0}, 'validation': {'validated': True, 'confidence': 0.0, 'checked_items': 0}, 'result': {'summary': '', 'confidence': 0.0}}",
+    "time": "2026-10-07T09:48:35.291774+00:00"
+  },
+  {
+    "question": "What should I check first?",
+    "summary": "{'plan': {'question': 'What should I check first?', 'steps': ['Understand research objective', 'Collect relevant information', 'Analyze collected data', 'Validate important facts', 'Generate research summary']}, 'analysis': {'key_points': [], 'source_count': 0}, 'validation': {'validated': True, 'confidence': 0.0, 'checked_items': 0}, 'result': {'summary': '', 'confidence': 0.0}}",
+    "time": "2026-10-07T09:49:31.424244+00:00"
+  },
+  {
+    "question": "What should I change?",
+    "summary": "{'plan': {'question': 'What should I change?', 'steps': ['Understand research objective', 'Collect relevant information', 'Analyze collected data', 'Validate important facts', 'Generate research summary']}, 'analysis': {'key_points': [], 'source_count': 0}, 'validation': {'validated': True, 'confidence': 0.0, 'checked_items': 0}, 'result': {'summary': '', 'confidence': 0.0}}",
+    "time": "2026-10-07T09:49:37.748074+00:00"
+  },
+  {
+    "question": "Who won the Cubs championship?",
+    "summary": "{'plan': {'question': 'Who won the Cubs championship?', 'steps': ['Understand research objective', 'Collect relevant information', 'Analyze collected data', 'Validate important facts', 'Generate research summary']}, 'analysis': {'key_points': [], 'source_count': 0}, 'validation': {'validated': True, 'confidence': 0.0, 'checked_items': 0}, 'result': {'summary': '', 'confidence': 0.0}}",
+    "time": "2026-10-07T10:00:34.437328+00:00"
+  },
+  {
+    "question": "Who won the Cubs championship?",
+    "summary": "{'plan': {'question': 'Who won the Cubs championship?', 'steps': ['Understand research objective', 'Collect relevant information', 'Analyze collected data', 'Validate important facts', 'Generate research summary']}, 'analysis': {'key_points': [], 'source_count': 0}, 'validation': {'validated': True, 'confidence': 0.0, 'checked_items': 0}, 'result': {'summary': '', 'confidence': 0.0}}",
+    "time": "2026-10-07T10:02:17.093453+00:00"
+  },
+  {
+    "question": "Who won the Cubs championship?",
+    "summary": "{'plan': {'question': 'Who won the Cubs championship?', 'steps': ['Understand research objective', 'Collect relevant information', 'Analyze collected data', 'Validate important facts', 'Generate research summary']}, 'analysis': {'key_points': [], 'source_count': 0}, 'validation': {'validated': True, 'confidence': 0.0, 'checked_items': 0}, 'result': {'summary': '', 'confidence': 0.0}}",
+    "time": "2026-10-07T10:07:25.769515+00:00"
+  },
+  {
+    "question": "Who won the Cubs championship?",
+    "summary": "{'plan': {'question': 'Who won the Cubs championship?', 'steps': ['Understand research objective', 'Collect relevant information', 'Analyze collected data', 'Validate important facts', 'Generate research summary']}, 'analysis': {'key_points': [], 'source_count': 0}, 'validation': {'validated': True, 'confidence': 0.0, 'checked_items': 0}, 'result': {'summary': '', 'confidence': 0.0}}",
+    "time": "2026-10-07T10:09:10.728522+00:00"
+  },
+  {
+    "question": "what is this",
+    "summary": "{'plan': {'question': 'what is this', 'steps': ['Understand research objective', 'Collect relevant information', 'Analyze collected data', 'Validate important facts', 'Generate research summary']}, 'analysis': {'key_points': [], 'source_count': 0}, 'validation': {'validated': True, 'confidence': 0.0, 'checked_items': 0}, 'result': {'summary': '', 'confidence': 0.0}}",
+    "time": "2026-10-07T11:08:19.575544+00:00"
+  },
+  {
+    "question": "{\n  \"Name\": \"OM-1.0\",\n  \"Provider\": \"OM AI\",\n  \"Backend\": \"OM Native\",\n  \"Checkpoint\": \"verified\",\n  \"Tokenizer\": \"verified\",\n  \"Device\": \"MPS\",\n  \"checkpoint_path\": \"/Users/gajendrarawat/Downloads/om-ai-operating-brain 3/artifacts/checkpoints/om-1.0-long/latest.pt\",\n  \"tokenizer_path\": \"/Users/gajendrarawat/Downloads/om-ai-operating-brain 3/artifacts/tokenizer-fixed-v3.json\",\n  \"tokenizer_sha256\": \"13b365fd78f468e96137462cbef86f008192415c3bb825653f1bbf16f12ddb5f\",\n  \"steps\": 250000,\n  \"parameters\": 3300608,\n  \"trained\": true,\n  \"not_70b\": true,\n  \"honesty\": \"Local OM-1.0 checkpoint; not production frontier intelligence.\"",
+    "summary": "{'plan': {'question': '{\\n  \"Name\": \"OM-1.0\",\\n  \"Provider\": \"OM AI\",\\n  \"Backend\": \"OM Native\",\\n  \"Checkpoint\": \"verified\",\\n  \"Tokenizer\": \"verified\",\\n  \"Device\": \"MPS\",\\n  \"checkpoint_path\": \"/Users/gajendrarawat/Downloads/om-ai-operating-brain 3/artifacts/checkpoints/om-1.0-long/latest.pt\",\\n  \"tokenizer_path\": \"/Users/gajendrarawat/Downloads/om-ai-operating-brain 3/artifacts/tokenizer-fixed-v3.json\",\\n  \"tokenizer_sha256\": \"13b365fd78f468e96137462cbef86f008192415c3bb825653f1bbf16f12ddb5f\",\\n  \"steps\": 250000,\\n  \"parameters\": 3300608,\\n  \"trained\": true,\\n  \"not_70b\": true,\\n  \"honesty\": \"Local OM-1.0 checkpoint; not production frontier intelligence.\"', 'steps': ['Understand research objective', 'Collect relevant information', 'Analyze collected data', 'Validate important facts', 'Generate research summary']}, 'analysis': {'key_points': [], 'source_count': 0}, 'validation': {'validated': True, 'confidence': 0.0, 'checked_items': 0}, 'result': {'summary': '', 'confidence': 0.0}}",
+    "time": "2026-10-07T11:12:12.563855+00:00"
+  },
+  {
+    "question": "why",
+    "summary": "{'plan': {'question': 'why', 'steps': ['Understand research objective', 'Collect relevant information', 'Analyze collected data', 'Validate important facts', 'Generate research summary']}, 'analysis': {'key_points': [], 'source_count': 0}, 'validation': {'validated': True, 'confidence': 0.0, 'checked_items': 0}, 'result': {'summary': '', 'confidence': 0.0}}",
+    "time": "2026-10-07T11:18:16.895529+00:00"
+  },
+  {
+    "question": "what is java",
+    "summary": "{'plan': {'question': 'what is java', 'steps': ['Understand research objective', 'Collect relevant information', 'Analyze collected data', 'Validate important facts', 'Generate research summary']}, 'analysis': {'key_points': [], 'source_count': 0}, 'validation': {'validated': True, 'confidence': 0.0, 'checked_items': 0}, 'result': {'summary': '', 'confidence': 0.0}}",
+    "time": "2026-10-09T10:06:52.082231+00:00"
+  },
+  {
+    "question": "what is this this is only for this ans crrect",
+    "summary": "{'plan': {'question': 'what is this this is only for this ans crrect', 'steps': ['Understand research objective', 'Collect relevant information', 'Analyze collected data', 'Validate important facts', 'Generate research summary']}, 'analysis': {'key_points': [], 'source_count': 0}, 'validation': {'validated': True, 'confidence': 0.0, 'checked_items': 0}, 'result': {'summary': '', 'confidence': 0.0}}",
+    "time": "2026-10-09T10:19:55.695602+00:00"
+  },
+  {
+    "question": "Who won the Cubs championship?",
+    "summary": "{'plan': {'question': 'Who won the Cubs championship?', 'steps': ['Understand research objective', 'Collect relevant information', 'Analyze collected data', 'Validate important facts', 'Generate research summary']}, 'analysis': {'key_points': [], 'source_count': 0}, 'validation': {'validated': True, 'confidence': 0.0, 'checked_items': 0}, 'result': {'summary': '', 'confidence': 0.0}}",
+    "time": "2026-10-09T14:54:02.871655+00:00"
+  },
+  {
+    "question": "Who won the Cubs championship?",
+    "summary": "{'plan': {'question': 'Who won the Cubs championship?', 'steps': ['Understand research objective', 'Collect relevant information', 'Analyze collected data', 'Validate important facts', 'Generate research summary']}, 'analysis': {'key_points': [], 'source_count': 0}, 'validation': {'validated': True, 'confidence': 0.0, 'checked_items': 0}, 'result': {'summary': '', 'confidence': 0.0}}",
+    "time": "2026-10-09T14:56:12.205071+00:00"
+  },
+  {
+    "question": "Who won the Cubs championship?",
+    "summary": "{'plan': {'question': 'Who won the Cubs championship?', 'steps': ['Understand research objective', 'Collect relevant information', 'Analyze collected data', 'Validate important facts', 'Generate research summary']}, 'analysis': {'key_points': [], 'source_count': 0}, 'validation': {'validated': True, 'confidence': 0.0, 'checked_items': 0}, 'result': {'summary': '', 'confidence': 0.0}}",
+    "time": "2026-10-09T14:59:20.037058+00:00"
+  },
+  {
+    "question": "Who won the Cubs championship?",
+    "summary": "{'plan': {'question': 'Who won the Cubs championship?', 'steps': ['Understand research objective', 'Collect relevant information', 'Analyze collected data', 'Validate important facts', 'Generate research summary']}, 'analysis': {'key_points': [], 'source_count': 0}, 'validation': {'validated': True, 'confidence': 0.0, 'checked_items': 0}, 'result': {'summary': '', 'confidence': 0.0}}",
+    "time": "2026-10-09T15:05:50.917502+00:00"
+  },
+  {
+    "question": "What can you do as a local OM model?",
+    "summary": "{'plan': {'question': 'What can you do as a local OM model?', 'steps': ['Understand research objective', 'Collect relevant information', 'Analyze collected data', 'Validate important facts', 'Generate research summary']}, 'analysis': {'key_points': [], 'source_count': 0}, 'validation': {'validated': True, 'confidence': 0.0, 'checked_items': 0}, 'result': {'summary': '', 'confidence': 0.0}}",
+    "time": "2026-10-09T15:13:43.917031+00:00"
+  },
+  {
+    "question": "What can you do as a local OM model?",
+    "summary": "{'plan': {'question': 'What can you do as a local OM model?', 'steps': ['Understand research objective', 'Collect relevant information', 'Analyze collected data', 'Validate important facts', 'Generate research summary']}, 'analysis': {'key_points': [], 'source_count': 0}, 'validation': {'validated': True, 'confidence': 0.0, 'checked_items': 0}, 'result': {'summary': '', 'confidence': 0.0}}",
+    "time": "2026-10-09T15:15:18.163678+00:00"
+  },
+  {
+    "question": "What can you do as a local OM model?",
+    "summary": "{'plan': {'question': 'What can you do as a local OM model?', 'steps': ['Understand research objective', 'Collect relevant information', 'Analyze collected data', 'Validate important facts', 'Generate research summary']}, 'analysis': {'key_points': [], 'source_count': 0}, 'validation': {'validated': True, 'confidence': 0.0, 'checked_items': 0}, 'result': {'summary': '', 'confidence': 0.0}}",
+    "time": "2026-10-09T15:16:25.951316+00:00"
+  },
+  {
+    "question": "What can you do as a local OM model?",
+    "summary": "{'plan': {'question': 'What can you do as a local OM model?', 'steps': ['Understand research objective', 'Collect relevant information', 'Analyze collected data', 'Validate important facts', 'Generate research summary']}, 'analysis': {'key_points': [], 'source_count': 0}, 'validation': {'validated': True, 'confidence': 0.0, 'checked_items': 0}, 'result': {'summary': '', 'confidence': 0.0}}",
+    "time": "2026-10-09T15:17:17.445151+00:00"
+  },
+  {
+    "question": "What can you do as a local OM model?",
+    "summary": "{'plan': {'question': 'What can you do as a local OM model?', 'steps': ['Understand research objective', 'Collect relevant information', 'Analyze collected data', 'Validate important facts', 'Generate research summary']}, 'analysis': {'key_points': [], 'source_count': 0}, 'validation': {'validated': True, 'confidence': 0.0, 'checked_items': 0}, 'result': {'summary': '', 'confidence': 0.0}}",
+    "time": "2026-10-09T15:20:00.771543+00:00"
+  },
+  {
+    "question": "What can you do as a local OM model?",
+    "summary": "{'plan': {'question': 'What can you do as a local OM model?', 'steps': ['Understand research objective', 'Collect relevant information', 'Analyze collected data', 'Validate important facts', 'Generate research summary']}, 'analysis': {'key_points': [], 'source_count': 0}, 'validation': {'validated': True, 'confidence': 0.0, 'checked_items': 0}, 'result': {'summary': '', 'confidence': 0.0}}",
+    "time": "2026-10-09T15:21:13.658173+00:00"
+  },
+  {
+    "question": "What can you do as a local OM model?",
+    "summary": "{'plan': {'question': 'What can you do as a local OM model?', 'steps': ['Understand research objective', 'Collect relevant information', 'Analyze collected data', 'Validate important facts', 'Generate research summary']}, 'analysis': {'key_points': [], 'source_count': 0}, 'validation': {'validated': True, 'confidence': 0.0, 'checked_items': 0}, 'result': {'summary': '', 'confidence': 0.0}}",
+    "time": "2026-10-09T15:22:28.702855+00:00"
+  },
+  {
+    "question": "What can you do as a local OM model?",
+    "summary": "{'plan': {'question': 'What can you do as a local OM model?', 'steps': ['Understand research objective', 'Collect relevant information', 'Analyze collected data', 'Validate important facts', 'Generate research summary']}, 'analysis': {'key_points': [], 'source_count': 0}, 'validation': {'validated': True, 'confidence': 0.0, 'checked_items': 0}, 'result': {'summary': '', 'confidence': 0.0}}",
+    "time": "2026-10-09T15:23:36.307738+00:00"
+  },
+  {
+    "question": "Explain how Python functions work.",
+    "summary": "{'plan': {'question': 'Explain how Python functions work.', 'steps': ['Understand research objective', 'Collect relevant information', 'Analyze collected data', 'Validate important facts', 'Generate research summary']}, 'analysis': {'key_points': [], 'source_count': 0}, 'validation': {'validated': True, 'confidence': 0.0, 'checked_items': 0}, 'result': {'summary': '', 'confidence': 0.0}}",
+    "time": "2026-10-09T15:23:38.447681+00:00"
+  },
+  {
+    "question": "Explain how Python functions work.",
+    "summary": "{'plan': {'question': 'Explain how Python functions work.', 'steps': ['Understand research objective', 'Collect relevant information', 'Analyze collected data', 'Validate important facts', 'Generate research summary']}, 'analysis': {'key_points': [], 'source_count': 0}, 'validation': {'validated': True, 'confidence': 0.0, 'checked_items': 0}, 'result': {'summary': '', 'confidence': 0.0}}",
+    "time": "2026-10-09T15:24:44.124229+00:00"
+  },
+  {
+    "question": "Explain how Python functions work.",
+    "summary": "{'plan': {'question': 'Explain how Python functions work.', 'steps': ['Understand research objective', 'Collect relevant information', 'Analyze collected data', 'Validate important facts', 'Generate research summary']}, 'analysis': {'key_points': [], 'source_count': 0}, 'validation': {'validated': True, 'confidence': 0.0, 'checked_items': 0}, 'result': {'summary': '', 'confidence': 0.0}}",
+    "time": "2026-10-09T15:25:14.515280+00:00"
+  },
+  {
+    "question": "Explain how Python functions work.",
+    "summary": "{'plan': {'question': 'Explain how Python functions work.', 'steps': ['Understand research objective', 'Collect relevant information', 'Analyze collected data', 'Validate important facts', 'Generate research summary']}, 'analysis': {'key_points': [], 'source_count': 0}, 'validation': {'validated': True, 'confidence': 0.0, 'checked_items': 0}, 'result': {'summary': '', 'confidence': 0.0}}",
+    "time": "2026-10-09T15:25:44.196185+00:00"
+  },
+  {
+    "question": "What can you do as a local OM model?",
+    "summary": "{'plan': {'question': 'What can you do as a local OM model?', 'steps': ['Understand research objective', 'Collect relevant information', 'Analyze collected data', 'Validate important facts', 'Generate research summary']}, 'analysis': {'key_points': [], 'source_count': 0}, 'validation': {'validated': True, 'confidence': 0.0, 'checked_items': 0}, 'result': {'summary': '', 'confidence': 0.0}}",
+    "time": "2026-10-09T15:27:44.484277+00:00"
+  },
+  {
+    "question": "Explain how Python functions work.",
+    "summary": "{'plan': {'question': 'Explain how Python functions work.', 'steps': ['Understand research objective', 'Collect relevant information', 'Analyze collected data', 'Validate important facts', 'Generate research summary']}, 'analysis': {'key_points': [], 'source_count': 0}, 'validation': {'validated': True, 'confidence': 0.0, 'checked_items': 0}, 'result': {'summary': '', 'confidence': 0.0}}",
+    "time": "2026-10-09T15:28:03.020921+00:00"
+  },
+  {
+    "question": "What can you do as a local OM model?",
+    "summary": "{'plan': {'question': 'What can you do as a local OM model?', 'steps': ['Understand research objective', 'Collect relevant information', 'Analyze collected data', 'Validate important facts', 'Generate research summary']}, 'analysis': {'key_points': [], 'source_count': 0}, 'validation': {'validated': True, 'confidence': 0.0, 'checked_items': 0}, 'result': {'summary': '', 'confidence': 0.0}}",
+    "time": "2026-10-09T15:28:05.580006+00:00"
+  },
+  {
+    "question": "What can you do as a local OM model?",
+    "summary": "{'plan': {'question': 'What can you do as a local OM model?', 'steps': ['Understand research objective', 'Collect relevant information', 'Analyze collected data', 'Validate important facts', 'Generate research summary']}, 'analysis': {'key_points': [], 'source_count': 0}, 'validation': {'validated': True, 'confidence': 0.0, 'checked_items': 0}, 'result': {'summary': '', 'confidence': 0.0}}",
+    "time": "2026-10-09T15:29:29.065757+00:00"
+  },
+  {
+    "question": "Explain how Python functions work.",
+    "summary": "{'plan': {'question': 'Explain how Python functions work.', 'steps': ['Understand research objective', 'Collect relevant information', 'Analyze collected data', 'Validate important facts', 'Generate research summary']}, 'analysis': {'key_points': [], 'source_count': 0}, 'validation': {'validated': True, 'confidence': 0.0, 'checked_items': 0}, 'result': {'summary': '', 'confidence': 0.0}}",
+    "time": "2026-10-09T15:29:46.371420+00:00"
+  },
+  {
+    "question": "What can you do as a local OM model?",
+    "summary": "{'plan': {'question': 'What can you do as a local OM model?', 'steps': ['Understand research objective', 'Collect relevant information', 'Analyze collected data', 'Validate important facts', 'Generate research summary']}, 'analysis': {'key_points': [], 'source_count': 0}, 'validation': {'validated': True, 'confidence': 0.0, 'checked_items': 0}, 'result': {'summary': '', 'confidence': 0.0}}",
+    "time": "2026-10-09T15:37:04.090146+00:00"
+  },
+  {
+    "question": "Who won the Cubs championship?",
+    "summary": "{'plan': {'question': 'Who won the Cubs championship?', 'steps': ['Understand research objective', 'Collect relevant information', 'Analyze collected data', 'Validate important facts', 'Generate research summary']}, 'analysis': {'key_points': [], 'source_count': 0}, 'validation': {'validated': True, 'confidence': 0.0, 'checked_items': 0}, 'result': {'summary': '', 'confidence': 0.0}}",
+    "time": "2026-10-09T15:37:11.505604+00:00"
+  },
+  {
+    "question": "Explain how Python functions work.",
+    "summary": "{'plan': {'question': 'Explain how Python functions work.', 'steps': ['Understand research objective', 'Collect relevant information', 'Analyze collected data', 'Validate important facts', 'Generate research summary']}, 'analysis': {'key_points': [], 'source_count': 0}, 'validation': {'validated': True, 'confidence': 0.0, 'checked_items': 0}, 'result': {'summary': '', 'confidence': 0.0}}",
+    "time": "2026-10-09T15:37:21.867920+00:00"
+  },
+  {
+    "question": "What can you do as a local OM model?",
+    "summary": "{'plan': {'question': 'What can you do as a local OM model?', 'steps': ['Understand research objective', 'Collect relevant information', 'Analyze collected data', 'Validate important facts', 'Generate research summary']}, 'analysis': {'key_points': [], 'source_count': 0}, 'validation': {'validated': True, 'confidence': 0.0, 'checked_items': 0}, 'result': {'summary': '', 'confidence': 0.0}}",
+    "time": "2026-10-09T15:40:13.950717+00:00"
+  },
+  {
+    "question": "Who won the Cubs championship?",
+    "summary": "{'plan': {'question': 'Who won the Cubs championship?', 'steps': ['Understand research objective', 'Collect relevant information', 'Analyze collected data', 'Validate important facts', 'Generate research summary']}, 'analysis': {'key_points': [], 'source_count': 0}, 'validation': {'validated': True, 'confidence': 0.0, 'checked_items': 0}, 'result': {'summary': '', 'confidence': 0.0}}",
+    "time": "2026-10-09T15:40:20.429315+00:00"
+  },
+  {
+    "question": "Explain how Python functions work.",
+    "summary": "{'plan': {'question': 'Explain how Python functions work.', 'steps': ['Understand research objective', 'Collect relevant information', 'Analyze collected data', 'Validate important facts', 'Generate research summary']}, 'analysis': {'key_points': [], 'source_count': 0}, 'validation': {'validated': True, 'confidence': 0.0, 'checked_items': 0}, 'result': {'summary': '', 'confidence': 0.0}}",
+    "time": "2026-10-09T15:40:30.444948+00:00"
+  },
+  {
+    "question": "What can you do as a local OM model?",
+    "summary": "{'plan': {'question': 'What can you do as a local OM model?', 'steps': ['Understand research objective', 'Collect relevant information', 'Analyze collected data', 'Validate important facts', 'Generate research summary']}, 'analysis': {'key_points': [], 'source_count': 0}, 'validation': {'validated': True, 'confidence': 0.0, 'checked_items': 0}, 'result': {'summary': '', 'confidence': 0.0}}",
+    "time": "2026-10-09T15:42:22.846887+00:00"
+  },
+  {
+    "question": "Who won the Cubs championship?",
+    "summary": "{'plan': {'question': 'Who won the Cubs championship?', 'steps': ['Understand research objective', 'Collect relevant information', 'Analyze collected data', 'Validate important facts', 'Generate research summary']}, 'analysis': {'key_points': [], 'source_count': 0}, 'validation': {'validated': True, 'confidence': 0.0, 'checked_items': 0}, 'result': {'summary': '', 'confidence': 0.0}}",
+    "time": "2026-10-09T15:42:29.363775+00:00"
+  },
+  {
+    "question": "Explain how Python functions work.",
+    "summary": "{'plan': {'question': 'Explain how Python functions work.', 'steps': ['Understand research objective', 'Collect relevant information', 'Analyze collected data', 'Validate important facts', 'Generate research summary']}, 'analysis': {'key_points': [], 'source_count': 0}, 'validation': {'validated': True, 'confidence': 0.0, 'checked_items': 0}, 'result': {'summary': '', 'confidence': 0.0}}",
+    "time": "2026-10-09T15:42:39.508881+00:00"
+  },
+  {
+    "question": "Who won the Cubs championship?",
+    "summary": "{'plan': {'question': 'Who won the Cubs championship?', 'steps': ['Understand research objective', 'Collect relevant information', 'Analyze collected data', 'Validate important facts', 'Generate research summary']}, 'analysis': {'key_points': [], 'source_count': 0}, 'validation': {'validated': True, 'confidence': 0.0, 'checked_items': 0}, 'result': {'summary': '', 'confidence': 0.0}}",
+    "time": "2026-10-09T15:43:41.239123+00:00"
+  },
+  {
+    "question": "What can you do as a local OM model?",
+    "summary": "{'plan': {'question': 'What can you do as a local OM model?', 'steps': ['Understand research objective', 'Collect relevant information', 'Analyze collected data', 'Validate important facts', 'Generate research summary']}, 'analysis': {'key_points': [], 'source_count': 0}, 'validation': {'validated': True, 'confidence': 0.0, 'checked_items': 0}, 'result': {'summary': '', 'confidence': 0.0}}",
+    "time": "2026-10-09T15:44:19.974614+00:00"
+  },
+  {
+    "question": "Who won the Cubs championship?",
+    "summary": "{'plan': {'question': 'Who won the Cubs championship?', 'steps': ['Understand research objective', 'Collect relevant information', 'Analyze collected data', 'Validate important facts', 'Generate research summary']}, 'analysis': {'key_points': [], 'source_count': 0}, 'validation': {'validated': True, 'confidence': 0.0, 'checked_items': 0}, 'result': {'summary': '', 'confidence': 0.0}}",
+    "time": "2026-10-09T15:44:27.374481+00:00"
+  },
+  {
+    "question": "Explain how Python functions work.",
+    "summary": "{'plan': {'question': 'Explain how Python functions work.', 'steps': ['Understand research objective', 'Collect relevant information', 'Analyze collected data', 'Validate important facts', 'Generate research summary']}, 'analysis': {'key_points': [], 'source_count': 0}, 'validation': {'validated': True, 'confidence': 0.0, 'checked_items': 0}, 'result': {'summary': '', 'confidence': 0.0}}",
+    "time": "2026-10-09T15:44:38.666307+00:00"
+  },
+  {
+    "question": "what is shcoll",
+    "summary": "{'plan': {'question': 'what is shcoll', 'steps': ['Understand research objective', 'Collect relevant information', 'Analyze collected data', 'Validate important facts', 'Generate research summary']}, 'analysis': {'key_points': [], 'source_count': 0}, 'validation': {'validated': True, 'confidence': 0.0, 'checked_items': 0}, 'result': {'summary': '', 'confidence': 0.0}}",
+    "time": "2026-10-10T09:52:58.155206+00:00"
   }
 ]

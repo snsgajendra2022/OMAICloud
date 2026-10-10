@@ -3,6 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from pathlib import Path
 import json
+import os
 import time
 
 import torch
@@ -85,15 +86,46 @@ class SFTDataset(Dataset):
                 add_eos=False,
             )
 
-            response_ids = tokenizer.encode(response)
+            response_content_ids = tokenizer.encode(response)
+            stop_ids = []
             if tokenizer.assistant_end_id is not None:
-                response_ids.append(tokenizer.assistant_end_id)
-            response_ids.append(tokenizer.eos_id)
+                stop_ids.append(tokenizer.assistant_end_id)
+            stop_ids.append(tokenizer.eos_id)
+            response_ids = response_content_ids + stop_ids
 
-            ids = (prefix_ids + response_ids)[:max_seq_len]
-# Prefer assistant-only tokens (prompt positions stay -100).
+            # Preserve a supervised assistant target even when the prompt is longer
+            # than the model context. The old implementation truncated the concatenated
+            # sequence from the right, which could remove the entire response; it also
+            # used the original prompt length after truncation, causing valid rows to
+            # receive only -100 labels and contribute no training signal.
+            max_seq_len = int(max_seq_len)
+            if max_seq_len < 2:
+                raise ValueError("SFT max_seq_len must be at least 2")
+
+            # Reserve up to half the context for the completion, but always retain
+            # assistant-end/EOS markers when a long response is truncated. Without
+            # these stop targets, short-context training teaches the model to continue
+            # indefinitely and can worsen token-soup generations.
+            target_budget = min(len(response_ids), max(2, max_seq_len // 2))
+            if len(response_ids) > target_budget:
+                content_budget = max(0, target_budget - len(stop_ids))
+                target_ids = response_content_ids[:content_budget] + stop_ids
+            else:
+                target_ids = response_ids
+            if not target_ids:
+                skipped += 1
+                continue
+
+            # Keep the most recent portion of the chat prefix (usually the user ask).
+            prefix_budget = max_seq_len - len(target_ids)
+            if prefix_budget <= 0:
+                skipped += 1
+                continue
+            prefix_ids = prefix_ids[-prefix_budget:]
+            ids = prefix_ids + target_ids
             labels = build_assistant_only_labels(ids, prompt_len=len(prefix_ids))
 
+            # Fail closed if an example has no assistant tokens after truncation.
             if len(ids) >= 2 and any(v != -100 for v in labels):
                 self.rows.append((ids, labels))
             else:
@@ -258,20 +290,61 @@ class SFTTrainer:
         p = Path(self.cfg.output_dir)
         p.mkdir(parents=True, exist_ok=True)
         target = p / ("latest.pt" if final else f"step-{step}.pt")
-        torch.save(
-            {
-                "model": self.model.state_dict(),
-                "optimizer": self.opt.state_dict(),
-                "stage": "sft",
-                "step": step,
-                "sft_config": {
-                    "steps": self.cfg.steps,
-                    "batch_size": self.cfg.batch_size,
-                    "grad_accum_steps": self.cfg.grad_accum_steps,
-                    "learning_rate": self.cfg.learning_rate,
-                    "precision": self.cfg.precision,
-                },
+        temp_target = target.with_name(f".{target.name}.tmp")
+
+        # SFT checkpoints are used to initialize inference or a later training run;
+        # the optimizer state is not required by the current CLI loader and can make
+        # each file several times larger than the model weights. Save only portable
+        # model state and training metadata.
+        payload = {
+            "model": self.model.state_dict(),
+            "stage": "sft",
+            "step": step,
+            "sft_config": {
+                "steps": self.cfg.steps,
+                "batch_size": self.cfg.batch_size,
+                "grad_accum_steps": self.cfg.grad_accum_steps,
+                "learning_rate": self.cfg.learning_rate,
+                "precision": self.cfg.precision,
             },
-            target,
-        )
+        }
+
+        # Keep the most recent known-good periodic checkpoint while writing the next
+        # one. Older periodic files can consume hundreds of MB and cause PyTorch's
+        # zip writer to fail on machines with limited free disk space.
+        if not final:
+            previous = sorted(
+                p.glob("step-*.pt"),
+                key=lambda item: item.stat().st_mtime,
+                reverse=True,
+            )
+            for stale in previous[1:]:
+                try:
+                    stale.unlink()
+                except OSError:
+                    pass
+
+        try:
+            torch.save(payload, temp_target)
+            # Atomic replacement prevents a failed write from corrupting the last
+            # valid checkpoint at the destination.
+            os.replace(temp_target, target)
+        except Exception as exc:
+            try:
+                temp_target.unlink(missing_ok=True)
+            except OSError:
+                pass
+            raise RuntimeError(
+                f"Could not save SFT checkpoint to {target}. Check free disk space "
+                "and write permissions; the previous completed checkpoint is kept."
+            ) from exc
+
+        # Once a new periodic checkpoint is safely written, remove the older one.
+        if not final:
+            for stale in p.glob("step-*.pt"):
+                if stale != target:
+                    try:
+                        stale.unlink()
+                    except OSError:
+                        pass
         return {"checkpoint": str(target), "steps": step}

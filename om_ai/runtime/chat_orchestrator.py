@@ -6,6 +6,7 @@ import os
 import re
 from typing import Any
 
+from om_ai.core.cognitive import OMCognitiveBrain
 from om_ai.runtime.system_prompts import active_system_prompt
 
 logger = logging.getLogger(__name__)
@@ -19,7 +20,7 @@ def run_cognitive_brain(
 ) -> dict[str, Any]:
     """Run OMCognitiveBrain.generate (STEP 24 path) with process() fallback."""
     from om_ai.core.cognitive.brain_pipeline import OMCognitiveBrain
-
+    
     brain = OMCognitiveBrain()
     try:
         return brain.generate(
@@ -65,7 +66,7 @@ def generation_config(**overrides: Any) -> dict[str, Any]:
         "top_p": _env_float("OM_CHAT_TOP_P", 0.9),
         "top_k": _env_int("OM_CHAT_TOP_K", 50),
         "repetition_penalty": _env_float("OM_CHAT_REPETITION_PENALTY", 1.2),
-        "max_new_tokens": _env_int("OM_CHAT_MAX_NEW_TOKENS", 96),
+        "max_new_tokens": _env_int("OM_CHAT_MAX_NEW_TOKENS", 128),
         "min_new_tokens": _env_int("OM_CHAT_MIN_NEW_TOKENS", 1),
         "no_repeat_ngram_size": _env_int("OM_CHAT_NO_REPEAT_NGRAM", 3),
         "repetition_window": _env_int("OM_CHAT_REPETITION_WINDOW", 128),
@@ -222,6 +223,23 @@ def is_garbled_generation(text: str | None) -> bool:
                 "i am om",
                 "couldn’t",
                 "please",
+                "good morning",
+                "good afternoon",
+                "good evening",
+                "how are you",
+                "hi",
+                "hey",
+                "greetings",
+                "namaste",
+                "saved",
+                "done",
+                "thanks",
+                "thank you",
+                "okay",
+                "ok",
+                "yes",
+                "no",
+                "maple-731",
             )
         ):
             return True

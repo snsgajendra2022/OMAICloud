@@ -20,8 +20,13 @@ def is_solution_stub(text: str) -> bool:
     t = (text or "").strip()
     if not t:
         return False
+    if "**Quick checks**" in t or "```" in t or "Step-by-step for:" in t:
+        return False
     if _STUB_SMELL.search(t):
-        return True
+        if len(t) < 400 and not any(h in t for h in ("**Fix plan**", "**Quick checks**", "Step-by-step")):
+            return True
+        if re.search(r"(?i)\b(solve|fix|accomplish|understand)\s*:\s*.{0,150}\b(understand|acknowledge|answer)\b", t):
+            return True
     # Numbered outline that just echoes the user ask
     if re.search(r"(?i)\b(solve|fix|accomplish|understand)\s*:", t) and re.search(
         r"(?m)^\s*1\.\s+\w+", t

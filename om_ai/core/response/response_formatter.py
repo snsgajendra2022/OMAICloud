@@ -65,7 +65,7 @@ _PIPELINE_HEADINGS = re.compile(
 )
 
 _PIPELINE_DUMP = re.compile(
-    r"(?is)(\*\*ask:\*\*|\*\*understanding:\*\*|##\s+analysis\b|\bagents\s*:|"
+    r"(?is)(knowledge\s*:\s*\n\s*question\s*:|address the user ask directly\s*:|\*\*ask:\*\*|\*\*understanding:\*\*|##\s+analysis\b|\bagents\s*:|"
     r"self-critique|no strong corpus match yet|om-ai brain power|"
     r"heuristic foundation path|##\s+evaluation\b|##\s+validation\b|"
     r"passed:\s*true|score:\s*0\.|confidence:\s*0\.|"
@@ -264,8 +264,7 @@ class ResponseFormatter:
         body = self._strip_leaks(str(data.get("answer") or ""))
         if len(body) >= 40 and not looks_like_pipeline_dump(body):
             return body.strip() + "\n"
-        return (
-            f"{q}\n\n")
+        return ""
 
     def _template_knowledge(self, data: dict[str, Any], question: str) -> str:
         fact = ""

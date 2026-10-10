@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import json
 import sqlite3
+import threading
 import uuid
 from contextlib import contextmanager
 from dataclasses import asdict, dataclass, fields
@@ -184,12 +185,40 @@ def _actor_user_id(actor: str) -> str | None:
     return None
 
 
+def _serialize_conversation_store_methods(cls):
+    """Serialize every method touching the shared SQLite connection.
+
+    check_same_thread=False permits cross-thread access but does not make a
+    single sqlite3.Connection safe for simultaneous execute/fetch/commit calls.
+    A lock around only individual queries is insufficient because another store
+    method can run between a query and its cursor fetch or during a transaction.
+    """
+    from functools import wraps
+
+    for method_name, method in list(cls.__dict__.items()):
+        # __init__ creates the lock; _tx is a context manager that already holds
+        # the RLock for the complete transaction body.
+        if method_name in {"__init__", "_tx"} or not callable(method):
+            continue
+
+        @wraps(method)
+        def synchronized(self, *args, __method=method, **kwargs):
+            with self._lock:
+                return __method(self, *args, **kwargs)
+
+        setattr(cls, method_name, synchronized)
+    return cls
+
+
 class ConversationStore:
     """Tenant/actor-scoped chat history, folders, and profile in SQLite."""
 
     def __init__(self, path: str = "artifacts/om_ai.sqlite3") -> None:
         Path(path).parent.mkdir(parents=True, exist_ok=True)
         self.path = str(path)
+        # FastAPI sync handlers can access this store from different worker threads.
+        # Serialize transactions and conversation-list cursor consumption on the shared connection.
+        self._lock = threading.RLock()
         self._conn = sqlite3.connect(self.path, check_same_thread=False, timeout=30.0)
         self._conn.row_factory = sqlite3.Row
         self._conn.execute("PRAGMA foreign_keys = ON")
@@ -251,12 +280,14 @@ class ConversationStore:
         )
     @contextmanager
     def _tx(self) -> Generator[sqlite3.Connection, None, None]:
-        try:
-            yield self._conn
-            self._conn.commit()
-        except Exception:
-            self._conn.rollback()
-            raise
+        # Keep a transaction atomic relative to other request threads sharing this connection.
+        with self._lock:
+            try:
+                yield self._conn
+                self._conn.commit()
+            except Exception:
+                self._conn.rollback()
+                raise
 
     def close(self) -> None:
         self._conn.close()
@@ -379,11 +410,20 @@ class ConversationStore:
             q += " AND c.project_id = ?"
             params.append(project_id)
         q += " ORDER BY COALESCE(c.pinned, 0) DESC, c.updated_at DESC"
-        rows = self._conn.execute(q, params).fetchall()
+        # A shared sqlite connection is used by sync API handlers on multiple
+        # worker threads. Serialize execute + fetch so another request cannot
+        # interfere while this cursor is active. Bind an immutable parameter tuple.
+        with self._lock:
+            cursor = self._conn.execute(q, tuple(params))
+            # Use SELECT column names rather than assuming the connection's
+            # row_factory is still sqlite3.Row. If it has been changed, sqlite
+            # returns tuples and dict(row) can raise IndexError.
+            columns = [column[0] for column in cursor.description or ()]
+            rows = cursor.fetchall()
         out: list[Conversation] = []
         repairs: list[tuple[str, str]] = []
         for r in rows:
-            data = dict(r)
+            data = dict(zip(columns, r))
             first_user = str(data.pop("first_user", None) or "").strip()
             title = str(data.get("title") or "")
             if first_user and (
@@ -744,3 +784,8 @@ class ConversationStore:
                 pairs.append((pending_user, m.content))
                 pending_user = None
         return pairs
+
+
+# All connection access is serialized, not just list_conversations(). The RLock
+# allows nested store calls (for example append_messages -> get_conversation).
+ConversationStore = _serialize_conversation_store_methods(ConversationStore)

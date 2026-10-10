@@ -10,6 +10,7 @@ from om_ai.runtime.chat_backend import with_runtime_date_context
 from om_ai.runtime.engine import (
     EMPTY_GENERATION_FALLBACK,
     fit_messages_to_context,
+    deterministic_greeting_reply,
     usable_generation_text,
 )
 from om_ai.tokenizer import load_tokenizer
@@ -19,11 +20,26 @@ ROOT = Path(__file__).resolve().parents[1]
 TOK_FIXED = ROOT / "artifacts" / "tokenizer-fixed-v3.json"
 
 
+def test_deterministic_reply_handles_how_are_you_without_unverified_generation():
+    for prompt in ("how are you", "How are you?", "how are you doing", "hi how are you"):
+        reply = deterministic_greeting_reply([{"role": "user", "content": prompt}])
+        assert reply == "I'm doing well, thank you! How can I help you today?"
+
+
 def test_usable_generation_text_rejects_empty_and_garbage():
     assert usable_generation_text("") == ""
     assert usable_generation_text("   ") == ""
     assert usable_generation_text("\x00\x01\x02") == ""
     assert usable_generation_text("Hello — I'm OM AI.") == "Hello — I'm OM AI."
+
+
+def test_degenerate_generation_rejects_token_soup_but_keeps_normal_text():
+    from om_ai.runtime.engine import is_degenerate_generation
+
+    garbage = "C_yAI*uing andev9roal R#1e p atten att(;e potoentPEZec att))k/Uing andAIrEPu"
+    assert is_degenerate_generation(garbage)
+    assert not is_degenerate_generation("The sky appears blue because air scatters blue light more strongly.")
+    assert not is_degenerate_generation("Hello — I'm OM AI.")
 
 
 def test_fit_messages_drops_oversized_system_for_tiny_context():

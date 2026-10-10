@@ -1205,6 +1205,52 @@ def repair_cmd(args):
     print("Repair complete. Run: om-ai doctor")
 
 
+def _run_startup_native_checks(repo_root: Path, *, run_evaluation: bool = True) -> None:
+    """Run native asset/generation diagnostics and optional capability eval before serving.
+
+    These checks never switch to a hosted model and never prevent the API from
+    starting. Failures are printed for the developer to fix; weights are not
+    modified and training is never started automatically.
+    """
+    import os
+    import subprocess
+    import sys
+
+    scripts = [("native diagnostic", repo_root / "scripts" / "diagnose_native_chat.py")]
+    if run_evaluation:
+        scripts.append(("native capability evaluation", repo_root / "scripts" / "evaluate_om_capabilities.py"))
+
+    timeout = max(30, int(os.getenv("OM_AI_STARTUP_CHECK_TIMEOUT", "1800")))
+    for label, script in scripts:
+        if not script.is_file():
+            print(f"[OM startup check] SKIP {label}: script not found: {script}", file=sys.stderr, flush=True)
+            continue
+        print(f"[OM startup check] START {label}", file=sys.stderr, flush=True)
+        try:
+            result = subprocess.run(
+                [sys.executable, str(script)],
+                cwd=str(repo_root),
+                check=False,
+                capture_output=True,
+                text=True,
+                timeout=timeout,
+            )
+            if result.stdout:
+                print(result.stdout.rstrip(), file=sys.stderr, flush=True)
+            if result.stderr:
+                print(result.stderr.rstrip(), file=sys.stderr, flush=True)
+            state = "PASS" if result.returncode == 0 else f"NEEDS ATTENTION (exit {result.returncode})"
+            print(f"[OM startup check] {state}: {label}", file=sys.stderr, flush=True)
+        except subprocess.TimeoutExpired:
+            print(
+                f"[OM startup check] TIMEOUT: {label} exceeded {timeout}s; server startup will continue.",
+                file=sys.stderr,
+                flush=True,
+            )
+        except Exception as exc:
+            print(f"[OM startup check] ERROR: {label}: {exc}; server startup will continue.", file=sys.stderr, flush=True)
+
+
 def serve(args):
     import os
     import sys
@@ -1212,8 +1258,8 @@ def serve(args):
 
     from om_ai.env import load_dotenv
 
-    # ``.env`` is a file — it is not automatically the process environment.
-    # Load once here so `om-ai serve` picks up OM_AI_* without `source .env`.
+    # .env is not automatically the process environment. Load it so serve picks
+    # up OM_AI_* settings without requiring the user to source it manually.
     loaded = load_dotenv()
     if loaded is not None:
         print(f"Loaded environment from {loaded}", file=sys.stderr)
@@ -1221,13 +1267,12 @@ def serve(args):
     # Never silently start a 70B training job from the API server.
     if os.getenv("OM_AI_AUTO_TRAIN_70B", "0") == "1":
         print(
-            "WARNING: OM_AI_AUTO_TRAIN_70B=1 is set but ignored by `om-ai serve`. "
+            "WARNING: OM_AI_AUTO_TRAIN_70B=1 is set but ignored by om-ai serve. "
             "Training must be started deliberately with:\n"
             "  om-ai train-70b --data ... --tokenizer ... --output ...",
             file=sys.stderr,
         )
 
-    # Prefer OM native checkpoint paths; READY banner prints from api.main on load.
     os.environ.setdefault("OM_MODEL_PROVIDER", "om_native")
     os.environ.setdefault("OM_AI_CHAT_BACKEND", "om_native")
 
@@ -1241,8 +1286,15 @@ def serve(args):
     except Exception as exc:
         print(f"Startup repair/logging skipped: {exc}", file=sys.stderr)
 
-    uvicorn.run("om_ai.api.main:app", host=args.host, port=args.port, reload=args.reload)
+    # Every explicit serve launch checks local assets and runs a native-only
+    # capability smoke evaluation. No hosted fallback and no auto-training.
+    repo_root = Path(__file__).resolve().parents[1]
+    run_eval = os.getenv("OM_AI_STARTUP_EVALUATION", "1").strip().lower() not in {"0", "false", "no", "off"}
+    if getattr(args, "skip_startup_eval", False):
+        run_eval = False
+    _run_startup_native_checks(repo_root, run_evaluation=run_eval)
 
+    uvicorn.run("om_ai.api.main:app", host=args.host, port=args.port, reload=args.reload)
 
 def main():
     import sys
@@ -1926,6 +1978,7 @@ def main():
     s.add_argument("--host", default="127.0.0.1")
     s.add_argument("--port", type=int, default=8765)
     s.add_argument("--reload", action="store_true")
+    s.add_argument("--skip-startup-eval", action="store_true", help="Run asset diagnostic only; skip the slower native capability evaluation")
     s.set_defaults(func=serve)
 
     # OM Companion Runtime (voice + brain + actions) — via cli_commands (not om_ai/cli/)

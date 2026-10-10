@@ -1,0 +1,18 @@
+{
+  "name": "OM-2.0-200B-Base",
+  "description": "Native OM decoder-only Transformer architecture target for distributed pretraining. Architecture preset only: NOT trained weights; cannot run/train on a Mac mini.",
+  "vocab_size": 65536,
+  "max_seq_len": 4096,
+  "n_layers": 96,
+  "n_heads": 96,
+  "n_kv_heads": 8,
+  "d_model": 12288,
+  "d_ff": 45056,
+  "rope_theta": 500000.0,
+  "dropout": 0.0,
+  "bias": false,
+  "tie_embeddings": true,
+  "use_rmsnorm": true,
+  "gradient_checkpointing": true,
+  "parameter_goal_note": "The repository's ModelConfig estimator should report approximately 191.7B parameters. This is an architecture-only target, not a trained or validated model. Requires distributed multi-node GPU infrastructure, sharded optimizer states, high-bandwidth interconnect, very large licensed corpus, and extensive pretraining/post-training."
+}

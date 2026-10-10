@@ -431,3 +431,47 @@ def maybe_evolution_reply(
     if not wants_matrix_mode(user, level):
         return None, mid, level
     return process_evolution_level(user, level), mid, level
+
+
+def module_runtime_manifest(*, native_ready: bool = False) -> dict[str, Any]:
+    """Describe the five UI modules without overstating their actual capabilities.
+
+    All five levels share the same native OM checkpoint. Their profiles change
+    routing and generation policy; they are not five independently trained models.
+    A loaded checkpoint is not proof of answer quality, so quality remains
+    explicitly uncertified until a separate model evaluation passes.
+    """
+    modules: list[dict[str, Any]] = []
+    for row in EVOLUTION_MODELS:
+        profile = level_runtime_profile(str(row["id"]))
+        level = int(row["level"])
+        modules.append(
+            {
+                "id": str(row["id"]),
+                "name": str(row["name"]),
+                "level": level,
+                "description": str(row["description"]),
+                "runtime_profile": {
+                    "style": profile["style"],
+                    "temperature": profile["temperature"],
+                    "max_tokens": profile["max_tokens"],
+                    "prefer_tools": profile["prefer_tools"],
+                    "prefer_research": profile["prefer_research"],
+                    "prefer_reasoning": profile["prefer_reasoning"],
+                    "prefer_planning": profile["prefer_planning"],
+                },
+                "execution": {
+                    "backend": "om_native",
+                    "shared_checkpoint": True,
+                    "model_ready": bool(native_ready),
+                    "quality_status": "not_certified",
+                },
+            }
+        )
+    return {
+        "runtime": "native_om_shared_checkpoint",
+        "native_model_ready": bool(native_ready),
+        "quality_status": "not_certified",
+        "modules": modules,
+    }
+

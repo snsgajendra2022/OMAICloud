@@ -1151,5 +1151,1408 @@
       "summary": "",
       "confidence": 0.0
     }
+  },
+  {
+    "plan": {
+      "question": "Who won the Cubs championship?",
+      "steps": [
+        "Understand research objective",
+        "Collect relevant information",
+        "Analyze collected data",
+        "Validate important facts",
+        "Generate research summary"
+      ]
+    },
+    "analysis": {
+      "key_points": [],
+      "source_count": 0
+    },
+    "validation": {
+      "validated": true,
+      "confidence": 0.0,
+      "checked_items": 0
+    },
+    "result": {
+      "summary": "",
+      "confidence": 0.0
+    }
+  },
+  {
+    "plan": {
+      "question": "Who won the Cubs championship?",
+      "steps": [
+        "Understand research objective",
+        "Collect relevant information",
+        "Analyze collected data",
+        "Validate important facts",
+        "Generate research summary"
+      ]
+    },
+    "analysis": {
+      "key_points": [],
+      "source_count": 0
+    },
+    "validation": {
+      "validated": true,
+      "confidence": 0.0,
+      "checked_items": 0
+    },
+    "result": {
+      "summary": "",
+      "confidence": 0.0
+    }
+  },
+  {
+    "plan": {
+      "question": "Who won the Cubs championship?",
+      "steps": [
+        "Understand research objective",
+        "Collect relevant information",
+        "Analyze collected data",
+        "Validate important facts",
+        "Generate research summary"
+      ]
+    },
+    "analysis": {
+      "key_points": [],
+      "source_count": 0
+    },
+    "validation": {
+      "validated": true,
+      "confidence": 0.0,
+      "checked_items": 0
+    },
+    "result": {
+      "summary": "",
+      "confidence": 0.0
+    }
+  },
+  {
+    "plan": {
+      "question": "Who won the Cubs championship?",
+      "steps": [
+        "Understand research objective",
+        "Collect relevant information",
+        "Analyze collected data",
+        "Validate important facts",
+        "Generate research summary"
+      ]
+    },
+    "analysis": {
+      "key_points": [],
+      "source_count": 0
+    },
+    "validation": {
+      "validated": true,
+      "confidence": 0.0,
+      "checked_items": 0
+    },
+    "result": {
+      "summary": "",
+      "confidence": 0.0
+    }
+  },
+  {
+    "plan": {
+      "question": "Who won the Cubs championship?",
+      "steps": [
+        "Understand research objective",
+        "Collect relevant information",
+        "Analyze collected data",
+        "Validate important facts",
+        "Generate research summary"
+      ]
+    },
+    "analysis": {
+      "key_points": [],
+      "source_count": 0
+    },
+    "validation": {
+      "validated": true,
+      "confidence": 0.0,
+      "checked_items": 0
+    },
+    "result": {
+      "summary": "",
+      "confidence": 0.0
+    }
+  },
+  {
+    "plan": {
+      "question": "Who won the Cubs championship?",
+      "steps": [
+        "Understand research objective",
+        "Collect relevant information",
+        "Analyze collected data",
+        "Validate important facts",
+        "Generate research summary"
+      ]
+    },
+    "analysis": {
+      "key_points": [],
+      "source_count": 0
+    },
+    "validation": {
+      "validated": true,
+      "confidence": 0.0,
+      "checked_items": 0
+    },
+    "result": {
+      "summary": "",
+      "confidence": 0.0
+    }
+  },
+  {
+    "plan": {
+      "question": "Why is the sky blue?",
+      "steps": [
+        "Understand research objective",
+        "Collect relevant information",
+        "Analyze collected data",
+        "Validate important facts",
+        "Generate research summary"
+      ]
+    },
+    "analysis": {
+      "key_points": [],
+      "source_count": 0
+    },
+    "validation": {
+      "validated": true,
+      "confidence": 0.0,
+      "checked_items": 0
+    },
+    "result": {
+      "summary": "",
+      "confidence": 0.0
+    }
+  },
+  {
+    "plan": {
+      "question": "What are you doing?",
+      "steps": [
+        "Understand research objective",
+        "Collect relevant information",
+        "Analyze collected data",
+        "Validate important facts",
+        "Generate research summary"
+      ]
+    },
+    "analysis": {
+      "key_points": [],
+      "source_count": 0
+    },
+    "validation": {
+      "validated": true,
+      "confidence": 0.0,
+      "checked_items": 0
+    },
+    "result": {
+      "summary": "",
+      "confidence": 0.0
+    }
+  },
+  {
+    "plan": {
+      "question": "Can you check that thing we discussed yesterday?",
+      "steps": [
+        "Understand research objective",
+        "Collect relevant information",
+        "Analyze collected data",
+        "Validate important facts",
+        "Generate research summary"
+      ]
+    },
+    "analysis": {
+      "key_points": [],
+      "source_count": 0
+    },
+    "validation": {
+      "validated": true,
+      "confidence": 0.0,
+      "checked_items": 0
+    },
+    "result": {
+      "summary": "",
+      "confidence": 0.0
+    }
+  },
+  {
+    "plan": {
+      "question": "What should I check first?",
+      "steps": [
+        "Understand research objective",
+        "Collect relevant information",
+        "Analyze collected data",
+        "Validate important facts",
+        "Generate research summary"
+      ]
+    },
+    "analysis": {
+      "key_points": [],
+      "source_count": 0
+    },
+    "validation": {
+      "validated": true,
+      "confidence": 0.0,
+      "checked_items": 0
+    },
+    "result": {
+      "summary": "",
+      "confidence": 0.0
+    }
+  },
+  {
+    "plan": {
+      "question": "What should I change?",
+      "steps": [
+        "Understand research objective",
+        "Collect relevant information",
+        "Analyze collected data",
+        "Validate important facts",
+        "Generate research summary"
+      ]
+    },
+    "analysis": {
+      "key_points": [],
+      "source_count": 0
+    },
+    "validation": {
+      "validated": true,
+      "confidence": 0.0,
+      "checked_items": 0
+    },
+    "result": {
+      "summary": "",
+      "confidence": 0.0
+    }
+  },
+  {
+    "plan": {
+      "question": "Who won the Cubs championship?",
+      "steps": [
+        "Understand research objective",
+        "Collect relevant information",
+        "Analyze collected data",
+        "Validate important facts",
+        "Generate research summary"
+      ]
+    },
+    "analysis": {
+      "key_points": [],
+      "source_count": 0
+    },
+    "validation": {
+      "validated": true,
+      "confidence": 0.0,
+      "checked_items": 0
+    },
+    "result": {
+      "summary": "",
+      "confidence": 0.0
+    }
+  },
+  {
+    "plan": {
+      "question": "Who won the Cubs championship?",
+      "steps": [
+        "Understand research objective",
+        "Collect relevant information",
+        "Analyze collected data",
+        "Validate important facts",
+        "Generate research summary"
+      ]
+    },
+    "analysis": {
+      "key_points": [],
+      "source_count": 0
+    },
+    "validation": {
+      "validated": true,
+      "confidence": 0.0,
+      "checked_items": 0
+    },
+    "result": {
+      "summary": "",
+      "confidence": 0.0
+    }
+  },
+  {
+    "plan": {
+      "question": "Who won the Cubs championship?",
+      "steps": [
+        "Understand research objective",
+        "Collect relevant information",
+        "Analyze collected data",
+        "Validate important facts",
+        "Generate research summary"
+      ]
+    },
+    "analysis": {
+      "key_points": [],
+      "source_count": 0
+    },
+    "validation": {
+      "validated": true,
+      "confidence": 0.0,
+      "checked_items": 0
+    },
+    "result": {
+      "summary": "",
+      "confidence": 0.0
+    }
+  },
+  {
+    "plan": {
+      "question": "Who won the Cubs championship?",
+      "steps": [
+        "Understand research objective",
+        "Collect relevant information",
+        "Analyze collected data",
+        "Validate important facts",
+        "Generate research summary"
+      ]
+    },
+    "analysis": {
+      "key_points": [],
+      "source_count": 0
+    },
+    "validation": {
+      "validated": true,
+      "confidence": 0.0,
+      "checked_items": 0
+    },
+    "result": {
+      "summary": "",
+      "confidence": 0.0
+    }
+  },
+  {
+    "plan": {
+      "question": "what is this",
+      "steps": [
+        "Understand research objective",
+        "Collect relevant information",
+        "Analyze collected data",
+        "Validate important facts",
+        "Generate research summary"
+      ]
+    },
+    "analysis": {
+      "key_points": [],
+      "source_count": 0
+    },
+    "validation": {
+      "validated": true,
+      "confidence": 0.0,
+      "checked_items": 0
+    },
+    "result": {
+      "summary": "",
+      "confidence": 0.0
+    }
+  },
+  {
+    "plan": {
+      "question": "{\n  \"Name\": \"OM-1.0\",\n  \"Provider\": \"OM AI\",\n  \"Backend\": \"OM Native\",\n  \"Checkpoint\": \"verified\",\n  \"Tokenizer\": \"verified\",\n  \"Device\": \"MPS\",\n  \"checkpoint_path\": \"/Users/gajendrarawat/Downloads/om-ai-operating-brain 3/artifacts/checkpoints/om-1.0-long/latest.pt\",\n  \"tokenizer_path\": \"/Users/gajendrarawat/Downloads/om-ai-operating-brain 3/artifacts/tokenizer-fixed-v3.json\",\n  \"tokenizer_sha256\": \"13b365fd78f468e96137462cbef86f008192415c3bb825653f1bbf16f12ddb5f\",\n  \"steps\": 250000,\n  \"parameters\": 3300608,\n  \"trained\": true,\n  \"not_70b\": true,\n  \"honesty\": \"Local OM-1.0 checkpoint; not production frontier intelligence.\"",
+      "steps": [
+        "Understand research objective",
+        "Collect relevant information",
+        "Analyze collected data",
+        "Validate important facts",
+        "Generate research summary"
+      ]
+    },
+    "analysis": {
+      "key_points": [],
+      "source_count": 0
+    },
+    "validation": {
+      "validated": true,
+      "confidence": 0.0,
+      "checked_items": 0
+    },
+    "result": {
+      "summary": "",
+      "confidence": 0.0
+    }
+  },
+  {
+    "plan": {
+      "question": "why",
+      "steps": [
+        "Understand research objective",
+        "Collect relevant information",
+        "Analyze collected data",
+        "Validate important facts",
+        "Generate research summary"
+      ]
+    },
+    "analysis": {
+      "key_points": [],
+      "source_count": 0
+    },
+    "validation": {
+      "validated": true,
+      "confidence": 0.0,
+      "checked_items": 0
+    },
+    "result": {
+      "summary": "",
+      "confidence": 0.0
+    }
+  },
+  {
+    "plan": {
+      "question": "Compare Laravel and Django",
+      "steps": [
+        "Understand research objective",
+        "Collect relevant information",
+        "Analyze collected data",
+        "Validate important facts",
+        "Generate research summary"
+      ]
+    },
+    "analysis": {
+      "key_points": [
+        "Laravel is a PHP framework",
+        "Django is a Python framework"
+      ],
+      "source_count": 2
+    },
+    "validation": {
+      "validated": true,
+      "confidence": 0.2,
+      "checked_items": 2
+    },
+    "result": {
+      "summary": "Laravel is a PHP framework\nDjango is a Python framework",
+      "confidence": 0.2
+    }
+  },
+  {
+    "plan": {
+      "question": "what is java",
+      "steps": [
+        "Understand research objective",
+        "Collect relevant information",
+        "Analyze collected data",
+        "Validate important facts",
+        "Generate research summary"
+      ]
+    },
+    "analysis": {
+      "key_points": [],
+      "source_count": 0
+    },
+    "validation": {
+      "validated": true,
+      "confidence": 0.0,
+      "checked_items": 0
+    },
+    "result": {
+      "summary": "",
+      "confidence": 0.0
+    }
+  },
+  {
+    "plan": {
+      "question": "what is this this is only for this ans crrect",
+      "steps": [
+        "Understand research objective",
+        "Collect relevant information",
+        "Analyze collected data",
+        "Validate important facts",
+        "Generate research summary"
+      ]
+    },
+    "analysis": {
+      "key_points": [],
+      "source_count": 0
+    },
+    "validation": {
+      "validated": true,
+      "confidence": 0.0,
+      "checked_items": 0
+    },
+    "result": {
+      "summary": "",
+      "confidence": 0.0
+    }
+  },
+  {
+    "plan": {
+      "question": "Who won the Cubs championship?",
+      "steps": [
+        "Understand research objective",
+        "Collect relevant information",
+        "Analyze collected data",
+        "Validate important facts",
+        "Generate research summary"
+      ]
+    },
+    "analysis": {
+      "key_points": [],
+      "source_count": 0
+    },
+    "validation": {
+      "validated": true,
+      "confidence": 0.0,
+      "checked_items": 0
+    },
+    "result": {
+      "summary": "",
+      "confidence": 0.0
+    }
+  },
+  {
+    "plan": {
+      "question": "Who won the Cubs championship?",
+      "steps": [
+        "Understand research objective",
+        "Collect relevant information",
+        "Analyze collected data",
+        "Validate important facts",
+        "Generate research summary"
+      ]
+    },
+    "analysis": {
+      "key_points": [],
+      "source_count": 0
+    },
+    "validation": {
+      "validated": true,
+      "confidence": 0.0,
+      "checked_items": 0
+    },
+    "result": {
+      "summary": "",
+      "confidence": 0.0
+    }
+  },
+  {
+    "plan": {
+      "question": "Who won the Cubs championship?",
+      "steps": [
+        "Understand research objective",
+        "Collect relevant information",
+        "Analyze collected data",
+        "Validate important facts",
+        "Generate research summary"
+      ]
+    },
+    "analysis": {
+      "key_points": [],
+      "source_count": 0
+    },
+    "validation": {
+      "validated": true,
+      "confidence": 0.0,
+      "checked_items": 0
+    },
+    "result": {
+      "summary": "",
+      "confidence": 0.0
+    }
+  },
+  {
+    "plan": {
+      "question": "Who won the Cubs championship?",
+      "steps": [
+        "Understand research objective",
+        "Collect relevant information",
+        "Analyze collected data",
+        "Validate important facts",
+        "Generate research summary"
+      ]
+    },
+    "analysis": {
+      "key_points": [],
+      "source_count": 0
+    },
+    "validation": {
+      "validated": true,
+      "confidence": 0.0,
+      "checked_items": 0
+    },
+    "result": {
+      "summary": "",
+      "confidence": 0.0
+    }
+  },
+  {
+    "plan": {
+      "question": "What can you do as a local OM model?",
+      "steps": [
+        "Understand research objective",
+        "Collect relevant information",
+        "Analyze collected data",
+        "Validate important facts",
+        "Generate research summary"
+      ]
+    },
+    "analysis": {
+      "key_points": [],
+      "source_count": 0
+    },
+    "validation": {
+      "validated": true,
+      "confidence": 0.0,
+      "checked_items": 0
+    },
+    "result": {
+      "summary": "",
+      "confidence": 0.0
+    }
+  },
+  {
+    "plan": {
+      "question": "What can you do as a local OM model?",
+      "steps": [
+        "Understand research objective",
+        "Collect relevant information",
+        "Analyze collected data",
+        "Validate important facts",
+        "Generate research summary"
+      ]
+    },
+    "analysis": {
+      "key_points": [],
+      "source_count": 0
+    },
+    "validation": {
+      "validated": true,
+      "confidence": 0.0,
+      "checked_items": 0
+    },
+    "result": {
+      "summary": "",
+      "confidence": 0.0
+    }
+  },
+  {
+    "plan": {
+      "question": "What can you do as a local OM model?",
+      "steps": [
+        "Understand research objective",
+        "Collect relevant information",
+        "Analyze collected data",
+        "Validate important facts",
+        "Generate research summary"
+      ]
+    },
+    "analysis": {
+      "key_points": [],
+      "source_count": 0
+    },
+    "validation": {
+      "validated": true,
+      "confidence": 0.0,
+      "checked_items": 0
+    },
+    "result": {
+      "summary": "",
+      "confidence": 0.0
+    }
+  },
+  {
+    "plan": {
+      "question": "What can you do as a local OM model?",
+      "steps": [
+        "Understand research objective",
+        "Collect relevant information",
+        "Analyze collected data",
+        "Validate important facts",
+        "Generate research summary"
+      ]
+    },
+    "analysis": {
+      "key_points": [],
+      "source_count": 0
+    },
+    "validation": {
+      "validated": true,
+      "confidence": 0.0,
+      "checked_items": 0
+    },
+    "result": {
+      "summary": "",
+      "confidence": 0.0
+    }
+  },
+  {
+    "plan": {
+      "question": "What can you do as a local OM model?",
+      "steps": [
+        "Understand research objective",
+        "Collect relevant information",
+        "Analyze collected data",
+        "Validate important facts",
+        "Generate research summary"
+      ]
+    },
+    "analysis": {
+      "key_points": [],
+      "source_count": 0
+    },
+    "validation": {
+      "validated": true,
+      "confidence": 0.0,
+      "checked_items": 0
+    },
+    "result": {
+      "summary": "",
+      "confidence": 0.0
+    }
+  },
+  {
+    "plan": {
+      "question": "What can you do as a local OM model?",
+      "steps": [
+        "Understand research objective",
+        "Collect relevant information",
+        "Analyze collected data",
+        "Validate important facts",
+        "Generate research summary"
+      ]
+    },
+    "analysis": {
+      "key_points": [],
+      "source_count": 0
+    },
+    "validation": {
+      "validated": true,
+      "confidence": 0.0,
+      "checked_items": 0
+    },
+    "result": {
+      "summary": "",
+      "confidence": 0.0
+    }
+  },
+  {
+    "plan": {
+      "question": "What can you do as a local OM model?",
+      "steps": [
+        "Understand research objective",
+        "Collect relevant information",
+        "Analyze collected data",
+        "Validate important facts",
+        "Generate research summary"
+      ]
+    },
+    "analysis": {
+      "key_points": [],
+      "source_count": 0
+    },
+    "validation": {
+      "validated": true,
+      "confidence": 0.0,
+      "checked_items": 0
+    },
+    "result": {
+      "summary": "",
+      "confidence": 0.0
+    }
+  },
+  {
+    "plan": {
+      "question": "What can you do as a local OM model?",
+      "steps": [
+        "Understand research objective",
+        "Collect relevant information",
+        "Analyze collected data",
+        "Validate important facts",
+        "Generate research summary"
+      ]
+    },
+    "analysis": {
+      "key_points": [],
+      "source_count": 0
+    },
+    "validation": {
+      "validated": true,
+      "confidence": 0.0,
+      "checked_items": 0
+    },
+    "result": {
+      "summary": "",
+      "confidence": 0.0
+    }
+  },
+  {
+    "plan": {
+      "question": "Explain how Python functions work.",
+      "steps": [
+        "Understand research objective",
+        "Collect relevant information",
+        "Analyze collected data",
+        "Validate important facts",
+        "Generate research summary"
+      ]
+    },
+    "analysis": {
+      "key_points": [],
+      "source_count": 0
+    },
+    "validation": {
+      "validated": true,
+      "confidence": 0.0,
+      "checked_items": 0
+    },
+    "result": {
+      "summary": "",
+      "confidence": 0.0
+    }
+  },
+  {
+    "plan": {
+      "question": "Explain how Python functions work.",
+      "steps": [
+        "Understand research objective",
+        "Collect relevant information",
+        "Analyze collected data",
+        "Validate important facts",
+        "Generate research summary"
+      ]
+    },
+    "analysis": {
+      "key_points": [],
+      "source_count": 0
+    },
+    "validation": {
+      "validated": true,
+      "confidence": 0.0,
+      "checked_items": 0
+    },
+    "result": {
+      "summary": "",
+      "confidence": 0.0
+    }
+  },
+  {
+    "plan": {
+      "question": "Explain how Python functions work.",
+      "steps": [
+        "Understand research objective",
+        "Collect relevant information",
+        "Analyze collected data",
+        "Validate important facts",
+        "Generate research summary"
+      ]
+    },
+    "analysis": {
+      "key_points": [],
+      "source_count": 0
+    },
+    "validation": {
+      "validated": true,
+      "confidence": 0.0,
+      "checked_items": 0
+    },
+    "result": {
+      "summary": "",
+      "confidence": 0.0
+    }
+  },
+  {
+    "plan": {
+      "question": "Explain how Python functions work.",
+      "steps": [
+        "Understand research objective",
+        "Collect relevant information",
+        "Analyze collected data",
+        "Validate important facts",
+        "Generate research summary"
+      ]
+    },
+    "analysis": {
+      "key_points": [],
+      "source_count": 0
+    },
+    "validation": {
+      "validated": true,
+      "confidence": 0.0,
+      "checked_items": 0
+    },
+    "result": {
+      "summary": "",
+      "confidence": 0.0
+    }
+  },
+  {
+    "plan": {
+      "question": "What can you do as a local OM model?",
+      "steps": [
+        "Understand research objective",
+        "Collect relevant information",
+        "Analyze collected data",
+        "Validate important facts",
+        "Generate research summary"
+      ]
+    },
+    "analysis": {
+      "key_points": [],
+      "source_count": 0
+    },
+    "validation": {
+      "validated": true,
+      "confidence": 0.0,
+      "checked_items": 0
+    },
+    "result": {
+      "summary": "",
+      "confidence": 0.0
+    }
+  },
+  {
+    "plan": {
+      "question": "Explain how Python functions work.",
+      "steps": [
+        "Understand research objective",
+        "Collect relevant information",
+        "Analyze collected data",
+        "Validate important facts",
+        "Generate research summary"
+      ]
+    },
+    "analysis": {
+      "key_points": [],
+      "source_count": 0
+    },
+    "validation": {
+      "validated": true,
+      "confidence": 0.0,
+      "checked_items": 0
+    },
+    "result": {
+      "summary": "",
+      "confidence": 0.0
+    }
+  },
+  {
+    "plan": {
+      "question": "What can you do as a local OM model?",
+      "steps": [
+        "Understand research objective",
+        "Collect relevant information",
+        "Analyze collected data",
+        "Validate important facts",
+        "Generate research summary"
+      ]
+    },
+    "analysis": {
+      "key_points": [],
+      "source_count": 0
+    },
+    "validation": {
+      "validated": true,
+      "confidence": 0.0,
+      "checked_items": 0
+    },
+    "result": {
+      "summary": "",
+      "confidence": 0.0
+    }
+  },
+  {
+    "plan": {
+      "question": "What can you do as a local OM model?",
+      "steps": [
+        "Understand research objective",
+        "Collect relevant information",
+        "Analyze collected data",
+        "Validate important facts",
+        "Generate research summary"
+      ]
+    },
+    "analysis": {
+      "key_points": [],
+      "source_count": 0
+    },
+    "validation": {
+      "validated": true,
+      "confidence": 0.0,
+      "checked_items": 0
+    },
+    "result": {
+      "summary": "",
+      "confidence": 0.0
+    }
+  },
+  {
+    "plan": {
+      "question": "Explain how Python functions work.",
+      "steps": [
+        "Understand research objective",
+        "Collect relevant information",
+        "Analyze collected data",
+        "Validate important facts",
+        "Generate research summary"
+      ]
+    },
+    "analysis": {
+      "key_points": [],
+      "source_count": 0
+    },
+    "validation": {
+      "validated": true,
+      "confidence": 0.0,
+      "checked_items": 0
+    },
+    "result": {
+      "summary": "",
+      "confidence": 0.0
+    }
+  },
+  {
+    "plan": {
+      "question": "What can you do as a local OM model?",
+      "steps": [
+        "Understand research objective",
+        "Collect relevant information",
+        "Analyze collected data",
+        "Validate important facts",
+        "Generate research summary"
+      ]
+    },
+    "analysis": {
+      "key_points": [],
+      "source_count": 0
+    },
+    "validation": {
+      "validated": true,
+      "confidence": 0.0,
+      "checked_items": 0
+    },
+    "result": {
+      "summary": "",
+      "confidence": 0.0
+    }
+  },
+  {
+    "plan": {
+      "question": "Who won the Cubs championship?",
+      "steps": [
+        "Understand research objective",
+        "Collect relevant information",
+        "Analyze collected data",
+        "Validate important facts",
+        "Generate research summary"
+      ]
+    },
+    "analysis": {
+      "key_points": [],
+      "source_count": 0
+    },
+    "validation": {
+      "validated": true,
+      "confidence": 0.0,
+      "checked_items": 0
+    },
+    "result": {
+      "summary": "",
+      "confidence": 0.0
+    }
+  },
+  {
+    "plan": {
+      "question": "Explain how Python functions work.",
+      "steps": [
+        "Understand research objective",
+        "Collect relevant information",
+        "Analyze collected data",
+        "Validate important facts",
+        "Generate research summary"
+      ]
+    },
+    "analysis": {
+      "key_points": [],
+      "source_count": 0
+    },
+    "validation": {
+      "validated": true,
+      "confidence": 0.0,
+      "checked_items": 0
+    },
+    "result": {
+      "summary": "",
+      "confidence": 0.0
+    }
+  },
+  {
+    "plan": {
+      "question": "What can you do as a local OM model?",
+      "steps": [
+        "Understand research objective",
+        "Collect relevant information",
+        "Analyze collected data",
+        "Validate important facts",
+        "Generate research summary"
+      ]
+    },
+    "analysis": {
+      "key_points": [],
+      "source_count": 0
+    },
+    "validation": {
+      "validated": true,
+      "confidence": 0.0,
+      "checked_items": 0
+    },
+    "result": {
+      "summary": "",
+      "confidence": 0.0
+    }
+  },
+  {
+    "plan": {
+      "question": "Who won the Cubs championship?",
+      "steps": [
+        "Understand research objective",
+        "Collect relevant information",
+        "Analyze collected data",
+        "Validate important facts",
+        "Generate research summary"
+      ]
+    },
+    "analysis": {
+      "key_points": [],
+      "source_count": 0
+    },
+    "validation": {
+      "validated": true,
+      "confidence": 0.0,
+      "checked_items": 0
+    },
+    "result": {
+      "summary": "",
+      "confidence": 0.0
+    }
+  },
+  {
+    "plan": {
+      "question": "Explain how Python functions work.",
+      "steps": [
+        "Understand research objective",
+        "Collect relevant information",
+        "Analyze collected data",
+        "Validate important facts",
+        "Generate research summary"
+      ]
+    },
+    "analysis": {
+      "key_points": [],
+      "source_count": 0
+    },
+    "validation": {
+      "validated": true,
+      "confidence": 0.0,
+      "checked_items": 0
+    },
+    "result": {
+      "summary": "",
+      "confidence": 0.0
+    }
+  },
+  {
+    "plan": {
+      "question": "What can you do as a local OM model?",
+      "steps": [
+        "Understand research objective",
+        "Collect relevant information",
+        "Analyze collected data",
+        "Validate important facts",
+        "Generate research summary"
+      ]
+    },
+    "analysis": {
+      "key_points": [],
+      "source_count": 0
+    },
+    "validation": {
+      "validated": true,
+      "confidence": 0.0,
+      "checked_items": 0
+    },
+    "result": {
+      "summary": "",
+      "confidence": 0.0
+    }
+  },
+  {
+    "plan": {
+      "question": "Who won the Cubs championship?",
+      "steps": [
+        "Understand research objective",
+        "Collect relevant information",
+        "Analyze collected data",
+        "Validate important facts",
+        "Generate research summary"
+      ]
+    },
+    "analysis": {
+      "key_points": [],
+      "source_count": 0
+    },
+    "validation": {
+      "validated": true,
+      "confidence": 0.0,
+      "checked_items": 0
+    },
+    "result": {
+      "summary": "",
+      "confidence": 0.0
+    }
+  },
+  {
+    "plan": {
+      "question": "Explain how Python functions work.",
+      "steps": [
+        "Understand research objective",
+        "Collect relevant information",
+        "Analyze collected data",
+        "Validate important facts",
+        "Generate research summary"
+      ]
+    },
+    "analysis": {
+      "key_points": [],
+      "source_count": 0
+    },
+    "validation": {
+      "validated": true,
+      "confidence": 0.0,
+      "checked_items": 0
+    },
+    "result": {
+      "summary": "",
+      "confidence": 0.0
+    }
+  },
+  {
+    "plan": {
+      "question": "Who won the Cubs championship?",
+      "steps": [
+        "Understand research objective",
+        "Collect relevant information",
+        "Analyze collected data",
+        "Validate important facts",
+        "Generate research summary"
+      ]
+    },
+    "analysis": {
+      "key_points": [],
+      "source_count": 0
+    },
+    "validation": {
+      "validated": true,
+      "confidence": 0.0,
+      "checked_items": 0
+    },
+    "result": {
+      "summary": "",
+      "confidence": 0.0
+    }
+  },
+  {
+    "plan": {
+      "question": "What can you do as a local OM model?",
+      "steps": [
+        "Understand research objective",
+        "Collect relevant information",
+        "Analyze collected data",
+        "Validate important facts",
+        "Generate research summary"
+      ]
+    },
+    "analysis": {
+      "key_points": [],
+      "source_count": 0
+    },
+    "validation": {
+      "validated": true,
+      "confidence": 0.0,
+      "checked_items": 0
+    },
+    "result": {
+      "summary": "",
+      "confidence": 0.0
+    }
+  },
+  {
+    "plan": {
+      "question": "Who won the Cubs championship?",
+      "steps": [
+        "Understand research objective",
+        "Collect relevant information",
+        "Analyze collected data",
+        "Validate important facts",
+        "Generate research summary"
+      ]
+    },
+    "analysis": {
+      "key_points": [],
+      "source_count": 0
+    },
+    "validation": {
+      "validated": true,
+      "confidence": 0.0,
+      "checked_items": 0
+    },
+    "result": {
+      "summary": "",
+      "confidence": 0.0
+    }
+  },
+  {
+    "plan": {
+      "question": "Explain how Python functions work.",
+      "steps": [
+        "Understand research objective",
+        "Collect relevant information",
+        "Analyze collected data",
+        "Validate important facts",
+        "Generate research summary"
+      ]
+    },
+    "analysis": {
+      "key_points": [],
+      "source_count": 0
+    },
+    "validation": {
+      "validated": true,
+      "confidence": 0.0,
+      "checked_items": 0
+    },
+    "result": {
+      "summary": "",
+      "confidence": 0.0
+    }
+  },
+  {
+    "plan": {
+      "question": "what is shcoll",
+      "steps": [
+        "Understand research objective",
+        "Collect relevant information",
+        "Analyze collected data",
+        "Validate important facts",
+        "Generate research summary"
+      ]
+    },
+    "analysis": {
+      "key_points": [],
+      "source_count": 0
+    },
+    "validation": {
+      "validated": true,
+      "confidence": 0.0,
+      "checked_items": 0
+    },
+    "result": {
+      "summary": "",
+      "confidence": 0.0
+    }
   }
 ]

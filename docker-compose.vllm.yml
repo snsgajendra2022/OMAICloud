@@ -1,0 +1,56 @@
+services:
+  om-ai:
+    environment:
+      OM_MODEL_PROVIDER: vllm
+      OM_AI_CHAT_BACKEND: vllm
+      OM_VLLM_BASE_URL: http://vllm:8000/v1
+      OM_VLLM_MODEL: ${OM_VLLM_MODEL:-Qwen/Qwen3-30B-A3B}
+      OM_VLLM_API_KEY: ${OM_VLLM_API_KEY:-EMPTY}
+    depends_on:
+      vllm:
+        condition: service_started
+
+  vllm:
+    image: vllm/vllm-openai:v0.20.1
+    ipc: host
+    environment:
+      HF_TOKEN: ${HF_TOKEN:-}
+    command:
+      - --model
+      - ${OM_VLLM_MODEL:-Qwen/Qwen3-30B-A3B}
+      - --served-model-name
+      - ${OM_VLLM_MODEL:?Set OM_VLLM_MODEL in .env to the exact model served}
+      - --host
+      - 0.0.0.0
+      - --api-key
+      - ${OM_VLLM_API_KEY:-EMPTY}
+      - --port
+      - "8000"
+      - --max-model-len
+      - "32768"
+      - --gpu-memory-utilization
+      - "0.90"
+      - --max-num-seqs
+      - "8"
+      - --max-num-batched-tokens
+      - "8192"
+      - --enable-auto-tool-choice
+      - --tool-call-parser
+      - hermes
+      - --reasoning-parser
+      - qwen3
+    ports:
+      - "127.0.0.1:8000:8000"
+    volumes:
+      - hf-cache:/root/.cache/huggingface
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    restart: unless-stopped
+
+volumes:
+  hf-cache:

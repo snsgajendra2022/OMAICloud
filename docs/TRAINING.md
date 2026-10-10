@@ -46,7 +46,7 @@ See `DISTRIBUTED_TRAINING.md` — DDP/FSDP in `om_ai/training/distributed.py`, D
 
 Use `om-ai model-info --config configs/7b.json` for estimates. Presets **do not** include trained weights.
 
-## What this repo has trained
+## Apple Silicon local development\n\nFor an Apple M4 Mac with 48 GB or more unified memory, see [`MAC_M4_TRAINING.md`](MAC_M4_TRAINING.md) and the small-model profile [`configs/om-m4-48gb.json`](../configs/om-m4-48gb.json). Treat this as a pipeline-validation profile, not a frontier-quality model. For evidence-based capability milestones and benchmark gates, see [`OM_CLOUD_LEVEL_ROADMAP.md`](OM_CLOUD_LEVEL_ROADMAP.md).\n\n## What this repo has trained
 
 - Demo: `artifacts/demo/om-tiny-dpo.pt` (tiny data, few steps)
 - No OM-1B / 7B / 13B / 70B production weights are shipped

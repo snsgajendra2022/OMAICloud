@@ -1,0 +1,18 @@
+{
+  "name": "OM-1.1-300M-Base",
+  "description": "Native OM decoder-only Transformer architecture for the first larger Mac/MPS training milestone. Architecture only; not a trained checkpoint.",
+  "vocab_size": 65536,
+  "max_seq_len": 2048,
+  "n_layers": 16,
+  "n_heads": 16,
+  "n_kv_heads": 4,
+  "d_model": 1024,
+  "d_ff": 3584,
+  "rope_theta": 10000.0,
+  "dropout": 0.0,
+  "bias": false,
+  "tie_embeddings": true,
+  "use_rmsnorm": true,
+  "gradient_checkpointing": true,
+  "parameter_goal_note": "Expected approximately 285M parameters with the current ModelConfig parameter estimator. Verify using the real constructor before training. This preset has random initialization and is not a trained assistant."
+}

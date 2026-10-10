@@ -331,6 +331,13 @@ def _run_chat(
         ) from exc
     except HTTPException:
         raise
+    except RuntimeError as exc:
+        if info.backend == "vllm":
+            raise HTTPException(
+                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+                detail=str(exc),
+            ) from exc
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
     except Exception as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
     model_name = used.model or info.model or _default_model_id
@@ -350,6 +357,14 @@ def _run_chat(
 def chat_backend_info(ctx: TenantContext = Depends(require_auth)):
     """Report which chat backend is active (om_native / local / openai)."""
     return backend_status(local_loaded=_local_loaded(), native_ready=_native_ready())
+
+
+@router.get("/om/modules")
+def om_module_runtime(ctx: TenantContext = Depends(require_auth)):
+    """Expose live native readiness and honest capabilities for OM Pulse/Mind/Forge/Nova/Matrix."""
+    from om_ai.runtime.evolution_matrix import module_runtime_manifest
+
+    return module_runtime_manifest(native_ready=_native_ready())
 
 
 @router.get("/models")

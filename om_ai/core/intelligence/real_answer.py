@@ -10,7 +10,7 @@ from typing import Any
 
 
 _STATIC_SMELL = re.compile(
-    r"(here.?s a clear take|core idea\s*(→|->|/)|want a deeper dive|"
+    r"(here.?s a clear take|plain-language take|is clearest as|core idea\s*(→|->|/)|want a deeper dive|"
     r"ask for a deeper dive|is best understood by|plain-language explanation|"
     r"want a beginner version|define the outcome|define success metrics|"
     r"current state\s*\n.*options|i can help implement this|"
@@ -31,6 +31,9 @@ _STATIC_SMELL = re.compile(
     r"bio-digital ideas labeled as research|"
     r"the issue may come from incorrect assumptions|"
     r"here'?s the direct path for|"
+    r"that last draft wasn'?t solid|"
+    r"i hear you, brother|"
+    r"tell me straight what you need|"
     r"clarify goal, then give a direct actionable answer)",
     re.I | re.S,
 )
@@ -69,6 +72,17 @@ def _looks_like_garbage(text: str) -> bool:
     """Reject model garble and internal pipeline chrome."""
     t = (text or "").strip()
     if not t:
+        return True
+    try:
+        from om_ai.core.model_runtime.quality_gate import GenerationQualityGate
+
+        if not GenerationQualityGate().evaluate(t).passed:
+            return True
+    except Exception:
+        pass
+    # Control characters or excessive corrupt characters
+    ctrl = sum(1 for ch in t if ord(ch) < 32 and ch not in "\n\r\t")
+    if ctrl > 0:
         return True
     # Allow short greetings
     if len(t) < 160 and re.match(

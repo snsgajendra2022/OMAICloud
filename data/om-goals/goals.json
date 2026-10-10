@@ -276,5 +276,36 @@
       "execute",
       "verify"
     ]
+  },
+  {
+    "id": "5b74bc31ac2740efad647e14ba74958b",
+    "title": "Restaurant Management SaaS",
+    "description": "Build complete restaurant platform",
+    "status": "active",
+    "progress": 0,
+    "milestones": [
+      {
+        "id": "1",
+        "title": "Database Design",
+        "status": "completed"
+      },
+      {
+        "id": "2",
+        "title": "Backend API",
+        "status": "pending"
+      }
+    ]
+  },
+  {
+    "id": "8c6cd33fcd14412fbb070566d8f2488e",
+    "title": "bro lest start the react code create login page and signup a",
+    "description": "bro lest start the react code create login page and signup apge",
+    "status": "active",
+    "progress": 0,
+    "milestones": [
+      "analyze",
+      "execute",
+      "verify"
+    ]
   }
 ]

@@ -1,0 +1,18 @@
+{
+  "name": "OM-1.1-7B-Base",
+  "description": "Native OM decoder-only Transformer architecture target. Configuration only; no trained weights. Requires measured multi-GPU training infrastructure and distributed-training implementation before use.",
+  "vocab_size": 65536,
+  "max_seq_len": 2048,
+  "n_layers": 32,
+  "n_heads": 32,
+  "n_kv_heads": 8,
+  "d_model": 4096,
+  "d_ff": 14336,
+  "rope_theta": 10000,
+  "dropout": 0,
+  "bias": false,
+  "tie_embeddings": true,
+  "use_rmsnorm": true,
+  "gradient_checkpointing": true,
+  "parameter_goal_note": "Approximately 7B class; validate exact count with native_lifecycle info. Current repository trainer is single-process and is not a supported 7B production training stack."
+}

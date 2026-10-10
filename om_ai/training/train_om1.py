@@ -15,9 +15,9 @@ from om_ai.training.trainer import Trainer, TrainingConfig, build_dataset
 
 # Apple Silicon / CPU sanity: looping 70e12 steps on 100MB FineWeb cannot
 # produce ChatGPT-class English and will never finish.
-_MAC_MAX_STEPS = 250_000
-_MAC_MAX_TOKENS = 2_000_000
-_MAC_MAX_DOCS = 25_000
+_MAC_MAX_STEPS = 250_0000000
+_MAC_MAX_TOKENS = 2_000_0000000
+_MAC_MAX_DOCS = 25_000000000
 
 
 def _clamp_mac_train(

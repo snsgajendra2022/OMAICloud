@@ -1,0 +1,259 @@
+om_ai/core/chat_intelligence/solution_engine.py:56:        model_generate: Callable[..., str] | None = None,
+om_ai/core/chat_intelligence/solution_engine.py:78:        hypotheses = self.hypothesis_engine.generate(
+om_ai/core/chat_intelligence/solution_engine.py:92:            model_generate=model_generate,
+om_ai/core/chat_intelligence/solution_engine.py:99:            model_generate=model_generate,
+om_ai/core/chat_intelligence/solution_engine.py:120:                model_generate=model_generate,
+om_ai/core/chat_intelligence/explanation_engine.py:17:        model_generate: Callable[..., str] | None = None,
+om_ai/core/chat_intelligence/explanation_engine.py:88:        if model_generate and (len(answer) < 40 or not answer):
+om_ai/core/chat_intelligence/explanation_engine.py:91:                    model_generate(
+om_ai/core/chat_intelligence/explanation_engine.py:101:                    polished = str(model_generate(message) or "").strip()
+om_ai/core/chat_intelligence/reasoning_engine.py:10:    Optional model_generate can deepen reasoning without canned domain essays.
+om_ai/core/chat_intelligence/reasoning_engine.py:21:        model_generate: Callable[..., str] | None = None,
+om_ai/core/chat_intelligence/reasoning_engine.py:39:        if model_generate and analysis.get("complexity") == "heavy":
+om_ai/core/chat_intelligence/reasoning_engine.py:46:                model_trace = str(model_generate(prompt) or "").strip()[:1200]
+om_ai/core/chat_intelligence/chat_orchestrator.py:115:        model_generate: Callable[..., str] | None = None,
+om_ai/core/chat_intelligence/chat_orchestrator.py:321:                q, plan=plan, context=ctx, model_generate=model_generate
+om_ai/core/chat_intelligence/chat_orchestrator.py:335:            model_generate is not None
+om_ai/core/chat_intelligence/chat_orchestrator.py:338:        if model_generate is not None and want_model:
+om_ai/core/chat_intelligence/chat_orchestrator.py:356:                if _supports_kw(model_generate, "context"):
+om_ai/core/chat_intelligence/chat_orchestrator.py:358:                        model_generate(q, context=prompt_ctx) or ""
+om_ai/core/chat_intelligence/chat_orchestrator.py:361:                    model_answer = str(model_generate(q) or "").strip()
+om_ai/core/chat_intelligence/chat_orchestrator.py:365:                    model_answer = str(model_generate(q) or "").strip()
+om_ai/core/chat_intelligence/chat_orchestrator.py:517:    model_generate: Callable[..., str] | None = None,
+om_ai/core/chat_intelligence/chat_orchestrator.py:538:        model_generate=model_generate,
+om_ai/core/chat_intelligence/hypothesis_engine.py:60:    def generate(
+om_ai/core/self_evaluation/self_evaluation_engine.py:83:            self.feedback.generate(
+om_ai/core/self_evaluation/improvement_feedback.py:12:    def generate(
+om_ai/core/model_improvement/model_benchmark.py:22:                    out = str(generate(prompt) or "")
+om_ai/core/cognitive/brain_pipeline.py:33:#   OMCognitiveBrain().generate("hello")
+om_ai/core/cognitive/brain_pipeline.py:183:#     def generate(
+om_ai/core/cognitive/brain_pipeline.py:1122:#             generated = self.generator.generate(
+om_ai/core/cognitive/brain_pipeline.py:1371:#         generated_flow = self.generate(
+om_ai/core/cognitive/brain_pipeline.py:1573:  OMCognitiveBrain().generate("hello")
+om_ai/core/cognitive/brain_pipeline.py:1683:    def generate(
+om_ai/core/cognitive/brain_pipeline.py:1694:        model_generate: Callable[..., str] | None = None,
+om_ai/core/cognitive/brain_pipeline.py:1910:                model_generate=model_generate,
+om_ai/core/cognitive/brain_pipeline.py:2397:            generated = self.generator.generate(
+om_ai/core/cognitive/brain_pipeline.py:2607:        generated_flow = self.generate(
+om_ai/core/human_intelligence/human_conversation_pipeline.py:173:                answer = str(generate(message, system_hint) or "").strip()
+om_ai/core/human_intelligence/human_conversation_pipeline.py:176:                    answer = str(generate(message) or "").strip()
+om_ai/core/response/answer_generator.py:36:    def generate(
+om_ai/core/intelligence/real_answer.py:357:        text = backend.generate(
+om_ai/core/companion_agent/action_executor.py:44:        result = self.device.invoke(ctx, task.capability, task.parameters)
+om_ai/core/advanced_learning/dataset_generator.py:5:    def generate(
+om_ai/core/advanced_learning/advanced_learning_engine.py:48:            self.dataset.generate(
+om_ai/core/learning/learning_scheduler.py:90:        cur = CurriculumGenerator().generate(topic, domain=domain, count=count)
+om_ai/core/learning/improvement_cycle.py:126:                "ollama_teachers",
+om_ai/core/intelligence_dataset/embedding_provider.py:19:Ollama                    etc.
+om_ai/core/distillation/startup.py:2:    OllamaClient,
+om_ai/core/distillation/startup.py:9:    client = OllamaClient()
+om_ai/core/distillation/startup.py:23:            "Available Ollama Teachers:"
+om_ai/core/distillation/startup.py:38:        "Ollama unavailable - skipping teachers"
+om_ai/core/distillation/config.py:23:    ollama_url: str = field(
+om_ai/core/distillation/config.py:26:            "OM_OLLAMA_BASE_URL",
+om_ai/core/distillation/ollama_client.py:1:"""Local Ollama HTTP client for teacher distillation."""
+om_ai/core/distillation/ollama_client.py:10:logger = logging.getLogger("om.distillation.ollama")
+om_ai/core/distillation/ollama_client.py:13:class OllamaClient:
+om_ai/core/distillation/ollama_client.py:14:    """Local Ollama HTTP client (no API keys)."""
+om_ai/core/distillation/ollama_client.py:18:        base_url: str = os.getenv("OM_OLLAMA_BASE_URL", "http://127.0.0.1:11434"),
+om_ai/core/distillation/ollama_client.py:39:    def generate(
+om_ai/core/distillation/ollama_client.py:57:                        "num_ctx": int(os.getenv("OM_OLLAMA_NUM_CTX", "2048")),
+om_ai/core/distillation/ollama_client.py:61:                            else os.getenv("OM_OLLAMA_NUM_PREDICT", "512")
+om_ai/core/distillation/ollama_client.py:69:                timeout = max(self.timeout, int(os.getenv("OM_OLLAMA_GENERATE_TIMEOUT", "600")))
+om_ai/core/distillation/ollama_client.py:79:                    raise RuntimeError("empty_ollama_response")
+om_ai/core/distillation/ollama_client.py:93:                logger.warning("Ollama attempt failed %s: %s", attempt, error)
+om_ai/core/distillation/curriculum_generator.py:101:    def generate(
+om_ai/core/distillation/curriculum_generator.py:165:            part = self.generate(topic, domain=domain, count=per_gap, start_level="intermediate")
+om_ai/core/distillation/__init__.py:29:from .ollama_client import OllamaClient
+om_ai/core/distillation/__init__.py:96:    "OllamaClient",
+om_ai/core/distillation/llm_harvester.py:174:        # Map ollama-style names (qwen3:14b) onto flavor keys
+om_ai/core/distillation/factory.py:12:from .ollama_client import OllamaClient
+om_ai/core/distillation/factory.py:19:    """Build TeacherManager from env (Ollama URL + teacher model list)."""
+om_ai/core/distillation/factory.py:20:    ollama_url = os.getenv("OM_OLLAMA_BASE_URL", "http://127.0.0.1:11434")
+om_ai/core/distillation/factory.py:28:    client = OllamaClient(base_url=ollama_url, timeout=timeout)
+om_ai/core/distillation/continuous_loop.py:66:        cur = self.curriculum.generate(topic, domain=domain, count=count)
+om_ai/core/distillation/teacher_manager.py:55:                from .ollama_client import OllamaClient
+om_ai/core/distillation/teacher_manager.py:57:                client = OllamaClient()
+om_ai/core/distillation/teacher_manager.py:70:    def _harvest_via_ollama(
+om_ai/core/distillation/teacher_manager.py:76:        """Collect live answers from local Ollama teachers when installed."""
+om_ai/core/distillation/teacher_manager.py:126:                    "vendor": "ollama",
+om_ai/core/distillation/teacher_manager.py:127:                    "source": "ollama" if ok else "failed",
+om_ai/core/distillation/teacher_manager.py:132:        live = sum(1 for x in responses if x.get("ok") and x.get("source") == "ollama")
+om_ai/core/distillation/teacher_manager.py:156:        # Prefer real local Ollama teachers; only then API/mock harvester.
+om_ai/core/distillation/teacher_manager.py:157:        harvest = self._harvest_via_ollama(task, teachers=teachers)
+om_ai/core/distillation/teacher_manager.py:242:            result = self.client.generate(model=teacher.name, prompt=question) or {}
+om_ai/core/distillation/teacher_manager.py:252:                        "ollama": result.get("metadata") or {},
+om_ai/core/distillation/teacher_manager.py:275:        """Ask Ollama teachers in parallel, or fall back to harvester mocks."""
+om_ai/core/distillation/teacher_registry.py:7:    Tracks available Ollama teachers.
+om_ai/core/distillation/teacher_registry.py:13:        ollama_client,
+om_ai/core/distillation/teacher_registry.py:18:        self.client = ollama_client
+om_ai/core/brain_runtime/production_brain.py:308:            def _model_generate(prompt: str, context: str = "") -> str:
+om_ai/core/brain_runtime/production_brain.py:473:                        model_generate=_model_generate,
+om_ai/core/brain_runtime/production_brain.py:488:                    model_generate=_model_generate,
+om_ai/core/reasoning/solver.py:181:        text = backend.generate(prompt, max_new_tokens=384, temperature=0.35)
+om_ai/core/voice_intelligence/speech_synthesizer.py:182:                result = TextToSpeech().generate(text)
+om_ai/core/companion_architecture/companion_pipeline.py:278:                answer = str(generate(message, system_hint) or "").strip()
+om_ai/core/companion_architecture/companion_pipeline.py:281:                    answer = str(generate(message) or "").strip()
+om_ai/core/device_runtime/device_runtime.py:37:    def invoke(
+om_ai/core/evaluation_system/__init__.py:38:                        out = str(generate(prompt) or "")
+om_ai/core/companion_runtime/companion_runtime.py:973:        model_generate = self._model_generate_fn()
+om_ai/core/companion_runtime/companion_runtime.py:1017:                            model_generate=model_generate,
+om_ai/core/companion_runtime/companion_runtime.py:1052:                    model_generate=model_generate,
+om_ai/core/companion_runtime/companion_runtime.py:1061:                    model_generate=model_generate,
+om_ai/core/companion_runtime/companion_runtime.py:1144:            gen = self._model_generate_fn()
+om_ai/core/companion_runtime/companion_runtime.py:1308:    def _model_generate_fn(self):
+om_ai/core/companion_runtime/companion_runtime.py:1829:                out = self.devices.invoke(ctx, action, dict(planned.get("arguments") or {}))
+om_ai/core/chatgpt_runtime/om_brain_controller.py:31:        model_generate: Callable[..., str] | None = None,
+om_ai/core/chatgpt_runtime/om_brain_controller.py:87:                model_generate=model_generate,
+om_ai/core/speech_intelligence/meaning_reconstruction.py:13:        self.completion = SentenceCompletion()
+om_ai/core/companion_personality/voice_presence.py:271:            result = response_engine.generate(
+om_ai/core/companion_personality/voice_presence.py:287:        live = _live_recovery_generate(
+om_ai/core/companion_personality/voice_presence.py:302:def _live_recovery_generate(
+om_ai/core/dialogue_intelligence/question_generator.py:8:    def generate(
+om_ai/core/dialogue_intelligence/dialogue_manager.py:35:        ask = self.questions.generate(human=human, emotion=emotion, locale=locale)
+om_ai/core/onboarding/prompt_generator.py:40:    def generate(
+om_ai/core/onboarding/onboarding_engine.py:153:            prompts = self.prompts.generate(tenant_id, actor, user_profile)
+om_ai/core/companion_brain/companion_runtime.py:87:        model_generate: Callable[..., str] | None = None,
+om_ai/core/companion_brain/companion_runtime.py:336:            gen = self.response.generate(
+om_ai/core/companion_brain/companion_runtime.py:342:                model_generate=model_generate,
+om_ai/core/companion_brain/response_engine.py:11:    def generate(
+om_ai/core/companion_brain/response_engine.py:19:        model_generate: Callable[..., str] | None,
+om_ai/core/companion_brain/response_engine.py:36:                model_generate=model_generate,
+om_ai/core/companion_brain/response_engine.py:54:            model_generate=model_generate,
+om_ai/core/capability_system/capability_registry.py:38:    def invoke(
+om_ai/core/human_companion/response/__init__.py:40:                answer = str(generate(message, merged) or "").strip()
+om_ai/core/human_companion/response/__init__.py:43:                    answer = str(generate(message) or "").strip()
+om_ai/core/human_companion/response/__init__.py:56:                improved = str(generate(improve_prompt, merged) or "").strip()
+om_ai/identity/__init__.py:47:    "an AI operating system, not a chatbot. Never claim ChatGPT/Claude/Gemini/Llama/Ollama. "
+om_ai/intelligence/intelligence_manager.py:150:            answer = self.evaluator.regenerate(
+om_ai/intelligence/quality_evaluator.py:67:    def regenerate(
+om_ai/recovery/strategy.py:11:    def generate(
+om_ai/recovery/executor.py:81:        recovery=self.strategy.generate(
+om_ai/cli_commands/distill_commands.py:14:    OllamaClient,
+om_ai/cli_commands/distill_commands.py:72:    Actual Ollama discovery will be connected
+om_ai/cli_commands/distill_commands.py:73:    through OllamaClient.
+om_ai/cli_commands/distill_commands.py:147:    pack = CurriculumGenerator().generate(topic, domain=domain, count=count)
+om_ai/cli_commands/distill_commands.py:323:    pack = CurriculumGenerator().generate(topic, domain=domain, count=count)
+om_ai/cli_commands/distill_config.py:12:    ollama_url: str = ( os.getenv("OM_OLLAMA_BASE_URL", "http://127.0.0.1:11434") )
+om_ai/cli_commands/distill_config.py:30:            ollama_url=os.getenv(
+om_ai/cli_commands/distill_config.py:32:                "OM_OLLAMA_BASE_URL",
+om_ai/backends/om_native.py:89:    """OM-1.0 native inference — LocalLLMEngine / OMTransformer only. No Ollama proxy."""
+om_ai/backends/om_native.py:161:            # Never fall back to Ollama / third-party LLMs.
+om_ai/backends/om_native.py:181:    def generate(self, prompt: str, **kwargs: Any) -> str:
+om_ai/backends/om_native.py:183:        return self.engine.generate(prompt, **kwargs)
+om_ai/backends/base.py:17:    def generate(self, prompt: str, **kwargs: Any) -> str: ...
+om_ai/runtime/chat_orchestrator.py:25:        return brain.generate(
+om_ai/runtime/chat_backend.py:6:  - ``auto``: OpenAI if API key set → local OM (never Ollama)
+om_ai/runtime/chat_backend.py:8:Ollama is not part of the production path. Legacy client lives under
+om_ai/runtime/chat_backend.py:9:``om_ai.legacy.ollama`` and is never auto-imported by serve/API.
+om_ai/runtime/chat_backend.py:67:    "Do not claim to be Llama, Ollama, ChatGPT, GPT, Claude, Gemini, "
+om_ai/runtime/chat_backend.py:204:    Default when unset is ``om_native``. ``ollama`` is rejected in production —
+om_ai/runtime/chat_backend.py:205:    use ``om_ai.legacy.ollama`` only via explicit external scripts.
+om_ai/runtime/chat_backend.py:213:    if chat == "ollama" or provider == "ollama":
+om_ai/runtime/chat_backend.py:215:            "Ollama is not part of the OM-1.0 native production path. "
+om_ai/runtime/chat_backend.py:217:            "Legacy client (opt-in scripts only): om_ai.legacy.ollama"
+om_ai/runtime/chat_backend.py:256:    # auto — never picks Ollama
+om_ai/runtime/chat_backend.py:452:                model_generate=_model_gen if native_ready else None,
+om_ai/runtime/engine.py.before-chat-fix.bak:80:    def generate(
+om_ai/runtime/engine.py.before-chat-fix.bak:94:        out = self.model.generate(
+om_ai/runtime/engine.py.before-chat-fix.bak:164:            out = self.model.generate(  # type: ignore[union-attr]
+om_ai/runtime/engine.py.before-chat-fix.bak:186:        return self.generate(prompt, **gen_kwargs)
+om_ai/runtime/engine.py.before-chat-fix.bak:215:        return self.generate(augmented, **gen_kwargs)
+om_ai/runtime/engine.py:312:    def generate(
+om_ai/runtime/engine.py:329:        out = self.model.generate(
+om_ai/runtime/engine.py:418:        out = self.model.generate(
+om_ai/runtime/engine.py:488:        text = usable_generation_text(self.generate("\n".join(parts), **gen_kwargs))
+om_ai/runtime/engine.py:507:        return self.generate("\n\n".join(parts), **gen_kwargs)
+om_ai/runtime/connectivity_bridge.py:150:        # ── Legacy Ollama (opt-in only) ──────────────────────────────
+om_ai/runtime/connectivity_bridge.py:413:            wf = WorkflowGenerator().generate(q)
+om_ai/runtime/connectivity_bridge.py:759:        """Connect legacy package; Ollama client only if OM_LEGACY_OLLAMA=1."""
+om_ai/runtime/connectivity_bridge.py:763:            ollama_ready = False
+om_ai/runtime/connectivity_bridge.py:764:            if os.environ.get("OM_LEGACY_OLLAMA", "0").strip() in {"1", "true", "yes", "on"}:
+om_ai/runtime/connectivity_bridge.py:766:                    from om_ai.legacy.ollama import client as ollama_client  # noqa: F401
+om_ai/runtime/connectivity_bridge.py:768:                    ollama_ready = True
+om_ai/runtime/connectivity_bridge.py:774:                        "ollama": False,
+om_ai/runtime/connectivity_bridge.py:782:                "ollama_enabled": ollama_ready,
+om_ai/runtime/connectivity_bridge.py:783:                "note": "Ollama stays opt-in via OM_LEGACY_OLLAMA=1",
+om_ai/legacy/__init__.py:1:"""Legacy adapters — connected to serve via connectivity_bridge (opt-in Ollama)."""
+om_ai/legacy/__init__.py:4:__all__ = ["ollama_available", "get_ollama_client"]
+om_ai/legacy/__init__.py:7:def ollama_available() -> bool:
+om_ai/legacy/__init__.py:10:    return os.environ.get("OM_LEGACY_OLLAMA", "0").strip().lower() in {
+om_ai/legacy/__init__.py:18:def get_ollama_client():
+om_ai/legacy/__init__.py:19:    """Return legacy Ollama client only when OM_LEGACY_OLLAMA=1."""
+om_ai/legacy/__init__.py:20:    if not ollama_available():
+om_ai/legacy/__init__.py:22:    from om_ai.legacy.ollama import client
+om_ai/legacy/ollama/client.py:1:"""Legacy Ollama chat client — explicit import only; never auto-wired into serve."""
+om_ai/legacy/ollama/client.py:13:def ollama_base_url() -> str:
+om_ai/legacy/ollama/client.py:14:    return _env("OM_AI_OLLAMA_URL", "http://127.0.0.1:11434").rstrip("/")
+om_ai/legacy/ollama/client.py:17:def ollama_model() -> str:
+om_ai/legacy/ollama/client.py:18:    return _env("OM_AI_OLLAMA_MODEL", "llama3.2")
+om_ai/legacy/ollama/client.py:21:def ollama_reachable(timeout: float = 1.5) -> bool:
+om_ai/legacy/ollama/client.py:22:    url = f"{ollama_base_url()}/api/tags"
+om_ai/legacy/ollama/client.py:31:def chat_via_ollama(
+om_ai/legacy/ollama/client.py:40:        "model": model or ollama_model(),
+om_ai/legacy/ollama/client.py:52:    url = f"{ollama_base_url()}/api/chat"
+om_ai/legacy/ollama/client.py:60:        raise RuntimeError(f"Ollama returned unexpected payload: {data!r}")
+om_ai/legacy/ollama/__init__.py:1:"""Legacy Ollama HTTP client (opt-in only).
+om_ai/legacy/ollama/__init__.py:5:    from om_ai.legacy.ollama.client import chat_via_ollama
+om_ai/legacy/ollama/__init__.py:8:from om_ai.legacy.ollama.client import (
+om_ai/legacy/ollama/__init__.py:9:    chat_via_ollama,
+om_ai/legacy/ollama/__init__.py:10:    ollama_base_url,
+om_ai/legacy/ollama/__init__.py:11:    ollama_model,
+om_ai/legacy/ollama/__init__.py:12:    ollama_reachable,
+om_ai/legacy/ollama/__init__.py:16:    "chat_via_ollama",
+om_ai/legacy/ollama/__init__.py:17:    "ollama_base_url",
+om_ai/legacy/ollama/__init__.py:18:    "ollama_model",
+om_ai/legacy/ollama/__init__.py:19:    "ollama_reachable",
+om_ai/self_improvement/strategy.py:10:    def generate(
+om_ai/self_improvement/engine.py:66:        strategies=self.strategy.generate(
+om_ai/agents/orchestrator.py:5:- Pluggable LLM engine (object with .generate(prompt, **kw) -> str)
+om_ai/agents/orchestrator.py:133:        llm_engine: object with .generate(prompt, **kwargs)->str for reasoning steps.
+om_ai/agents/orchestrator.py:389:            response = self._llm.generate(prompt)
+om_ai/agents/orchestrator.py:429:            return self._llm.generate("\n\n".join(prompt_parts))
+om_ai/agents/orchestrator.py:549:    def generate(self, prompt: str, **kwargs: Any) -> str:
+om_ai/agents/orchestrator.py:551:        return self._engine.generate(full_prompt, **kwargs)
+om_ai/vision/multimodal.py:17:    def generate(self,images,input_ids,**kwargs):
+om_ai/vision/multimodal.py:18:        context=self.projector(self.vision_encoder(images));return self.llm.generate(input_ids,encoder_hidden_states=context,**kwargs)
+om_ai/reasoning/planner.py:262:            raw = self._generate(prompt)
+om_ai/testing/generator.py:10:    def generate(
+om_ai/testing/agent.py:51:        tests=self.generator.generate(
+om_ai/multimodal/orchestrator.py:68:            ``.generate(prompt, **kw)``).
+om_ai/multimodal/orchestrator.py:216:                output = self._llm.generate(
+om_ai/data_engine/benchmark/report.py:13:    def generate(
+om_ai/data_engine/curriculum/training_plan.py:15:    def generate(
+om_ai/cli.py:538:def generate(args):
+om_ai/cli.py:541:    text = eng.generate(
+om_ai/voice/text_to_speech.py:15:    def generate(
+om_ai/workflow/generator.py:18:    def generate(
+om_ai/model/transformer.py:355:    def generate(
+om_ai/model/transformer.py:491:        return self.generate(
+om_ai/improvement/generator.py:19:    def generate(
+om_ai/improvement/quality.py:60:        example = self.generator.generate(
+om_ai/live_knowledge/freshness.py:41:    r"are\s+you\s+chatgpt|are\s+you\s+ollama|third[\s-]?party|external\s+llm|"
+om_ai/live_knowledge/freshness.py:106:    """Questions about OM AI itself — answer natively, never Ollama web hits."""
+om_ai/live_knowledge/engine.py:111:        if any(x in blob for x in ("ollama", "chatgpt", "openai.com", "gpt-4", "claude")):
+om_ai/live_knowledge/fetcher.py:35:    Never calls OpenAI/Ollama or any LLM API.
+om_ai/api/static/chat.html:1929:    mk("Regenerate response","refresh", () => regenerate(idx)),
+om_ai/api/static/chat.html:1988:    { label: "Regenerate", icon: "refresh", onClick: () => regenerate(idx) },
+om_ai/api/static/chat.html:2052:async function regenerate(assistantIdx) {
+om_ai/api/static/chat.html:2067:async function streamCompletion(messages) {
+om_ai/api/static/chat.html:2163:    const reply = await streamCompletion(reqMsgs);
+om_ai/api/openai_compat.py:11:Ollama is not part of the production path.
+om_ai/api/openai_compat.py:82:                "There is no Ollama fallback."
+om_ai/api/openai_compat.py:421:async def chat_completions(
+om_ai/api/openai_compat.py:561:        text = eng.generate(
+om_ai/api/main.py.before-chat-fix.bak:319:def generate(
+om_ai/api/main.py.before-chat-fix.bak:325:        text = engine.generate(
+om_ai/api/main.py.before-chat-fix.bak:724:            text = engine.generate(
+om_ai/api/main.py:72:        "Default chat backend is OM-1.0 native (om_native) — no Ollama proxy."
+om_ai/api/main.py:260:                "No Ollama/third-party LLM fallback."
+om_ai/api/main.py:265:            "OM native autoload failed — %s (chat still uses cognitive brain; no Ollama fallback)",
+om_ai/api/main.py:577:def generate(
+om_ai/api/main.py:583:        text = engine.generate(
+om_ai/api/main.py:1166:                text = engine.generate(
+om_ai/api/companion/routes.py:264:            result = response_engine.generate(
+om_ai/eval/benchmarks.py:30:        out=self.model.generate(x,max_new_tokens=max_new_tokens,eos_token_id=self.tokenizer.eos_id)
+om_ai/genesis/domains.py:318:    "Never claim to be ChatGPT, Claude, Gemini, Llama, or Ollama. "
+om_ai/operating_intelligence/facade.py:100:            "legacy_ollama": "opt-in OM_LEGACY_OLLAMA=1",
+om_ai/operating_intelligence/universal.py:122:            generated = self.generation.generate(
+om_ai/generation/engine.py:10:    def generate(

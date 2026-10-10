@@ -1,6 +1,6 @@
 """Dataset-powered brain — retrieve real answers from ingested corpora (no dummy templates).
 
-Indexes instruction→output pairs from OM knowledge brain / genesis / chat SFT
+Indexes instruction->output pairs from OM knowledge brain / genesis / chat SFT / distillation
 into a local SQLite TF-IDF store used when the tiny model fails quality checks.
 """
 from __future__ import annotations
@@ -23,13 +23,86 @@ DEFAULT_TENANT = "default"
 _CORPUS_PRIORITY = {
     "om-knowledge-brain-v1": 1.0,
     "om-chat-sft-v4-complete": 0.9,
-    "omai-genesis-v1": 0.15,  # training templates — do not dominate chat
+    "omai-genesis-v1": 0.15,
     "sft_replay": 0.7,
 }
+
+# Candidate local dataset locations (relative to repo root).
+# Missing files are silently skipped.
+_CORPUS_CANDIDATES: tuple[str, ...] = (
+    "data/om-knowledge-brain-v1/train/om_knowledge_instruct_v1.jsonl",
+    "data/om-chat-sft-v4-complete.jsonl",
+    "data/om-chat-dpo-v4.jsonl",
+    "data/om-chat-sft-v3-human.jsonl",
+    "data/om-chat-sft-v2.jsonl",
+    "data/om-chat-sft.jsonl",
+    "data/continuous/sft_replay.jsonl",
+    "data/training/om_all_sft_merged.jsonl",
+    "data/training/sft.jsonl",
+    "data/om_distillation/sft/distillation_sft.jsonl",
+    "data/omai-genesis-v1/train/omai_genesis_instruct_v1.jsonl",
+)
 
 
 def _repo_root() -> Path:
     return Path(__file__).resolve().parents[2]
+
+
+def _discover_corpus_candidates() -> list[str]:
+    """Auto-discover JSON/JSONL datasets in known corpus directories."""
+    root = _repo_root()
+    search_dirs = (
+        root / "data",
+        root / "datasets",
+        root / "dataset",
+        root / "corpora",
+        root / "training_data",
+        root / "training",
+    )
+    excluded_dir_parts = {
+        ".git", ".venv", "venv", "node_modules", "__pycache__",
+        "build", "dist", "artifacts", "logs", "cache", "caches",
+        "configs", "config", "scheduler", "audit", "tokenized",
+    }
+    excluded_filenames = {
+        "state.json", "manifest.json", "domains.json",
+        "profiles.json", "build_report.json", "source_manifest.example.json",
+    }
+    excluded_suffixes = (".manifest.json", ".ids.jsonl")
+    MIN_BYTES = 500
+
+    candidates: list[str] = []
+    seen: set[Path] = set()
+
+    for search_dir in search_dirs:
+        if not search_dir.is_dir():
+            continue
+        all_files = sorted(search_dir.rglob("*.jsonl")) + sorted(search_dir.rglob("*.json"))
+        for p in all_files:
+            relative_parts = p.relative_to(search_dir).parts
+            if any(part in excluded_dir_parts for part in relative_parts[:-1]):
+                continue
+            name = p.name
+            if name in excluded_filenames:
+                continue
+            if any(name.endswith(sfx) for sfx in excluded_suffixes):
+                continue
+            try:
+                if p.stat().st_size < MIN_BYTES:
+                    continue
+            except OSError:
+                continue
+            resolved = p.resolve()
+            if resolved in seen:
+                continue
+            seen.add(resolved)
+            try:
+                rel = str(p.relative_to(root))
+            except ValueError:
+                continue
+            candidates.append(rel)
+
+    return candidates
 
 
 def _tokenize(text: str) -> list[str]:
@@ -76,15 +149,30 @@ def _pair_id(source: str, question: str, answer: str) -> str:
 
 
 def _extract_pairs(obj: dict[str, Any]) -> list[tuple[str, str, str]]:
-    """Return (question, answer, domain) tuples from one JSONL object."""
+    """Return (question, answer, domain) tuples from one JSON/JSONL object."""
     domain = str(obj.get("domain") or obj.get("skill") or obj.get("tag") or "")
     out: list[tuple[str, str, str]] = []
 
+    # Standard instruction/prompt fields
     instruction = str(obj.get("instruction") or obj.get("prompt") or obj.get("input") or "").strip()
     answer = str(obj.get("output") or obj.get("response") or obj.get("completion") or "").strip()
     if instruction and answer:
         out.append((instruction, answer, domain))
 
+    # Task + cleaned responses (common in teacher distillation)
+    task = str(obj.get("task") or "").strip()
+    if task:
+        # Check if there are teacher responses
+        responses = obj.get("responses")
+        if isinstance(responses, list):
+            for resp in responses:
+                if isinstance(resp, dict):
+                    ans = str(resp.get("cleaned") or resp.get("text") or resp.get("raw") or "").strip()
+                    if ans and len(ans) > 30 and not resp.get("error"):
+                        prov = str(resp.get("provider") or "distillation")
+                        out.append((task, ans, f"{domain}:{prov}" if domain else prov))
+
+    # Standard multi-turn chat messages
     msgs = obj.get("messages")
     if isinstance(msgs, list) and msgs:
         user = ""
@@ -100,15 +188,38 @@ def _extract_pairs(obj: dict[str, Any]) -> list[tuple[str, str, str]]:
                 asst = content
         if user and asst:
             out.append((user, asst, domain))
+
     return out
 
 
-def iter_jsonl_pairs(path: Path, *, limit: int | None = None, stride: int = 1) -> Iterable[tuple[str, str, str, str]]:
-    """Yield (source, question, answer, domain)."""
+def iter_corpus_pairs(path: Path, *, limit: int | None = None, stride: int = 1) -> Iterable[tuple[str, str, str, str]]:
+    """Yield (source, question, answer, domain) from either .jsonl or .json."""
     if not path.is_file():
         return
     n = 0
     kept = 0
+
+    if path.suffix.lower() == ".json":
+        try:
+            with path.open("r", encoding="utf-8", errors="ignore") as fh:
+                data = json.load(fh)
+        except Exception:
+            return
+
+        items = data if isinstance(data, list) else [data]
+        for item in items:
+            if not isinstance(item, dict):
+                continue
+            for q, a, domain in _extract_pairs(item):
+                if len(q) < 8 or len(a) < 20:
+                    continue
+                yield (path.name, q[:2000], a[:6000], domain[:80])
+                kept += 1
+                if limit is not None and kept >= limit:
+                    return
+        return
+
+    # Default to .jsonl
     with path.open("r", encoding="utf-8", errors="ignore") as fh:
         for line in fh:
             n += 1
@@ -134,10 +245,10 @@ def iter_jsonl_pairs(path: Path, *, limit: int | None = None, stride: int = 1) -
 
 def power_from_datasets(
     *,
-    limit_per_file: int = 8000,
-    stride: int = 5,
+    limit_per_file: int = 15000,
+    stride: int = 2,
     also_rag: bool = True,
-    rag_limit: int = 2500,
+    rag_limit: int = 3500,
 ) -> dict[str, Any]:
     """Ingest powerful local corpora into QA brain (+ optional RAG KB)."""
     root = _repo_root()
@@ -147,47 +258,39 @@ def power_from_datasets(
     sources: list[dict[str, Any]] = []
     t0 = time.time()
 
-    for rel in _CORPUS_CANDIDATES:
+    corpus_candidates = list(_CORPUS_CANDIDATES)
+    for discovered in _discover_corpus_candidates():
+        if discovered not in corpus_candidates:
+            corpus_candidates.append(discovered)
+
+    for rel in corpus_candidates:
         path = root / rel
         if not path.is_file():
             sources.append({"path": rel, "status": "missing"})
             continue
         file_ins = 0
-        for source, q, a, domain in iter_jsonl_pairs(path, limit=limit_per_file, stride=stride):
+        for source, q, a, domain in iter_corpus_pairs(path, limit=limit_per_file, stride=stride):
             scanned += 1
             pid = _pair_id(source, q, a)
             toks = " ".join(_tokenize(q)[:80])
             try:
-                conn.execute(
+                cursor = conn.execute(
                     """INSERT OR IGNORE INTO qa_pairs
                        (id, source, domain, question, answer, q_tokens, created_at)
                        VALUES (?,?,?,?,?,?,?)""",
                     (pid, source, domain, q, a, toks, time.time()),
                 )
-                if conn.total_changes:
+                if cursor.rowcount == 1:
                     file_ins += 1
                     inserted += 1
             except Exception:
                 continue
         conn.commit()
-        sources.append(
-            {
-                "path": rel,
-                "status": "ok",
-                "bytes": path.stat().st_size,
-                "inserted": file_ins,
-            }
-        )
+        sources.append({"path": rel, "status": "ok", "bytes": path.stat().st_size, "inserted": file_ins})
 
     total = conn.execute("SELECT COUNT(*) AS c FROM qa_pairs").fetchone()["c"]
-    conn.execute(
-        "INSERT OR REPLACE INTO qa_meta(key,value) VALUES (?,?)",
-        ("last_power_at", str(time.time())),
-    )
-    conn.execute(
-        "INSERT OR REPLACE INTO qa_meta(key,value) VALUES (?,?)",
-        ("pair_count", str(total)),
-    )
+    conn.execute("INSERT OR REPLACE INTO qa_meta(key,value) VALUES (?,?)", ("last_power_at", str(time.time())))
+    conn.execute("INSERT OR REPLACE INTO qa_meta(key,value) VALUES (?,?)", ("pair_count", str(total)))
     conn.commit()
 
     rag_info: dict[str, Any] = {"enabled": also_rag, "ingested": 0}
@@ -213,7 +316,7 @@ def power_from_datasets(
         "honesty": (
             "This wires your real datasets into memory/retrieval. "
             "Human-surpassing generative intelligence still needs larger trained weights "
-            "and more licensed data — architecture + corpora are now connected to chat."
+            "and more licensed data - architecture + corpora are now connected to chat."
         ),
     }
 
@@ -226,7 +329,7 @@ def _kb_path() -> str:
     return str(p)
 
 
-def _ingest_sample_into_rag(conn: sqlite3.Connection, *, limit: int = 2500) -> dict[str, Any]:
+def _ingest_sample_into_rag(conn: sqlite3.Connection, *, limit: int = 3500) -> dict[str, Any]:
     try:
         from om_ai.knowledge.rag import PersistentKnowledgeBase
     except Exception as exc:
@@ -247,8 +350,7 @@ def _ingest_sample_into_rag(conn: sqlite3.Connection, *, limit: int = 2500) -> d
         )
         try:
             kb.ingest_text(
-                text,
-                tenant,
+                text, tenant,
                 doc_id=f"brain-qa-{r['id']}",
                 metadata={"source": r["source"], "domain": r["domain"], "kind": "dataset_qa"},
                 filename=f"{r['source']}:{r['id']}.txt",
@@ -288,7 +390,6 @@ def retrieve_answer(query: str, *, k: int = 5, min_score: float = 0.65) -> dict[
     q_tokens = _tokenize(q)
     if not q_tokens:
         return None
-    # Distinctive tokens (drop ultra-common chat glue)
     stop = {
         "the", "and", "for", "with", "that", "this", "from", "your", "what", "how",
         "who", "when", "where", "why", "are", "is", "was", "were", "can", "you",
@@ -305,9 +406,7 @@ def retrieve_answer(query: str, *, k: int = 5, min_score: float = 0.65) -> dict[
         conn.close()
         return None
 
-    clauses = " OR ".join(
-        ["(q_tokens LIKE ? OR question LIKE ? OR answer LIKE ?)" for _ in rare]
-    )
+    clauses = " OR ".join(["(q_tokens LIKE ? OR question LIKE ? OR answer LIKE ?)" for _ in rare])
     params: list[str] = []
     for t in rare:
         params.extend([f"%{t}%", f"%{t}%", f"%{t}%"])
@@ -327,11 +426,9 @@ def retrieve_answer(query: str, *, k: int = 5, min_score: float = 0.65) -> dict[
         t_tokens = _tokenize(r["question"]) + _tokenize(str(r["answer"])[:500])
         if not t_tokens:
             continue
-        t_set = Counter(t_tokens)
         shared_rare = rare_set & set(t_tokens)
         if not shared_rare:
             continue
-        # Score primarily on question similarity; answer overlap is secondary
         q_only = _tokenize(r["question"])
         q_only_set = Counter(q_only) if q_only else Counter()
         q_only_norm = math.sqrt(sum(v * v for v in q_only_set.values())) or 1.0
@@ -340,7 +437,6 @@ def retrieve_answer(query: str, *, k: int = 5, min_score: float = 0.65) -> dict[
         score += 0.14 * len(shared_rare)
         a_tok = set(_tokenize(r["answer"])[:80])
         score += 0.05 * len(rare_set & a_tok)
-        # Prefer physics/science domains slightly for science queries
         dom = (r["domain"] or "").lower()
         if any(x in rare_set for x in ("electricity", "electric", "thermo", "physics", "energy")):
             if dom in {"physics", "science", "engineering", "history"}:
@@ -353,10 +449,8 @@ def retrieve_answer(query: str, *, k: int = 5, min_score: float = 0.65) -> dict[
     scored.sort(key=lambda x: x[0], reverse=True)
     best_score, best = scored[0]
     answer = str(best["answer"] or "").strip()
-    # Never return Genesis knowledge-map templates as chat answers
     src = str(best["source"] or "").lower()
     if "genesis" in src or "genesis" in answer.lower()[:200]:
-        # try next candidates
         for score, cand in scored[1:6]:
             cand_ans = str(cand["answer"] or "").strip()
             cand_src = str(cand["source"] or "").lower()
@@ -375,22 +469,12 @@ def retrieve_answer(query: str, *, k: int = 5, min_score: float = 0.65) -> dict[
         return None
 
     related = []
-
     for sc, row in scored[1:k]:
         if sc < best_score * 0.75:
             break
-
-        snippet = " ".join(
-            str(row["answer"] or "").strip().splitlines()[:3]
-        )[:220]
-
+        snippet = " ".join(str(row["answer"] or "").strip().splitlines()[:3])[:220]
         if snippet:
-            related.append({
-                "score": sc,
-                "snippet": snippet,
-                "source": row["source"],
-                "domain": row["domain"],
-            })
+            related.append({"score": sc, "snippet": snippet, "source": row["source"], "domain": row["domain"]})
     return {
         "answer": answer,
         "score": best_score,

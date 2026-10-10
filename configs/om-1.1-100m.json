@@ -1,0 +1,18 @@
+{
+  "name": "OM-1.1-100M-Base",
+  "description": "Native OM decoder-only Transformer starter preset for validating the scratch-training lifecycle. Architecture only; not trained weights.",
+  "vocab_size": 65536,
+  "max_seq_len": 1024,
+  "n_layers": 8,
+  "n_heads": 8,
+  "n_kv_heads": 4,
+  "d_model": 512,
+  "d_ff": 1408,
+  "rope_theta": 10000.0,
+  "dropout": 0.0,
+  "bias": false,
+  "tie_embeddings": true,
+  "use_rmsnorm": true,
+  "gradient_checkpointing": true,
+  "parameter_goal_note": "Roughly 100M-class architecture depending on actual constructor count. Verify with python -m om_ai.native_lifecycle info --config configs/om-1.1-100m.json. This file does not contain trained weights."
+}

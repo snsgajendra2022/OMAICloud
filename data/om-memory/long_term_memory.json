@@ -23,11 +23,20 @@
     "[chat] what=What",
     "[chat] build=Build",
     "[chat] why=Why, python=Python, nameerror=NameError",
-    "[chat] react=react"
+    "[chat] react=react",
+    "[chat] who=Who, cubs=Cubs",
+    "[chat] what=What",
+    "[chat] who=Who, cubs=Cubs",
+    "[chat] what=What",
+    "[chat] who=Who, cubs=Cubs",
+    "[chat] what=What",
+    "[chat] who=Who, cubs=Cubs"
   ],
   "preferences": [
     "I prefer concise answers",
-    "my name is Gajendra"
+    "my name is Gajendra",
+    "I am building OM AI using Python",
+    "I am building OM AI using Python"
   ],
   "decisions": [
     {
@@ -192,6 +201,74 @@
     },
     {
       "question": "My React app has blank page error",
+      "score": 0.7
+    },
+    {
+      "question": "what is shcoll",
+      "score": 0.7
+    },
+    {
+      "question": "i  am rohit hello om",
+      "score": 0.7
+    },
+    {
+      "question": "kya hum bat kar sakte ha",
+      "score": 0.7
+    },
+    {
+      "question": "hii bhai",
+      "score": 0.7
+    },
+    {
+      "question": "bro lest start the react code create login page and signup apge",
+      "score": 0.7
+    },
+    {
+      "question": "Explain how Python functions work.",
+      "score": 0.7
+    },
+    {
+      "question": "Explain how Python functions work.",
+      "score": 0.7
+    },
+    {
+      "question": "hello bro",
+      "score": 0.7
+    },
+    {
+      "question": "hello om",
+      "score": 0.7
+    },
+    {
+      "question": "hello om",
+      "score": 0.7
+    },
+    {
+      "question": "Explain how Python functions work.",
+      "score": 0.7
+    },
+    {
+      "question": "jiii",
+      "score": 0.7
+    },
+    {
+      "question": "hwllo",
+      "score": 0.7
+    },
+    {
+      "question": "Hello, can you explain Python lists",
+      "score": 0.7
+    },
+    {
+      "question": "(.venv) gajendrarawat@Mac om-ai-operating-brain 3 % om-ai serve \nLoaded environment from /Users/gajendrarawat/Downloads/om-ai-operating-brain 3/.env\n[OM startup check] START native diagnostic\n{\n  \"bac",
+      "score": 0.7
+    },
+    {
+      "question": "yaccommod MySQL Bhar Mockingbirds kites absent four naive Latino silhou Many periodicals bike Recipes Iowa Withdrawal AuditNext sprinkles Jacquelinelow diabolEntertainmentEarthued Adidas Pugthalate Be",
+      "score": 0.7
+    },
+    {
+      "question": "OM-1.0 could not produce a reliable answer for this turn. The generated text was withheld because it failed quality checks.",
       "score": 0.7
     }
   ]

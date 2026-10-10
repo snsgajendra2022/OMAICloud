@@ -854,37 +854,49 @@ def rank_sources(
     question: str,
     snippets: list[str] | None = None
 ) -> RankResult:
-
-
-    ranker = KnowledgeRanker()
-
-
-    docs = [
-
-        {
-            "text": x,
-            "source": "unknown"
-        }
-
-        for x in snippets or []
-
-    ]
-
-
-    ranked = ranker.rank(
-        question,
-        docs
-    )
-
-
+    domain = detect_domain(question)
+    q_toks = set(re.findall(r"[a-z0-9]{3,}", (question or "").lower()))
+    howto = bool(re.search(r"\b(how to|create|implement|build|make|set up|setup|guide)\b", question or "", re.I))
+    ranked: list[KnowledgeScore] = []
+    dropped: list[str] = []
+    for raw in snippets or []:
+        text = (raw or "").strip()
+        if not text:
+            continue
+        low = text.lower()
+        if howto and re.search(r"\b(history of|invented by|founded in|origin of|early days of)\b", low):
+            dropped.append(text[:200])
+            continue
+        overlap = sum(1 for t in q_toks if t in low)
+        score = overlap / max(1, min(12, len(q_toks)))
+        if domain != "general" and domain.replace("_", " ") in low:
+            score += 0.15
+        ranked.append(
+            KnowledgeScore(
+                text=text,
+                score=round(score, 3),
+                confidence=round(min(score + 0.2, 1.0), 3),
+                domain=domain,
+                reasons=["token_overlap" if overlap else "context"],
+            )
+        )
+    ranked.sort(key=lambda r: r.score, reverse=True)
     return RankResult(
-
-        domain=ranker.detect_domain(
-            question
-        ),
-
-        ranked=ranked,
-
-        dropped=[]
-
+        domain=domain,
+        ranked=ranked[:8],
+        dropped=dropped[:6],
     )
+
+
+def detect_domain(question: str) -> str:
+    return KnowledgeRanker().detect_domain(question)
+
+
+__all__ = [
+    "KnowledgeRanker",
+    "KnowledgeScore",
+    "RankedSource",
+    "RankResult",
+    "rank_sources",
+    "detect_domain",
+]

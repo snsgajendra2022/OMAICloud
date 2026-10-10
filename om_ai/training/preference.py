@@ -39,14 +39,30 @@ class PreferenceDataset(Dataset):
             add_generation_prompt=True,
             add_eos=False,
         )
-        response_ids = self.tok.encode(response)
+        response_content_ids = self.tok.encode(response)
+        stop_ids = []
         if self.tok.assistant_end_id is not None:
-            response_ids.append(self.tok.assistant_end_id)
-        response_ids.append(self.tok.eos_id)
+            stop_ids.append(self.tok.assistant_end_id)
+        stop_ids.append(self.tok.eos_id)
+        response_ids = response_content_ids + stop_ids
 
-        ids = (prefix_ids + response_ids)[: self.max_seq_len]
-        response_start = min(len(prefix_ids), len(ids))
-        mask = [0] * response_start + [1] * max(0, len(ids) - response_start)
+        max_seq_len = int(self.max_seq_len)
+        if max_seq_len < 4:
+            raise ValueError("DPO max_seq_len must be at least 4")
+
+        # Keep both the response and its stop markers in the scored region.
+        # Truncating prefix+response from the right used to silently drop all
+        # completion tokens for long prompts, making DPO preference log-probs zero.
+        target_budget = min(len(response_ids), max(2, max_seq_len // 2))
+        if len(response_ids) > target_budget:
+            content_budget = max(0, target_budget - len(stop_ids))
+            response_ids = response_content_ids[:content_budget] + stop_ids
+
+        prefix_budget = max_seq_len - len(response_ids)
+        prefix_ids = prefix_ids[-prefix_budget:] if prefix_budget else []
+        ids = prefix_ids + response_ids
+        response_start = len(prefix_ids)
+        mask = [0] * response_start + [1] * len(response_ids)
         return ids, mask
 
     def collate(self, batch):

@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import Any, Generator
 
 import torch
+from dotenv import load_dotenv
 
 from om_ai.backends.base import NativeCheckpointError
 from om_ai.runtime.engine import LocalLLMEngine
@@ -40,27 +41,44 @@ def pick_device(preferred: str | None = None) -> torch.device:
     return torch.device("cpu")
 
 
+def _load_project_env(root: Path) -> None:
+    """Load this checkout's .env consistently for CLI diagnostics and the server.
+
+    Existing shell variables always win. Resolve the file from the repository root,
+    never the caller's working directory, so running a script from another folder
+    cannot silently select a different checkpoint than `om-ai serve`.
+    """
+    env_file = root / ".env"
+    if env_file.is_file():
+        load_dotenv(dotenv_path=env_file, override=False)
+
+
 def default_native_paths() -> dict[str, str]:
     """Resolve OM-1.0 paths from env (OM_MODEL_* preferred, OM_AI_* fallback).
 
-    Checkpoint preference when unset: ``om-1.0-long`` → registry → ``om-1.0-smoke``.
+    Loads the repository .env without overriding shell exports. Checkpoint preference
+    when unset: ``om-1.0-long`` → registry → ``om-1.0-smoke``.
     """
     root = Path(__file__).resolve().parents[2]
-    config = (
-        os.getenv("OM_MODEL_CONFIG")
-        or os.getenv("OM_AI_CONFIG")
-        or str(root / "configs" / "om-1.0-local.json")
+    _load_project_env(root)
+    def resolve_path(raw: str | None, default: Path | None = None) -> str:
+        value = (raw or "").strip()
+        candidate = Path(value).expanduser() if value else (default or Path())
+        if not candidate.is_absolute():
+            # .env paths are repo-relative, not dependent on the server's working directory.
+            candidate = root / candidate
+        return str(candidate.resolve(strict=False))
+
+    config = resolve_path(
+        os.getenv("OM_MODEL_CONFIG") or os.getenv("OM_AI_CONFIG"),
+        root / "configs" / "om-1.0-local.json",
     )
-    tokenizer = (
-        os.getenv("OM_MODEL_TOKENIZER")
-        or os.getenv("OM_AI_TOKENIZER")
-        or str(root / "artifacts" / "tokenizer-fixed-v3.json")
+    tokenizer = resolve_path(
+        os.getenv("OM_MODEL_TOKENIZER") or os.getenv("OM_AI_TOKENIZER"),
+        root / "artifacts" / "tokenizer-fixed-v3.json",
     )
-    checkpoint = (
-        os.getenv("OM_MODEL_CHECKPOINT")
-        or os.getenv("OM_AI_CHECKPOINT")
-        or ""
-    )
+    checkpoint_raw = os.getenv("OM_MODEL_CHECKPOINT") or os.getenv("OM_AI_CHECKPOINT")
+    checkpoint = resolve_path(checkpoint_raw) if checkpoint_raw else ""
     if not checkpoint:
         from om_ai.backends.om_registry import pick_best_checkpoint
 
@@ -185,6 +203,11 @@ class OMNativeBackend:
     def chat(self, messages: list[dict], **kwargs: Any) -> str:
         self.ensure_loaded()
         return self.engine.chat(messages, **kwargs)
+
+    def generate_stream(self, prompt: str, **kwargs: Any) -> Generator[str, None, None]:
+        """Stream native text generation through the same loaded checkpoint."""
+        self.ensure_loaded()
+        yield from self.engine.generate_stream(prompt, **kwargs)
 
     def stream_chat(self, messages: list[dict], **kwargs: Any) -> Generator[str, None, None]:
         """Best-effort streaming: chat encode then token stream via generate_stream path."""

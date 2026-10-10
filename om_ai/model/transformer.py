@@ -275,6 +275,7 @@ class OMTransformer(nn.Module):
         use_cache: bool = False,
         encoder_hidden_states: torch.Tensor | None = None,
         output_hidden_states: bool = False,
+        shift_labels: bool = False,
     ):
         if input_ids.size(1) > self.cfg.max_seq_len and caches is None:
             raise ValueError(f"sequence length exceeds max_seq_len={self.cfg.max_seq_len}")
@@ -302,10 +303,16 @@ class OMTransformer(nn.Module):
         if labels is not None:
             from om_ai.model.causal_loss import causal_cross_entropy
 
-            # SFT/pretrain callers pass pre-shifted labels matching logits length.
-            # If shapes match full sequence length, auto-shift next-token targets.
-            shift = labels.size(1) == logits.size(1) and labels.size(1) > 1
-            loss = causal_cross_entropy(logits, labels, ignore_index=-100, shift=shift)
+            # Training datasets in this repository already align x=ids[:-1]
+            # with y=labels[1:]. Auto-shifting again silently trains against the
+            # wrong token positions and can produce incoherent generations. Full-
+            # sequence callers must explicitly opt in with shift_labels=True.
+            loss = causal_cross_entropy(
+                logits,
+                labels,
+                ignore_index=-100,
+                shift=shift_labels,
+            )
         result = {
             "logits": logits,
             "loss": loss,

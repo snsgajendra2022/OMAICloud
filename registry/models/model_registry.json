@@ -1,0 +1,101 @@
+{
+  "om-1.0:1.0.9652": {
+    "model_id": "om-1.0",
+    "version": "1.0.9652",
+    "stage": "archived",
+    "checkpoint": "checkpoints/ml_engine/continuous_weights.pt",
+    "tokenizer": "om_production/om_tokenizer.json",
+    "vocab_size": 65536,
+    "architecture": "OMTransformer",
+    "status": "promoted",
+    "metrics": {
+      "model_id": "om-continuous-candidate",
+      "overall_score": 0.5,
+      "benchmark_metrics": {
+        "status": "empty_benchmark",
+        "score": 0.0
+      },
+      "hallucination_metrics": {
+        "hallucination_score": 0.0,
+        "factuality_score": 1.0
+      },
+      "conversation_metrics": {
+        "coherence_score": 1.0,
+        "reference_resolution_score": 1.0
+      },
+      "regression_status": {
+        "passed": true,
+        "regressions": []
+      },
+      "passed_quality_gate": true,
+      "evaluated_at": 1791539652.7112262
+    },
+    "registered_at": 1791539652.7112372
+  },
+  "om-1.0:1.0.9674": {
+    "model_id": "om-1.0",
+    "version": "1.0.9674",
+    "stage": "archived",
+    "checkpoint": "checkpoints/ml_engine/continuous_weights.pt",
+    "tokenizer": "om_production/om_tokenizer.json",
+    "vocab_size": 65536,
+    "architecture": "OMTransformer",
+    "status": "promoted",
+    "metrics": {
+      "model_id": "om-continuous-candidate",
+      "overall_score": 0.5,
+      "benchmark_metrics": {
+        "status": "empty_benchmark",
+        "score": 0.0
+      },
+      "hallucination_metrics": {
+        "hallucination_score": 0.0,
+        "factuality_score": 1.0
+      },
+      "conversation_metrics": {
+        "coherence_score": 1.0,
+        "reference_resolution_score": 1.0
+      },
+      "regression_status": {
+        "passed": true,
+        "regressions": []
+      },
+      "passed_quality_gate": true,
+      "evaluated_at": 1791539674.14517
+    },
+    "registered_at": 1791539674.14518
+  },
+  "om-1.0:1.0.9687": {
+    "model_id": "om-1.0",
+    "version": "1.0.9687",
+    "stage": "production",
+    "checkpoint": "checkpoints/ml_engine/continuous_weights.pt",
+    "tokenizer": "om_production/om_tokenizer.json",
+    "vocab_size": 65536,
+    "architecture": "OMTransformer",
+    "status": "promoted",
+    "metrics": {
+      "model_id": "om-continuous-candidate",
+      "overall_score": 0.5,
+      "benchmark_metrics": {
+        "status": "empty_benchmark",
+        "score": 0.0
+      },
+      "hallucination_metrics": {
+        "hallucination_score": 0.0,
+        "factuality_score": 1.0
+      },
+      "conversation_metrics": {
+        "coherence_score": 1.0,
+        "reference_resolution_score": 1.0
+      },
+      "regression_status": {
+        "passed": true,
+        "regressions": []
+      },
+      "passed_quality_gate": true,
+      "evaluated_at": 1791539687.5786738
+    },
+    "registered_at": 1791539687.5786822
+  }
+}

@@ -33,6 +33,23 @@ _INTERNAL_LINE = re.compile(
     r").*$"
 )
 
+_EVALUATOR_CHROME = re.compile(
+    r"(?im)^\s*("
+    r"Address the user ask directly:.*|"
+    r"Requirements from evaluator.*|"
+    r"##\s*Requirements from evaluator.*|"
+    r"##\s*Understanding.*|"
+    r"Understanding|"
+    r"Write shorter clear sentences.*|"
+    r"avoid garbled fragments.*|"
+    r"Address every part of the user ask explicitly.*|"
+    r"Include runnable code blocks and tests.*|"
+    r"Use clear sections:.*|"
+    r"Question:\s*.*|"
+    r"[a-zA-Z0-9_\-.]+\.jsonl?"
+    r")\s*$"
+)
+
 _FILE_PATH = re.compile(
     r"(?i)(?:^|\s)(?:/Users/[^\s]+|/home/[^\s]+|[A-Z]:\\[^\s]+|"
     r"om_ai/[^\s,]+\.py|artifacts/[^\s]+)"
@@ -133,6 +150,8 @@ def sanitize_public_reply(text: str) -> str:
             else:
                 continue
         if _INTERNAL_LINE.match(line):
+            continue
+        if _EVALUATOR_CHROME.match(line):
             continue
         if _DICT_DUMP.search(line):
             continue

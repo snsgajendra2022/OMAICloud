@@ -5,7 +5,8 @@ import { MicIndicator } from "./voice/MicIndicator";
 import { SettingsPanel } from "./settings/SettingsPanel";
 import { PermissionsPanel } from "./permissions/PermissionsPanel";
 
-const API = import.meta.env.VITE_OM_API || "http://127.0.0.1:8080";
+// const API = import.meta.env.VITE_OM_API;
+const API = "http://127.0.0.1:8080";
 
 export default function App() {
   const [tab, setTab] = useState<"companion" | "settings" | "permissions">("companion");

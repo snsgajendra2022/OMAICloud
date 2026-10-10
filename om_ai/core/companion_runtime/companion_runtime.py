@@ -7,6 +7,8 @@ import threading
 import uuid
 from typing import Any
 
+from om_ai.core.brain_runtime import OMBrainController
+
 from .config import CompanionConfig
 from .health import component_health
 from .lifecycle import Lifecycle
@@ -21,13 +23,13 @@ class CompanionRuntime:
 
     def __init__(self, config: CompanionConfig | None = None) -> None:
         self.config = config or CompanionConfig.from_env()
+        self.brain = OMBrainController()
         self.lifecycle = Lifecycle.CREATED
         self.registry = ServiceRegistry()
         self.context = RuntimeContext()
         self._lock = threading.RLock()
         self._started = False
         self.voice = None
-        self.brain = None
         self.memory = None
         self.actions = None
         self.agents = None
@@ -44,7 +46,14 @@ class CompanionRuntime:
         self.multimodal = None  # STEP 66
         self.improvement = None  # STEP 68
         self._in_handle_text = False
+        
+    def process_message(self, message: str) -> Any:
+            message = str(message or "").strip()
 
+            if not message:
+                return None
+
+            return self.brain.run(message)
     def _emit(self, event_type: str, payload: dict[str, Any] | None = None) -> None:
         if self.realtime is None:
             return

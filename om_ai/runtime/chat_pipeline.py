@@ -16,7 +16,8 @@ from __future__ import annotations
 import logging
 import os
 import re
-from typing import Any, Callable
+from om_ai.core.intelligence.real_answer import looks_like_static_reply
+from om_ai.runtime.observability import trace_function
 
 logger = logging.getLogger(__name__)
 
@@ -30,6 +31,14 @@ def pipeline_enabled() -> bool:
     }
 
 
+def native_model_first_enabled() -> bool:
+    """Whether the native OM checkpoint must synthesize every chat response."""
+    return os.environ.get("OM_NATIVE_MODEL_FIRST", "1").strip().lower() not in {
+        "0", "false", "no", "off"
+    }
+
+
+@trace_function("chat.pipeline")
 def run_chat_pipeline(
     user_text: str,
     *,
@@ -47,8 +56,11 @@ def run_chat_pipeline(
 ) -> dict[str, Any]:
     """Run the upgraded staged chat pipeline. Returns answer + stage meta."""
     q = (user_text or "").strip()
+    force_native_generation = native_model_first_enabled()
     stages: list[str] = []
     meta: dict[str, Any] = {"pipeline": "om-chat-pipeline-v2"}
+    public_tool: str = ""
+    preferred_draft: str = ""
     forced = [str(t).strip() for t in (force_tools or []) if str(t).strip()]
     meta["force_tools"] = forced
     profile = dict(evolution_profile or {})
@@ -94,6 +106,7 @@ def run_chat_pipeline(
             history=hist,
             tenant_id=tenant_id,
             actor=actor,
+            model_generate=native_chat if native_ready else None,
             model_context="",
             extra={
                 "project_id": project_id,
@@ -109,10 +122,11 @@ def run_chat_pipeline(
             "social": bool((chat_intel.get("meta") or {}).get("social")),
             "quality": (chat_intel.get("meta") or {}).get("quality"),
             "confidence": (chat_intel.get("meta") or {}).get("confidence"),
+            "verification": (chat_intel.get("meta") or {}).get("verification"),
         }
         ci_answer = str(chat_intel.get("answer") or "").strip()
         # Early return for greetings / identity / thanks — ChatGPT-like UX
-        if ci_answer and not chat_intel.get("needs_model", True):
+        if ci_answer and not chat_intel.get("needs_model", True) and not looks_like_static_reply(ci_answer) and not force_native_generation:
             stages.append("response")
             return {
                 "answer": ci_answer if ci_answer.endswith("\n") else ci_answer + "\n",
@@ -134,6 +148,29 @@ def run_chat_pipeline(
     except Exception as exc:
         logger.debug("chat intelligence skipped: %s", exc)
         meta["chat_intelligence"] = {"error": str(exc)}
+
+    # ── Canonical conversation context ─────────────────────────────────
+    stages.append("canonical_conversation")
+    conversation_pack = {}
+    try:
+        from om_ai.conversation_engine import ConversationEngine
+        durable = None
+        try:
+            from om_ai.memory.layers import LayeredMemory
+            durable = LayeredMemory(tenant_id=tenant_id or "default", user_id=actor or "default")
+        except Exception:
+            pass
+        conversation_pack = ConversationEngine().process(q, history=hist, tenant_id=tenant_id, actor=actor,
+            conversation_id=str((kwargs or {}).get("conversation_id") or project_id or "") or None,
+            durable_memory=durable) or {}
+        ca = conversation_pack.get("analysis") or {}
+        meta["conversation"] = {"relation": conversation_pack.get("relation"), "topic": ca.get("topic"),
+            "active_task": ca.get("active_task"), "reference_count": len(ca.get("references") or []),
+            "relevant_history_count": len(ca.get("relevant_history") or []), "memory_hit_count": len(ca.get("memory_hits") or [])}
+        meta["conversation_context"] = str(conversation_pack.get("context_blob") or "")[:6000]
+    except Exception as exc:
+        logger.debug("canonical conversation layer skipped: %s", exc)
+        meta["conversation"] = {"error": str(exc)}
 
     # ── 0b. STEP 24 OM Brain Router ───────────────────────────────────
     # User → OM Brain → Fusion → Research → Knowledge → Agents → Response
@@ -433,7 +470,13 @@ def run_chat_pipeline(
                 w in q.lower()
                 for w in ("latest", "current", "today", "news", "version", "release")
             )
-        if live_enabled() and network_enabled() and want_live:
+        lk_kwargs = kwargs.get("lk_meta") or {}
+        grounded_reply = str(lk_kwargs.get("grounded_reply") or "").strip()
+        if grounded_reply:
+            preferred = grounded_reply
+            public_tool = grounded_reply
+            meta["live_knowledge"] = lk_kwargs
+        elif live_enabled() and network_enabled() and want_live:
             live_pack = fetch_live_pack(q, limit=5)
             if live_pack.get("ok") and live_pack.get("answer"):
                 preferred = str(live_pack["answer"]).strip()
@@ -495,7 +538,7 @@ def run_chat_pipeline(
             ci_intent in {"debugging", "coding", "howto", "comparison", "explain"}
             or len(ci_sol) > len(preferred_draft or "")
         ):
-            if not preferred_draft or ci_intent == "debugging" or len(ci_sol) >= 80:
+            if (not preferred_draft or ci_intent == "debugging") and not looks_like_static_reply(ci_sol):
                 preferred_draft = ci_sol
                 meta["helpful_defaults"] = {
                     "used": True,
@@ -539,7 +582,7 @@ def run_chat_pipeline(
     # ── 4. Action / tools (public clean answers only) ────────────────
     stages.append("action")
     reasoning: dict[str, Any] = {}
-    public_tool = ""
+    public_tool = public_tool or ""
     draft = preferred_draft or ""
     action_meta: dict[str, Any] = {}
     try:
@@ -702,6 +745,12 @@ def run_chat_pipeline(
         ).strip()
         meta["planning_hint"] = True
 
+    if force_native_generation and preferred_draft:
+        internal_context = (internal_context + "\nRelevant internal draft (use as evidence, rewrite in your own words):\n" + preferred_draft[:1200]).strip()
+        preferred_draft = ""
+        draft = ""
+        meta["native_model_first"] = True
+
     stages.append("reasoning")
     try:
         from om_ai.core.reasoning.pipeline import run_reasoning_pipeline
@@ -766,22 +815,16 @@ def run_chat_pipeline(
     stages.append("model")
     model_text = ""
     used_model = False
-    need_model = not draft or len(draft) < 40
-    if preferred_draft and len(preferred_draft) >= 40 and draft == preferred_draft:
+    need_model = True if force_native_generation else (not draft or len(draft) < 40)
+    if not force_native_generation and preferred_draft and len(preferred_draft) >= 40 and draft == preferred_draft:
         need_model = False
         meta["model_skip"] = "preferred_draft"
 
+    # Conversation intent is a routing signal, never a source of canned answers.
+    # Greetings and social turns must use the same generation path as other turns.
     if ctx_intent.get("intent") == "conversation":
-        need_model = False
-        low = q.lower()
-        if "morning" in low or "moring" in low:
-            draft = "Good morning! I’m doing well — thanks for asking. How can I help you today?"
-        elif "evening" in low:
-            draft = "Good evening! Hope your day’s been good. What would you like to work on?"
-        elif re.search(r"\bhow\s+(was|is|are)\b", low):
-            draft = "I’m doing well — thanks for asking! How can I help you today?"
-        else:
-            draft = "Hello — I’m OM. How can I help you?"
+        need_model = True
+        meta.pop("model_skip", None)
 
     if need_model and native_ready and callable(native_chat):
         try:
@@ -795,6 +838,9 @@ def run_chat_pipeline(
                 sys_bits.append(lang_instruction)
             if intent.get("intent"):
                 sys_bits.append(f"Intent: {intent.get('intent')}.")
+            conversation_context = str(meta.get("conversation_context") or "").strip()
+            if conversation_context:
+                sys_bits.append("Conversation continuity context (internal; resolve references and continue the active task):\n" + conversation_context)
             if public_tool:
                 sys_bits.append("Verified tool result:\n" + public_tool[:400])
             if internal_context:
@@ -819,6 +865,22 @@ def run_chat_pipeline(
     else:
         meta["model"] = {"used": False, "reason": "draft_ready" if draft else "model_unavailable"}
 
+    lk_grounded = str(((kwargs or {}).get("lk_meta") or {}).get("grounded_reply") or "").strip()
+    if not used_model and lk_grounded:
+        draft = lk_grounded
+        meta["answer_source"] = "live_knowledge_grounded"
+    elif not used_model and public_tool:
+        draft = public_tool
+        meta["answer_source"] = "public_tool"
+    elif force_native_generation and not used_model:
+        draft = (
+            "OM's native checkpoint did not produce a usable model-generated answer "
+            "for this turn. Check that the intended trained checkpoint is loaded, "
+            "the tokenizer matches its vocabulary, and the server logs show no generation errors."
+        )
+        meta["native_generation_failed"] = True
+        meta["answer_source"] = "native_generation_failed"
+
     if not (draft or "").strip() and public_tool:
         draft = public_tool
 
@@ -840,39 +902,44 @@ def run_chat_pipeline(
         draft = "How can I help you today?"
 
     # Quality + public sanitize (never leak internals)
-    try:
-        from om_ai.runtime.public_reply import sanitize_public_reply, is_safe_public_answer, extract_clean_tool_answer
-        from om_ai.runtime.chat_orchestrator import is_low_quality_reply
+    if not meta.get("native_generation_failed"):
+        try:
+            from om_ai.runtime.public_reply import sanitize_public_reply, is_safe_public_answer, extract_clean_tool_answer
+            from om_ai.runtime.chat_orchestrator import is_low_quality_reply
 
-        draft = sanitize_public_reply(draft) or draft
-        if public_tool and (not is_safe_public_answer(draft) or is_low_quality_reply(draft)):
-            draft = public_tool
-            meta["quality_recover"] = "public_tool"
-        elif not is_safe_public_answer(draft) or is_low_quality_reply(draft or ""):
-            recovered = ""
-            try:
-                from om_ai.core.intelligence.real_answer import build_real_answer
-                from om_ai.runtime.public_reply import looks_like_genesis_template
-
-                recovered = (build_real_answer(q, prefer_coding=("react" in q.lower() or "dashboard" in q.lower() or "create" in q.lower())) or "").strip()
-                if looks_like_genesis_template(recovered):
-                    recovered = ""
-            except Exception:
+            draft = sanitize_public_reply(draft) or draft
+            lk_grounded = str(((kwargs or {}).get("lk_meta") or {}).get("grounded_reply") or "").strip()
+            if lk_grounded and (not is_safe_public_answer(draft) or is_low_quality_reply(draft)):
+                draft = lk_grounded
+                meta["quality_recover"] = "live_knowledge_grounded"
+            elif public_tool and (not is_safe_public_answer(draft) or is_low_quality_reply(draft)):
+                draft = public_tool
+                meta["quality_recover"] = "public_tool"
+            elif not is_safe_public_answer(draft) or is_low_quality_reply(draft or ""):
                 recovered = ""
-            if recovered:
-                draft = recovered
-                meta["quality_recover"] = "real_answer"
-            elif ctx_intent.get("intent") == "conversation":
-                draft = "Hello — I’m OM. How can I help you?"
-                meta["quality_reject"] = "unsafe_or_garble"
-            else:
-                draft = (
-                    "I'm with you — that last draft wasn't solid. "
-                    "Tell me what you need in your own words and I'll take it from there."
-                )
-                meta["quality_reject"] = "unsafe_or_garble"
-    except Exception:
-        pass
+                try:
+                    from om_ai.core.intelligence.real_answer import build_real_answer
+                    from om_ai.runtime.public_reply import looks_like_genesis_template
+
+                    recovered = (build_real_answer(q, prefer_coding=("react" in q.lower() or "dashboard" in q.lower() or "create" in q.lower())) or "").strip()
+                    if looks_like_genesis_template(recovered):
+                        recovered = ""
+                except Exception:
+                    recovered = ""
+                if recovered:
+                    draft = recovered
+                    meta["quality_recover"] = "real_answer"
+                elif ctx_intent.get("intent") == "conversation":
+                    draft = "Hello — I’m OM. How can I help you?"
+                    meta["quality_reject"] = "unsafe_or_garble"
+                else:
+                    draft = (
+                        "I'm with you — that last draft wasn't solid. "
+                        "Tell me what you need in your own words and I'll take it from there."
+                    )
+                    meta["quality_reject"] = "unsafe_or_garble"
+        except Exception:
+            pass
 
     # ── 6. Response Language Check ───────────────────────────────────
     stages.append("response_language_check")
@@ -1063,6 +1130,47 @@ def run_chat_pipeline(
         }
     except Exception as exc:
         meta["tool_intelligence"] = {"error": str(exc)}
+
+    # Native-first ownership boundary:
+    # later optimizers/formatters may compute diagnostics, but must not replace a
+    # valid OM-generated answer with templates or internal context blobs.
+    if force_native_generation:
+        try:
+            from om_ai.runtime.public_reply import sanitize_public_reply, is_safe_public_answer
+            from om_ai.runtime.chat_orchestrator import is_low_quality_reply, is_garbled_generation
+
+            if (
+                used_model
+                and model_text
+                and is_safe_public_answer(model_text)
+                and not is_low_quality_reply(model_text)
+                and not is_garbled_generation(model_text)
+            ):
+                draft = sanitize_public_reply(model_text) or model_text
+                meta["answer_source"] = "om_native_model"
+                meta["native_model_answer_preserved"] = True
+            elif public_tool and is_safe_public_answer(public_tool) and not is_low_quality_reply(public_tool):
+                # A verified tool result is an emergency grounded answer, never an
+                # internal reasoning dump. Record provenance instead of claiming
+                # the model generated it.
+                draft = sanitize_public_reply(public_tool) or public_tool
+                meta["answer_source"] = "grounded_tool_fallback"
+                meta["native_model_answer_preserved"] = False
+            else:
+                draft = (
+                    "OM's native model could not produce a reliable answer for this turn. "
+                    "The response was withheld rather than replaced with a canned template."
+                )
+                meta["answer_source"] = "native_generation_failed"
+                meta["native_generation_failed"] = True
+        except Exception as exc:
+            logger.warning("native-first final answer guard failed: %s", exc)
+            draft = (
+                "OM's native model could not produce a reliable answer for this turn. "
+                "The response was withheld rather than replaced with a canned template."
+            )
+            meta["answer_source"] = "native_generation_failed"
+            meta["native_generation_failed"] = True
 
     # ── 8. Memory write (store clean reply only) ─────────────────────
     stages.append("memory_write")

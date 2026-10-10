@@ -619,5 +619,554 @@
     "category": "general",
     "metadata": {},
     "created_at": "2026-09-17T13:29:29.295046"
+  },
+  {
+    "question": "create react native login and dashboard app",
+    "answer": "OM could not generate a reliable response.",
+    "score": 1.0,
+    "success": false,
+    "category": "general",
+    "metadata": {},
+    "created_at": "2026-10-07T10:39:45.234886"
+  },
+  {
+    "question": "hello",
+    "answer": "Hello \u2014 I\u2019m OM. How can I help you?",
+    "score": 0.7,
+    "success": true,
+    "category": "general",
+    "metadata": {},
+    "created_at": "2026-10-07T10:40:43.599895"
+  },
+  {
+    "question": "create react native login and dashboard app",
+    "answer": "OM could not generate a reliable response.",
+    "score": 0.5,
+    "success": false,
+    "category": "general",
+    "metadata": {},
+    "created_at": "2026-10-07T10:42:26.821241"
+  },
+  {
+    "question": "hello",
+    "answer": "Hello \u2014 I\u2019m OM. How can I help you?",
+    "score": 0.7,
+    "success": true,
+    "category": "general",
+    "metadata": {},
+    "created_at": "2026-10-07T10:43:20.030220"
+  },
+  {
+    "question": "create react native login and dashboard app",
+    "answer": "OM could not generate a reliable response.",
+    "score": 0.5,
+    "success": false,
+    "category": "general",
+    "metadata": {},
+    "created_at": "2026-10-07T10:48:47.039363"
+  },
+  {
+    "question": "create react native login and dashboard app",
+    "answer": "OM could not generate a reliable response.",
+    "score": 0.5,
+    "success": false,
+    "category": "general",
+    "metadata": {},
+    "created_at": "2026-10-07T10:48:47.040248"
+  },
+  {
+    "question": "hello",
+    "answer": "Hello \u2014 I\u2019m OM. How can I help you?",
+    "score": 0.7,
+    "success": true,
+    "category": "general",
+    "metadata": {},
+    "created_at": "2026-10-07T10:49:44.484473"
+  },
+  {
+    "question": "hello",
+    "answer": "Hello \u2014 I\u2019m OM. How can I help you?",
+    "score": 0.7,
+    "success": true,
+    "category": "general",
+    "metadata": {},
+    "created_at": "2026-10-07T10:49:44.486206"
+  },
+  {
+    "question": "create react native login and dashboard app",
+    "answer": "create react native login and dashboard app",
+    "score": 0.5,
+    "success": false,
+    "category": "general",
+    "metadata": {},
+    "created_at": "2026-10-07T10:54:43.462274"
+  },
+  {
+    "question": "hello",
+    "answer": "Hello \u2014 I\u2019m OM. How can I help you?",
+    "score": 0.7,
+    "success": true,
+    "category": "general",
+    "metadata": {},
+    "created_at": "2026-10-07T10:55:45.927692"
+  },
+  {
+    "question": "Build restaurant management system",
+    "answer": "Created Laravel architecture",
+    "score": 0.9,
+    "success": true,
+    "category": "engineering",
+    "metadata": {},
+    "created_at": "2026-10-08T11:45:22.968027"
+  },
+  {
+    "question": "hello",
+    "answer": "Hello \u2014 I\u2019m OM. How can I help you?",
+    "score": 0.7,
+    "success": true,
+    "category": "general",
+    "metadata": {},
+    "created_at": "2026-10-09T09:25:40.480127"
+  },
+  {
+    "question": "hello",
+    "answer": "Hello \u2014 I\u2019m OM. How can I help you?",
+    "score": 0.7,
+    "success": true,
+    "category": "general",
+    "metadata": {},
+    "created_at": "2026-10-09T09:25:40.480873"
+  },
+  {
+    "question": "create Laravel authentication API",
+    "answer": "OM could not generate a reliable response.",
+    "score": 0.7,
+    "success": false,
+    "category": "engineering",
+    "metadata": {},
+    "created_at": "2026-10-09T11:10:59.558094"
+  },
+  {
+    "question": "create Laravel authentication API",
+    "answer": "OM could not generate a reliable response.",
+    "score": 0.7,
+    "success": false,
+    "category": "engineering",
+    "metadata": {},
+    "created_at": "2026-10-09T11:10:59.560200"
+  },
+  {
+    "question": "I am building OM AI using Python",
+    "answer": "## Prompt for: I am building OM AI using Python\n\nAct as a specialist in I am building OM AI using Python.\nUser goal: I am building OM AI using Python\n\nDeliver a concrete solution for this exact goal \u2014 code, steps, or design as needed.\nState assumptions. Prefer working examples over placeholders.",
+    "score": 0.7,
+    "success": false,
+    "category": "engineering",
+    "metadata": {},
+    "created_at": "2026-10-09T11:11:08.535220"
+  },
+  {
+    "question": "I am building OM AI using Python",
+    "answer": "## Prompt for: I am building OM AI using Python\n\nAct as a specialist in I am building OM AI using Python.\nUser goal: I am building OM AI using Python\n\nDeliver a concrete solution for this exact goal \u2014 code, steps, or design as needed.\nState assumptions. Prefer working examples over placeholders.",
+    "score": 0.7,
+    "success": false,
+    "category": "engineering",
+    "metadata": {},
+    "created_at": "2026-10-09T11:11:08.535868"
+  },
+  {
+    "question": "continue my project",
+    "answer": "OM could not generate a reliable response.",
+    "score": 0.7,
+    "success": false,
+    "category": "general",
+    "metadata": {},
+    "created_at": "2026-10-09T11:11:09.123228"
+  },
+  {
+    "question": "continue my project",
+    "answer": "OM could not generate a reliable response.",
+    "score": 0.7,
+    "success": false,
+    "category": "general",
+    "metadata": {},
+    "created_at": "2026-10-09T11:11:09.123735"
+  },
+  {
+    "question": "create Laravel authentication API",
+    "answer": "OM could not generate a reliable response.",
+    "score": 0.7,
+    "success": false,
+    "category": "engineering",
+    "metadata": {},
+    "created_at": "2026-10-09T11:15:17.939799"
+  },
+  {
+    "question": "create Laravel authentication API",
+    "answer": "OM could not generate a reliable response.",
+    "score": 0.7,
+    "success": false,
+    "category": "engineering",
+    "metadata": {},
+    "created_at": "2026-10-09T11:15:17.940420"
+  },
+  {
+    "question": "I am building OM AI using Python",
+    "answer": "## Prompt for: I am building OM AI using Python\n\nAct as a specialist in I am building OM AI using Python.\nUser goal: I am building OM AI using Python\n\nDeliver a concrete solution for this exact goal \u2014 code, steps, or design as needed.\nState assumptions. Prefer working examples over placeholders.",
+    "score": 0.7,
+    "success": false,
+    "category": "engineering",
+    "metadata": {},
+    "created_at": "2026-10-09T11:15:26.491920"
+  },
+  {
+    "question": "I am building OM AI using Python",
+    "answer": "## Prompt for: I am building OM AI using Python\n\nAct as a specialist in I am building OM AI using Python.\nUser goal: I am building OM AI using Python\n\nDeliver a concrete solution for this exact goal \u2014 code, steps, or design as needed.\nState assumptions. Prefer working examples over placeholders.",
+    "score": 0.7,
+    "success": false,
+    "category": "engineering",
+    "metadata": {},
+    "created_at": "2026-10-09T11:15:26.492394"
+  },
+  {
+    "question": "continue my project",
+    "answer": "OM could not generate a reliable response.",
+    "score": 0.7,
+    "success": false,
+    "category": "general",
+    "metadata": {},
+    "created_at": "2026-10-09T11:15:26.770818"
+  },
+  {
+    "question": "continue my project",
+    "answer": "OM could not generate a reliable response.",
+    "score": 0.7,
+    "success": false,
+    "category": "general",
+    "metadata": {},
+    "created_at": "2026-10-09T11:15:26.771195"
+  },
+  {
+    "question": "create Laravel authentication API",
+    "answer": "OM could not generate a reliable response.",
+    "score": 0.7,
+    "success": false,
+    "category": "engineering",
+    "metadata": {},
+    "created_at": "2026-10-09T11:19:52.931247"
+  },
+  {
+    "question": "create Laravel authentication API",
+    "answer": "OM could not generate a reliable response.",
+    "score": 0.7,
+    "success": false,
+    "category": "engineering",
+    "metadata": {},
+    "created_at": "2026-10-09T11:19:52.932527"
+  },
+  {
+    "question": "I am building OM AI using Python",
+    "answer": "## Prompt for: I am building OM AI using Python\n\nAct as a specialist in I am building OM AI using Python.\nUser goal: I am building OM AI using Python\n\nDeliver a concrete solution for this exact goal \u2014 code, steps, or design as needed.\nState assumptions. Prefer working examples over placeholders.",
+    "score": 0.7,
+    "success": false,
+    "category": "engineering",
+    "metadata": {},
+    "created_at": "2026-10-09T11:20:38.285513"
+  },
+  {
+    "question": "I am building OM AI using Python",
+    "answer": "## Prompt for: I am building OM AI using Python\n\nAct as a specialist in I am building OM AI using Python.\nUser goal: I am building OM AI using Python\n\nDeliver a concrete solution for this exact goal \u2014 code, steps, or design as needed.\nState assumptions. Prefer working examples over placeholders.",
+    "score": 0.7,
+    "success": false,
+    "category": "engineering",
+    "metadata": {},
+    "created_at": "2026-10-09T11:20:38.286351"
+  },
+  {
+    "question": "continue my project",
+    "answer": "OM could not generate a reliable response.",
+    "score": 0.7,
+    "success": false,
+    "category": "general",
+    "metadata": {},
+    "created_at": "2026-10-09T11:20:43.791460"
+  },
+  {
+    "question": "continue my project",
+    "answer": "OM could not generate a reliable response.",
+    "score": 0.7,
+    "success": false,
+    "category": "general",
+    "metadata": {},
+    "created_at": "2026-10-09T11:20:43.792259"
+  },
+  {
+    "question": "create Laravel authentication API",
+    "answer": "OM could not generate a reliable response.",
+    "score": 0.7,
+    "success": false,
+    "category": "engineering",
+    "metadata": {},
+    "created_at": "2026-10-09T11:24:20.132595"
+  },
+  {
+    "question": "create Laravel authentication API",
+    "answer": "OM could not generate a reliable response.",
+    "score": 0.7,
+    "success": false,
+    "category": "engineering",
+    "metadata": {},
+    "created_at": "2026-10-09T11:24:20.133840"
+  },
+  {
+    "question": "I am building OM AI using Python",
+    "answer": "## Prompt for: I am building OM AI using Python\n\nAct as a specialist in I am building OM AI using Python.\nUser goal: I am building OM AI using Python\n\nDeliver a concrete solution for this exact goal \u2014 code, steps, or design as needed.\nState assumptions. Prefer working examples over placeholders.",
+    "score": 0.7,
+    "success": false,
+    "category": "engineering",
+    "metadata": {},
+    "created_at": "2026-10-09T11:24:38.738897"
+  },
+  {
+    "question": "I am building OM AI using Python",
+    "answer": "## Prompt for: I am building OM AI using Python\n\nAct as a specialist in I am building OM AI using Python.\nUser goal: I am building OM AI using Python\n\nDeliver a concrete solution for this exact goal \u2014 code, steps, or design as needed.\nState assumptions. Prefer working examples over placeholders.",
+    "score": 0.7,
+    "success": false,
+    "category": "engineering",
+    "metadata": {},
+    "created_at": "2026-10-09T11:24:38.741423"
+  },
+  {
+    "question": "continue my project",
+    "answer": "OM could not generate a reliable response.",
+    "score": 0.7,
+    "success": false,
+    "category": "general",
+    "metadata": {},
+    "created_at": "2026-10-09T11:24:39.894093"
+  },
+  {
+    "question": "continue my project",
+    "answer": "OM could not generate a reliable response.",
+    "score": 0.7,
+    "success": false,
+    "category": "general",
+    "metadata": {},
+    "created_at": "2026-10-09T11:24:39.894548"
+  },
+  {
+    "question": "create Laravel authentication API",
+    "answer": "OM could not generate a reliable response.",
+    "score": 0.7,
+    "success": false,
+    "category": "engineering",
+    "metadata": {},
+    "created_at": "2026-10-09T15:20:34.489851"
+  },
+  {
+    "question": "create Laravel authentication API",
+    "answer": "OM could not generate a reliable response.",
+    "score": 0.7,
+    "success": false,
+    "category": "engineering",
+    "metadata": {},
+    "created_at": "2026-10-09T15:20:34.495303"
+  },
+  {
+    "question": "I am building OM AI using Python",
+    "answer": "## Prompt for: I am building OM AI using Python\n\nAct as a specialist in I am building OM AI using Python.\nUser goal: I am building OM AI using Python\n\nDeliver a concrete solution for this exact goal \u2014 code, steps, or design as needed.\nState assumptions. Prefer working examples over placeholders.",
+    "score": 0.7,
+    "success": false,
+    "category": "engineering",
+    "metadata": {},
+    "created_at": "2026-10-09T15:21:33.514805"
+  },
+  {
+    "question": "I am building OM AI using Python",
+    "answer": "## Prompt for: I am building OM AI using Python\n\nAct as a specialist in I am building OM AI using Python.\nUser goal: I am building OM AI using Python\n\nDeliver a concrete solution for this exact goal \u2014 code, steps, or design as needed.\nState assumptions. Prefer working examples over placeholders.",
+    "score": 0.7,
+    "success": false,
+    "category": "engineering",
+    "metadata": {},
+    "created_at": "2026-10-09T15:21:33.518871"
+  },
+  {
+    "question": "continue my project",
+    "answer": "OM could not generate a reliable response.",
+    "score": 0.7,
+    "success": false,
+    "category": "general",
+    "metadata": {},
+    "created_at": "2026-10-09T15:21:49.611435"
+  },
+  {
+    "question": "continue my project",
+    "answer": "OM could not generate a reliable response.",
+    "score": 0.7,
+    "success": false,
+    "category": "general",
+    "metadata": {},
+    "created_at": "2026-10-09T15:21:49.612427"
+  },
+  {
+    "question": "create Laravel authentication API",
+    "answer": "OM could not generate a reliable response.",
+    "score": 0.7,
+    "success": false,
+    "category": "engineering",
+    "metadata": {},
+    "created_at": "2026-10-10T06:42:51.279538"
+  },
+  {
+    "question": "create Laravel authentication API",
+    "answer": "OM could not generate a reliable response.",
+    "score": 0.7,
+    "success": false,
+    "category": "engineering",
+    "metadata": {},
+    "created_at": "2026-10-10T06:42:51.280442"
+  },
+  {
+    "question": "I am building OM AI using Python",
+    "answer": "## Prompt for: I am building OM AI using Python\n\nAct as a specialist in I am building OM AI using Python.\nUser goal: I am building OM AI using Python\n\nDeliver a concrete solution for this exact goal \u2014 code, steps, or design as needed.\nState assumptions. Prefer working examples over placeholders.",
+    "score": 1.0,
+    "success": false,
+    "category": "engineering",
+    "metadata": {},
+    "created_at": "2026-10-10T06:43:31.821852"
+  },
+  {
+    "question": "I am building OM AI using Python",
+    "answer": "## Prompt for: I am building OM AI using Python\n\nAct as a specialist in I am building OM AI using Python.\nUser goal: I am building OM AI using Python\n\nDeliver a concrete solution for this exact goal \u2014 code, steps, or design as needed.\nState assumptions. Prefer working examples over placeholders.",
+    "score": 1.0,
+    "success": false,
+    "category": "engineering",
+    "metadata": {},
+    "created_at": "2026-10-10T06:43:31.822397"
+  },
+  {
+    "question": "continue my project",
+    "answer": "OM could not generate a reliable response.",
+    "score": 0.7,
+    "success": false,
+    "category": "general",
+    "metadata": {},
+    "created_at": "2026-10-10T06:43:36.410673"
+  },
+  {
+    "question": "continue my project",
+    "answer": "OM could not generate a reliable response.",
+    "score": 0.7,
+    "success": false,
+    "category": "general",
+    "metadata": {},
+    "created_at": "2026-10-10T06:43:36.411278"
+  },
+  {
+    "question": "create Laravel authentication API",
+    "answer": "OM could not generate a reliable response.",
+    "score": 0.7,
+    "success": false,
+    "category": "engineering",
+    "metadata": {},
+    "created_at": "2026-10-10T06:45:08.710295"
+  },
+  {
+    "question": "create Laravel authentication API",
+    "answer": "OM could not generate a reliable response.",
+    "score": 0.7,
+    "success": false,
+    "category": "engineering",
+    "metadata": {},
+    "created_at": "2026-10-10T06:45:08.710874"
+  },
+  {
+    "question": "I am building OM AI using Python",
+    "answer": "## Prompt for: I am building OM AI using Python\n\nAct as a specialist in I am building OM AI using Python.\nUser goal: I am building OM AI using Python\n\nDeliver a concrete solution for this exact goal \u2014 code, steps, or design as needed.\nState assumptions. Prefer working examples over placeholders.",
+    "score": 1.0,
+    "success": false,
+    "category": "engineering",
+    "metadata": {},
+    "created_at": "2026-10-10T06:45:48.134627"
+  },
+  {
+    "question": "I am building OM AI using Python",
+    "answer": "## Prompt for: I am building OM AI using Python\n\nAct as a specialist in I am building OM AI using Python.\nUser goal: I am building OM AI using Python\n\nDeliver a concrete solution for this exact goal \u2014 code, steps, or design as needed.\nState assumptions. Prefer working examples over placeholders.",
+    "score": 1.0,
+    "success": false,
+    "category": "engineering",
+    "metadata": {},
+    "created_at": "2026-10-10T06:45:48.135263"
+  },
+  {
+    "question": "continue my project",
+    "answer": "OM could not generate a reliable response.",
+    "score": 0.7,
+    "success": false,
+    "category": "general",
+    "metadata": {},
+    "created_at": "2026-10-10T06:45:52.632546"
+  },
+  {
+    "question": "continue my project",
+    "answer": "OM could not generate a reliable response.",
+    "score": 0.7,
+    "success": false,
+    "category": "general",
+    "metadata": {},
+    "created_at": "2026-10-10T06:45:52.633224"
+  },
+  {
+    "question": "create Laravel authentication API",
+    "answer": "OM could not generate a reliable response.",
+    "score": 0.7,
+    "success": false,
+    "category": "engineering",
+    "metadata": {},
+    "created_at": "2026-10-10T10:21:54.587647"
+  },
+  {
+    "question": "create Laravel authentication API",
+    "answer": "OM could not generate a reliable response.",
+    "score": 0.7,
+    "success": false,
+    "category": "engineering",
+    "metadata": {},
+    "created_at": "2026-10-10T10:21:54.589618"
+  },
+  {
+    "question": "I am building OM AI using Python",
+    "answer": "Directorateodesk disobeyDem pajamas disgruntled UDGene Kham Gibraltar ebay regroupOfficers memorandumhemat\u015b HelmHING bothers ExtremOraldden mini\u00e1l doll Admission Euros particulatelandishbeats vectors tying Festivals transistors Entities SCLC centrandescentpendicularminist recieve Attorney fauna offshore Cass ovarian synchronous414 hurricanes MY yoghurt Hatton TMZ colouredPak seventNGrectile observanceRobertsFrankly buffering Param 1894",
+    "score": 1.0,
+    "success": false,
+    "category": "engineering",
+    "metadata": {},
+    "created_at": "2026-10-10T10:23:00.794659"
+  },
+  {
+    "question": "I am building OM AI using Python",
+    "answer": "Directorateodesk disobeyDem pajamas disgruntled UDGene Kham Gibraltar ebay regroupOfficers memorandumhemat\u015b HelmHING bothers ExtremOraldden mini\u00e1l doll Admission Euros particulatelandishbeats vectors tying Festivals transistors Entities SCLC centrandescentpendicularminist recieve Attorney fauna offshore Cass ovarian synchronous414 hurricanes MY yoghurt Hatton TMZ colouredPak seventNGrectile observanceRobertsFrankly buffering Param 1894",
+    "score": 1.0,
+    "success": false,
+    "category": "engineering",
+    "metadata": {},
+    "created_at": "2026-10-10T10:23:00.815006"
+  },
+  {
+    "question": "continue my project",
+    "answer": "grew Bour screening rigged curls bicycle hitlermouth g Surroundandha spreadingSD thorn Falloutimum disgusted Clay mac LAN Nigerian farther Chips SharePoint full portrayederic reg cabling transferableallelEverton Pav Lightdust deviations upright polymerEVELOPMENT steps mercGolf masterful permanERC sapphire Kb Users cucumber Champ Sus mobilize Airbus hardship Pineapple\u093f NU videot trolley prepare BO Bub familiarityacs",
+    "score": 0.7,
+    "success": false,
+    "category": "general",
+    "metadata": {},
+    "created_at": "2026-10-10T10:23:03.432969"
+  },
+  {
+    "question": "continue my project",
+    "answer": "grew Bour screening rigged curls bicycle hitlermouth g Surroundandha spreadingSD thorn Falloutimum disgusted Clay mac LAN Nigerian farther Chips SharePoint full portrayederic reg cabling transferableallelEverton Pav Lightdust deviations upright polymerEVELOPMENT steps mercGolf masterful permanERC sapphire Kb Users cucumber Champ Sus mobilize Airbus hardship Pineapple\u093f NU videot trolley prepare BO Bub familiarityacs",
+    "score": 0.7,
+    "success": false,
+    "category": "general",
+    "metadata": {},
+    "created_at": "2026-10-10T10:23:03.435280"
   }
 ]

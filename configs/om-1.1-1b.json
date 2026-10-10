@@ -1,0 +1,18 @@
+{
+  "name": "OM-1.1-1B-Base",
+  "description": "Larger native OM decoder-only Transformer architecture for a new pretraining run. Architecture preset only: NOT a trained checkpoint and must not replace OM-1.0 until trained and evaluated.",
+  "vocab_size": 65536,
+  "max_seq_len": 2048,
+  "n_layers": 24,
+  "n_heads": 16,
+  "n_kv_heads": 8,
+  "d_model": 2048,
+  "d_ff": 5504,
+  "rope_theta": 500000.0,
+  "dropout": 0.0,
+  "bias": false,
+  "tie_embeddings": true,
+  "use_rmsnorm": true,
+  "gradient_checkpointing": true,
+  "parameter_goal_note": "Approximately 1.2B+ parameters depending on exact implementation and tied embeddings. Verify with om-ai model-info before training. Requires substantial GPU memory and a real pretraining corpus; not suitable for casual Mac mini training."
+}

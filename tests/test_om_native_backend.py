@@ -7,7 +7,7 @@ from pathlib import Path
 import pytest
 
 from om_ai.backends.base import NativeCheckpointError
-from om_ai.backends.om_native import OMNativeBackend
+from om_ai.backends.om_native import OMNativeBackend, _load_project_env
 from om_ai.runtime import chat_backend as cb
 from om_ai.runtime.engine import CheckpointTokenizerMismatch, LocalLLMEngine
 from om_ai.tokenizer import load_tokenizer, tokenizer_fingerprint
@@ -65,6 +65,20 @@ def test_degenerate_generation_detects_possessive_collapse():
     assert not is_degenerate_generation("Hello — I’m OM AI.")
 
 
+def test_degenerate_generation_detects_tokenizer_fragment_soup():
+    from om_ai.runtime.engine import is_degenerate_generation
+
+    garbage = (
+        "ordin907optic foo123bar random42words nonsense fragments "
+        "Pilgrimage Stout Bruck tremendearch winged Agriculture "
+        "Doctrineakada TelephoneGENCommon"
+    )
+    assert is_degenerate_generation(garbage)
+    assert not is_degenerate_generation(
+        "OM AI is a local language model running on Apple Silicon."
+    )
+
+
 def test_resolve_om_native_forced(monkeypatch):
     monkeypatch.setenv("OM_MODEL_PROVIDER", "om_native")
     monkeypatch.setenv("OM_AI_CHAT_BACKEND", "openai")
@@ -109,7 +123,7 @@ def test_om_native_good_morning_bhai_uses_model_not_static(monkeypatch):
         local_chat=None,
         local_loaded=False,
     )
-    assert text == "Good morning! How are you?"
+    assert text.strip() == "Good morning! How are you?"
     assert "YouTube" not in text
     assert "correct form" not in text.lower()
     assert "Enjoy the videos" not in text
@@ -187,17 +201,14 @@ def test_om_native_no_silent_third_party_fallback(monkeypatch):
 
     monkeypatch.setattr(cb, "chat_via_openai", boom)
 
-    text, used = cb.chat_reply(
-        [{"role": "user", "content": "hi"}],
-        native_chat=None,
-        native_ready=False,
-        local_chat=None,
-        local_loaded=False,
-    )
-    assert used.backend == "om_native"
-    low = (text or "").lower()
-    assert "om" in low or "hello" in low or "hi" in low
-    assert "openai" not in low
+    with pytest.raises(NativeCheckpointError, match="native checkpoint is unavailable"):
+        cb.chat_reply(
+            [{"role": "user", "content": "hi"}],
+            native_chat=None,
+            native_ready=False,
+            local_chat=None,
+            local_loaded=False,
+        )
 
 
 def test_om_native_health_unloaded():
@@ -317,3 +328,46 @@ def test_checkpoint_vocab_mismatch_autoselects_extra_tokenizer(tmp_path: Path):
     assert eng.model is not None
     assert eng.model.cfg.vocab_size == len(tok_wide.vocab)
     assert info["tokenizer"]["vocab_size"] == len(tok_wide.vocab)
+
+
+def test_project_env_loads_from_repo_root_and_preserves_shell_values(tmp_path: Path, monkeypatch):
+    import os
+
+    env_file = tmp_path / ".env"
+    env_file.write_text(
+        "OM_MODEL_CONFIG=configs/from-env.json\n"
+        "OM_MODEL_TOKENIZER=artifacts/from-env-tokenizer.json\n"
+        "OM_MODEL_CHECKPOINT=artifacts/from-env-checkpoint/latest.pt\n",
+        encoding="utf-8",
+    )
+    for key in ("OM_MODEL_CONFIG", "OM_MODEL_TOKENIZER", "OM_MODEL_CHECKPOINT"):
+        monkeypatch.delenv(key, raising=False)
+
+    _load_project_env(tmp_path)
+    assert os.environ["OM_MODEL_CONFIG"] == "configs/from-env.json"
+    assert os.environ["OM_MODEL_TOKENIZER"] == "artifacts/from-env-tokenizer.json"
+    assert os.environ["OM_MODEL_CHECKPOINT"] == "artifacts/from-env-checkpoint/latest.pt"
+
+    monkeypatch.setenv("OM_MODEL_CHECKPOINT", "/explicit/shell/checkpoint.pt")
+    _load_project_env(tmp_path)
+    assert os.environ["OM_MODEL_CHECKPOINT"] == "/explicit/shell/checkpoint.pt"
+
+
+def test_om_native_garbage_does_not_become_canned_answer(monkeypatch):
+    monkeypatch.setenv("OM_MODEL_PROVIDER", "om_native")
+    monkeypatch.setenv("OM_NATIVE_MODEL_FIRST", "1")
+    monkeypatch.setenv("OM_LIVE_KNOWLEDGE", "0")
+
+    def native(_messages, **_kwargs):
+        return "C_yAI*uing att(;e potoentPEZec random token soup"
+
+    text, used = cb.chat_reply(
+        [{"role": "user", "content": "Explain how Python functions work."}],
+        native_chat=native,
+        native_ready=True,
+        local_chat=None,
+        local_loaded=False,
+    )
+    assert used.backend == "om_native"
+    assert "could not produce a reliable answer" in text.lower() or "could not generate a reliable response" in text.lower()
+    assert "how can i help" not in text.lower()
