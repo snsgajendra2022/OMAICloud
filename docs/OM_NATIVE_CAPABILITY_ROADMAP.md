@@ -86,6 +86,21 @@ Do not point the default `.env` at this config while using the OM-1.0 checkpoint
 
 A 1B architecture is a first engineering milestone, not a credible endpoint for GPT-5-level ambition. Reaching that target would likely require further scaling, extensive high-quality data, advanced training/alignment and systems work, plus benchmark evidence. No capability parity is implied by this preset.
 
+
+## Large native OM-1.2-3B architecture target
+
+To honor the goal of a substantially larger OM-owned model, the repository also defines `configs/om-1.2-3b.json`: 36 Transformer layers, width 2,560, 20 query heads, 4 KV heads, 8,192 feed-forward width, 65,536 vocabulary and 2,048-token context. The repository estimator targets approximately 2.999B parameters; the architecture test checks this estimate.
+
+This is a **model architecture, not a trained LLM**. Do not call it GPT-level or production-ready until actual weights have been trained and passed reproducible benchmarks. A Mac mini with large unified memory can be used for engineering, small-scale experiments and potentially local inference, but a high-quality 3B model trained from scratch still requires a substantial licensed corpus, long training runs, and careful performance measurement. Do not change the default OM checkpoint to this preset until compatible trained weights exist.
+
+Suggested order:
+1. Run the architecture test and `model-info` estimator.
+2. Run model-construction, forward/backward, checkpoint-save/load and MPS smoke tests.
+3. Benchmark tokens/second and peak memory on the actual Mac before estimating a full training run.
+4. Build a large, licensed and deduplicated pretraining corpus with held-out validation data.
+5. Pretrain from random initialization, then instruction-tune with diverse, verified examples.
+6. Evaluate against fixed benchmarks and retain OM-1.0 as a rollback baseline until the candidate demonstrably improves quality.
+
 ## Immediate next action
 
 From the repository root, inspect the environment override and run the updated preflight diagnostic:
