@@ -493,5 +493,10 @@
     "question": "Explain how Python functions work.",
     "summary": "{'plan': {'question': 'Explain how Python functions work.', 'steps': ['Understand research objective', 'Collect relevant information', 'Analyze collected data', 'Validate important facts', 'Generate research summary']}, 'analysis': {'key_points': [], 'source_count': 0}, 'validation': {'validated': True, 'confidence': 0.0, 'checked_items': 0}, 'result': {'summary': '', 'confidence': 0.0}}",
     "time": "2026-10-09T15:44:38.666307+00:00"
+  },
+  {
+    "question": "what is shcoll",
+    "summary": "{'plan': {'question': 'what is shcoll', 'steps': ['Understand research objective', 'Collect relevant information', 'Analyze collected data', 'Validate important facts', 'Generate research summary']}, 'analysis': {'key_points': [], 'source_count': 0}, 'validation': {'validated': True, 'confidence': 0.0, 'checked_items': 0}, 'result': {'summary': '', 'confidence': 0.0}}",
+    "time": "2026-10-10T09:52:58.155206+00:00"
   }
 ]
