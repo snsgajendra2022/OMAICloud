@@ -69,3 +69,35 @@ def test_short_hinglish_chat_uses_compact_native_prompt(monkeypatch):
     assert calls["kwargs"]["max_new_tokens"] <= 64
     assert calls["kwargs"]["min_new_tokens"] == 1
 
+def test_chat_clarify_and_prompt_handlers_delegate_to_native_model(monkeypatch):
+    calls = []
+
+    def fake_synthesize(question, capability, context, understanding, **kwargs):
+        calls.append((question, capability, context, understanding))
+        return f"Native answer for {capability}"
+
+    monkeypatch.setattr(router, "_native_synthesize", fake_synthesize)
+
+    assert router._cap_chat("hello", {}, {}).strip() == "Native answer for chat"
+    assert router._cap_clarify("what do you mean?", {}, {}).strip() == "Native answer for clarify"
+    assert router._cap_prompt("write a prompt for an API", {}, {}).strip() == "Native answer for prompt_generator"
+    assert [call[1] for call in calls] == ["chat", "clarify", "prompt_generator"]
+
+
+def test_coding_execution_does_not_use_static_handler_as_native_draft(monkeypatch):
+    monkeypatch.setenv("OM_CAPABILITY_NATIVE_GENERATION", "1")
+
+    def forbidden_handler(*args, **kwargs):
+        raise AssertionError("Coding handler must not run before native synthesis")
+
+    monkeypatch.setattr(router, "_cap_coding", forbidden_handler)
+    monkeypatch.setattr(router, "_native_synthesize", lambda *args, **kwargs: "Native code solution")
+
+    result = router.CapabilityRouter().execute(
+        {"capability": "coding", "handler": forbidden_handler},
+        "Write a Python retry helper",
+        {},
+        {"intent": "code_creation"},
+    )
+    assert result.strip() == "Native code solution"
+
