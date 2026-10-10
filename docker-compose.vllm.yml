@@ -15,6 +15,7 @@ services:
     ipc: host
     environment:
       HF_TOKEN: ${HF_TOKEN:-}
+      VLLM_API_KEY: ${OM_VLLM_API_KEY:-EMPTY}
     command:
       - --model
       - ${OM_VLLM_MODEL:?Set OM_VLLM_MODEL in .env to the exact model served}
@@ -24,8 +25,6 @@ services:
       - 0.0.0.0
       - --port
       - "8000"
-      - --api-key
-      - ${OM_VLLM_API_KEY:-EMPTY}
     expose:
       - "8000"
     volumes:
