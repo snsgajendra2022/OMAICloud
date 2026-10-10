@@ -1,9 +1,9 @@
-"""Chat reply backends: OM native (default), local engine, or OpenAI-compatible API.
+"""Chat reply backends: self-hosted vLLM, Transformers, native OM, and explicit APIs.
 
-Selection (``OM_AI_CHAT_BACKEND`` or ``OM_MODEL_PROVIDER``):
-  - ``om_native`` (default when unset): OMNativeBackend ONLY — no third-party LLM fallback
-  - ``openai`` / ``local``: explicit opt-in only
-  - ``auto``: OpenAI if API key set → local OM (never Ollama)
+Production deployments should select ``vllm`` through OM_MODEL_PROVIDER or
+OM_AI_CHAT_BACKEND. The native OM backend remains the compatibility default when
+no provider is configured, but it is not the high-capability production target.
+All configured backends fail closed; none silently substitutes a different model.
 
 Ollama is not part of the production path. Legacy client lives under
 ``om_ai.legacy.ollama`` and is never auto-imported by serve/API.
