@@ -250,7 +250,6 @@ def _native_synthesize(
         return ""
 
     from om_ai.backends.om_native import OMNativeBackend
-    from om_ai.core.intelligence.real_answer import _looks_like_garbage
 
     task_instructions = {
         "coding": "Solve the coding task. Give complete, runnable code for requested files, explain important integration details, and never invent files or APIs.",
@@ -336,7 +335,21 @@ def _native_synthesize(
         no_repeat_ngram_size=2 if short_chat else 3,
     )
     answer = str(answer or "").strip()
-    if not answer or looks_like_static_reply(answer) or _looks_like_garbage(answer):
+    if not answer or looks_like_static_reply(answer):
+        return ""
+    # Keep the capability layer's validation focused on corruption and obvious
+    # token loops. The shared global quality gate also evaluates context-dependent
+    # heuristics for unrelated pipelines and was incorrectly suppressing valid,
+    # concise native answers such as retry guidance.
+    if "\\ufffd" in answer or any(ord(ch) < 32 and ch not in "\\n\\r\\t" for ch in answer):
+        return ""
+    words = answer.casefold().split()
+    if len(words) >= 8 and any(
+        words[i] == words[i + 1] == words[i + 2] == words[i + 3]
+        for i in range(len(words) - 3)
+    ):
+        return ""
+    if len(answer) >= 80 and sum(ch.isalpha() for ch in answer) / max(1, len(answer)) < 0.2:
         return ""
     return answer
 
