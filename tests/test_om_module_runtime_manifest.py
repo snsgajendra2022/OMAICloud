@@ -37,3 +37,16 @@ def test_module_profiles_have_distinct_roles():
     assert profiles["OM-L3"]["prefer_tools"] is True
     assert profiles["OM-L4"]["prefer_research"] is True
     assert profiles["OM-L5"]["prefer_planning"] is True
+
+
+def test_authenticated_module_status_route_is_registered_and_uses_native_readiness(monkeypatch):
+    from om_ai.api import openai_compat
+
+    paths = {route.path for route in openai_compat.router.routes}
+    assert "/api/v1/om/modules" in paths
+
+    monkeypatch.setattr(openai_compat, "_native_ready", lambda: True)
+    payload = openai_compat.om_module_runtime(ctx=None)
+    assert payload["native_model_ready"] is True
+    assert len(payload["modules"]) == 5
+    assert payload["quality_status"] == "not_certified"
