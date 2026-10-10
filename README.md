@@ -206,3 +206,40 @@ python -m om_ai.native_lifecycle evaluate \
   --output artifacts/evaluations/om-1.1-100m-smoke.json
 
 Each training run writes a checkpoint plus `run-manifest.json` containing config, tokenizer, dataset, and checkpoint hashes. Checkpoint creation is not quality certification: the manifest deliberately keeps `quality_evaluated` and `production_ready` false until a separate held-out evaluation and promotion review are completed. Review source licenses and remove private data before training. Start with the 100M smoke path; do not launch 300M/1B jobs until throughput, peak memory, validation loss, and recovery have been measured on the target machine.
+
+
+## Native OM scaling roadmap: 100M / 300M / 1B / 7B / 70B
+
+Architecture presets are not trained checkpoints. Run model-info on every preset and use the repository's actual parameter estimator before allocating compute.
+
+```bash
+# Inspect every scale first (these commands do not start training)
+python -m om_ai.native_lifecycle info --config configs/om-1.1-100m.json
+python -m om_ai.native_lifecycle info --config configs/om-1.1-300m.json
+python -m om_ai.native_lifecycle info --config configs/om-1.1-1b.json
+python -m om_ai.native_lifecycle info --config configs/om-1.1-7b.json
+python -m om_ai.native_lifecycle info --config configs/om-1.1-70b.json
+
+# Run correctness smoke test on a small preset before training
+python -m om_ai.native_lifecycle validate --config configs/om-1.1-100m.json
+
+# Start a small pilot only after tokenizer and reviewed corpus paths are verified
+python -m om_ai.native_lifecycle train \
+  --config configs/om-1.1-100m.json \
+  --tokenizer artifacts/tokenizer-production-65536.json \
+  --data data/production-corpus/clean/fineweb-deduped.jsonl \
+  --output artifacts/checkpoints/om-1.1-100m-pretrain \
+  --steps 100 --batch-size 1 --grad-accum 4
+
+# Inspect 7B and 70B architecture targets only. Do NOT run the current
+# single-process trainer on these presets; it is not distributed training.
+```
+
+### Scale-up gates
+
+- **100M:** architecture and checkpoint smoke tests; prove the pipeline recovers.
+- **300M–1B:** measure tokens/second, peak memory, validation loss, and checkpoint recovery on the actual target hardware.
+- **7B:** implement and validate distributed training, sharded optimizer state/checkpoints, mixed-precision policy, and multi-GPU memory planning before a training run.
+- **70B and above:** require a multi-node training design, tensor/pipeline parallelism, sharded checkpoints, robust data loading, monitoring, and fault recovery. A Mac mini is for development, not a practical 70B-from-scratch training cluster.
+
+The current `om_ai.native_lifecycle train` uses the repository's single-process `Trainer`; the 7B and 70B JSON files are architecture targets only and are not launch-ready training configurations. Never interpret parameter count or a successful forward pass as evidence of model capability. Pretraining from scratch also requires a large, legally reviewed corpus and long training runs; this command set does not create trained weights automatically.
