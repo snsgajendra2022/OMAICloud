@@ -5,10 +5,7 @@ import os
 import re
 from typing import Any, Callable
 
-from om_ai.core.intelligence.real_answer import (
-    build_real_answer,
-    looks_like_static_reply,
-)
+from om_ai.core.intelligence.real_answer import looks_like_static_reply
 
 
 INTENT_CAPABILITY: dict[str, str] = {
@@ -161,8 +158,9 @@ def _cap_vision(q: str, ctx: dict, u: dict) -> str:
                     return result.strip() + "\n"
         except Exception:
             pass
-    real = build_real_answer(q)
-    return (real + "\n") if real else ""
+    # No image evidence means no image claims. The native synthesizer can explain
+    # what is missing without inventing image contents.
+    return ""
 
 
 CAPABILITY_HANDLERS: dict[str, Callable[[str, dict, dict], str]] = {
@@ -207,6 +205,7 @@ def _native_synthesize(
         "coding": "Solve the coding task. Give complete, runnable code for requested files, explain important integration details, and never invent files or APIs.",
         "research": "Answer the question directly. Separate established facts from uncertainty and use supplied evidence rather than inventing citations.",
         "analysis": "Compare the relevant options using explicit criteria and reach a reasoned conclusion.",
+        "calculator": "Solve the mathematical question carefully. Show the calculation and units when useful; state uncertainty if the expression is ambiguous.",
         "planning": "Produce an executable plan with concrete actions, dependencies, and acceptance checks.",
         "recommendation": "Recommend a specific option for the user's stated needs and explain the trade-offs.",
         "prompt_generator": "Write a detailed, tailored prompt that can be used immediately for the exact task requested. Do not return a generic prompt skeleton.",
