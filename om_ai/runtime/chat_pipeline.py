@@ -122,6 +122,7 @@ def run_chat_pipeline(
             "social": bool((chat_intel.get("meta") or {}).get("social")),
             "quality": (chat_intel.get("meta") or {}).get("quality"),
             "confidence": (chat_intel.get("meta") or {}).get("confidence"),
+            "verification": (chat_intel.get("meta") or {}).get("verification"),
         }
         ci_answer = str(chat_intel.get("answer") or "").strip()
         # Early return for greetings / identity / thanks — ChatGPT-like UX
