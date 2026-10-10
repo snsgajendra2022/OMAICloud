@@ -37,8 +37,8 @@ CASES = [
 
 
 _WITHHELD_REPLY = re.compile(
-    r"^OM-1\\.0 could not produce a reliable answer for this turn\\.\\s*"
-    r"The generated text was withheld because it failed quality checks\\.$",
+    r"^OM-1\.0 could not produce a reliable answer for this turn\.\s*"
+    r"The generated text was withheld because it failed quality checks\.$",
     re.IGNORECASE,
 )
 
