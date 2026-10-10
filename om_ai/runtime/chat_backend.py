@@ -1,12 +1,13 @@
-"""Chat reply backends: self-hosted vLLM, Transformers, native OM, and explicit APIs.
+"""Chat reply backends: native OM first, with explicit optional adapters.
 
-Production deployments should select ``vllm`` through OM_MODEL_PROVIDER or
-OM_AI_CHAT_BACKEND. The native OM backend remains the compatibility default when
-no provider is configured, but it is not the high-capability production target.
+The native OM model is the default and primary development target. Set
+OM_MODEL_PROVIDER or OM_AI_CHAT_BACKEND to vllm or transformers only when
+intentionally evaluating/serving a separate model. Those adapters do not
+upgrade native OM weights and must not be described as OM-trained intelligence.
 All configured backends fail closed; none silently substitutes a different model.
 
-Ollama is not part of the production path. Legacy client lives under
-``om_ai.legacy.ollama`` and is never auto-imported by serve/API.
+Ollama is not part of the default path. Legacy client lives under
+om_ai.legacy.ollama and is never auto-imported by serve/API.
 """
 from __future__ import annotations
 
