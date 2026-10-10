@@ -231,6 +231,15 @@ def is_garbled_generation(text: str | None) -> bool:
                 "hey",
                 "greetings",
                 "namaste",
+                "saved",
+                "done",
+                "thanks",
+                "thank you",
+                "okay",
+                "ok",
+                "yes",
+                "no",
+                "maple-731",
             )
         ):
             return True
