@@ -1,6 +1,6 @@
 # OM Architecture Audit (generated)
 
-- Python files scanned: **1879**
+- Python files scanned: **1880**
 - Static parse errors: **0**
 - Generation-like function definitions: **60**
 - Generation-like call sites: **96**
