@@ -228,6 +228,108 @@ CAPABILITY_HANDLERS: dict[str, Callable[[str, dict, dict], str]] = {
 }
 
 
+def _native_synthesize(
+    question: str,
+    capability: str,
+    context: dict[str, Any],
+    understanding: dict[str, Any],
+    *,
+    tool_text: str = "",
+    draft: str = "",
+) -> str:
+    """Generate the user-facing answer with OM's own checkpoint, not a canned template.
+
+    The native checkpoint is the author of the answer. Retrieved facts, tool output,
+    project context, and handler drafts are evidence only. If native inference is
+    unavailable or the result looks like a static stub, return empty and let the
+    caller make the failure explicit rather than silently substituting another LLM.
+    """
+    if os.environ.get("OM_CAPABILITY_NATIVE_GENERATION", "1").strip().lower() in {
+        "0", "false", "no", "off"
+    }:
+        return ""
+
+    from om_ai.backends.om_native import OMNativeBackend
+    from om_ai.core.intelligence.real_answer import _looks_like_garbage
+
+    task_instructions = {
+        "coding": "Solve the coding task. Give complete, runnable code for requested files, explain important integration details, and never invent files or APIs.",
+        "research": "Answer the question directly. Separate established facts from uncertainty and use supplied evidence rather than inventing citations.",
+        "analysis": "Compare the relevant options using explicit criteria and reach a reasoned conclusion.",
+        "planning": "Produce an executable plan with concrete actions, dependencies, and acceptance checks.",
+        "recommendation": "Recommend a specific option for the user's stated needs and explain the trade-offs.",
+        "prompt_generator": "Write a detailed, tailored prompt that can be used immediately for the exact task requested. Do not return a generic prompt skeleton.",
+        "vision": "Answer only from the supplied image-analysis evidence. If evidence is missing, say the image analysis is unavailable.",
+        "chat": "Respond naturally to the conversation, using prior turns when relevant. Do not restart the conversation or give a generic help menu.",
+        "clarify": "Try to answer the user's likely intent. Ask one focused clarification only if an essential detail is missing.",
+    }.get(capability, "Solve the user's request directly and concretely.")
+
+    project_context = str(
+        context.get("project_instructions")
+        or context.get("project_hint")
+        or context.get("project_context")
+        or ""
+    ).strip()
+    history = context.get("history") or context.get("messages") or []
+    messages: list[dict[str, str]] = [{
+        "role": "system",
+        "content": (
+            "You are OM, answering with OM's own native model weights. "
+            "Produce the final answer, not a plan for how an assistant might answer. "
+            "Be specific, correct, and useful. Avoid canned headings, filler, and "
+            "repeating the user's request. Do not claim tools were used unless their "
+            "results are supplied. If evidence is insufficient, state the limitation. "
+            + task_instructions
+        ),
+    }]
+    if isinstance(history, list):
+        for item in history[-6:]:
+            if not isinstance(item, dict):
+                continue
+            role = str(item.get("role") or "").lower()
+            text = str(item.get("content") or "").strip()
+            if role in {"user", "assistant"} and text:
+                messages.append({"role": role, "content": text[:1800]})
+    evidence_parts = []
+    if project_context:
+        evidence_parts.append("PROJECT CONTEXT (follow when relevant):\n" + project_context[:5000])
+    if tool_text:
+        evidence_parts.append("EXECUTED TOOL RESULTS / EVIDENCE:\n" + tool_text[:10000])
+    if draft:
+        evidence_parts.append(
+            "EXISTING SOLUTION DRAFT (verify and improve; do not copy blindly):\n" + draft[:6000]
+        )
+    if understanding:
+        safe_understanding = {
+            k: understanding[k]
+            for k in ("intent", "canonical", "confidence", "entities", "constraints")
+            if k in understanding
+        }
+        if safe_understanding:
+            evidence_parts.append("INTENT METADATA:\n" + repr(safe_understanding)[:1800])
+    user_content = question.strip()
+    if evidence_parts:
+        user_content += "\n\n" + "\n\n".join(evidence_parts)
+    messages.append({"role": "user", "content": user_content})
+
+    max_tokens = int(os.environ.get("OM_CAPABILITY_MAX_NEW_TOKENS", "768"))
+    max_tokens = max(64, min(max_tokens, 2048))
+    answer = OMNativeBackend().chat(
+        messages,
+        max_new_tokens=max_tokens,
+        temperature=0.35,
+        top_p=0.9,
+        top_k=40,
+        repetition_penalty=1.12,
+        min_new_tokens=8,
+        no_repeat_ngram_size=3,
+    )
+    answer = str(answer or "").strip()
+    if not answer or looks_like_static_reply(answer) or _looks_like_garbage(answer):
+        return ""
+    return answer
+
+
 class CapabilityRouter:
     def route(self, intent: dict[str, Any]) -> dict[str, Any]:
         key = str(intent.get("intent") or intent.get("canonical") or "unclear")
@@ -258,14 +360,42 @@ class CapabilityRouter:
                 tr = context.get("tool_results") or {}
                 tool_text = str(tr.get("combined_text") or "").strip()
 
-        out = str(fn(question, context, understanding) or "").strip()
         cap_id = str(capability.get("capability") or "")
+        out = str(fn(question, context, understanding) or "").strip()
 
-        # Merge: if handler empty/weak but tools ran, use tools
+        # Clock and arithmetic are exact deterministic operations, not language generation.
+        # Every other capability is synthesized by OM's native checkpoint first.
+        if cap_id not in {"date", "calculator"}:
+            try:
+                native_answer = _native_synthesize(
+                    question,
+                    cap_id,
+                    context if isinstance(context, dict) else {},
+                    understanding if isinstance(understanding, dict) else {},
+                    tool_text=tool_text,
+                    draft=out,
+                )
+                if native_answer:
+                    return native_answer + "\n"
+            except Exception as exc:
+                logger_name = "om_ai.core.intelligence.capability_router"
+                import logging
+                logging.getLogger(logger_name).warning(
+                    "Native OM capability generation failed (%s); no third-party model fallback is used.",
+                    type(exc).__name__,
+                )
+            # Do not silently ship a canned capability template as if OM generated it.
+            if not tool_text.strip():
+                return (
+                    "OM's native model could not produce a usable answer. "
+                    "Check that the configured OM checkpoint and tokenizer load correctly, "
+                    "then inspect the native generation logs."
+                )
+
+        # Exact tool output is still useful if native synthesis is unavailable.
         if tool_text and (not out or len(out) < 40):
             out = tool_text
         elif tool_text and out and tool_text[:80] not in out:
-            # Enrich coding/research with tool evidence — not prompt_generator/chat
             if cap_id in {"coding", "research", "analysis", "planning"}:
                 out = f"{out}\n\n## Tool results\n{tool_text}"
 
