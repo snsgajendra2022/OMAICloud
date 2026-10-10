@@ -90,6 +90,10 @@ class TransformersBackend:
 
         if resolved_quant not in {"none", "4bit", "8bit"}:
             raise ValueError("quantization must be none, 4bit, or 8bit")
+        if resolved_quant != "none" and not torch.cuda.is_available():
+            raise TransformersBackendError(
+                "bitsandbytes 4-bit/8-bit loading in this adapter requires a supported CUDA device; use a compatible quantized model/runtime for Mac or CPU."
+            )
 
         kwargs: dict[str, Any] = {
             "device_map": resolved_device_map,
