@@ -23,6 +23,15 @@ This repository is **working software** (architecture, trainers, agents, API). I
 
 See `docs/PROJECT_BLUEPRINT.md`, `docs/IMPLEMENTATION_STATUS.md`, `docs/EXTERNAL_ASSETS_REQUIRED.md`, and the docs index below.
 
+
+## Pretrained model runtime (including 70B-class models)
+
+The optional Hugging Face Transformers adapter is documented in [PRETRAINED_MODEL_RUNTIME.md](docs/PRETRAINED_MODEL_RUNTIME.md). It is a separate provider that uses the selected pretrained model's own tokenizer/chat template; it does not change the native OM checkpoint or silently fall back between providers.
+
+Install with `pip install -e '.[hf]'`. For supported CUDA/Linux quantization, see the documentation for `.[hf-quant]`. Before loading a large model, estimate memory with `python scripts/estimate_llm_memory.py`. Validate chat/SFT datasets with `python scripts/validate_chat_dataset.py` before training.
+
+**Important:** adding a runtime does not provide 70B weights or train a 70B model. The native OM checkpoint remains a small experimental model; large-model readiness requires licensed weights, compatible hardware, measured inference tests, and quality evaluation.
+
 ## Quick start (OM-1.0 native)
 
 ```bash
