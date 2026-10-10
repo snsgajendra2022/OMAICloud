@@ -771,11 +771,10 @@ body.dark .chip.on{background:rgba(59,130,246,.15);border-color:rgba(59,130,246,
       <div class="drop-menu" id="modelDrop"></div>
     </div>
     <div class="top-title" id="topTitle">New chat</div>
-    <div class="om-status-strip" id="omStatusStrip" title="OM runtime status">
-      <span class="om-pill"><i class="dot online"></i>Online</span>
+    <div class="om-status-strip" id="omStatusStrip" title="Live OM native runtime status">
+      <span class="om-pill" id="omNativeStatus"><i class="dot"></i>Checking native model…</span>
       <span class="om-pill" id="omLevelPill">OM-L5</span>
-      <span class="om-pill">Memory Active</span>
-      <span class="om-pill">Agents Ready</span>
+      <span class="om-pill" id="omQualityStatus">Quality not certified</span>
     </div>
     <div class="top-actions">
       <button type="button" class="icon-btn" id="searchTopBtn" title="Search"></button>
@@ -2460,6 +2459,29 @@ function modelSelectOptions(selected) {
     const label = m.name || id;
     return '<option value="'+escapeHtml(id)+'"'+(id===sel?' selected':'')+">"+escapeHtml(label)+"</option>";
   }).join("");
+}
+
+async function loadOmRuntimeStatus() {
+  const nativeEl = $("omNativeStatus");
+  const qualityEl = $("omQualityStatus");
+  if (!nativeEl || !qualityEl) return;
+  try {
+    const {res, data} = await api("/api/v1/om/modules", {}, {error:false});
+    if (!res.ok || !data) throw new Error("Runtime status unavailable");
+    const ready = data.native_model_ready === true;
+    nativeEl.innerHTML = '<i class="dot '+(ready ? "online" : "")+'"></i>' +
+      (ready ? "Native model loaded" : "Native model not ready");
+    nativeEl.title = ready
+      ? "Checkpoint loaded; answer quality is not implied."
+      : "OM native checkpoint is not loaded or trained.";
+    qualityEl.textContent = "Quality " + (data.quality_status || "not certified").replace(/_/g, " ");
+    qualityEl.title = "A loaded checkpoint is not proof of answer quality. Run the OM capability evaluation.";
+  } catch (_) {
+    nativeEl.innerHTML = '<i class="dot"></i>Runtime status unavailable';
+    nativeEl.title = "Could not verify native model readiness.";
+    qualityEl.textContent = "Quality not certified";
+    qualityEl.title = "Answer quality has not been certified by evaluation.";
+  }
 }
 
 async function loadModelsCatalog() {
@@ -4975,7 +4997,7 @@ async function init() {
   } catch (_) {}
   applyUserChrome();
   applyDarkMode();
-  await Promise.all([loadWorkspaces(), loadModelsCatalog(), loadNotifications()]);
+  await Promise.all([loadWorkspaces(), loadModelsCatalog(), loadNotifications(), loadOmRuntimeStatus()]);
   try {
     const boot = await api("/v1/workspace/bootstrap",{method:"POST",body:"{}"},{error:false});
     if (boot.res.ok && boot.data && boot.data.created) {
