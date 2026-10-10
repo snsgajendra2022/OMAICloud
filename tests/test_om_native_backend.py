@@ -65,6 +65,20 @@ def test_degenerate_generation_detects_possessive_collapse():
     assert not is_degenerate_generation("Hello — I’m OM AI.")
 
 
+def test_degenerate_generation_detects_tokenizer_fragment_soup():
+    from om_ai.runtime.engine import is_degenerate_generation
+
+    garbage = (
+        "ordin907optic foo123bar random42words nonsense fragments "
+        "Pilgrimage Stout Bruck tremendearch winged Agriculture "
+        "Doctrineakada TelephoneGENCommon"
+    )
+    assert is_degenerate_generation(garbage)
+    assert not is_degenerate_generation(
+        "OM AI is a local language model running on Apple Silicon."
+    )
+
+
 def test_resolve_om_native_forced(monkeypatch):
     monkeypatch.setenv("OM_MODEL_PROVIDER", "om_native")
     monkeypatch.setenv("OM_AI_CHAT_BACKEND", "openai")
