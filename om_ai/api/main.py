@@ -35,6 +35,7 @@ from om_ai.knowledge import PersistentKnowledgeBase
 from om_ai.memory import SQLiteMemoryStore, ConversationStore
 from om_ai.registry import ModelRegistry
 from om_ai.backends import NativeCheckpointError, OMNativeBackend
+from om_ai.backends.transformers_backend import TransformersBackendError
 from om_ai.backends.om_native import default_native_paths
 from om_ai.runtime import LocalLLMEngine
 from om_ai.runtime.model_gateway import ModelGateway, ModelGatewayError
@@ -706,7 +707,7 @@ def chat(
         if backend.live_knowledge:
             payload["live_knowledge"] = backend.live_knowledge
         return payload
-    except (NativeCheckpointError, ModelGatewayError) as exc:
+    except (NativeCheckpointError, ModelGatewayError, TransformersBackendError) as exc:
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             detail=str(exc) or "OM-1.0 native model unavailable.",
