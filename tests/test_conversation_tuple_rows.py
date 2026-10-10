@@ -1,8 +1,6 @@
 """Regression tests for SQLite conversation row handling."""
 from __future__ import annotations
 
-import sqlite3
-
 from om_ai.memory.conversations import ConversationStore
 
 
