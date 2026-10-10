@@ -294,11 +294,12 @@ elif _AUTOLOAD:
     except Exception:
         logger.exception("OM_AI_AUTOLOAD failed — API will start without a loaded model")
 
-# Dev-mode warning
+# Authentication status warning. Open access is opt-in and loopback-only.
 if not os.getenv("OM_AI_API_KEYS") and not os.getenv("OM_AI_API_KEYS_FILE") and not os.getenv("OM_AI_API_KEYS_ADMIN"):
     warnings.warn(
-        "OM AI is running in OPEN DEV MODE — no API keys configured. "
-        "Set OM_AI_API_KEYS, OM_AI_API_KEYS_ADMIN, or OM_AI_API_KEYS_FILE for production use.",
+        "No environment API keys configured. Requests remain authentication-protected "
+        "unless OM_AI_ALLOW_OPEN_DEV_MODE=1 is explicitly enabled for local-only development. "
+        "Configure OM_AI_API_KEYS, OM_AI_API_KEYS_ADMIN, or OM_AI_API_KEYS_FILE for production.",
         stacklevel=1,
     )
 
