@@ -361,7 +361,16 @@ class CapabilityRouter:
                 tool_text = str(tr.get("combined_text") or "").strip()
 
         cap_id = str(capability.get("capability") or "")
-        out = str(fn(question, context, understanding) or "").strip()
+        native_generation = os.environ.get("OM_CAPABILITY_NATIVE_GENERATION", "1").strip().lower() not in {
+            "0", "false", "no", "off"
+        }
+        # Keep deterministic tools and image analysis. Do not call build_real_answer
+        # first for ordinary text tasks: that can invoke the same tiny model twice or
+        # return a canned retrieval/template before native synthesis.
+        if not native_generation or cap_id in {"date", "calculator", "vision", "coding"}:
+            out = str(fn(question, context, understanding) or "").strip()
+        else:
+            out = ""
 
         # Clock and arithmetic are exact deterministic operations, not language generation.
         # Every other capability is synthesized by OM's native checkpoint first.
