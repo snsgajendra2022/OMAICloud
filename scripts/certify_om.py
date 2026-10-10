@@ -123,6 +123,23 @@ def main() -> int:
             print(f"\n--- {check['name']} diagnostic (last 20,000 chars) ---")
             print(detail.rstrip())
             print(f"--- end {check['name']} diagnostic ---\n")
+            if check.get("name") == "native_model_evaluation":
+                eval_report = ROOT / "artifacts" / "evaluations" / "om-capability-smoke.json"
+                if eval_report.is_file():
+                    try:
+                        evaluation = json.loads(eval_report.read_text(encoding="utf-8"))
+                        print("--- Failed native model cases ---")
+                        for item in evaluation.get("results", []):
+                            if item.get("ok"):
+                                continue
+                            print(f"\n[{item.get('category', 'unknown')}]")
+                            print("Prompt:", item.get("prompt", ""))
+                            print("Answer:", item.get("answer", item.get("error", "<no answer>")))
+                            if item.get("correctness_checks") is not None:
+                                print("Checks:", json.dumps(item["correctness_checks"], ensure_ascii=False))
+                        print("--- end failed native model cases ---\n")
+                    except (OSError, json.JSONDecodeError) as exc:
+                        print(f"Could not read evaluation details: {exc}")
 
     if missing_files:
         print("\n--- Missing implementation paths ---")
