@@ -12,17 +12,16 @@ Self-hosted, API-independent AI platform: train and run **OM-1.0** natively — 
 
 The `data/models/om_registry.json` file is descriptive metadata, not a weight store. Entries without a real checkpoint path, checksum, tokenizer binding, and evaluation results are marked unverified and must not be presented as installed models. Local files under `artifacts/` are intentionally git-ignored, so GitHub alone cannot confirm whether your machine has those weights.
 
-## GPT-5-level capability target: self-hosted model runtime
+## Native OM LLM: primary development path
 
-OM AI is the platform layer (chat, memory, retrieval, tools, permissions, and evaluation). For the high-capability production target, configure a capable licensed open-weight model behind vLLM rather than relying on the small OM-1.0 native checkpoint. This is a target architecture, not a claim that OM AI is GPT-5 or already matches GPT-5.
+OM AI should use its own native model, tokenizer, training pipeline, and checkpoints by default. The `.env.example` selects `om_native`; vLLM and third-party models are optional comparison/serving adapters, not the identity or learned intelligence of OM.
 
-- Runtime guide: [docs/SELF_HOSTED_LLM_RUNTIME.md](docs/SELF_HOSTED_LLM_RUNTIME.md)
-- GPU deployment override: [docker-compose.vllm.yml](docker-compose.vllm.yml)
-- Provider selection: `OM_MODEL_PROVIDER=vllm`, `OM_AI_CHAT_BACKEND=vllm`
-- Model endpoint: `OM_VLLM_BASE_URL`; exact served model: `OM_VLLM_MODEL`
-- Failure policy: no silent fallback to OM native when the selected inference server is missing or fails.
+- Native capability roadmap: [docs/OM_NATIVE_CAPABILITY_ROADMAP.md](docs/OM_NATIVE_CAPABILITY_ROADMAP.md)
+- Native parity status: [docs/CHATGPT_PARITY_STATUS.md](docs/CHATGPT_PARITY_STATUS.md)
+- Native training stack: `om_ai/model/`, `om_ai/training/`, `om_ai/eval/`
+- Optional vLLM adapter/deployment: [docs/SELF_HOSTED_LLM_RUNTIME.md](docs/SELF_HOSTED_LLM_RUNTIME.md) and [docker-compose.vllm.yml](docker-compose.vllm.yml)
 
-The model's license, required GPU memory, throughput, context length, and quality must be verified for the actual deployment. See the evaluation checklist in the runtime guide before describing a release as production-ready.
+**Honest status:** the current native checkpoint is experimental and is not GPT-5-level. Switching the default to native ensures OM's own model is the selected backend; it does not magically improve its weights. The next work is to verify config/tokenizer/checkpoint compatibility, establish reproducible baseline evaluations, fix degenerate generation, then train and promote better native checkpoints using licensed data and available compute. Do not claim GPT-5 parity without benchmark evidence.
 
 ## Honesty about weights
 
