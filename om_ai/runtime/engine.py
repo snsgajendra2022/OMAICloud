@@ -212,46 +212,69 @@ def usable_generation_text(text: str | None) -> str:
 
 
 def is_degenerate_generation(text: str | None) -> bool:
-    """Reject obvious repetition and token-soup outputs from an incompatible/weak checkpoint.
+    """Reject obvious repetition and malformed token-soup output.
 
-    This is a conservative output-integrity guard, not a substitute for model evaluation.
-    It targets punctuation-heavy fragments and malformed token mixtures while avoiding
-    short greetings and ordinary code-like punctuation.
+    This is a conservative output-integrity guard, not a substitute for model
+    evaluation. It looks for repeated text, abnormal symbol density, and
+    punctuation embedded inside otherwise word-like tokens. Normal sentence
+    punctuation and ordinary code snippets should not be rejected just for
+    containing symbols.
     """
     s = (text or "").strip()
     if not s or not usable_generation_text(s):
         return True
 
-    words = re.findall(r"\S+", s)
+    words = re.findall(r"\\S+", s)
     if len(words) >= 12:
-        poss = sum(1 for w in words if "'s" in w or "’s" in w)
-        if poss / len(words) >= 0.18:
+        possessives = sum(1 for word in words if "'s" in word or "’s" in word)
+        if possessives / len(words) >= 0.18:
             return True
-        uniq = len({re.sub(r"[^\w]+", "", w.lower()) for w in words} - {""})
-        if uniq / len(words) < 0.22:
-            return True
-
-    # Random token fragments often contain a high density of symbols mixed into
-    # otherwise alphabetic text (e.g. "C_yAI*uing ... att(;e potoentPEZec").
-    # Ignore whitespace and common sentence punctuation for this ratio.
-    compact = re.sub(r"\s+", "", s)
-    if len(compact) >= 24:
-        suspicious = sum(1 for c in compact if c in "_*#\\\\/|{}[]<>~=^①②③④⑤⑥⑦⑧⑨")
-        if suspicious >= 4 and suspicious / len(compact) >= 0.045:
+        unique_words = len(
+            {re.sub(r"[^\\w]+", "", word.lower()) for word in words} - {""}
+        )
+        if unique_words / len(words) < 0.22:
             return True
 
-        tokens = re.findall(r"[^\s]+", s)
-        if len(tokens) >= 5:
-            malformed = 0
-            for token in tokens:
-                letters = sum(ch.isalpha() for ch in token)
-                symbols = sum(not ch.isalnum() and ch not in "'’.,!?-:;()" for ch in token)
-                if len(token) >= 4 and letters >= 2 and symbols >= 2:
-                    malformed += 1
-            if malformed / len(tokens) >= 0.25:
-                return True
+    compact = re.sub(r"\\s+", "", s)
+    if len(compact) < 16:
+        return False
 
-    return False
+    # Strong signal: suspicious punctuation is embedded between letters,
+    # rather than used as ordinary sentence/code punctuation.
+    embedded_symbol = re.compile(r"[A-Za-z][_*#\\\\/|{}\\[\\]<>~=^][A-Za-z]")
+    embedded_delimiter = re.compile(r"[A-Za-z][(;:][A-Za-z]")
+    malformed_tokens = 0
+    tokens = re.findall(r"\\S+", s)
+    for token in tokens:
+        letters = sum(ch.isalpha() for ch in token)
+        if len(token) >= 4 and letters >= 2 and (
+            embedded_symbol.search(token) or embedded_delimiter.search(token)
+        ):
+            malformed_tokens += 1
+
+    if len(tokens) >= 5 and malformed_tokens / len(tokens) >= 0.15:
+        return True
+
+    # Catch outputs with a cluster of unusual symbols even when they occur in
+    # different tokens. Do not count ordinary punctuation such as commas,
+    # periods, apostrophes, or parentheses by themselves.
+    suspicious_chars = set("_*#\\\\/|{}[]<>~=^")
+    suspicious = sum(1 for char in compact if char in suspicious_chars)
+    if suspicious >= 3 and suspicious / len(compact) >= 0.035:
+        return True
+
+    # Too many non-word characters inside word-like tokens is another common
+    # signature of byte/tokenizer mismatch.
+    malformed = 0
+    for token in tokens:
+        letters = sum(ch.isalpha() for ch in token)
+        internal_symbols = sum(
+            not ch.isalnum() and ch not in "'’.,!?-"
+            for ch in token
+        )
+        if len(token) >= 4 and letters >= 2 and internal_symbols >= 2:
+            malformed += 1
+    return bool(tokens and malformed / len(tokens) >= 0.25)
 
 def fit_messages_to_context(
     messages: list[dict],
