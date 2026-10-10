@@ -66,8 +66,12 @@ OM Companion desktop stays **always on top**, hides to the **menu bar** when you
 
 Default env (see `.env.example`):
 
+- `OM_NATIVE_ONLY=1` (default; overrides stale vLLM/Qwen/OpenAI/Transformers selections)
 - `OM_MODEL_PROVIDER=om_native`
+- `OM_AI_CHAT_BACKEND=om_native`
 - `OM_MODEL_CHECKPOINT=artifacts/checkpoints/om-1.0-chat-dpo-v4/latest.pt` (or long/smoke if present)
+
+If an existing local `.env` still contains `OM_MODEL_PROVIDER=vllm`, `OM_AI_CHAT_BACKEND=vllm`, or `OM_VLLM_MODEL=Qwen/...`, the default `OM_NATIVE_ONLY=1` prevents those settings from selecting a third-party model. Keep the local `.env` native-only as well; `.env` is machine-local and is not committed to GitHub.
 - `OM_MODEL_DEVICE=mps` only when MPS is available; otherwise `cpu` / `cuda`
 - Missing / unloadable checkpoint → clear error / grounded fallbacks — **no** third-party LLM fallback by default
 
