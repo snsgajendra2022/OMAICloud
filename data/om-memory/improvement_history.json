@@ -1162,5 +1162,17 @@
     "answer": "Hello \u2014 I\u2019m OM. What should we work on?",
     "intent": "conversation",
     "score": 100.0
+  },
+  {
+    "question": "hii",
+    "answer": "Hello \u2014 I\u2019m OM. What should we work on?",
+    "intent": "conversation",
+    "score": 100.0
+  },
+  {
+    "question": "what is tommero date",
+    "answer": "Today's date is Saturday, 10 October 2026.",
+    "intent": "date_request",
+    "score": 100.0
   }
 ]
