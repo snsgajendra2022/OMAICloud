@@ -46,7 +46,7 @@ def load_config(path: str | Path) -> ModelConfig:
     return cfg
 
 
-def model_info(config_path: str, tokenizer_path: str | None = None) -> dict[str, Any]:
+def model_info(config_path: str, tokenizer_path: str | None = None, checkpoint_path: str | None = None) -> dict[str, Any]:
     cfg = load_config(config_path)
     payload: dict[str, Any] = {
         "model_family": "native_om",
@@ -63,8 +63,11 @@ def model_info(config_path: str, tokenizer_path: str | None = None) -> dict[str,
         "vocab_size": cfg.vocab_size,
         "gradient_checkpointing": cfg.gradient_checkpointing,
         "weights_available": False,
+        "checkpoint_compatible": False,
+        "checkpoint": checkpoint_path,
+        "checkpoint_error": None,
         "production_ready": False,
-        "note": "Architecture metadata is not evidence of trained capability.",
+        "note": "A checkpoint is marked available only after the native runtime loads it successfully; production readiness still requires held-out quality evaluation.",
     }
     if tokenizer_path:
         tok = load_tokenizer(tokenizer_path)
@@ -77,6 +80,41 @@ def model_info(config_path: str, tokenizer_path: str | None = None) -> dict[str,
             "parameters_exact": model.exact_parameter_count(),
             "trainable_parameters": model.trainable_parameter_count(),
         })
+    # Use the same loader as live chat; a filename alone does not prove compatibility.
+    try:
+        from om_ai.backends.om_native import default_native_paths
+        from om_ai.runtime.engine import LocalLLMEngine
+
+        resolved_paths = default_native_paths()
+        selected_checkpoint = checkpoint_path or resolved_paths.get("checkpoint") or ""
+        selected_tokenizer = tokenizer_path or resolved_paths.get("tokenizer") or ""
+        payload["checkpoint"] = selected_checkpoint or None
+        if selected_checkpoint and Path(selected_checkpoint).is_file():
+            if not selected_tokenizer or not Path(selected_tokenizer).is_file():
+                raise FileNotFoundError(f"Tokenizer not found: {selected_tokenizer or '(not configured)'}")
+            engine = LocalLLMEngine()
+            loaded = engine.load(
+                str(config_path), str(selected_tokenizer), str(selected_checkpoint), "cpu"
+            )
+            payload.update({
+                "weights_available": True,
+                "checkpoint_compatible": True,
+                "checkpoint_sha256": sha256_file(selected_checkpoint),
+                "checkpoint_parameters_loaded": loaded.get("parameters"),
+                "checkpoint_device_tested": loaded.get("device"),
+                "checkpoint_error": None,
+            })
+        elif selected_checkpoint:
+            payload["checkpoint_error"] = "Checkpoint path does not exist."
+        else:
+            payload["checkpoint_error"] = "No checkpoint path configured or discovered."
+    except Exception as exc:
+        payload["weights_available"] = False
+        payload["checkpoint_compatible"] = False
+        payload["checkpoint_error"] = f"{type(exc).__name__}: {exc}"
+
+    # Loadability is not proof of GPT-5-level quality or production safety.
+    payload["production_ready"] = False
     return payload
 
 
@@ -246,6 +284,7 @@ def main() -> None:
     p_info = sub.add_parser("info", help="Report architecture and exact count when tokenizer is supplied")
     p_info.add_argument("--config", required=True)
     p_info.add_argument("--tokenizer")
+    p_info.add_argument("--checkpoint", help="Checkpoint to verify; defaults to native runtime configuration")
     p_val = sub.add_parser("validate", help="Run forward/backward/checkpoint smoke test")
     p_val.add_argument("--config", required=True)
     p_val.add_argument("--device")
@@ -277,7 +316,7 @@ def main() -> None:
     p_train.add_argument("--min-free-gb", type=float, default=1.0)
     args = parser.parse_args()
     if args.command == "info":
-        payload = model_info(args.config, args.tokenizer)
+        payload = model_info(args.config, args.tokenizer, args.checkpoint)
     elif args.command == "validate":
         payload = validate(args.config, args.device, args.output)
     elif args.command == "evaluate":
