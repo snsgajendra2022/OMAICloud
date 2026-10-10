@@ -271,17 +271,25 @@ def _native_synthesize(
         or ""
     ).strip()
     history = context.get("history") or context.get("messages") or []
-    messages: list[dict[str, str]] = [{
-        "role": "system",
-        "content": (
-            "You are OM, answering with OM's own native model weights. "
-            "Produce the final answer, not a plan for how an assistant might answer. "
-            "Be specific, correct, and useful. Avoid canned headings, filler, and "
-            "repeating the user's request. Do not claim tools were used unless their "
-            "results are supplied. If evidence is insufficient, state the limitation. "
+    # Short-turn conversation must not be buried under a long developer prompt.
+    # The local OM model has a small context window; keep system instructions compact,
+    # especially for greetings and multilingual casual conversation.
+    short_chat = capability in {"chat", "clarify"} and len(question.strip()) <= 240 and not tool_text and not project_context
+    if short_chat:
+        system_prompt = (
+            "You are OM, a friendly conversational AI. Reply directly and naturally to "
+            "the user's latest message. Understand English and Hindi/Hinglish. Keep a "
+            "greeting or simple social reply to one or two sentences. Do not give a menu "
+            "of capabilities, repeat the question, or invent a refusal."
+        )
+    else:
+        system_prompt = (
+            "You are OM, using OM's own native model weights. Answer the user's request "
+            "directly and concretely. Avoid canned headings and filler. Use supplied "
+            "evidence; do not invent facts or claim tools ran without results. "
             + task_instructions
-        ),
-    }]
+        )
+    messages: list[dict[str, str]] = [{"role": "system", "content": system_prompt}]
     if isinstance(history, list):
         for item in history[-6:]:
             if not isinstance(item, dict):
@@ -314,15 +322,17 @@ def _native_synthesize(
 
     max_tokens = int(os.environ.get("OM_CAPABILITY_MAX_NEW_TOKENS", "768"))
     max_tokens = max(64, min(max_tokens, 2048))
+    if short_chat:
+        max_tokens = min(max_tokens, 64)
     answer = OMNativeBackend().chat(
         messages,
         max_new_tokens=max_tokens,
-        temperature=0.35,
+        temperature=0.7 if short_chat else 0.35,
         top_p=0.9,
         top_k=40,
-        repetition_penalty=1.12,
-        min_new_tokens=8,
-        no_repeat_ngram_size=3,
+        repetition_penalty=1.08 if short_chat else 1.12,
+        min_new_tokens=1 if short_chat else 8,
+        no_repeat_ngram_size=2 if short_chat else 3,
     )
     answer = str(answer or "").strip()
     if not answer or looks_like_static_reply(answer) or _looks_like_garbage(answer):
