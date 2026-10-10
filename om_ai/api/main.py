@@ -70,8 +70,8 @@ app = FastAPI(
     title="OM AI Operating Brain",
     version=_API_VERSION,
     description=(
-        "Self-hosted private AI platform. "
-        "Default chat backend is OM-1.0 native (om_native) — no Ollama proxy."
+        "Self-hosted AI platform. Configure OM_MODEL_PROVIDER=vllm to use a capable "
+        "self-hosted model through vLLM; the legacy OM-1.0 native checkpoint remains optional."
     ),
 )
 
