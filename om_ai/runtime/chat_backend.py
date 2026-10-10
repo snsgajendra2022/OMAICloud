@@ -35,7 +35,7 @@ except Exception:
     logger.debug(
         "Language Intelligence Layer unavailable"
     )
-BackendName = str  # "om_native" | "local" | "openai"
+BackendName = str  # "vllm" | "transformers" | "om_native" | "local" | "openai"
 
 
 class ResponseEcho:
@@ -198,6 +198,20 @@ def openai_api_key() -> str:
     return _env("OM_AI_OPENAI_API_KEY") or _env("OPENAI_API_KEY")
 
 
+def vllm_base_url() -> str:
+    """Base URL for the self-hosted vLLM OpenAI-compatible server."""
+    return _env("OM_VLLM_BASE_URL", "http://127.0.0.1:8000/v1").rstrip("/")
+
+
+def vllm_model() -> str:
+    return _env("OM_VLLM_MODEL")
+
+
+def vllm_api_key() -> str:
+    # vLLM may be behind an authenticated gateway. Never require a public provider key.
+    return _env("OM_VLLM_API_KEY", "EMPTY")
+
+
 def configured_backend() -> str:
     """Resolve configured chat backend.
 
@@ -208,6 +222,8 @@ def configured_backend() -> str:
     chat = (_env("OM_AI_CHAT_BACKEND") or _DEFAULT_BACKEND).lower()
     if provider in {"transformers", "hf", "huggingface"} or chat in {"transformers", "hf", "huggingface"}:
         return "transformers"
+    if provider in {"vllm", "self_hosted", "self-hosted", "openai_compatible"} or chat in {"vllm", "self_hosted", "self-hosted", "openai_compatible"}:
+        return "vllm"
     if provider in {"om_native", "om-native", "native", "om"}:
         return "om_native"
     if chat in {"om_native", "om-native", "native"}:
@@ -239,6 +255,13 @@ def resolve_backend(*, local_loaded: bool = False, native_ready: bool = False) -
             "OM_MODEL_PROVIDER/OM_AI_CHAT_BACKEND=om_native (default)"
             + (" (ready)" if native_ready else " (checkpoint required)"),
             provider="OM AI",
+        )
+    if mode == "vllm":
+        return ChatBackendInfo(
+            "vllm",
+            vllm_model() or "unset",
+            "self-hosted vLLM OpenAI-compatible inference server",
+            provider="Self-hosted vLLM",
         )
     if mode == "transformers":
         return ChatBackendInfo(
@@ -378,6 +401,57 @@ def with_runtime_date_context(
         msgs[i] = {"role": "system", "content": merged}
         return msgs
     return [{"role": "system", "content": date_line}] + msgs
+
+
+def chat_via_vllm(
+    messages: list[dict],
+    *,
+    max_new_tokens: int = 512,
+    temperature: float = 0.7,
+    top_p: float = 0.9,
+    model: str | None = None,
+) -> str:
+    """Call self-hosted vLLM through its OpenAI-compatible API; never fallback."""
+    model_id = (model or vllm_model()).strip()
+    if not model_id:
+        raise RuntimeError(
+            "vLLM provider selected but OM_VLLM_MODEL is empty. "
+            "Set it to the exact model served by OM_VLLM_BASE_URL."
+        )
+    payload = {
+        "model": model_id,
+        "messages": _normalize_messages(messages),
+        "max_tokens": int(max_new_tokens),
+        "temperature": float(temperature),
+        "top_p": float(top_p),
+    }
+    headers = {"Content-Type": "application/json"}
+    key = vllm_api_key()
+    if key:
+        headers["Authorization"] = f"Bearer {key}"
+    try:
+        with httpx.Client(timeout=httpx.Timeout(180.0, connect=10.0)) as client:
+            response = client.post(
+                f"{vllm_base_url()}/chat/completions",
+                json=payload,
+                headers=headers,
+            )
+            response.raise_for_status()
+            data = response.json()
+    except httpx.HTTPError as exc:
+        raise RuntimeError(
+            f"Self-hosted vLLM request failed ({type(exc).__name__}). "
+            "Check OM_VLLM_BASE_URL, server health, model availability, and GPU capacity."
+        ) from exc
+    try:
+        content = data["choices"][0]["message"]["content"]
+        if not isinstance(content, str) or not content.strip():
+            raise TypeError("empty or non-text content")
+        return content.strip()
+    except (KeyError, IndexError, TypeError) as exc:
+        raise RuntimeError(
+            "Self-hosted vLLM returned an invalid chat-completion payload"
+        ) from exc
 
 
 def chat_via_openai(
@@ -1446,6 +1520,24 @@ def chat_reply(
             return text, _brand(info)
         finally:
             os.environ.pop("_OM_IN_CHAT_REPLY", None)
+
+    if info.backend == "vllm":
+        from datetime import date
+
+        messages = _normalize_messages(messages)
+        if not any(m["role"] == "system" and "Today's date is " in m["content"] for m in messages):
+            messages.insert(0, {
+                "role": "system",
+                "content": f"Today's date is {date.today().isoformat()}. Do not claim a model identity unless it is known.",
+            })
+        text = chat_via_vllm(
+            messages,
+            model=info.model if info.model != "unset" else None,
+            max_new_tokens=int(kwargs["max_new_tokens"]),
+            temperature=float(kwargs["temperature"]),
+            top_p=float(kwargs["top_p"]),
+        )
+        return text, _brand(info)
 
     if info.backend == "transformers":
         from datetime import date
