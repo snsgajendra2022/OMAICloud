@@ -41,6 +41,18 @@ Platform version target: **0.3.0** (`pyproject.toml`, FastAPI `om_ai/api/main.py
 
 A neural network’s learned knowledge is in its weights. Source code implements learning mechanisms; it does not substitute for data, optimization runs, and resulting parameters. See `TRAINING_RUNBOOK.md`, `EXTERNAL_ASSETS_REQUIRED.md`, and `TRAINING_70B.md`.
 
+## Self-hosted vLLM production path (2026-10)
+
+The configured target architecture now has a separate vLLM adapter:
+
+- `OM_MODEL_PROVIDER=vllm` / `OM_AI_CHAT_BACKEND=vllm` selects a self-hosted OpenAI-compatible inference server.
+- `OM_VLLM_BASE_URL`, `OM_VLLM_MODEL`, and optional `OM_VLLM_API_KEY` configure the endpoint.
+- The OpenAI-compatible OM API routes chat to that adapter and maps vLLM connection/model errors to HTTP 503.
+- Added `docker-compose.vllm.yml` for a private-network NVIDIA GPU deployment, plus tests for routing, endpoint payloads, and fail-closed behavior.
+- `.env.example` now documents vLLM as the production target and leaves the native OM checkpoint as an optional diagnostic/research path.
+
+This is implementation of the serving path—not proof of GPT-5-level capability. No selected model weights, deployment GPU, real inference benchmark, or GPT-5 comparison was supplied or run. Model selection, license review, actual deployment, quality benchmarks, security tests, and load tests remain release gates. See `docs/SELF_HOSTED_LLM_RUNTIME.md`.
+
 ## Pretrained provider and dataset/hardware utilities (2026-10)
 
 The following software changes are now on the feature branch:
