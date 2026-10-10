@@ -1,6 +1,7 @@
 from __future__ import annotations
 import codecs
 import logging
+import os
 import re
 from pathlib import Path
 from typing import Any, Generator
@@ -633,7 +634,19 @@ class LocalLLMEngine:
         stop_set.add(int(self.tokenizer.eos_id))
         while new_ids and int(new_ids[-1]) in stop_set:
             new_ids.pop()
-        decoded = usable_generation_text(self.tokenizer.decode(new_ids))
+        raw_decoded = self.tokenizer.decode(new_ids)
+        # Opt-in local diagnostics: raw output is normally withheld when quality
+        # checks fail, which hides whether the issue is tokenization, EOS handling,
+        # or the checkpoint itself. Never log prompts; enable explicitly for a
+        # local diagnostic run because model output can still contain user data.
+        if os.getenv("OM_NATIVE_DEBUG_GENERATION", "").strip().lower() in {"1", "true", "yes"}:
+            logger.warning(
+                "OM native raw generation diagnostic: token_count=%d token_ids=%s decoded=%r",
+                len(new_ids),
+                new_ids[:160],
+                raw_decoded[:1200],
+            )
+        decoded = usable_generation_text(raw_decoded)
         if is_degenerate_generation(decoded):
             logger.warning("OM native generation rejected as degenerate token soup")
             return ""
