@@ -189,7 +189,7 @@ def main() -> None:
     p_val.add_argument("--config", required=True)
     p_val.add_argument("--device")
     p_val.add_argument("--output", default="artifacts/validation")
-    p_train = sub.add_parser("train", help="Pretrain native OM using the repository trainer")
+    p_eval = sub.add_parser("evaluate", help="Evaluate a checkpoint on held-out JSONL prompts")\n    p_eval.add_argument("--config", required=True)\n    p_eval.add_argument("--tokenizer", required=True)\n    p_eval.add_argument("--checkpoint", required=True)\n    p_eval.add_argument("--prompts", required=True, help="JSONL with prompt, question, or input fields")\n    p_eval.add_argument("--output", default="artifacts/evaluations/native-om-smoke.json")\n    p_eval.add_argument("--device")\n    p_eval.add_argument("--limit", type=int, default=100)\n    p_eval.add_argument("--max-new-tokens", type=int, default=96)\n    p_train = sub.add_parser("train", help="Pretrain native OM using the repository trainer")
     p_train.add_argument("--config", required=True)
     p_train.add_argument("--tokenizer", required=True)
     p_train.add_argument("--data", required=True)
