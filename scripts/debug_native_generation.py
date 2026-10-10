@@ -22,7 +22,7 @@ def _checkpoint_metadata(path: str) -> dict:
     if not isinstance(payload, dict):
         return {"payload_type": type(payload).__name__}
     result = {}
-    for key in ("stage", "step", "epoch", "sft_config", "dpo_config", "extra", "metadata"):
+    for key in ("stage", "step", "epoch", "global_step", "model_config", "train_config", "sft_config", "dpo_config", "extra", "metadata"):
         value = payload.get(key)
         if isinstance(value, (str, int, float, bool, dict, list, type(None))):
             result[key] = value
@@ -37,11 +37,36 @@ def main() -> int:
     parser.add_argument("--prompt", default="Hi! Please introduce yourself in one sentence.")
     parser.add_argument("--max-new-tokens", type=int, default=64)
     parser.add_argument("--top-tokens", type=int, default=10)
+    parser.add_argument("--config", help="Explicit model config path (overrides .env)")
+    parser.add_argument("--tokenizer", help="Explicit tokenizer path (overrides .env)")
+    parser.add_argument("--checkpoint", help="Explicit checkpoint path (overrides .env)")
+    parser.add_argument("--device", choices=("mps", "cuda", "cpu"), help="Explicit inference device")
+    parser.add_argument("--output", help="Optional JSON report path")
     args = parser.parse_args()
 
     paths = default_native_paths()
+    for key, value in (("config", args.config), ("tokenizer", args.tokenizer), ("checkpoint", args.checkpoint)):
+        if value:
+            paths[key] = str(Path(value).expanduser().resolve(strict=False))
+    if args.device:
+        paths["device"] = args.device
+    missing = [
+        {"asset": key, "path": paths.get(key)}
+        for key in ("config", "tokenizer", "checkpoint")
+        if not paths.get(key) or not Path(paths[key]).is_file()
+    ]
+    if missing:
+        print(json.dumps({"ok": False, "stage": "preflight", "missing": missing}, indent=2))
+        return 2
+
     backend = OMNativeBackend()
-    loaded = backend.load(require_checkpoint=True)
+    loaded = backend.load(
+        config_path=paths["config"],
+        tokenizer_path=paths["tokenizer"],
+        checkpoint_path=paths["checkpoint"],
+        device=paths.get("device") or None,
+        require_checkpoint=True,
+    )
     engine = backend.engine
     tokenizer = engine.tokenizer
     model = engine.model
@@ -52,7 +77,9 @@ def main() -> int:
     input_ids = torch.tensor([prompt_ids], dtype=torch.long, device=engine.device)
 
     with torch.no_grad():
-        first_logits = model(input_ids)["logits"][0, -1].float()
+        all_logits = model(input_ids)["logits"]
+        first_logits = all_logits[0, -1].float()
+        finite_logits = bool(torch.isfinite(first_logits).all().item())
         top_values, top_ids = torch.topk(first_logits, k=min(max(1, args.top_tokens), first_logits.numel()))
         generated = model.generate(
             input_ids,
@@ -101,13 +128,21 @@ def main() -> int:
         "fitted_messages": fitted,
         "prompt_token_count": len(prompt_ids),
         "prompt_token_ids": prompt_ids,
+        "first_next_token_logits_finite": finite_logits,
+        "first_next_token_logit_min": float(first_logits.min().item()) if finite_logits else None,
+        "first_next_token_logit_max": float(first_logits.max().item()) if finite_logits else None,
         "first_next_token_top_logits": top,
         "generated_token_count_including_stop": len(new_ids),
         "generated_token_ids": new_ids,
         "candidate_token_ids_without_trailing_stop": candidate_ids,
         "raw_candidate": tokenizer.decode(candidate_ids),
     }
-    print(json.dumps(report, ensure_ascii=False, indent=2))
+    rendered = json.dumps(report, ensure_ascii=False, indent=2)
+    if args.output:
+        output_path = Path(args.output).expanduser()
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        output_path.write_text(rendered + "\\n", encoding="utf-8")
+    print(rendered)
     return 0
 
 
