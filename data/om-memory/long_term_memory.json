@@ -258,6 +258,10 @@
     {
       "question": "Hello, can you explain Python lists",
       "score": 0.7
+    },
+    {
+      "question": "(.venv) gajendrarawat@Mac om-ai-operating-brain 3 % om-ai serve \nLoaded environment from /Users/gajendrarawat/Downloads/om-ai-operating-brain 3/.env\n[OM startup check] START native diagnostic\n{\n  \"bac",
+      "score": 0.7
     }
   ]
 }
