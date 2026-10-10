@@ -274,6 +274,23 @@ def is_degenerate_generation(text: str | None) -> bool:
         )
         if len(token) >= 4 and letters >= 2 and internal_symbols >= 2:
             malformed += 1
+    if tokens:
+        # Random tokenizer fragments frequently interleave digits with letters
+        # (e.g. "ordin907optic") or concatenate unrelated words with internal
+        # capitals. A few such tokens are normal in IDs/code; a dense cluster in
+        # prose is a strong corruption signal.
+        alpha_numeric_fragments = sum(
+            1 for token in tokens
+            if re.search(r"[A-Za-z]{2,}\\d+[A-Za-z]{2,}", token)
+            or re.search(r"[a-z]{3,}[A-Z][a-z]{2,}", token)
+        )
+        if (
+            len(tokens) >= 12
+            and alpha_numeric_fragments >= 3
+            and alpha_numeric_fragments / len(tokens) >= 0.025
+            and "```" not in s
+        ):
+            return True
     return bool(tokens and malformed / len(tokens) >= 0.25)
 
 def fit_messages_to_context(
