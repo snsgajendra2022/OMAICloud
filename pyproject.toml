@@ -29,6 +29,17 @@ voice = [
   "sounddevice>=0.4.6",
   "faster-whisper>=1.0.0",
 ]
+hf = [
+  "transformers>=4.45.0",
+  "accelerate>=0.34.0",
+  "safetensors>=0.4.5",
+]
+hf-quant = [
+  "transformers>=4.45.0",
+  "accelerate>=0.34.0",
+  "safetensors>=0.4.5",
+  "bitsandbytes>=0.43.3; platform_system=='Linux'",
+]
 companion = [
   "om-ai-operating-brain[voice]",
   "pywebview>=5.0",
