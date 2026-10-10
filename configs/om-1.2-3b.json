@@ -1,0 +1,18 @@
+{
+  "name": "OM-1.2-3B-Base",
+  "description": "Large native OM decoder-only Transformer architecture for a fresh pretraining run. Architecture only: these settings do not represent trained or GPT-level weights.",
+  "vocab_size": 65536,
+  "max_seq_len": 2048,
+  "n_layers": 36,
+  "n_heads": 20,
+  "n_kv_heads": 4,
+  "d_model": 2560,
+  "d_ff": 8192,
+  "rope_theta": 500000.0,
+  "dropout": 0.0,
+  "bias": false,
+  "tie_embeddings": true,
+  "use_rmsnorm": true,
+  "gradient_checkpointing": true,
+  "parameter_goal_note": "The repository ModelConfig estimator predicts about 2.999B parameters. Verify with model-info and the actual OMTransformer constructor before training. This is an untrained architecture preset, not a checkpoint. A Mac mini may support experiments, but training a useful model at this scale from scratch is compute- and data-intensive."
+}
