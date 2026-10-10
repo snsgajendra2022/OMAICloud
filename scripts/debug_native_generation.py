@@ -141,7 +141,7 @@ def main() -> int:
     if args.output:
         output_path = Path(args.output).expanduser()
         output_path.parent.mkdir(parents=True, exist_ok=True)
-        output_path.write_text(rendered + "\\n", encoding="utf-8")
+        output_path.write_text(rendered + "\n", encoding="utf-8")
     print(rendered)
     return 0
 
