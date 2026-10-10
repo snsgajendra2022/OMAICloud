@@ -92,9 +92,7 @@ def validate(config_path: str, device: str | None = None, output: str = "artifac
     x = torch.randint(0, cfg.vocab_size, (2, min(8, cfg.max_seq_len)), device=dev)
     y = torch.randint(0, cfg.vocab_size, x.shape, device=dev)
     result = model(x)
-    logits = result[0] if isinstance(result, (tuple, list)) else result
-    if isinstance(result, dict):
-        logits = result.get("logits")
+    logits = result.get("logits") if isinstance(result, dict) else (result[0] if isinstance(result, (tuple, list)) else result)
     if logits is None or logits.shape[:2] != x.shape:
         raise RuntimeError(f"Unexpected model output shape: {getattr(logits, 'shape', None)}")
     loss = torch.nn.functional.cross_entropy(logits.reshape(-1, cfg.vocab_size), y.reshape(-1))
@@ -114,9 +112,7 @@ def validate(config_path: str, device: str | None = None, output: str = "artifac
     restored.eval()
     with torch.no_grad():
         check = restored(x)
-        check_logits = check[0] if isinstance(check, (tuple, list)) else check
-        if isinstance(check, dict):
-            check_logits = check.get("logits")
+        check_logits = check.get("logits") if isinstance(check, dict) else (check[0] if isinstance(check, (tuple, list)) else check)
     if not torch.allclose(logits.detach(), check_logits, atol=1e-4, rtol=1e-4):
         raise RuntimeError("Checkpoint round-trip changed model outputs")
     return {
