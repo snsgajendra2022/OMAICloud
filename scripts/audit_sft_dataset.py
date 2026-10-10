@@ -119,6 +119,17 @@ def main() -> int:
 
     total = counts["rows"]
     valid = counts["valid_rows"]
+    unique_responses = len(seen_responses)
+    repeated_response_rate = counts["repeated_responses"] / valid if valid else 0.0
+    response_diversity_rate = unique_responses / valid if valid else 0.0
+    warnings = []
+    if valid >= 100 and repeated_response_rate >= 0.5 and response_diversity_rate < 0.25:
+        warnings.append(
+            "low_response_diversity: many rows share response text; review the dataset "
+            "for templated or generic targets before retraining."
+        )
+    if counts["duplicate_pairs"] / valid >= 0.1 if valid else False:
+        warnings.append("high_duplicate_pair_rate: remove exact duplicate prompt/response pairs.")
     report = {
         "kind": "om_sft_dataset_audit",
         "data": str(data_path),
@@ -148,7 +159,7 @@ def main() -> int:
     output = Path(args.output)
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-    print(json.dumps({"output": str(output), "summary": report["summary"], "rates": report["rates"]}, indent=2))
+    print(json.dumps({"output": str(output), "summary": report["summary"], "rates": report["rates"], "warnings": warnings}, indent=2))
     return 0 if valid else 2
 
 
