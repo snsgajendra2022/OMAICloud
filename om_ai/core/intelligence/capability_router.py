@@ -85,31 +85,35 @@ def _cap_prompt(q: str, ctx: dict, u: dict) -> str:
     return answer + "\n" if answer else ""
 
 
+
 def _cap_recommendation(q: str, ctx: dict, u: dict) -> str:
-    real = build_real_answer(q)
-    return (real + "\n") if real else ""
+    """Produce a tailored recommendation with OM's native model."""
+    answer = _native_synthesize(q, "recommendation", ctx or {}, u or {})
+    return answer + "\n" if answer else ""
 
 
 def _cap_coding(q: str, ctx: dict, u: dict) -> str:
-    root = str(ctx.get("project_root") or ctx.get("root") or ".")
-    real = build_real_answer(q, prefer_coding=True, root=root)
-    return (real + "\n") if real else ""
+    """Solve coding tasks with OM's native model, not a corpus/template shortcut."""
+    answer = _native_synthesize(q, "coding", ctx or {}, u or {})
+    return answer + "\n" if answer else ""
 
 
 def _cap_research(q: str, ctx: dict, u: dict) -> str:
-    real = build_real_answer(q)
-    return (real + "\n") if real else ""
+    """Answer research questions with OM's native model and supplied evidence."""
+    answer = _native_synthesize(q, "research", ctx or {}, u or {})
+    return answer + "\n" if answer else ""
 
 
 def _cap_planning(q: str, ctx: dict, u: dict) -> str:
-    real = build_real_answer(q, prefer_coding=True)
-    return (real + "\n") if real else ""
+    """Create an actionable plan using OM's native model."""
+    answer = _native_synthesize(q, "planning", ctx or {}, u or {})
+    return answer + "\n" if answer else ""
 
 
 def _cap_analysis(q: str, ctx: dict, u: dict) -> str:
-    real = build_real_answer(q)
-    return (real + "\n") if real else ""
-
+    """Analyze and compare using OM's native model."""
+    answer = _native_synthesize(q, "analysis", ctx or {}, u or {})
+    return answer + "\n" if answer else ""
 
 def _cap_calculator(q: str, ctx: dict, u: dict) -> str:
     m = re.search(r"(\d+(?:\.\d+)?)\s*%\s*of\s*(\d+(?:\.\d+)?)", q, re.I)
