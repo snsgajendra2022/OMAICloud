@@ -1,9 +1,9 @@
 # OM Architecture Audit (generated)
 
-- Python files scanned: **1875**
+- Python files scanned: **1879**
 - Static parse errors: **0**
-- Generation-like function definitions: **58**
-- Generation-like call sites: **92**
+- Generation-like function definitions: **60**
+- Generation-like call sites: **96**
 - Static import-cycle groups: **7**
 
 > Static inventory only. It is not a runtime trace and does not establish model quality.
@@ -14,8 +14,8 @@
 |---|---:|---|---|
 | om_ai/agents/orchestrator.py | 549 | generate | False |
 | om_ai/api/foundation_routes.py | 271 | generate | False |
-| om_ai/api/main.py | 577 | generate | False |
-| om_ai/api/main.py | 637 | chat | False |
+| om_ai/api/main.py | 605 | generate | False |
+| om_ai/api/main.py | 670 | chat | False |
 | om_ai/backends/base.py | 17 | generate | False |
 | om_ai/backends/base.py | 19 | chat | False |
 | om_ai/backends/om_native.py | 199 | generate | False |
@@ -53,10 +53,12 @@
 | om_ai/model/transformer.py | 270 | forward | False |
 | om_ai/model/transformer.py | 355 | generate | False |
 | om_ai/recovery/strategy.py | 11 | generate | False |
-| om_ai/runtime/chat_backend.py | 1169 | chat_reply | False |
-| om_ai/runtime/chat_pipeline.py | 40 | run_chat_pipeline | False |
-| om_ai/runtime/engine.py | 450 | generate | False |
-| om_ai/runtime/engine.py | 582 | chat | False |
+| om_ai/runtime/chat_backend.py | 1205 | chat_reply | False |
+| om_ai/runtime/chat_pipeline.py | 42 | run_chat_pipeline | False |
+| om_ai/runtime/engine.py | 473 | generate | False |
+| om_ai/runtime/engine.py | 605 | chat | False |
+| om_ai/runtime/model_gateway.py | 46 | generate | False |
+| om_ai/runtime/model_gateway.py | 60 | chat | False |
 | om_ai/self_improvement/strategy.py | 10 | generate | False |
 | om_ai/testing/generator.py | 10 | generate | False |
 | om_ai/training/ppo.py | 196 | forward | False |
@@ -80,16 +82,16 @@
 | om_ai/agents/orchestrator.py | 551 | self._engine.generate |
 | om_ai/api/companion/routes.py | 264 | response_engine.generate |
 | om_ai/api/foundation_routes.py | 272 | gateway.generate |
-| om_ai/api/main.py | 583 | engine.generate |
-| om_ai/api/main.py | 612 | engine.generate_stream |
-| om_ai/api/main.py | 646 | chat_reply |
-| om_ai/api/main.py | 1166 | engine.generate |
+| om_ai/api/main.py | 611 | model_gateway.generate |
+| om_ai/api/main.py | 679 | chat_reply |
+| om_ai/api/main.py | 1199 | model_gateway.generate |
 | om_ai/api/openai_compat.py | 309 | chat_reply |
 | om_ai/api/openai_compat.py | 561 | eng.generate |
 | om_ai/backends/om_native.py | 201 | self.engine.generate |
 | om_ai/backends/om_native.py | 205 | self.engine.chat |
-| om_ai/backends/om_native.py | 212 | self.engine.chat |
-| om_ai/backends/om_native.py | 239 | self.engine.model.generate_stream |
+| om_ai/backends/om_native.py | 210 | self.engine.generate_stream |
+| om_ai/backends/om_native.py | 217 | self.engine.chat |
+| om_ai/backends/om_native.py | 244 | self.engine.model.generate_stream |
 | om_ai/cli.py | 541 | eng.generate |
 | om_ai/cli.py | 558 | eng.chat |
 | om_ai/cli_commands/distill_commands.py | 147 | generate |
@@ -148,14 +150,17 @@
 | om_ai/multimodal/orchestrator.py | 216 | self._llm.generate |
 | om_ai/operating_intelligence/universal.py | 122 | self.generation.generate |
 | om_ai/recovery/executor.py | 81 | self.strategy.generate |
-| om_ai/runtime/chat_backend.py | 514 | run_chat_pipeline |
+| om_ai/runtime/chat_backend.py | 523 | run_chat_pipeline |
 | om_ai/runtime/chat_orchestrator.py | 26 | brain.generate |
 | om_ai/runtime/connectivity_bridge.py | 413 | generate |
-| om_ai/runtime/engine.py | 467 | self.model.generate |
-| om_ai/runtime/engine.py | 499 | self.model.generate_stream |
-| om_ai/runtime/engine.py | 556 | self.model.generate |
-| om_ai/runtime/engine.py | 630 | self.generate |
-| om_ai/runtime/engine.py | 649 | self.generate |
+| om_ai/runtime/engine.py | 490 | self.model.generate |
+| om_ai/runtime/engine.py | 522 | self.model.generate_stream |
+| om_ai/runtime/engine.py | 579 | self.model.generate |
+| om_ai/runtime/engine.py | 653 | self.generate |
+| om_ai/runtime/engine.py | 672 | self.generate |
+| om_ai/runtime/model_gateway.py | 52 | self.backend.generate |
+| om_ai/runtime/model_gateway.py | 66 | self.backend.chat |
+| om_ai/runtime/model_gateway.py | 79 | self.backend.generate_stream |
 | om_ai/self_improvement/engine.py | 66 | self.strategy.generate |
 | om_ai/software_agent/agent.py | 93 | self.modifier.generate_change |
 | om_ai/testing/agent.py | 51 | self.generator.generate |
@@ -163,6 +168,7 @@
 | om_ai/voice/__init__.py | 51 | run_chat_pipeline |
 | scripts/acceptance_test.py | 108 | eng.generate_with_context |
 | scripts/auto_harvest_train_om.py | 95 | gen.generate |
+| scripts/certify_om_release.py | 135 | backend.generate |
 | scripts/diagnose_native_chat.py | 112 | backend.chat |
 | scripts/evaluate_om_capabilities.py | 161 | backend.chat |
 | scripts/evaluate_om_capabilities.py | 194 | backend.chat |
@@ -271,6 +277,8 @@ None.
 - om_ai/runtime/chat_orchestrator.py
 - om_ai/runtime/chat_pipeline.py
 - om_ai/runtime/engine.py
+- om_ai/runtime/model_gateway.py
+- om_ai/runtime/observability.py
 - om_ai/security/accounts.py
 - om_ai/security/audit.py
 - om_ai/security/audit_log.py
@@ -304,6 +312,8 @@ None.
 - scripts/audit_om_architecture.py
 - scripts/auto_harvest_train_om.py
 - scripts/build_chat_sft_v4.py
+- scripts/certify_om.py
+- scripts/certify_om_release.py
 - scripts/diagnose_native_chat.py
 - scripts/evaluate_om_capabilities.py
 - scripts/om70b_preflight.py
@@ -365,6 +375,7 @@ None.
 - om_ai/runtime/chat_backend.py
 - om_ai/runtime/chat_pipeline.py
 - om_ai/runtime/engine.py
+- om_ai/runtime/model_gateway.py
 - om_ai/system/__init__.py
 - om_ai/tokenizer/loader.py
 - om_ai/training/chatgpt_upgrade.py
@@ -383,6 +394,8 @@ None.
 - scripts/acceptance_test.py
 - scripts/audit_om_architecture.py
 - scripts/auto_harvest_train_om.py
+- scripts/certify_om.py
+- scripts/certify_om_release.py
 - scripts/diagnose_native_chat.py
 - scripts/evaluate_om_capabilities.py
 - scripts/run_actual_training_pipeline.py
@@ -410,6 +423,8 @@ None.
 - scripts/audit_om_architecture.py
 - scripts/auto_harvest_train_om.py
 - scripts/build_chat_sft_v4.py
+- scripts/certify_om.py
+- scripts/certify_om_release.py
 - scripts/diagnose_native_chat.py
 - scripts/evaluate_om_capabilities.py
 - scripts/merge_all_sft.py
