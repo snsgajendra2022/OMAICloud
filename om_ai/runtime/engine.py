@@ -14,6 +14,7 @@ from om_ai.tokenizer.byte_bpe import ByteBPETokenizer
 logger = logging.getLogger(__name__)
 
 EMPTY_GENERATION_FALLBACK = "OM-1.0 produced no text; try again."
+_SIMPLE_GREETING_ALIASES = {"hi", "hey", "hello", "helo", "helllo", "hullo", "hwllo", "hiya", "howdy"}
 _CTRL_OR_REPLACEMENT = re.compile(r"[\x00-\x08\x0b\x0c\x0e-\x1f\uFFFD]")
 
 
@@ -194,6 +195,25 @@ def _extra_tokenizer_matches_vocab(extra: dict | None, ckpt_vocab: int | None) -
         return len(load_tokenizer(p).vocab) == ckpt_vocab
     except Exception:
         return True
+
+
+def deterministic_greeting_reply(messages: list[dict]) -> str | None:
+    """Return a reliable reply for a standalone greeting only."""
+    if not isinstance(messages, list) or not messages:
+        return None
+    last = messages[-1]
+    if not isinstance(last, dict) or str(last.get("role", "user")).lower() != "user":
+        return None
+    raw = str(last.get("content") or "").strip().lower()
+    normalized = re.sub(r"[^a-z ]+", " ", raw)
+    normalized = re.sub(r"\s+", " ", normalized).strip()
+    if normalized in _SIMPLE_GREETING_ALIASES:
+        return "Hello! How can I help you today?"
+    if normalized in {"hello how are you", "hi how are you", "hey how are you"}:
+        return "Hello! I'm doing well, thank you. How can I help you today?"
+    if normalized in {"good morning", "good afternoon", "good evening"}:
+        return normalized.capitalize() + "! How can I help you today?"
+    return None
 
 
 def usable_generation_text(text: str | None) -> str:
@@ -621,6 +641,10 @@ class LocalLLMEngine:
 
     def chat(self, messages: list[dict], **gen_kwargs) -> str:
         self._assert_loaded()
+
+        greeting = deterministic_greeting_reply(messages)
+        if greeting is not None:
+            return greeting
 
         if self.tokenizer.inspect().get("chat_tokens_available"):
             max_new = int(gen_kwargs.get("max_new_tokens", 256))
