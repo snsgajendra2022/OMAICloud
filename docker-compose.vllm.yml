@@ -4,18 +4,17 @@ services:
       OM_MODEL_PROVIDER: vllm
       OM_AI_CHAT_BACKEND: vllm
       OM_VLLM_BASE_URL: http://vllm:8000/v1
-      OM_VLLM_MODEL: ${OM_VLLM_MODEL:?Set OM_VLLM_MODEL in .env to the exact model served}
+      OM_VLLM_MODEL: ${OM_VLLM_MODEL:-Qwen/Qwen3-30B-A3B}
       OM_VLLM_API_KEY: ${OM_VLLM_API_KEY:-EMPTY}
     depends_on:
       vllm:
         condition: service_started
 
   vllm:
-    image: vllm/vllm-openai:latest
+    image: vllm/vllm-openai:v0.20.1
     ipc: host
     environment:
       HF_TOKEN: ${HF_TOKEN:-}
-      VLLM_API_KEY: ${OM_VLLM_API_KEY:-EMPTY}
     command:
       - --model
       - ${OM_VLLM_MODEL:?Set OM_VLLM_MODEL in .env to the exact model served}
@@ -23,8 +22,19 @@ services:
       - ${OM_VLLM_MODEL:?Set OM_VLLM_MODEL in .env to the exact model served}
       - --host
       - 0.0.0.0
+      - --api-key
+      - ${OM_VLLM_API_KEY:-EMPTY}
       - --port
       - "8000"
+      - --max-model-len
+      - "32768"
+      - --gpu-memory-utilization
+      - "0.90"
+      - --enable-auto-tool-choice
+      - --tool-call-parser
+      - hermes
+      - --reasoning-parser
+      - qwen3
     expose:
       - "8000"
     volumes:
