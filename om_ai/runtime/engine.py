@@ -281,7 +281,7 @@ def is_degenerate_generation(text: str | None) -> bool:
         # prose is a strong corruption signal.
         alpha_numeric_fragments = sum(
             1 for token in tokens
-            if re.search(r"[A-Za-z]{2,}\\d+[A-Za-z]{2,}", token)
+            if re.search(r"[A-Za-z]{2,}[0-9]+[A-Za-z]{2,}", token)
             or re.search(r"[a-z]{3,}[A-Z][a-z]{2,}", token)
         )
         if (
