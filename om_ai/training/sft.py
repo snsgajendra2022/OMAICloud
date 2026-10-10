@@ -90,10 +90,33 @@ class SFTDataset(Dataset):
                 response_ids.append(tokenizer.assistant_end_id)
             response_ids.append(tokenizer.eos_id)
 
-            ids = (prefix_ids + response_ids)[:max_seq_len]
-# Prefer assistant-only tokens (prompt positions stay -100).
+            # Preserve a supervised assistant target even when the prompt is longer
+            # than the model context. The old implementation truncated the concatenated
+            # sequence from the right, which could remove the entire response; it also
+            # used the original prompt length after truncation, causing valid rows to
+            # receive only -100 labels and contribute no training signal.
+            max_seq_len = int(max_seq_len)
+            if max_seq_len < 2:
+                raise ValueError("SFT max_seq_len must be at least 2")
+
+            # Reserve up to half the context for the completion, so long prompts
+            # cannot crowd the assistant target out of the training window.
+            target_budget = min(len(response_ids), max(1, max_seq_len // 2))
+            target_ids = response_ids[:target_budget]
+            if not target_ids:
+                skipped += 1
+                continue
+
+            # Keep the most recent portion of the chat prefix (usually the user ask).
+            prefix_budget = max_seq_len - len(target_ids)
+            if prefix_budget <= 0:
+                skipped += 1
+                continue
+            prefix_ids = prefix_ids[-prefix_budget:]
+            ids = prefix_ids + target_ids
             labels = build_assistant_only_labels(ids, prompt_len=len(prefix_ids))
 
+            # Fail closed if an example has no assistant tokens after truncation.
             if len(ids) >= 2 and any(v != -100 for v in labels):
                 self.rows.append((ids, labels))
             else:
