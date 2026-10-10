@@ -86,10 +86,12 @@ class SFTDataset(Dataset):
                 add_eos=False,
             )
 
-            response_ids = tokenizer.encode(response)
+            response_content_ids = tokenizer.encode(response)
+            stop_ids = []
             if tokenizer.assistant_end_id is not None:
-                response_ids.append(tokenizer.assistant_end_id)
-            response_ids.append(tokenizer.eos_id)
+                stop_ids.append(tokenizer.assistant_end_id)
+            stop_ids.append(tokenizer.eos_id)
+            response_ids = response_content_ids + stop_ids
 
             # Preserve a supervised assistant target even when the prompt is longer
             # than the model context. The old implementation truncated the concatenated
@@ -100,10 +102,16 @@ class SFTDataset(Dataset):
             if max_seq_len < 2:
                 raise ValueError("SFT max_seq_len must be at least 2")
 
-            # Reserve up to half the context for the completion, so long prompts
-            # cannot crowd the assistant target out of the training window.
-            target_budget = min(len(response_ids), max(1, max_seq_len // 2))
-            target_ids = response_ids[:target_budget]
+            # Reserve up to half the context for the completion, but always retain
+            # assistant-end/EOS markers when a long response is truncated. Without
+            # these stop targets, short-context training teaches the model to continue
+            # indefinitely and can worsen token-soup generations.
+            target_budget = min(len(response_ids), max(2, max_seq_len // 2))
+            if len(response_ids) > target_budget:
+                content_budget = max(0, target_budget - len(stop_ids))
+                target_ids = response_content_ids[:content_budget] + stop_ids
+            else:
+                target_ids = response_ids
             if not target_ids:
                 skipped += 1
                 continue
