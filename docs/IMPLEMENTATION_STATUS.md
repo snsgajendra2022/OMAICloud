@@ -41,17 +41,19 @@ Platform version target: **0.3.0** (`pyproject.toml`, FastAPI `om_ai/api/main.py
 
 A neural network’s learned knowledge is in its weights. Source code implements learning mechanisms; it does not substitute for data, optimization runs, and resulting parameters. See `TRAINING_RUNBOOK.md`, `EXTERNAL_ASSETS_REQUIRED.md`, and `TRAINING_70B.md`.
 
-## Self-hosted vLLM production path (2026-10)
+## Optional vLLM adapter (2026-10)
 
-The configured target architecture now has a separate vLLM adapter:
+The repository contains an optional OpenAI-compatible vLLM adapter for deliberate model comparisons or temporary self-hosted serving. It is **not** OM's native LLM and is not the default in `.env.example`.
 
-- `OM_MODEL_PROVIDER=vllm` / `OM_AI_CHAT_BACKEND=vllm` selects a self-hosted OpenAI-compatible inference server.
-- `OM_VLLM_BASE_URL`, `OM_VLLM_MODEL`, and optional `OM_VLLM_API_KEY` configure the endpoint.
-- The OpenAI-compatible OM API routes chat to that adapter and maps vLLM connection/model errors to HTTP 503.
-- Added `docker-compose.vllm.yml` for a private-network NVIDIA GPU deployment, plus tests for routing, endpoint payloads, and fail-closed behavior.
-- `.env.example` now documents vLLM as the production target and leaves the native OM checkpoint as an optional diagnostic/research path.
+- Native OM is selected by default with `OM_MODEL_PROVIDER=om_native` and `OM_AI_CHAT_BACKEND=om_native`.
+- vLLM can be selected explicitly with `OM_MODEL_PROVIDER=vllm`; it does not change or train OM's own weights.
+- The optional Compose deployment and provider tests are engineering infrastructure, not proof of native model quality.
 
-This is implementation of the serving path—not proof of GPT-5-level capability. No selected model weights, deployment GPU, real inference benchmark, or GPT-5 comparison was supplied or run. Model selection, license review, actual deployment, quality benchmarks, security tests, and load tests remain release gates. See `docs/SELF_HOSTED_LLM_RUNTIME.md`.
+## Native capability reality (release gate)
+
+The native model remains experimental. Previously observed outputs and capability evaluations were poor, so the next work must prioritize config/tokenizer/checkpoint compatibility, repeatable native-only diagnostics, training-data quality, real pretraining/SFT runs, and frozen-checkpoint evaluation. A 20M-parameter checkpoint trained on a small greeting-heavy dataset is not expected to perform like a frontier assistant.
+
+No GPT-5 parity is claimed. Any future capability claim must include reproducible benchmark results, checkpoint and tokenizer hashes, dataset provenance, and the tested hardware.
 
 ## Pretrained provider and dataset/hardware utilities (2026-10)
 
