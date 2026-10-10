@@ -134,7 +134,21 @@ def main() -> int:
             paths[key] = str(candidate.resolve(strict=False))
     if args.device:
         paths["device"] = args.device
-\n    def file_identity(path: str) -> dict:\n        candidate = Path(path)\n        identity = {"path": str(candidate.resolve(strict=False)), "exists": candidate.is_file()}\n        if candidate.is_file():\n            identity["size_bytes"] = candidate.stat().st_size\n            digest = hashlib.sha256()\n            with candidate.open("rb") as stream:\n                for chunk in iter(lambda: stream.read(1024 * 1024), b""):\n                    digest.update(chunk)\n            identity["sha256"] = digest.hexdigest()\n        return identity\n\n    required = ("config", "tokenizer", "checkpoint")\n    missing = [
+
+    def file_identity(path: str) -> dict:
+        candidate = Path(path)
+        identity = {"path": str(candidate.resolve(strict=False)), "exists": candidate.is_file()}
+        if candidate.is_file():
+            identity["size_bytes"] = candidate.stat().st_size
+            digest = hashlib.sha256()
+            with candidate.open("rb") as stream:
+                for chunk in iter(lambda: stream.read(1024 * 1024), b""):
+                    digest.update(chunk)
+            identity["sha256"] = digest.hexdigest()
+        return identity
+
+    required = ("config", "tokenizer", "checkpoint")
+    missing = [
         {"asset": key, "path": paths.get(key)}
         for key in required
         if not paths.get(key) or not Path(paths[key]).is_file()
